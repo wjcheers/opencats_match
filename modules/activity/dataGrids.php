@@ -130,7 +130,7 @@ class ActivityDataGrid extends DataGrid
                                      'pagerWidth'      => 240,
                                      'pagerOptional'   => true,
                                      'alphaNavigation' => true,
-                                     'filterHaving'    => 'notes'),  
+                                     'filter'          => 'activity.notes'),  
                                      
             'Entered By' =>         array(
                                      'pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'enteredByFirstName\'], $rsData[\'enteredByLastName\'], false, LAST_NAME_MAXLEN);',
