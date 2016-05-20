@@ -130,6 +130,7 @@ class ActivityDataGrid extends DataGrid
                                      'pagerWidth'      => 240,
                                      'pagerOptional'   => true,
                                      'alphaNavigation' => true,
+                                     'filterHaving'    => 'notes',
                                      'filter'          => 'activity.notes'),  
                                      
             'Entered By' =>         array(
