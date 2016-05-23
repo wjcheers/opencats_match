@@ -191,20 +191,30 @@ class HomeUI extends UserInterface
         /* Bail out to prevent an error if the GET string doesn't even contain
          * a field named 'quickSearchFor' at all.
          */
-        if (!isset($_GET['quickSearchFor']))
+        if (!isset($_GET['quickSearchFor']) && !isset($_GET['quickSearchMatchFor']))
         {
             CommonErrors::fatal(COMMONERROR_BADFIELDS, $this, 'No query string specified.');
         }
 
-        $query = trim($_GET['quickSearchFor']);
+        $search = new QuickSearch($this->_siteID);
+        $matchKeySkills = false;
+        if(isset($_GET['quickSearchMatchFor']))
+        {
+            $query = trim($_GET['quickSearchMatchFor']);
+            $jobOrdersKeySkillsRS  = $search->jobOrdersKeySkills($query);       
+            $matchKeySkills = true;
+        }
+        else
+        {
+            $query = trim($_GET['quickSearchFor']);   
+            $candidatesRS = $search->candidates($query);
+            $companiesRS  = $search->companies($query);
+            $contactsRS   = $search->contacts($query);
+            $jobOrdersRS  = $search->jobOrders($query);
+        }
         $wildCardQuickSearch = $query;
 
         $search = new QuickSearch($this->_siteID);
-        $candidatesRS = $search->candidates($query);
-        $companiesRS  = $search->companies($query);
-        $contactsRS   = $search->contacts($query);
-        $jobOrdersRS  = $search->jobOrders($query);
-        //$listsRS      = $search->lists($query);
 
         if (!empty($candidatesRS))
         {
@@ -362,11 +372,67 @@ class HomeUI extends UserInterface
             }
         }
 
+        if (!empty($jobOrdersKeySkillsRS))
+        {
+            foreach ($jobOrdersKeySkillsRS as $rowIndex => $row)
+            {
+                if ($jobOrdersKeySkillsRS[$rowIndex]['startDate'] == '00-00-00')
+                {
+                    $jobOrdersKeySkillsRS[$rowIndex]['startDate'] = '';
+                }
+
+                if ($jobOrdersKeySkillsRS[$rowIndex]['isHot'] == 1)
+                {
+                    $jobOrdersKeySkillsRS[$rowIndex]['linkClass'] = 'jobLinkHot';
+                }
+                else
+                {
+                    $jobOrdersKeySkillsRS[$rowIndex]['linkClass'] = 'jobLinkCold';
+                }
+
+                if (!empty($jobOrdersKeySkillsRS[$rowIndex]['recruiterAbbrName']))
+                {
+                    $jobOrdersKeySkillsRS[$rowIndex]['recruiterAbbrName'] = StringUtility::makeInitialName(
+                        $jobOrdersKeySkillsRS[$rowIndex]['recruiterFirstName'],
+                        $jobOrdersKeySkillsRS[$rowIndex]['recruiterLastName'],
+                        false,
+                        LAST_NAME_MAXLEN
+                    );
+                }
+                else
+                {
+                    $jobOrdersKeySkillsRS[$rowIndex]['recruiterAbbrName'] = 'None';
+                }
+
+                if (!empty($jobOrdersKeySkillsRS[$rowIndex]['ownerFirstName']))
+                {
+                    $jobOrdersKeySkillsRS[$rowIndex]['ownerAbbrName'] = StringUtility::makeInitialName(
+                        $jobOrdersKeySkillsRS[$rowIndex]['ownerFirstName'],
+                        $jobOrdersKeySkillsRS[$rowIndex]['ownerLastName'],
+                        false,
+                        LAST_NAME_MAXLEN
+                    );
+                }
+                else
+                {
+                    $jobOrdersKeySkillsRS[$rowIndex]['ownerAbbrName'] = 'None';
+                }
+            }
+        }
+
         $this->_template->assign('active', $this);
-        $this->_template->assign('jobOrdersRS', $jobOrdersRS);
-        $this->_template->assign('candidatesRS', $candidatesRS);
-        $this->_template->assign('companiesRS', $companiesRS);
-        $this->_template->assign('contactsRS', $contactsRS);
+        $this->_template->assign('matchKeySkills', $matchKeySkills);
+        if ($matchKeySkills)
+        {
+            $this->_template->assign('jobOrdersKeySkillsRS', $jobOrdersKeySkillsRS);            
+        }
+        else
+        {
+            $this->_template->assign('jobOrdersRS', $jobOrdersRS);
+            $this->_template->assign('candidatesRS', $candidatesRS);
+            $this->_template->assign('companiesRS', $companiesRS);
+            $this->_template->assign('contactsRS', $contactsRS);            
+        }
         //$this->_template->assign('listsRS', $listsRS);
         $this->_template->assign('wildCardQuickSearch', $wildCardQuickSearch);
 

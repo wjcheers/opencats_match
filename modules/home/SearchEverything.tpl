@@ -15,6 +15,58 @@
             </table>
             <br />
 
+            <?php if ($this->matchKeySkills): ?>
+            
+            <!-- JO KeySkills-->
+            <p class="note">Job Orders Key Skills Matched</p>
+            <?php if (!empty($this->jobOrdersKeySkillsRS)): ?>
+                <table class="sortable" width="100%">
+                    <tr>
+                        <th align="left">Title</th>
+                        <th align="left">Company</th>
+                        <th align="left">Type</th>
+                        <th align="left">Status</th>
+                        <th align="left">Key Skills</th>
+                        <th align="left">Recruiter</th>
+                        <th align="left">Owner</th>
+                        <th align="left">Created</th>
+                        <th align="left">Modified</th>
+
+                    </tr>
+
+                    <?php foreach ($this->jobOrdersKeySkillsRS as $rowNumber => $jobOrdersData): ?>
+                        <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
+                            <td valign="top">
+                                <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=show&amp;jobOrderID=<?php $this->_($jobOrdersData['jobOrderID']) ?>" class="<?php $this->_($jobOrdersData['linkClass']) ?>">
+                                    <?php $this->_($jobOrdersData['title']) ?>
+                                </a>
+                            </td>
+                            <td valign="top">
+                                <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=show&amp;companyID=<?php $this->_($jobOrdersData['companyID']) ?>">
+                                    <?php $this->_($jobOrdersData['companyName']) ?>
+                                </a>
+                            </td>
+                            <td valign="top"><?php $this->_($jobOrdersData['type']) ?></td>
+                            <td valign="top"><?php $this->_($jobOrdersData['status']) ?></td>
+                            <td valign="top"><?php $this->_($jobOrdersData['keySkills']) ?></td>
+                            <td valign="top"><?php $this->_($jobOrdersData['recruiterAbbrName']) ?></td>
+                            <td valign="top"><?php $this->_($jobOrdersData['ownerAbbrName']) ?></td>
+                            <td valign="top"><?php $this->_($jobOrdersData['dateCreated']) ?></td>
+                            <td valign="top"><?php $this->_($jobOrdersData['dateModified']) ?></td>
+
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            <?php else: ?>
+                <p>No matching entries found.</p>
+            <?php endif; ?>
+            <br />
+            <!-- /JO KeySkills-->
+            
+            
+            <?php else: ?>
+            <! -- matchKeySkills -->
+            
             <!-- JO -->
             <p class="note">Job Orders Results</p>
             <?php if (!empty($this->jobOrdersRS)): ?>
@@ -60,6 +112,9 @@
             <?php endif; ?>
             <br />
             <!-- /JO -->
+
+            
+
 
             <!-- Candidates -->
             <p class="note">Candidates Results</p>
@@ -180,6 +235,11 @@
                 <p>No matching entries found.</p>
             <?php endif; ?>
             <!-- /Contacts -->
+            
+            
+            <?php endif; ?>
+            <!-- /matchKeySkills -->
+
         </div>
     </div>
     <div id="bottomShadow"></div>

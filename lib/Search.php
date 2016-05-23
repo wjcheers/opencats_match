@@ -1554,7 +1554,134 @@ class QuickSearch
 
         return $this->_db->getAllAssoc($sql);
     }
+
+    public function jobOrdersKeySkills($wildCardString)
+    {
+        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = $this->_db->makeQueryString($wildCardString);
+
+        $sql = sprintf(
+            "SELECT
+                extra_field.field_name AS fieldName,
+                extra_field.data_item_id AS jobOrderID,
+                extra_field.data_item_type AS dataItemType,
+                extra_field.value AS value
+            FROM
+                extra_field
+            WHERE
+            (
+                extra_field.field_name LIKE 'Key Skills'
+                AND extra_field.data_item_type LIKE '400'
+            )
+            AND
+                extra_field.site_id = %s
+            ORDER BY
+                value ASC",
+            $this->_siteID
+        );
+
+        if (!eval(Hooks::get('JO_SEARCH_SQL'))) return;
+        if (!eval(Hooks::get('JO_SEARCH_BY_EVERYTHING'))) return;
+
+        $extraRS = $this->_db->getAllAssoc($sql);
+
+        $jobOrderIDs = array();
+                
+        foreach ($extraRS as $rowIndex => $row)
+        {
+            if (!empty($extraRS[$rowIndex]['value']))
+            {
+                $keySkill = $extraRS[$rowIndex]['value'];
+                $keySkills = explode(',', $keySkill);
+                $allMatch = true;
+                
+                foreach ($keySkills as $keySkill)
+                {
+                    $keySkill = trim($keySkill);
+                    
+                    if (stripos($wildCardString, $keySkill) === false) {
+                        $allMatch = false;
+                        continue;
+                    }
+                }
+                if($allMatch == true)
+                {
+                    $jobOrderIDs[] = $extraRS[$rowIndex]['jobOrderID'];
+                }
+            }
+        }
+
+        if (empty($jobOrderIDs))
+        {
+            return '';
+        }
+        
+        $sql_in = '(' . implode($jobOrderIDs, ', ') . ')';
+        
+        $sql = sprintf(
+            "SELECT
+                company.company_id AS companyID,
+                company.name AS companyName,
+                extra_field.value AS keySkills,
+                joborder.joborder_id AS jobOrderID,
+                joborder.title AS title,
+                joborder.type AS type,
+                joborder.is_hot AS isHot,
+                joborder.duration AS duration,
+                joborder.rate_max AS maxRate,
+                joborder.salary AS salary,
+                joborder.status AS status,
+                joborder.city AS city,
+                joborder.state AS state,
+                recruiter_user.first_name AS recruiterFirstName,
+                recruiter_user.last_name AS recruiterLastName,
+                owner_user.first_name AS ownerFirstName,
+                owner_user.last_name AS ownerLastName,
+                DATE_FORMAT(
+                    joborder.start_date, '%%m-%%d-%%y'
+                ) AS startDate,
+                DATE_FORMAT(
+                    joborder.date_created, '%%m-%%d-%%y'
+                ) AS dateCreated,
+                DATE_FORMAT(
+                    joborder.date_modified, '%%m-%%d-%%y'
+                ) AS dateModified
+            FROM
+                joborder
+            LEFT JOIN company
+                ON joborder.company_id = company.company_id
+            LEFT JOIN extra_field
+                ON extra_field.data_item_id = joborder.joborder_id
+            LEFT JOIN user AS recruiter_user
+                ON joborder.recruiter = recruiter_user.user_id
+            LEFT JOIN user AS owner_user
+                ON joborder.owner = owner_user.user_id
+            WHERE
+                joborder.joborder_id in %s
+            AND
+                extra_field.field_name LIKE 'Key Skills'
+            AND
+                extra_field.data_item_type LIKE '400'
+            AND
+                joborder.is_admin_hidden = 0
+            AND
+                joborder.site_id = %s
+            AND
+                company.site_id = %s
+            ORDER BY
+                name ASC",
+            $sql_in,
+            $this->_siteID,
+            $this->_siteID
+        );
+
+        if (!eval(Hooks::get('JO_SEARCH_SQL'))) return;
+        if (!eval(Hooks::get('JO_SEARCH_BY_EVERYTHING'))) return;
+
+        return $this->_db->getAllAssoc($sql);
+    }
 }
+
 
 /**
  *	Saved Searches Library

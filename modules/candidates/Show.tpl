@@ -150,7 +150,19 @@
 
                             <tr>
                                 <td class="vertical">Key Skills:</td>
-                                <td class="data"><?php $this->_($this->data['keySkills']); ?></td>
+                                <td class="data"><?php $this->_($this->data['keySkills']); ?>
+                                
+                                <form id="quickSearchMatchForm" action="index.php" method="get" onsubmit="return checkQuickSearchForm(document.quickSearchMatchForm);">
+
+                                <input type="hidden" name="m" value="home" />
+                                <input type="hidden" name="a" value="quickSearch" />
+                                
+                                <input name="quickSearchMatchFor" id="quickSearchMatchFor" type="hidden" value="<?php $this->_($this->data['keySkills']); ?>" />
+                                
+                                <input type="submit" name="quickSearch" class="button" value="Match" />
+                                </form>
+                                
+                                </td>
                             </tr>
 
                             <tr>

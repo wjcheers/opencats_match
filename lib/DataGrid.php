@@ -1283,7 +1283,6 @@ class DataGrid
                     if (count($whereSQL_or) > 0)
                     {
                         $whereSQL[] = '(' . implode(' AND ', $whereSQL_or) . ')';
-                        echo "whereSQL[]" . $whereSQL . "<br>";          
                     }
                     if (count($havingSQL_or) > 0)
                     {

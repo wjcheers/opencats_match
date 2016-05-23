@@ -825,9 +825,10 @@ function removeEvent(obj, type, fn, useCapture)
 function checkQuickSearchForm(form)
 {
     var fieldValue = document.getElementById('quickSearchFor').value;
+    var fieldMatchValue = document.getElementById('quickSearchMatchFor').value;
     var fieldLabel = document.getElementById('quickSearchLabel');
 
-    if (fieldValue == '')
+    if (fieldValue == '' && fieldMatchValue == '')
     {
         fieldLabel.style.color = '#ff0000';
         return false;
