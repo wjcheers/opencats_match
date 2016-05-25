@@ -113,9 +113,6 @@
             <br />
             <!-- /JO -->
 
-            
-
-
             <!-- Candidates -->
             <p class="note">Candidates Results</p>
             <?php if (!empty($this->candidatesRS)): ?>
@@ -123,7 +120,8 @@
                     <tr>
                         <th align="left" nowrap="nowrap">First Name</th>
                         <th align="left" nowrap="nowrap">Last Name</th>
-                        <th align="left" width="255">Key Skills</th>
+                        <th align="left" nowrap="nowrap">Chinese Name</th>
+                        <th align="left" width="510">Key Skills</th>
                         <th align="left" width="65">Owner</th>
                         <th align="left" width="60">Created</th>
                         <th align="left" width="60">Modified</th>
@@ -139,6 +137,11 @@
                             <td>
                                 <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($candidatesData['candidateID']) ?>">
                                     <?php $this->_($candidatesData['lastName']) ?>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($candidatesData['candidateID']) ?>">
+                                    <?php $this->_($candidatesData['chineseName']) ?>
                                 </a>
                             </td>
                             <td valign="top" align="left"><?php $this->_($candidatesData['keySkills']); ?></td>

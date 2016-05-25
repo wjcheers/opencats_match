@@ -1245,14 +1245,18 @@ class QuickSearch
      */
     public function candidates($wildCardString)
     {
+        $wildCardStringChineseName = $wildCardString;
         $wildCardString = str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
+        $wildCardStringChineseName = '%' . str_replace('*', '%', $wildCardStringChineseName) . '%';
+        $wildCardStringChineseName = $this->_db->makeQueryString($wildCardStringChineseName);
 
         $sql = sprintf(
             "SELECT
                 candidate.candidate_id AS candidateID,
                 candidate.first_name AS firstName,
                 candidate.last_name AS lastName,
+                extra_field_data.value AS chineseName,
                 candidate.phone_home AS phoneHome,
                 candidate.phone_cell AS phoneCell,
                 candidate.phone_cell AS phoneWork,
@@ -1270,6 +1274,10 @@ class QuickSearch
                 candidate
             LEFT JOIN user AS owner_user
                 ON candidate.owner = owner_user.user_id
+            LEFT JOIN extra_field AS extra_field_data
+                ON extra_field_data.data_item_id = candidate.candidate_id
+                AND extra_field_data.field_name = 'Chinese Name'
+                AND extra_field_data.data_item_type = '100'
             WHERE
             (
                 CONCAT(candidate.first_name, ' ', candidate.last_name) LIKE %s
@@ -1318,6 +1326,7 @@ class QuickSearch
 							'.', ''),
 						')', ''),
 					'(', '')
+                OR extra_field_data.value LIKE %s
             )
             AND
                 candidate.site_id = %s
@@ -1334,6 +1343,7 @@ class QuickSearch
             $wildCardString,
             $wildCardString,
             $wildCardString,
+            $wildCardStringChineseName,
             $this->_siteID
         );
 
@@ -1593,18 +1603,19 @@ class QuickSearch
             {
                 $keySkill = $extraRS[$rowIndex]['value'];
                 $keySkills = explode(',', $keySkill);
-                $allMatch = true;
+                $matchCnt = 0;
+                $totalCnt = count($keySkills);
                 
                 foreach ($keySkills as $keySkill)
                 {
                     $keySkill = trim($keySkill);
                     
                     if (stripos($wildCardString, $keySkill) === false) {
-                        $allMatch = false;
                         continue;
                     }
+                    $matchCnt++;
                 }
-                if($allMatch == true)
+                if($totalCnt == $matchCnt)
                 {
                     $jobOrderIDs[] = $extraRS[$rowIndex]['jobOrderID'];
                 }
