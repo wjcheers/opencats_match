@@ -594,6 +594,9 @@ function AS_onRegardingChange(statusesArray, jobOrdersArray, regardingSelectID,
         regardingSelectList.selectedIndex
     ].value;
 
+    document.getElementById('triggerValidSpan').style.display = 'none';
+    document.getElementById('triggerValid').checked = false;
+    
     if (regardingID != '-1')
     {
         changeStatus.disabled = false;
@@ -658,6 +661,14 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
     var triggerEmail = document.getElementById(triggerEmailID);
     var emailIsDisabled = document.getElementById(emailIsDisabledID);
 
+    document.getElementById('triggerValidSpan').style.display = 'none';
+    document.getElementById('triggerValid').checked = false;
+    
+    if(statusSelectList[statusSelectList.selectedIndex].text == 'Qualifying')
+    {
+        document.getElementById('triggerValidSpan').style.display = 'inline';
+    }
+    
     if (regardingIDOverride == null)
     {
         var regardingID = regardingSelectList[

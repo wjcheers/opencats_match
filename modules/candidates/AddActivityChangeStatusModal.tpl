@@ -97,6 +97,7 @@
                         </select>
                         <span id="changeStatusSpanB" style="color: #aaaaaa;">&nbsp;*</span>&nbsp;&nbsp;
                         <span id="triggerEmailSpan" style="display: none;"><input type="checkbox" name="triggerEmail" id="triggerEmail" onclick="AS_onSendEmailChange('triggerEmail', 'sendEmailCheckTR', 'visibleTR');" />Send E-Mail Notification to Candidate</span>
+                        <br><span id="triggerValidSpan" style="display: none;"><input type="checkbox" name="triggerValid" id="triggerValid" /><b>Already checked the Effective Recommendation *<br>Never applied a job of this company or applied more than 1 year</b></span>
                     </div>
                 </td>
             </tr>
