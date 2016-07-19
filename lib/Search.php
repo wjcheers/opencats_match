@@ -1262,6 +1262,7 @@ class QuickSearch
                 candidate.phone_cell AS phoneWork,
                 candidate.key_skills AS keySkills,
                 candidate.email1 AS email1,
+                candidate.email2 AS email2,
                 owner_user.first_name AS ownerFirstName,
                 owner_user.last_name AS ownerLastName,
                 DATE_FORMAT(
@@ -1284,6 +1285,7 @@ class QuickSearch
                 OR CONCAT(candidate.last_name, ' ', candidate.first_name) LIKE %s
                 OR CONCAT(candidate.last_name, ', ', candidate.first_name) LIKE %s
                 OR candidate.email1 LIKE %s
+                OR candidate.email2 LIKE %s
                 OR REPLACE(
                     REPLACE(
                         REPLACE(
@@ -1336,6 +1338,7 @@ class QuickSearch
                 candidate.date_modified DESC,
                 candidate.first_name ASC,
                 candidate.last_name ASC",
+            $wildCardString,
             $wildCardString,
             $wildCardString,
             $wildCardString,
