@@ -686,7 +686,8 @@ class Statistics
 
     public function getPeriodJobOrderReport($jobOrderID, $period)
     {
-        $criterion = $this->makePeriodCriterion('candidate_joborder.date_created', $period);
+        $criterion_candidate_joborder_date_created = $this->makePeriodCriterion('candidate_joborder.date_created', $period);
+        $criterion_date = $this->makePeriodCriterion('date', $period);
         
         $sql = sprintf(
             "SELECT
@@ -711,12 +712,10 @@ class Statistics
                         COUNT(*)
                     FROM
                         candidate_joborder
-					LEFT JOIN joborder
-						ON joborder.joborder_id = candidate_joborder.joborder_id
                     WHERE
-                        joborder.joborder_id = %s
+                        candidate_joborder.joborder_id = %s
                     AND
-                        joborder.site_id = %s
+                        candidate_joborder.site_id = %s
                     %s
                 ) AS pipeline,
                 (
@@ -778,19 +777,19 @@ class Statistics
                 joborder.joborder_id",
             $this->_db->makeQueryInteger($jobOrderID),
             $this->_siteID,
-            $criterion,
+            $criterion_candidate_joborder_date_created,
             $this->_db->makeQueryInteger($jobOrderID),
             PIPELINE_STATUS_SUBMITTED,
             $this->_siteID,
-            $criterion,
+            $criterion_date,
             $this->_db->makeQueryInteger($jobOrderID),
             PIPELINE_STATUS_PLACED,
             $this->_siteID,
-            $criterion,
+            $criterion_date,
             $this->_db->makeQueryInteger($jobOrderID),
             PIPELINE_STATUS_INTERVIEWING,
             $this->_siteID,
-            $criterion,
+            $criterion_date,
             $this->_db->makeQueryInteger($jobOrderID),
             $this->_siteID
         );
