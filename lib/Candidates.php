@@ -1146,6 +1146,7 @@ class CandidatesDataGrid extends DataGrid
                                      'pagerNoTitle' => true,
                                      'sizable'  => false,
                                      'exportable' => false,
+                                     'filter'         => 'candidate_joborder_submitted.candidate_joborder_id',
                                      'filterable' => '===~'),
 
             'First Name' =>     array('select'         => 'candidate.first_name AS firstName',
