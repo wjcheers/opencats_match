@@ -683,6 +683,121 @@ class Statistics
         return $this->_db->getAssoc($sql);
     }
     
+
+    public function getLastMonthJobOrderReport($jobOrderID)
+    {
+        $criterion = $this->makePeriodCriterion('candidate_joborder.date_created', TIME_PERIOD_LASTMONTH);
+        
+        $sql = sprintf(
+            "SELECT
+                joborder.joborder_id AS jobOrderID,
+                joborder.company_id AS companyID,
+                company.name AS companyName,
+                joborder.client_job_id AS clientJobID,
+                joborder.title AS title,
+                joborder.city AS city,
+                joborder.state AS state,
+                CONCAT(
+                    recruiter_user.first_name, ' ', recruiter_user.last_name
+                ) AS recruiterFullName,
+                CONCAT(
+                    owner_user.first_name, ' ', owner_user.last_name
+                ) AS ownerFullName,
+                DATE_FORMAT(
+                    joborder.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateCreated,
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        candidate_joborder
+					LEFT JOIN joborder
+						ON joborder.joborder_id = candidate_joborder.joborder_id
+                    WHERE
+                        joborder.joborder_id = %s
+                    AND
+                        joborder.site_id = %s
+                    %s
+                ) AS pipeline,
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        candidate_joborder_status_history
+                    WHERE
+                        joborder_id = %s
+                    AND
+                        status_to = %s
+                    AND
+                        site_id = %s
+                    %s
+                ) AS submitted,
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        candidate_joborder_status_history
+                    WHERE
+                        joborder_id = %s
+                    AND
+                        status_to = %s
+                    AND
+                        site_id = %s
+                    %s
+                ) AS pipelinePlaced,
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        candidate_joborder_status_history
+                    WHERE
+                        joborder_id = %s
+                    AND
+                        status_to = %s
+                    AND
+                        site_id = %s
+                    %s
+                ) AS pipelineInterving
+            FROM
+                joborder
+            LEFT JOIN company
+                ON joborder.company_id = company.company_id
+            LEFT JOIN user AS recruiter_user
+                ON joborder.recruiter = recruiter_user.user_id
+            LEFT JOIN user AS owner_user
+                ON joborder.owner = owner_user.user_id
+            LEFT JOIN user AS entered_by_user
+                ON joborder.entered_by = entered_by_user.user_id
+            LEFT JOIN candidate_joborder
+                ON joborder.joborder_id = candidate_joborder.joborder_id
+            WHERE
+                joborder.joborder_id = %s
+            AND
+                joborder.site_id = %s
+            GROUP BY
+                joborder.joborder_id",
+            $this->_db->makeQueryInteger($jobOrderID),
+            $this->_siteID,
+            $criterion,
+            $this->_db->makeQueryInteger($jobOrderID),
+            PIPELINE_STATUS_SUBMITTED,
+            $this->_siteID,
+            $criterion,
+            $this->_db->makeQueryInteger($jobOrderID),
+            PIPELINE_STATUS_PLACED,
+            $this->_siteID,
+            $criterion,
+            $this->_db->makeQueryInteger($jobOrderID),
+            PIPELINE_STATUS_INTERVIEWING,
+            $this->_siteID,
+            $criterion,
+            $this->_db->makeQueryInteger($jobOrderID),
+            $this->_siteID
+        );
+
+        return $this->_db->getAssoc($sql);
+    }
+    
     public function getEEOReport($modePeriod, $modeStatus)
     {
         switch ($modePeriod)

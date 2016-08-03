@@ -360,6 +360,7 @@ class ReportsUI extends UserInterface
 
         $statistics = new Statistics($this->_siteID);
         $data = $statistics->getJobOrderReport($jobOrderID);
+        $dataLastMonth = $statistics->getLastMonthJobOrderReport($jobOrderID);
 
         /* Bail out if we got an empty result set. */
         if (empty($data))
@@ -389,6 +390,18 @@ class ReportsUI extends UserInterface
             $reportParameters['dataSet3'],
             $reportParameters['dataSet2'],
             $reportParameters['dataSet1']
+        );
+
+        $reportParameters['dataSetLastMonth1'] = $dataLastMonth['pipeline'];
+        $reportParameters['dataSetLastMonth2'] = $dataLastMonth['submitted'];
+        $reportParameters['dataSetLastMonth3'] = $dataLastMonth['pipelineInterving'];
+        $reportParameters['dataSetLastMonth4'] = $dataLastMonth['pipelinePlaced'];
+
+        $dataSetLastMonth = array(
+            $reportParameters['dataSetLastMonth4'],
+            $reportParameters['dataSetLastMonth3'],
+            $reportParameters['dataSetLastMonth2'],
+            $reportParameters['dataSetLastMonth1']
         );
 
         $this->_template->assign('reportParameters', $reportParameters);
