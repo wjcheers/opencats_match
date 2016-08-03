@@ -128,6 +128,62 @@
                 </table>
 
                 <table class="editTable" width="700">
+                    <input type="hidden" name="dataSetThisMonth" id="dataSetThisMonth" value="0,0,0,0">
+                    <script type="text/javascript">
+                        function setDataSet()
+                        {
+                            document.getElementById('dataSetThisMonth').value =
+                                document.getElementById('dataSetThisMonth1').value + ',' +
+                                document.getElementById('dataSetThisMonth2').value + ',' +
+                                document.getElementById('dataSetThisMonth3').value + ',' +
+                                document.getElementById('dataSetThisMonth4').value;
+                        }
+                    </script>
+
+                    <tr>
+                        <td class="tdVertical" style="width: 140px;">
+                            <label id="dataSetThisMonthLabel"for="dataSetThisMonth">This Month:</label>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td class="tdVertical" style="width: 140px;">
+                            <label id="dataSetThisMonth1Label"for="dataSetThisMonth1">Candidates Screened:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" name="dataSetThisMonth1" id="dataSetThisMonth1" value="<?php $this->_($this->reportParameters['dataSetThisMonth1']); ?>" style="width: 75px;" onchange="setDataSet();" />&nbsp;*
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="dataSetThisMonth2Label"for="dataSetThisMonth2">Candidates Submitted:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" name="dataSetThisMonth2" id="dataSetThisMonth2" value="<?php $this->_($this->reportParameters['dataSetThisMonth2']); ?>" style="width: 75px;" onchange="setDataSet();" />&nbsp;*
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="dataSetThisMonth3Label"for="dataSetThisMonth3">Candidates Interviewed:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" name="dataSetThisMonth3" id="dataSetThisMonth3" value="<?php $this->_($this->reportParameters['dataSetThisMonth3']); ?>" style="width: 75px;" onchange="setDataSet();" />&nbsp;*
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="dataSetThisMonth4Label"for="dataSetThisMonth4">Candidates Placed:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" name="dataSetThisMonth4" id="dataSetThisMonth4" value="<?php $this->_($this->reportParameters['dataSetThisMonth4']); ?>" style="width: 75px;" onchange="setDataSet();" />&nbsp;*
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="editTable" width="700">
                     <input type="hidden" name="dataSetLastMonth" id="dataSetLastMonth" value="0,0,0,0">
                     <script type="text/javascript">
                         function setDataSet()

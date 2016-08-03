@@ -684,9 +684,9 @@ class Statistics
     }
     
 
-    public function getLastMonthJobOrderReport($jobOrderID)
+    public function getPeriodJobOrderReport($jobOrderID, $period)
     {
-        $criterion = $this->makePeriodCriterion('candidate_joborder.date_created', TIME_PERIOD_LASTMONTH);
+        $criterion = $this->makePeriodCriterion('candidate_joborder.date_created', $period);
         
         $sql = sprintf(
             "SELECT
