@@ -1146,7 +1146,7 @@ class CandidatesDataGrid extends DataGrid
                                      'pagerNoTitle' => true,
                                      'sizable'  => false,
                                      'exportable' => false,
-                                     'filterable' => false),
+                                     'filterable' => '===~'),
 
             'First Name' =>     array('select'         => 'candidate.first_name AS firstName',
                                       'pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'firstName\']).\'</a>\';',
