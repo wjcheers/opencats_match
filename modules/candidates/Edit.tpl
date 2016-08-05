@@ -21,7 +21,7 @@
                 <input type="hidden" name="postback" id="postback" value="postback" />
                 <input type="hidden" id="candidateID" name="candidateID" value="<?php $this->_($this->data['candidateID']); ?>" />
 
-                <table class="editTable" width="700">
+                <table class="editTable" width="1000">
                     <tr>
                         <td class="tdVertical" valign="top" style="height: 28px;">
                             <label id="isHotLabel" for="isHot">Active:</label>
@@ -228,16 +228,16 @@
                
                 <?php if($this->EEOSettingsRS['enabled'] == 1): ?>
                     <?php if(!$this->EEOSettingsRS['canSeeEEOInfo']): ?>
-                        <table class="editTable" width="700">
+                        <table class="editTable" width="1000">
                             <tr>
                                 <td>
                                     Editing EEO data is disabled.
                                 </td>
                             </tr>
                         </tr>
-                        <table class="editTable" width="700" style="display:none;">
+                        <table class="editTable" width="1000" style="display:none;">
                     <?php else: ?>
-                        <table class="editTable" width="700">
+                        <table class="editTable" width="1000">
                     <?php endif; ?>               
 
                          <?php if ($this->EEOSettingsRS['genderTracking'] == 1): ?>
@@ -304,7 +304,7 @@
                     </table>
                 <?php endif; ?>
 
-                <table class="editTable" width="700">
+                <table class="editTable" width="1000">
                     
                     <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
                         <tr>
@@ -374,7 +374,7 @@
                             <label id="keySkillsLabel" for="keySkills">Key Skills:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="keySkills" name="keySkills" value="<?php $this->_($this->data['keySkills']); ?>" style="width: 400px;" />
+                            <input type="text" class="inputbox" id="keySkills" name="keySkills" value="<?php $this->_($this->data['keySkills']); ?>" style="width: 700px;" />
                         </td>
                     </tr>
 
@@ -383,7 +383,7 @@
                             <label id="notesLabel" for="notes">Misc. Notes:</label>
                         </td>
                         <td class="tdData">
-                            <textarea class="inputbox" id="notes" name="notes" rows="5" style="width: 400px;"><?php $this->_($this->data['notes']); ?></textarea>
+                            <textarea class="inputbox" id="notes" name="notes" rows="5" style="width: 700px; height: 400px"><?php $this->_($this->data['notes']); ?></textarea>
                         </td>
                     </tr>
                 </table>
