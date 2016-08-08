@@ -1246,6 +1246,8 @@ class QuickSearch
     public function candidates($wildCardString)
     {
         $wildCardStringChineseName = $wildCardString;
+        $wildCardString = str_replace('-', '%', $wildCardString);
+        $wildCardString = str_replace('_', '%', $wildCardString);
         $wildCardString = str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
         $wildCardStringChineseName = '%' . str_replace('*', '%', $wildCardStringChineseName) . '%';
