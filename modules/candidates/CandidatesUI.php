@@ -2739,9 +2739,88 @@ class CandidatesUI extends UserInterface
                     );
                 }
             }
+            
+            $activityEntries = new ActivityEntries($this->_siteID);
+            
+            /* Notify candidate owner & joborder recruiter */
+            if ($activityTypeID == ACTIVITY_ARRANGE)
+            {
+                $activityUsers = $activityEntries->getUser($candidateID, $regardingID);
+                
+                if (!empty($activityUsers))
+                {
+                    $activityUsers = $activityUsers[0];
+                }
+                        
+                if(!empty($activityUsers) &&
+                   !empty($activityUsers['jobOrderRecruiterEmail']) &&
+                   !empty($activityUsers['candidateOwnerEmail']) &&
+                   $activityUsers['jobOrderRecruiterEmail'] != '' &&
+                   $activityUsers['candidateOwnerEmail'] != '')
+                {                
+                    /* Get the change status email template. */
+                    $emailTemplates = new EmailTemplates($this->_siteID);
+                    $statusChangeTemplateRS = $emailTemplates->getByTag(
+                        'EMAIL_TEMPLATE_ARRANGEMENT'
+                    );
+                    
+                    if (empty($statusChangeTemplateRS) ||
+                        empty($statusChangeTemplateRS['textReplaced']))
+                    {
+                        $statusChangeTemplate = '';
+                    }
+                    else
+                    {
+                        $statusChangeTemplate = $statusChangeTemplateRS['textReplaced'];
+                    }
+                    
+                    /* Replace e-mail template variables. */
+                    $stringsToFind = array(
+                        '%CANDOWNER%',
+                        '%CANDFIRSTNAME%',
+                        '%CANDFULLNAME%',
+                        '%CANDCATSURL%',
+                        '%JBODCATSURL%',
+                        '%MESSAGE%'
+                    );
+                    $replacementStrings = array(
+                        $activityUsers['candidateOwnerFirstName'] . ' ' . $activityUsers['candidateOwnerLastName'],
+                        $activityUsers['candidateFirstName'],
+                        $activityUsers['candidateFirstName'] . ' ' . $activityUsers['candidateLastName'],
+                        '<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=candidates&amp;a=show&amp;candidateID=' . $candidateID . '">'.
+                            'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=candidates&amp;a=show&amp;candidateID=' . $candidateID . '</a>',
+                        '<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $regardingID . '">'.
+                            'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $regardingID . '</a>',
+                        $activityNote
+                    );
+                    
+                    $statusChangeTemplate = str_replace(
+                        $stringsToFind,
+                        $replacementStrings,
+                        $statusChangeTemplate
+                    );
+
+                    $email = $statusChangeTemplate;// . '<br><br><p>' . $activityNote . '</p>';
+                    
+                    /* Send e-mail notification. */
+                    //FIXME: Make subject configurable.
+                    $mailer = new Mailer($this->_siteID);
+                    $mailerStatus = $mailer->sendToMany(
+                        array(array($activityUsers['candidateOwnerEmail'], ''), array($activityUsers['jobOrderRecruiterEmail'], '')),
+                        'CATS Notification: Arrangement - ' . $activityUsers['candidateFirstName'] . ' ' . $activityUsers['candidateLastName']
+                        . ' (' . $activityUsers['candidateOwnerFirstName'] . ' ' . $activityUsers['candidateOwnerLastName'] . ')',
+                        $email,
+                        true);
+                }
+                else
+                {
+                    $notificationHTML .= '<p><span class="bold" style="color: #ff0000;">Error: An e-mail notification'
+                        . ' could not be sent to the candidate owner and job order recruiter'
+                        . ' because the owner/recruiter does not have a valid e-mail address.</span></p>';
+                }
+            }
 
             /* Add the activity entry. */
-            $activityEntries = new ActivityEntries($this->_siteID);
             $activityID = $activityEntries->add(
                 $candidateID,
                 DATA_ITEM_CANDIDATE,
@@ -2818,33 +2897,33 @@ class CandidatesUI extends UserInterface
                 if (empty($data['candidateEmail']))
                 {
                     $email = '';
-                    $notificationHTML = '<p><span class="bold">Error:</span> An e-mail notification'
+                    $notificationHTML .= '<p><span class="bold">Error:</span> An e-mail notification'
                         . ' could not be sent to the candidate because the candidate'
                         . ' does not have a valid e-mail address.</p>';
                 }
                 else if (empty($customMessage))
                 {
                     $email = '';
-                    $notificationHTML = '<p><span class="bold">Error:</span> An e-mail notification'
+                    $notificationHTML .= '<p><span class="bold">Error:</span> An e-mail notification'
                         . ' will not be sent because the message text specified was blank.</p>';
                 }
                 else if ($this->_accessLevel == ACCESS_LEVEL_DEMO)
                 {
                     $email = '';
-                    $notificationHTML = '<p><span class="bold">Error:</span> Demo users can not send'
+                    $notificationHTML .= '<p><span class="bold">Error:</span> Demo users can not send'
                         . ' E-Mails.  No E-Mail was sent.</p>';
                 }
                 else
                 {
                     $email = $data['candidateEmail'];
-                    $notificationHTML = '<p>An e-mail notification has been sent to the candidate.</p>';
+                    $notificationHTML .= '<p>An e-mail notification has been sent to the candidate.</p>';
                 }
             }
             else
             {
                 $email = '';
                 $customMessage = '';
-                $notificationHTML = '<p>No e-mail notification has been sent to the candidate.</p>';
+                $notificationHTML .= '<p>No e-mail notification has been sent to the candidate.</p>';
             }
 
             /* Set the pipeline entry's status, but don't send e-mails for now. */

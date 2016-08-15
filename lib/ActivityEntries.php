@@ -37,6 +37,7 @@ define('ACTIVITY_OTHER',       400);
 define('ACTIVITY_CALL_TALKED', 500);
 define('ACTIVITY_CALL_LVM',    600);
 define('ACTIVITY_CALL_MISSED', 700);
+define('ACTIVITY_ARRANGE',     800);
 
 /**
  * Candidates library.
@@ -513,6 +514,46 @@ class ActivityEntries
         return $this->_db->getAllAssoc($sql);
     }
 
+    /**
+     * Returns all activity types and their descriptions.
+     *
+     * @return resultset Activity type IDs and descriptions.
+     */
+    public function getUser($candidateID, $jobOrderID)
+    {
+        $sql = sprintf(
+            "SELECT
+                candidate_name.first_name AS candidateFirstName,
+                candidate_name.last_name AS candidateLastName,
+                candidate_owner.first_name AS candidateOwnerFirstName,
+                candidate_owner.last_name AS candidateOwnerLastName,
+                candidate_owner.email AS candidateOwnerEmail,
+                jobOrderRecruiter.first_name AS jobOrderRecruiterFirstName,
+                jobOrderRecruiter.last_name AS jobOrderRecruiterLastName,
+                jobOrderRecruiter.email AS jobOrderRecruiterEmail
+            FROM
+                candidate_joborder
+            LEFT JOIN candidate AS candidate_name
+                ON candidate_name.candidate_id = candidate_joborder.candidate_id
+            LEFT JOIN joborder as joborder_recruiter
+                ON joborder_recruiter.joborder_id = candidate_joborder.joborder_id
+            LEFT JOIN user AS candidate_owner
+                ON candidate_owner.user_id = candidate_name.owner
+            LEFT JOIN user AS jobOrderRecruiter
+                ON jobOrderRecruiter.user_id = joborder_recruiter.recruiter
+            WHERE
+                candidate_joborder.candidate_id = %s
+            AND
+                candidate_joborder.joborder_id = %s
+            AND
+                candidate_joborder.site_id = %s",
+            $candidateID,
+            $jobOrderID,
+            $this->_siteID
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
 
     /**
      * Updates a Data Item's modified timestamp.

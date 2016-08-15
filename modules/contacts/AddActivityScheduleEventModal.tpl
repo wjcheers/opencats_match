@@ -47,9 +47,10 @@
                             <option value="<?php echo(ACTIVITY_EMAIL); ?>">E-Mail</option>
                             <option value="<?php echo(ACTIVITY_MEETING); ?>">Meeting</option>
                             <option value="<?php echo(ACTIVITY_OTHER); ?>">Other</option>
+                            <option value="<?php echo(ACTIVITY_ARRANGE); ?>">Arrange</option>
                         </select><br />
                         <span id="addActivitySpanB">Activity Notes</span><br />
-                        <textarea name="activityNote" id="activityNote" cols="50" style="margin-bottom: 4px;" class="inputbox"></textarea>
+                        <textarea name="activityNote" id="activityNote" cols="50" rows="10" style="margin-bottom: 4px;" class="inputbox"></textarea>
                     </div>
                 </td>
             </tr>

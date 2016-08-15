@@ -152,10 +152,13 @@
                                                         <?php generateInsertAtCursorLinkConditional($data, 'CATS Contact URL', '%CONTCATSURL%'); ?>
 
                                                         <?php generateInsertAtCursorLinkConditional($data, 'Job Order Owner', '%JBODOWNER%'); ?>
+                                                        <?php generateInsertAtCursorLinkConditional($data, 'Job Order Recruiter', '%JBODRECRUITER%'); ?>
                                                         <?php generateInsertAtCursorLinkConditional($data, 'Job Order Title', '%JBODTITLE%'); ?>
                                                         <?php generateInsertAtCursorLinkConditional($data, 'Job Order Company', '%JBODCLIENT%'); ?>
                                                         <?php generateInsertAtCursorLinkConditional($data, 'Job Order ID', '%JBODID%'); ?>
                                                         <?php generateInsertAtCursorLinkConditional($data, 'CATS Job Order URL', '%JBODCATSURL%'); ?>
+                                                        
+                                                        <?php generateInsertAtCursorLinkConditional($data, 'Message', '%MESSAGE%'); ?>
                                                     </td>
                                                  </tr>
                                              </table>

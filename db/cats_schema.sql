@@ -48,7 +48,7 @@ CREATE TABLE `activity_type` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 LOCK TABLES `activity_type` WRITE;
-INSERT INTO `activity_type` VALUES (100,'Call'),(200,'Email'),(300,'Meeting'),(400,'Other'),(500,'Call (Talked)'),(600,'Call (LVM)'),(700,'Call (Missed)');
+INSERT INTO `activity_type` VALUES (100,'Call'),(200,'Email'),(300,'Meeting'),(400,'Other'),(500,'Call (Talked)'),(600,'Call (LVM)'),(700,'Call (Missed)'),(800,'Arrange');
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `attachment`;
 CREATE TABLE `attachment` (
