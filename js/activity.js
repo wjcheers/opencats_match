@@ -38,7 +38,7 @@ ACTIVITY_CALL_LVM    = 600;
 ACTIVITY_CALL_MISSED = 700;
 ACTIVITY_ARRANGE     = 800;
 
-ARRANGE_TEXT = "Arrange:\nDate: 8/8/2016\nTime: 7:30am (Taiwan Time;CST)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
+ARRANGE_TEXT = "Arrange: \nDate: 8/8/2016\nTime: 7:30am (Taiwan Time;CST)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
 
 function Activity_fillTypeSelect(selectList, selectedText)
 {
@@ -736,23 +736,23 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
                 jobOrdersArrayStringTitle[statusIndex],
                 jobOrdersArrayStringCompany[statusIndex]
             );
-            if (activityEntry.value == '' || activityEntry.value.indexOf('Status change: ') != -1)
+            if (activityEntry.value == '' || activityEntry.value.indexOf('Status change: ') != -1 || activityEntry.value.indexOf('Arrange: ') != -1)
             {
                 activityEntry.value = 'Status change: ' +
                     statusSelectList[statusSelectList.selectedIndex].text + '\n';
             }
             if(activityType[activityType.selectedIndex].text == 'Arrange')
             {
-                if (activityEntry.value.indexOf(ARRANGE_TEXT) == -1)
+                if (activityEntry.value.indexOf('Arrange: ') == -1)
                 {
                     activityEntry.value = activityEntry.value + ARRANGE_TEXT;
                 }
             }
-            else //if(activityTypeSelect[activityTypeSelect.selectedIndex].text != 'Arrange')
+            else //(activityTypeSelect[activityTypeSelect.selectedIndex].text != 'Arrange')
             {
-                if(activityEntry.value.indexOf(ARRANGE_TEXT) != -1)
+                if(activityEntry.value.indexOf('Arrange: ') != -1)
                 {
-                    activityEntry.value = activityEntry.value.replace(ARRANGE_TEXT, '');
+                    activityEntry.value = activityEntry.value.replace(/Arrange[\s\S]*/g, '');
                 }
             }
         }
@@ -857,16 +857,16 @@ function AS_onActivityChange(addActivityCheckboxID, activityTypeSelectID,
 
     if(activityTypeSelect[activityTypeSelect.selectedIndex].text == 'Arrange')
     {
-        if (activityNote.value.indexOf(ARRANGE_TEXT) == -1)
+        if (activityNote.value.indexOf('Arrange: ') == -1)
         {
             activityNote.value = activityNote.value + ARRANGE_TEXT;
         }
     }
     else //(activityTypeSelect[activityTypeSelect.selectedIndex].text != 'Arrange')
     {
-        if(activityNote.value.indexOf(ARRANGE_TEXT) != -1)
+        if(activityNote.value.indexOf('Arrange: ') != -1)
         {
-            activityNote.value = activityNote.value.replace(ARRANGE_TEXT, '');
+            activityNote.value = activityNote.value.replace(/Arrange[\s\S]*/g, '');
         }
     }
 }
