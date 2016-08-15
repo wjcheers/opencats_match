@@ -66,6 +66,7 @@ class ImportantPipelineDashboard extends DataGrid
             array('name' => 'Position', 'width' => 275),
             array('name' => 'Company', 'width' => 210),
             array('name' => 'Modified', 'width' => 80),
+            array('name' => 'Owner', 'width' => 65),
         );
 
 
@@ -113,6 +114,13 @@ class ImportantPipelineDashboard extends DataGrid
                                      'pagerWidth'      => 70,
                                      'pagerOptional'   => true,
                                      'filterHaving'    => 'DATE_FORMAT(candidate_joborder.date_modified, \'%m-%d-%y (%%h:%%i %%p)\')'),
+
+            'Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
+                                     'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
+                                     'sortableColumn'     => 'ownerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true,
+                                     'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
          );
 
         parent::__construct("home:ImportantPipelineDashboard", $parameters);
@@ -141,6 +149,7 @@ class ImportantPipelineDashboard extends DataGrid
                 joborder.joborder_id as joborderID,
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
+                CONCAT(user.last_name, user.first_name) AS ownerSort,
                 DATE_FORMAT(candidate_joborder.date_modified, '%%m-%%d-%%y ') as dateModified,
                 candidate_joborder.date_modified as dateModifiedSort,
                 IF(candidate_joborder.status = %s, 1,
