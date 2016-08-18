@@ -868,6 +868,42 @@ class Candidates
     }
 
     /**
+     * Returns personal agreement for a candidate.
+     *
+     * @param integer Candidate ID.
+     * @return array Multi-dimensional associative result set array of
+     *               candidate attachments data, or array() if no records were
+     *               returned.
+     */
+    public function getPersonalAgreement($candidateID)
+    {
+        //                COUNT(*) AS count
+        $sql = sprintf(
+            "SELECT
+                attachment.attachment_id AS attachmentID,
+                attachment.data_item_id AS candidateID,
+                attachment.title AS title,
+                attachment.text AS text
+            FROM
+                attachment
+            WHERE
+                attachment.data_item_type = %s
+            AND
+                attachment.data_item_id = %s
+            AND
+                attachment.title like %s
+            AND
+                attachment.site_id = %s",
+            DATA_ITEM_CANDIDATE,
+            $this->_db->makeQueryInteger($candidateID),
+            $this->_db->makeQueryString('%personalagreement%'),
+            $this->_siteID
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+    
+    /**
      * Returns an array of job orders data (jobOrderID, title, companyName)
      * for the specified candidate ID.
      *

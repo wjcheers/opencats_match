@@ -608,6 +608,8 @@ function AS_onRegardingChange(statusesArray, jobOrdersArray, regardingSelectID,
 
     document.getElementById('triggerValidSpan').style.display = 'none';
     document.getElementById('triggerValid').checked = false;
+    document.getElementById('triggerPersonalAgreementSpan').style.display = 'none';
+    document.getElementById('triggerPersonalAgreement').checked = false;
     
     if (regardingID != '-1')
     {
@@ -675,6 +677,8 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
 
     document.getElementById('triggerValidSpan').style.display = 'none';
     document.getElementById('triggerValid').checked = false;
+    document.getElementById('triggerPersonalAgreementSpan').style.display = 'none';
+    document.getElementById('triggerPersonalAgreement').checked = false;
     
     if(statusSelectList[statusSelectList.selectedIndex].text == 'Qualifying')
     {

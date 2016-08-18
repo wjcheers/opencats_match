@@ -14,10 +14,11 @@ function checkActivityForm(form)
 
     errorMessage += checkEventTitle();
     errorMessage += checkValid();
+    errorMessage += checkPersonalAgreement();
 
     if (errorMessage != '')
     {
-        alert("Form Error:\n" + errorMessage);
+        alert("Form Error:\n\n" + errorMessage);
         return false;
     }
 
@@ -38,7 +39,7 @@ function checkEventTitle()
     fieldLabel = document.getElementById('titleLabel');
     if (fieldValue == '')
     {
-        errorMessage = "    - You must enter an event title.\n";
+        errorMessage = "    - You must enter an event title.\n\n";
 
         fieldLabel.style.color = '#ff0000';
     }
@@ -58,13 +59,48 @@ function checkValid()
     if((document.getElementById('triggerValidSpan').style.display != 'none') &&
        (document.getElementById('triggerValid').checked == false))
     {
-        errorMessage = "    - Did you confirm the Effective Recommendation of this candidates?\n";
+        errorMessage = "    - Did you confirm the Effective Recommendation of this candidate?\n\n";
 
         fieldLabel.style.color = '#ff0000';        
     }
     else
     {
         fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+
+function checkPersonalAgreement()
+{
+    var errorMessage = '';
+    fieldLabel = document.getElementById('triggerPersonalAgreementSpan');
+    
+    
+    var personalAgreement = fieldLabel.getAttribute('data-personal-agreement');
+    var personalAgreementCount = fieldLabel.getAttribute('data-personal-agreement-count');
+    personalAgreementCount ++;
+    fieldLabel.setAttribute('data-personal-agreement-count', personalAgreementCount);
+
+    if(personalAgreement == "0"
+        && document.getElementById('changeStatus').checked == true
+        && document.changePipelineStatusForm.statusID.options[document.changePipelineStatusForm.statusID.selectedIndex].text == "Qualifying")
+    {
+        if(personalAgreementCount >= 3)
+        {
+            document.getElementById('triggerPersonalAgreementSpan').style.display = 'inline';
+        }
+        if(document.getElementById('triggerPersonalAgreement').checked == false)
+        {
+            errorMessage  = "    - Did you upload the candidate's Personal Agreement?\n";
+            errorMessage += "      File name: PersonalAgreement...\n\n";
+
+            fieldLabel.style.color = '#ff0000';        
+        }
+        else
+        {
+            fieldLabel.style.color = '#000';
+        }
     }
 
     return errorMessage;

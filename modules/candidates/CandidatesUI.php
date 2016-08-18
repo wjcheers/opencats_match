@@ -1528,6 +1528,7 @@ class CandidatesUI extends UserInterface
 
         $candidates = new Candidates($this->_siteID);
         $candidateData = $candidates->get($candidateID);
+        $personalAgreementPresent = count($candidates->getPersonalAgreement($candidateID)) > 0 ? 1 : 0;
 
         /* Bail out if we got an empty result set. */
         if (empty($candidateData))
@@ -1611,6 +1612,7 @@ class CandidatesUI extends UserInterface
         }
 
         $this->_template->assign('candidateID', $candidateID);
+        $this->_template->assign('personalAgreementPresent', $personalAgreementPresent);
         $this->_template->assign('pipelineRS', $pipelineRS);
         $this->_template->assign('statusRS', $statusRS);
         $this->_template->assign('selectedJobOrderID', $selectedJobOrderID);
@@ -2745,18 +2747,18 @@ class CandidatesUI extends UserInterface
             /* Notify candidate owner & joborder recruiter */
             if ($activityTypeID == ACTIVITY_ARRANGE)
             {
-                $activityUsers = $activityEntries->getUser($candidateID, $regardingID);
+                $pipelineUsers = $pipelines->getUser($candidateID, $regardingID);
                 
-                if (!empty($activityUsers))
+                if (!empty($pipelineUsers))
                 {
-                    $activityUsers = $activityUsers[0];
+                    $pipelineUsers = $pipelineUsers[0];
                 }
                         
-                if(!empty($activityUsers) &&
-                   !empty($activityUsers['jobOrderRecruiterEmail']) &&
-                   !empty($activityUsers['candidateOwnerEmail']) &&
-                   $activityUsers['jobOrderRecruiterEmail'] != '' &&
-                   $activityUsers['candidateOwnerEmail'] != '')
+                if(!empty($pipelineUsers) &&
+                   !empty($pipelineUsers['jobOrderRecruiterEmail']) &&
+                   !empty($pipelineUsers['candidateOwnerEmail']) &&
+                   $pipelineUsers['jobOrderRecruiterEmail'] != '' &&
+                   $pipelineUsers['candidateOwnerEmail'] != '')
                 {                
                     /* Get the change status email template. */
                     $emailTemplates = new EmailTemplates($this->_siteID);
@@ -2784,9 +2786,9 @@ class CandidatesUI extends UserInterface
                         '%MESSAGE%'
                     );
                     $replacementStrings = array(
-                        $activityUsers['candidateOwnerFirstName'] . ' ' . $activityUsers['candidateOwnerLastName'],
-                        $activityUsers['candidateFirstName'],
-                        $activityUsers['candidateFirstName'] . ' ' . $activityUsers['candidateLastName'],
+                        $pipelineUsers['candidateOwnerFirstName'] . ' ' . $pipelineUsers['candidateOwnerLastName'],
+                        $pipelineUsers['candidateFirstName'],
+                        $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'],
                         '<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=candidates&amp;a=show&amp;candidateID=' . $candidateID . '">'.
                             'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=candidates&amp;a=show&amp;candidateID=' . $candidateID . '</a>',
                         '<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $regardingID . '">'.
@@ -2806,9 +2808,9 @@ class CandidatesUI extends UserInterface
                     //FIXME: Make subject configurable.
                     $mailer = new Mailer($this->_siteID);
                     $mailerStatus = $mailer->sendToMany(
-                        array(array($activityUsers['candidateOwnerEmail'], ''), array($activityUsers['jobOrderRecruiterEmail'], '')),
-                        'CATS Notification: Arrangement - ' . $activityUsers['candidateFirstName'] . ' ' . $activityUsers['candidateLastName']
-                        . ' (' . $activityUsers['candidateOwnerFirstName'] . ' ' . $activityUsers['candidateOwnerLastName'] . ')',
+                        array(array($pipelineUsers['candidateOwnerEmail'], ''), array($pipelineUsers['jobOrderRecruiterEmail'], '')),
+                        'CATS Notification: Arrangement - ' . $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName']
+                        . ' (' . $pipelineUsers['candidateOwnerFirstName'] . ' ' . $pipelineUsers['candidateOwnerLastName'] . ')',
                         $email,
                         true);
                 }
@@ -2886,6 +2888,82 @@ class CandidatesUI extends UserInterface
                 else
                 {
                     $statusChanged = false;
+                }
+            }
+            
+            // notify to prepare Personal Agreement
+            if ($newStatusDescription == "Qualifying" && $this->isChecked('triggerPersonalAgreement', $_POST))
+            {                
+                $pipelineUsers = $pipelines->getUser($candidateID, $regardingID);
+                
+                if (!empty($pipelineUsers))
+                {
+                    $pipelineUsers = $pipelineUsers[0];
+                }
+                        
+                if(!empty($pipelineUsers) &&
+                   !empty($pipelineUsers['jobOrderRecruiterEmail']) &&
+                   !empty($pipelineUsers['candidateOwnerEmail']) &&
+                   $pipelineUsers['jobOrderRecruiterEmail'] != '' &&
+                   $pipelineUsers['candidateOwnerEmail'] != '')
+                {                
+                    /* Get the change status email template. */
+                    $emailTemplates = new EmailTemplates($this->_siteID);
+                    $statusChangeTemplateRS = $emailTemplates->getByTag(
+                        'EMAIL_TEMPLATE_PERSONALAGREEMENT'
+                    );
+                    
+                    if (empty($statusChangeTemplateRS) ||
+                        empty($statusChangeTemplateRS['textReplaced']))
+                    {
+                        $statusChangeTemplate = '';
+                    }
+                    else
+                    {
+                        $statusChangeTemplate = $statusChangeTemplateRS['textReplaced'];
+                    }
+                    
+                    /* Replace e-mail template variables. */
+                    $stringsToFind = array(
+                        '%CANDOWNER%',
+                        '%CANDFIRSTNAME%',
+                        '%CANDFULLNAME%',
+                        '%CANDCATSURL%',
+                        '%JBODCATSURL%'
+                    );
+                    $replacementStrings = array(
+                        $pipelineUsers['candidateOwnerFirstName'] . ' ' . $pipelineUsers['candidateOwnerLastName'],
+                        $pipelineUsers['candidateFirstName'],
+                        $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'],
+                        '<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=candidates&amp;a=show&amp;candidateID=' . $candidateID . '">'.
+                            'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=candidates&amp;a=show&amp;candidateID=' . $candidateID . '</a>',
+                        '<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $regardingID . '">'.
+                            'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $regardingID . '</a>'
+                    );
+                    
+                    $statusChangeTemplate = str_replace(
+                        $stringsToFind,
+                        $replacementStrings,
+                        $statusChangeTemplate
+                    );
+
+                    $email = $statusChangeTemplate;// . '<br><br><p>' . $activityNote . '</p>';
+                    
+                    /* Send e-mail notification. */
+                    //FIXME: Make subject configurable.
+                    $mailer = new Mailer($this->_siteID);
+                    $mailerStatus = $mailer->sendToMany(
+                        array(array($pipelineUsers['candidateOwnerEmail'], ''), array($pipelineUsers['jobOrderRecruiterEmail'], '')),
+                        'CATS Notification: Personal Agreement Missed - ' . $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName']
+                        . ' (' . $pipelineUsers['candidateOwnerFirstName'] . ' ' . $pipelineUsers['candidateOwnerLastName'] . ')',
+                        $email,
+                        true);
+                }
+                else
+                {
+                    $notificationHTML .= '<p><span class="bold" style="color: #ff0000;">Error: An e-mail notification'
+                        . ' could not be sent to the candidate owner and job order recruiter'
+                        . ' because the owner/recruiter does not have a valid e-mail address.</span></p>';                    
                 }
             }
 

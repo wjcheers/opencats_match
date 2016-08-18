@@ -98,6 +98,7 @@
                         <span id="changeStatusSpanB" style="color: #aaaaaa;">&nbsp;*</span>&nbsp;&nbsp;
                         <span id="triggerEmailSpan" style="display: none;"><input type="checkbox" name="triggerEmail" id="triggerEmail" onclick="AS_onSendEmailChange('triggerEmail', 'sendEmailCheckTR', 'visibleTR');" />Send E-Mail Notification to Candidate</span>
                         <br><span id="triggerValidSpan" style="display: none;"><input type="checkbox" name="triggerValid" id="triggerValid" /><b>Already checked the Effective Recommendation *<br>Never applied a job of this company or applied more than 1 year</b></span>
+                        <br><span id="triggerPersonalAgreementSpan" style="display: none;" data-personal-agreement-count=0 data-personal-agreement=<?php if ($this->personalAgreementPresent): ?>"1" <?php else: ?>"0"<?php endif; ?> ><input type="checkbox" name="triggerPersonalAgreement" id="triggerPersonalAgreement" /><b>Prepare Personal Agreement later.</b></span>
                     </div>
                 </td>
             </tr>

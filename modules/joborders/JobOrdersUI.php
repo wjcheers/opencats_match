@@ -1390,6 +1390,7 @@ class JobOrdersUI extends UserInterface
 
         $candidates = new Candidates($this->_siteID);
         $candidateData = $candidates->get($candidateID);
+        $personalAgreementPresent = count($candidates->getPersonalAgreement($candidateID)) > 0 ? 1 : 0;
 
         /* Bail out if we got an empty result set. */
         if (empty($candidateData))
@@ -1470,6 +1471,7 @@ class JobOrdersUI extends UserInterface
         }
 
         $this->_template->assign('candidateID', $candidateID);
+        $this->_template->assign('personalAgreementPresent', $personalAgreementPresent);
         $this->_template->assign('pipelineData', $pipelineData);
         $this->_template->assign('statusRS', $statusRS);
         $this->_template->assign('selectedJobOrderID', $jobOrderID);
