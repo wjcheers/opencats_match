@@ -38,7 +38,7 @@ ACTIVITY_CALL_LVM    = 600;
 ACTIVITY_CALL_MISSED = 700;
 ACTIVITY_ARRANGE     = 800;
 
-ARRANGE_TEXT = "Arrange: \nDate: 8/8/2016\nTime: 7:30am (Taiwan Time;CST)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
+ARRANGE_TEXT = "Arrange: \nDate: 8/8/2016\nTime: 7:30am (Taiwan Time)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
 
 function Activity_fillTypeSelect(selectList, selectedText)
 {
