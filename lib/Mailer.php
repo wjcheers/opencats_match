@@ -199,6 +199,8 @@ class Mailer
         $this->_mailer->WordWrap = $wrapLinesAt;
 
         $this->_mailer->Subject = $subject;
+        
+        $this->_mailer->CharSet = "UTF-8";
 
         if ($isHTML)
         {
@@ -206,8 +208,7 @@ class Mailer
 
             if ($signature)
             {
-                $body .= "\n<br />\n<br /><span style=\"font-size: 10pt;\">Powered by <a href=\"http://www.catsone.com\" alt=\"CATS "
-                    . "Applicant Tracking System\">CATS</a> (Free ATS)</span>";
+                $body .= "\n<br />\n<br /><span style=\"font-size: 10pt;\">IMPORTANT: The contents of this email and any attachments are confidential. They are intended for the named recipient(s) only. If you have received this email by mistake, please notify the sender immediately and do not disclose the contents to anyone or make copies thereof.</span>";
             }
 
             $this->_mailer->Body = '<div style="font: normal normal 12px Arial, Tahoma, sans-serif">'
