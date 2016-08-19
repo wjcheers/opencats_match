@@ -37,8 +37,10 @@ ACTIVITY_CALL_TALKED = 500;
 ACTIVITY_CALL_LVM    = 600;
 ACTIVITY_CALL_MISSED = 700;
 ACTIVITY_ARRANGE     = 800;
+ACTIVITY_CONFIRM     = 900;
 
 ARRANGE_TEXT = "Arrange: \nDate: 8/8/2016\nTime: 7:30am (Taiwan Time)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
+CONFIRM_TEXT = "Confirm: \nDate: 8/8/2016\nTime: 7:30am (Taiwan Time)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
 
 function Activity_fillTypeSelect(selectList, selectedText)
 {
@@ -84,6 +86,11 @@ function Activity_fillTypeSelect(selectList, selectedText)
     optionElements[7].value = ACTIVITY_ARRANGE;
     optionElements[7].appendChild(document.createTextNode('Arrange'));
 
+    /* Confirm option. */
+    optionElements[8] = document.createElement('option');
+    optionElements[8].value = ACTIVITY_CONFIRM;
+    optionElements[8].appendChild(document.createTextNode('Confirm'));
+
     /* Select the correct option. */
     if (selectedText)
     {
@@ -118,6 +125,10 @@ function Activity_fillTypeSelect(selectList, selectedText)
         else if (selectedText == 'Arrange')
         {
             optionElements[7].setAttribute('selected', 'selected');
+        }
+        else if (selectedText == 'Confirm')
+        {
+            optionElements[8].setAttribute('selected', 'selected');
         }
     }
 
@@ -740,10 +751,24 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
                 jobOrdersArrayStringTitle[statusIndex],
                 jobOrdersArrayStringCompany[statusIndex]
             );
-            if (activityEntry.value == '' || activityEntry.value.indexOf('Status change: ') != -1 || activityEntry.value.indexOf('Arrange: ') != -1)
+            if (activityEntry.value == '' || activityEntry.value.indexOf('Status change: ') != -1 || activityEntry.value.indexOf('Arrange: ') != -1 || activityEntry.value.indexOf('Confirm: ') != -1)
             {
                 activityEntry.value = 'Status change: ' +
                     statusSelectList[statusSelectList.selectedIndex].text + '\n';
+            }
+            if(activityType[activityType.selectedIndex].text != 'Confirm')
+            {
+                if(activityEntry.value.indexOf('Confirm: ') != -1)
+                {
+                    activityEntry.value = activityEntry.value.replace(/Confirm[\s\S]*/g, '');
+                }
+            }
+            if(activityType[activityType.selectedIndex].text != 'Arrange')
+            {
+                if(activityEntry.value.indexOf('Arrange: ') != -1)
+                {
+                    activityEntry.value = activityEntry.value.replace(/Arrange[\s\S]*/g, '');
+                }
             }
             if(activityType[activityType.selectedIndex].text == 'Arrange')
             {
@@ -752,11 +777,11 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
                     activityEntry.value = activityEntry.value + ARRANGE_TEXT;
                 }
             }
-            else //(activityTypeSelect[activityTypeSelect.selectedIndex].text != 'Arrange')
+            if(activityType[activityType.selectedIndex].text == 'Confirm')
             {
-                if(activityEntry.value.indexOf('Arrange: ') != -1)
+                if (activityEntry.value.indexOf('Confirm: ') == -1)
                 {
-                    activityEntry.value = activityEntry.value.replace(/Arrange[\s\S]*/g, '');
+                    activityEntry.value = activityEntry.value + CONFIRM_TEXT;
                 }
             }
         }
@@ -859,6 +884,21 @@ function AS_onActivityChange(addActivityCheckboxID, activityTypeSelectID,
     var activityNote = document.getElementById(activityNoteID);
     var activityTypeSelect = document.getElementById(activityTypeSelectID);
 
+    if(activityTypeSelect[activityTypeSelect.selectedIndex].text != 'Arrange')
+    {
+        if(activityNote.value.indexOf('Arrange: ') != -1)
+        {
+            activityNote.value = activityNote.value.replace(/Arrange[\s\S]*/g, '');
+        }
+    }
+    if(activityTypeSelect[activityTypeSelect.selectedIndex].text != 'Confirm')
+    {
+        if(activityNote.value.indexOf('Confirm: ') != -1)
+        {
+            activityNote.value = activityNote.value.replace(/Confirm[\s\S]*/g, '');
+        }
+    }
+
     if(activityTypeSelect[activityTypeSelect.selectedIndex].text == 'Arrange')
     {
         if (activityNote.value.indexOf('Arrange: ') == -1)
@@ -866,11 +906,11 @@ function AS_onActivityChange(addActivityCheckboxID, activityTypeSelectID,
             activityNote.value = activityNote.value + ARRANGE_TEXT;
         }
     }
-    else //(activityTypeSelect[activityTypeSelect.selectedIndex].text != 'Arrange')
+    if(activityTypeSelect[activityTypeSelect.selectedIndex].text == 'Confirm')
     {
-        if(activityNote.value.indexOf('Arrange: ') != -1)
+        if (activityNote.value.indexOf('Confirm: ') == -1)
         {
-            activityNote.value = activityNote.value.replace(/Arrange[\s\S]*/g, '');
+            activityNote.value = activityNote.value + CONFIRM_TEXT;
         }
     }
 }

@@ -38,6 +38,7 @@ define('ACTIVITY_CALL_TALKED', 500);
 define('ACTIVITY_CALL_LVM',    600);
 define('ACTIVITY_CALL_MISSED', 700);
 define('ACTIVITY_ARRANGE',     800);
+define('ACTIVITY_CONFIRM',     900);
 
 /**
  * Candidates library.

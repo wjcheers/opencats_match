@@ -2745,7 +2745,7 @@ class CandidatesUI extends UserInterface
             $activityEntries = new ActivityEntries($this->_siteID);
             
             /* Notify candidate owner & joborder recruiter */
-            if ($activityTypeID == ACTIVITY_ARRANGE)
+            if ($activityTypeID == ACTIVITY_ARRANGE || $activityTypeID == ACTIVITY_CONFIRM)
             {
                 $pipelineUsers = $pipelines->getUser($candidateID, $regardingID);
                 
@@ -2809,7 +2809,7 @@ class CandidatesUI extends UserInterface
                     $mailer = new Mailer($this->_siteID);
                     $mailerStatus = $mailer->sendToMany(
                         array(array($pipelineUsers['candidateOwnerEmail'], ''), array($pipelineUsers['jobOrderRecruiterEmail'], '')),
-                        'CATS Notification: Arrangement - ' . $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName']
+                        'CATS Notification: Arrangement / Confirmation - ' . $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName']
                         . ' (' . $pipelineUsers['candidateOwnerFirstName'] . ' ' . $pipelineUsers['candidateOwnerLastName'] . ')',
                         $email,
                         true);
