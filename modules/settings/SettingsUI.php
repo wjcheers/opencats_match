@@ -1690,6 +1690,7 @@ class SettingsUI extends UserInterface
         $candidateJoborderStatusSendsMessage[PIPELINE_STATUS_CONTACTED] = (UserInterface::isChecked('statusChangeContacted', $_POST) ? 1 : 0);
         $candidateJoborderStatusSendsMessage[PIPELINE_STATUS_CANDIDATE_REPLIED] = (UserInterface::isChecked('statusChangeReplied', $_POST) ? 1 : 0);
         $candidateJoborderStatusSendsMessage[PIPELINE_STATUS_QUALIFYING] = (UserInterface::isChecked('statusChangeQualifying', $_POST) ? 1 : 0);
+        $candidateJoborderStatusSendsMessage[PIPELINE_STATUS_VERIFIED] = (UserInterface::isChecked('statusChangeVerified', $_POST) ? 1 : 0);
         $candidateJoborderStatusSendsMessage[PIPELINE_STATUS_SUBMITTED] = (UserInterface::isChecked('statusChangeSubmitted', $_POST) ? 1 : 0);
         $candidateJoborderStatusSendsMessage[PIPELINE_STATUS_INTERVIEWING] = (UserInterface::isChecked('statusChangeInterviewing', $_POST) ? 1 : 0);
         $candidateJoborderStatusSendsMessage[PIPELINE_STATUS_OFFERED] = (UserInterface::isChecked('statusChangeOffered', $_POST) ? 1 : 0);

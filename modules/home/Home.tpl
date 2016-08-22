@@ -71,11 +71,43 @@
             <table>
                 <tr>
                     <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
-                        <div class="noteUnsizedSpan" style="width: 1220px;">Important Candidates (Qualifying, Submitted, Interviewing, Offered in Active Job Orders) - Page <?php echo($this->dataGrid->getCurrentPageHTML()); ?> (<?php echo($this->dataGrid->getNumberOfRows()); ?> Items)</div>
+                        <div class="noteUnsizedSpan" style="width: 1220px;">Important Candidates (Submitted, Interviewing, Offered in Active Job Orders) - Page <?php echo($this->dataGrid->getCurrentPageHTML()); ?> (<?php echo($this->dataGrid->getNumberOfRows()); ?> Items)</div>
                         <?php $this->dataGrid->draw(); ?>
                         <div style="float:right;"><?php $this->dataGrid->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGrid->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 
                         <?php if (!$this->dataGrid->getNumberOfRows()): ?>
+                        <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
+                            &nbsp;
+                        </div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
+                        <div class="noteUnsizedSpan" style="width: 1220px;">Qualifying Candidates in Active Job Orders - Page <?php echo($this->dataGridQualifying->getCurrentPageHTML()); ?> (<?php echo($this->dataGridQualifying->getNumberOfRows()); ?> Items)</div>
+                        <?php $this->dataGridQualifying->draw(); ?>
+                        <div style="float:right;"><?php $this->dataGridQualifying->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridQualifying->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+
+                        <?php if (!$this->dataGridQualifying->getNumberOfRows()): ?>
+                        <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
+                            &nbsp;
+                        </div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
+                        <div class="noteUnsizedSpan" style="width: 1220px;">Verified Candidates in Active Job Orders - Page <?php echo($this->dataGridVerified->getCurrentPageHTML()); ?> (<?php echo($this->dataGridVerified->getNumberOfRows()); ?> Items)</div>
+                        <?php $this->dataGridVerified->draw(); ?>
+                        <div style="float:right;"><?php $this->dataGridVerified->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridVerified->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+
+                        <?php if (!$this->dataGridVerified->getNumberOfRows()): ?>
                         <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
                             &nbsp;
                         </div>

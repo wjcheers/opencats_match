@@ -86,7 +86,7 @@ function checkPersonalAgreement()
         && document.getElementById('changeStatus').checked == true
         && document.changePipelineStatusForm.statusID.options[document.changePipelineStatusForm.statusID.selectedIndex].text == "Qualifying")
     {
-        if(personalAgreementCount >= 3)
+        if(personalAgreementCount >= 1)
         {
             document.getElementById('triggerPersonalAgreementSpan').style.display = 'inline';
         }
