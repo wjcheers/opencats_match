@@ -558,6 +558,7 @@ class DriftingDashboard extends DataGrid
             array('name' => 'First Name', 'width' => 85),
             array('name' => 'Last Name', 'width' => 75),
             array('name' => 'Regarding', 'width' => 125),
+            array('name' => 'Entered', 'width' => 60),
             array('name' => 'Created', 'width' => 125),
             array('name' => 'Modified', 'width' => 125),
             array('name' => 'Activity Notes', 'width' => 175),
@@ -586,6 +587,7 @@ class DriftingDashboard extends DataGrid
                                      'filterHaving'    => 'lastName'),
 
 
+            'Entered' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
                                      'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
                                      'sortableColumn'     => 'ownerSort',
                                      'pagerWidth'    => 75,
@@ -670,6 +672,7 @@ class DriftingDashboard extends DataGrid
             LEFT JOIN company ON
                 joborder.company_id = company.company_id
             LEFT JOIN user ON
+                activity.entered_by = user.user_id
             WHERE
                 activity.site_id = %s
             AND
