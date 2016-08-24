@@ -401,6 +401,7 @@ class ActivityEntries
             "SELECT
                 activity.activity_id AS activityID,
                 activity.data_item_id AS dataItemID,
+                activity.data_item_type AS dataItemType,
                 activity.joborder_id AS jobOrderID,
                 activity.type AS type,
                 activity_type.short_description AS typeDescription,
@@ -410,6 +411,7 @@ class ActivityEntries
                 ) AS dateCreated,
                 entered_by_user.first_name AS enteredByFirstName,
                 entered_by_user.last_name AS enteredByLastName,
+                entered_by_user.email AS enteredByEmail,
                 IF(
                     ISNULL(joborder.title),
                     'General',

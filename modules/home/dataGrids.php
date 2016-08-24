@@ -529,6 +529,171 @@ class VerifiedPipelineDashboard extends DataGrid
     }
 }
 
+
+class DriftingDashboard extends DataGrid
+{
+    protected $_siteID;
+
+
+    // FIXME: Fix ugly indenting - ~400 character lines = bad.
+    public function __construct($siteID, $parameters)
+    {
+        /* Pager configuration. */
+        $this->_tableWidth = 1215;
+        $this->_defaultAlphabeticalSortBy = 'lastName';
+        $this->ajaxMode = true;
+        $this->showExportColumn = false;
+        $this->showExportCheckboxes = false;
+        $this->showActionArea = true;
+        $this->showChooseColumnsBox = true;
+        $this->allowResizing = true;
+        $this->dateCriterion = '';
+        $this->globalStyle = 'font-size:11px;';
+        $this->ignoreSavedColumnLayouts = true;
+
+        $this->defaultSortBy = 'notes';
+        $this->defaultSortDirection = 'DESC';
+
+        $this->_defaultColumns = array(
+            array('name' => 'First Name', 'width' => 85),
+            array('name' => 'Last Name', 'width' => 75),
+            array('name' => 'Regarding', 'width' => 125),
+            array('name' => 'Created', 'width' => 125),
+            array('name' => 'Modified', 'width' => 125),
+            array('name' => 'Activity Notes', 'width' => 175),
+        );
+
+
+        $this->_db = DatabaseConnection::getInstance();
+        $this->_siteID = $siteID;
+        $this->_assignedCriterion = "";
+        $this->_candidateIDColumn = 'company.company_id';
+
+        $this->_classColumns = array(
+
+            'First Name' =>     array('pagerRender'    => '$ret = \'<img src="images/mru/candidate.gif" height="12" alt="" />\'; if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return $ret.\'&nbsp;<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" style="font-size:11px;" class="\'.$className.\'" title="\'.htmlspecialchars(InfoString::make(DATA_ITEM_CANDIDATE,$rsData[\'candidateID\'],$rsData[\'siteID\'])).\'">\'.htmlspecialchars($rsData[\'firstName\']).\'</a>\';',
+                                     'sortableColumn'  => 'firstName',
+                                     'pagerWidth'      => 85,
+                                     'pagerOptional'   => false,
+                                     'alphaNavigation' => true,
+                                     'filterHaving'    => 'firstName'),
+
+            'Last Name' =>      array('pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'"  style="font-size:11px;" class="\'.$className.\'" title="\'.htmlspecialchars(InfoString::make(DATA_ITEM_CANDIDATE,$rsData[\'candidateID\'],$rsData[\'siteID\'])).\'"> \'.htmlspecialchars($rsData[\'lastName\']).\'</a>\';',
+                                     'sortableColumn'  => 'lastName',
+                                     'pagerWidth'      => 75,
+                                     'pagerOptional'   => false,
+                                     'alphaNavigation' => true,
+                                     'filterHaving'    => 'lastName'),
+
+
+                                     'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
+                                     'sortableColumn'     => 'ownerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true,
+                                     'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
+                                     
+            'Created' =>       array('select'   => 'DATE_FORMAT(activity.date_created, \'%m-%d-%y\') AS dateCreated',
+                                     'pagerRender'      => 'return $rsData[\'dateCreated\'];',
+                                     'sortableColumn'     => 'dateCreatedSort',
+                                     'pagerWidth'    => 125,
+                                     'filterHaving' => 'DATE_FORMAT(activity.date_created, \'%m-%d-%y\')'),
+
+            'Modified' =>      array('select'   => 'DATE_FORMAT(activity.date_modified, \'%m-%d-%y\') AS dateModified',
+                                     'pagerRender'      => 'return $rsData[\'dateModified\'];',
+                                     'sortableColumn'     => 'dateModifiedSort',
+                                     'pagerWidth'    => 125,
+                                     'pagerOptional' => false,
+                                     'filterHaving' => 'DATE_FORMAT(activity.date_modified, \'%m-%d-%y\')'),
+
+            'Activity Notes'    =>      array('pagerRender'    => 'return $rsData[\'notes\'];',
+                                     'sortableColumn'  => 'notes',
+                                     'pagerWidth'      => 175,
+                                     'alphaNavigation' => true,
+                                     'filterHaving'    => 'notes'),
+    
+             'Regarding' =>      array('pagerRender'    => 'if ($rsData[\'jobOrderIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; if ($rsData[\'companyIsHot\'] == 1) $companyClassName =  \'jobLinkHot\'; else $companyClassName = \'jobLinkCold\';  if ($rsData[\'jobOrderTitle\'] == \'\') {$ret = \'General\'; } else {$ret = \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'jobOrderID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'jobOrderTitle\']).\'</a>\'; if($rsData[\'regardingCompanyName\'] != \'\') {$ret .= \' <a href="'.CATSUtility::getIndexName().'?m=companies&amp;a=show&amp;companyID=\'.$rsData[\'companyID\'].\'" class="\'.$companyClassName.\'">(\'.htmlspecialchars($rsData[\'regardingCompanyName\']).\')\';}} return $ret;', 
+                                     'sortableColumn'  => 'regarding',
+                                     'pagerWidth'      => 125,
+                                     'pagerOptional'   => true,
+                                     'alphaNavigation' => true,
+                                     'filterHaving'    => 'regarding'),    
+         );
+
+        parent::__construct("home:DriftingDashboard", $parameters);
+    }
+
+    /**
+     * Returns the sql statment for the pager.
+     *
+     * @return array clients data
+     */
+    public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
+    {
+        $sql = sprintf(
+            "SELECT SQL_CALC_FOUND_ROWS %s
+                candidate.first_name as firstName,
+                candidate.last_name as lastName,
+                candidate.candidate_id as candidateID,
+                candidate.site_id as siteID,
+                candidate.is_hot as isHot,
+                company.name as companyName,
+                company.company_id as companyID,
+                company.is_hot as companyIsHot,
+                joborder.title as jobOrderTitle,
+                joborder.is_hot as jobOrderIsHot,
+                joborder.joborder_id as jobOrderID,
+                user.first_name as userFirstName,
+                user.last_name as userLastName,
+                CONCAT(user.last_name, user.first_name) AS ownerSort,
+                activity.notes as notes,
+                DATE_FORMAT(
+                    activity.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateCreated,
+                activity.date_created AS dateCreatedSort,
+                DATE_FORMAT(
+                    activity.date_modified, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateModified,
+                activity.date_modified AS dateModifiedSort,
+                IF(
+                    ISNULL(joborder.title),
+                    'General',
+                    CONCAT(joborder.title, ' (', company.name, ')')
+                ) as regarding,
+                joborder.title AS regardingJobTitle,
+                company.name AS regardingCompanyName
+            FROM
+                activity
+            LEFT JOIN candidate ON
+                candidate.candidate_id = activity.data_item_id
+            LEFT JOIN joborder ON
+                joborder.joborder_id = activity.joborder_id
+            LEFT JOIN company ON
+                joborder.company_id = company.company_id
+            LEFT JOIN user ON
+            WHERE
+                activity.site_id = %s
+            AND
+                activity.data_item_type = %s
+            AND
+                activity.type = %s
+            %s
+            %s
+            %s
+            %s",
+            $distinct,
+            $this->_siteID,
+            $this->_db->makeQueryInteger(DATA_ITEM_CANDIDATE),
+            $this->_db->makeQueryInteger(ACTIVITY_DRIFTING),
+            (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
+            (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : '',
+            $orderSQL,
+            $limitSQL
+        );
+
+        return $sql;
+    }
+}
+
 // FIXME: Includes in the middle of the file = bad.
 // FIXME: Multiple classes per file probably also bad.
 include_once('./lib/ActivityEntries.php');

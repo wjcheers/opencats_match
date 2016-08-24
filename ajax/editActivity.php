@@ -31,6 +31,7 @@
 include_once('./lib/StringUtility.php');
 include_once('./lib/ActivityEntries.php');
 include_once('./lib/Pipelines.php');
+include_once('./lib/Mailer.php');
 
 
 $interface = new SecureAJAXInterface();
@@ -71,6 +72,7 @@ $activityDate = trim(urldecode($_REQUEST['date']));
 $activityHour = trim(urldecode($_REQUEST['hour']));
 $activityMinute = trim(urldecode($_REQUEST['minute']));
 $activityAMPM = trim(urldecode($_REQUEST['ampm']));
+$locationPathname = trim(urldecode($_REQUEST['locationPathname']));
 
 if (!DateUtility::validate('-', $activityDate, DATE_FORMAT_MMDDYY))
 {
@@ -121,11 +123,36 @@ if (empty($activityEntry['notes']))
     $activityEntry['notes'] = '(No Notes)';
 }
 
+$notificationHTML = '';
+/* Notify activity entered owner*/
+if ($type == ACTIVITY_DRIFTING)
+{           
+    if(!empty($activityEntry['enteredByEmail']) &&
+       $activityEntry['enteredByEmail'] != '' &&
+       $activityEntry['dataItemType'] == DATA_ITEM_CANDIDATE)
+    {
+        $email = $activityNote . '<BR \><BR \>' . 'Candidate: <BR \>' . '<a href="http://' . $_SERVER['HTTP_HOST'] . $locationPathname . '?m=candidates&amp;a=show&amp;candidateID=' . $activityEntry['dataItemID'] . '">' . 'http://' . $_SERVER['HTTP_HOST'] . $locationPathname . '?m=candidates&amp;a=show&amp;candidateID=' . $activityEntry['dataItemID']. '</a>';
+        //$email = $activityNote . '<BR \><BR \>' . 'Candidate: <BR \>' . $_SERVER['HTTP_HOST'] . 'abc' . $_SERVER['REQUEST_URI'];
+
+        /* Send e-mail notification. */
+        //FIXME: Make subject configurable.
+        $mailer = new Mailer($siteID);
+        $mailerStatus = $mailer->sendToOne(array($activityEntry['enteredByEmail'], ''), 'CATS Notification: Drift Activity Updated', $email, true);
+
+        $notificationHTML .= 'Send an e-mail notification to activity note owner';
+    }
+    else
+    {
+        $notificationHTML .= 'Error: An e-mail notification could not be sent to the activity entered owner, because the owner does not have a valid e-mail address.';
+    }
+}
+
+
 /* Send back the XML data. */
 $interface->outputXMLPage(
     "<data>\n" .
-    "    <errorcode>0</errorcode>\n" .
-    "    <errormessage></errormessage>\n" .
+    "    <errorcode>1</errorcode>\n" .
+    "    <errormessage>" . $notificationHTML . "</errormessage>\n" .
     "    <type>"            . $activityEntry['type'] . "</type>\n" .
     "    <typedescription>" . $activityEntry['typeDescription'] . "</typedescription>\n" .
     "    <notes>"           . htmlspecialchars($activityEntry['notes']) . "</notes>\n" .

@@ -115,6 +115,22 @@
                     </td>
                 </tr>
             </table>
+
+            <table>
+                <tr>
+                    <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
+                        <div class="noteUnsizedSpan" style="width: 1220px;">Drifting Candidates in Active Job Orders - Page <?php echo($this->dataGridDrifting->getCurrentPageHTML()); ?> (<?php echo($this->dataGridDrifting->getNumberOfRows()); ?> Items)</div>
+                        <?php $this->dataGridDrifting->draw(); ?>
+                        <div style="float:right;"><?php $this->dataGridDrifting->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridDrifting->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+
+                        <?php if (!$this->dataGridDrifting->getNumberOfRows()): ?>
+                        <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
+                            &nbsp;
+                        </div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
     <div id="bottomShadow"></div>

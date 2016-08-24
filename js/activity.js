@@ -464,6 +464,7 @@ function Activity_submitEditedEntry(notes, date, hour, minute, ampm,
     POSTData += '&activityID=' + activityID;
     POSTData += '&type='       + selectedType;
     POSTData += '&jobOrderID=' + jobOrderID;
+    POSTData += '&locationPathname='    + location.pathname;
 
     /* Anonymous callback function triggered when HTTP response is received. */
     var callBack = function ()
@@ -491,7 +492,7 @@ function Activity_submitEditedEntry(notes, date, hour, minute, ampm,
         {
             if (errorMessageNode.firstChild)
             {
-                var errorMessage = "An error occurred while receiving a response from the server.\n\n"
+                var errorMessage = "Notify:\n\n"
                                  + errorMessageNode.firstChild.nodeValue;
                 alert(errorMessage);
             }

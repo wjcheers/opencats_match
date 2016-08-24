@@ -120,6 +120,10 @@ class HomeUI extends UserInterface
         $dataGrid = DataGrid::get("home:VerifiedPipelineDashboard", $dataGridProperties);
 
         $this->_template->assign('dataGridVerified', $dataGrid);
+        
+        $dataGrid = DataGrid::get("home:DriftingDashboard", $dataGridProperties);
+        
+        $this->_template->assign('dataGridDrifting', $dataGrid);
 
         $dataGridProperties = array(
             'rangeStart'    => 0,
