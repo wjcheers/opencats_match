@@ -42,7 +42,6 @@ ACTIVITY_DRIFTING    = 1000;
 
 ARRANGE_TEXT = "Arrange: \nDate: 8/8/2016\nTime: 7:30am (Taiwan Time)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
 CONFIRM_TEXT = "Confirm: \nDate: 8/8/2016\nTime: 7:30am (Taiwan Time)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
-DRIFTING_TEXT = "Drifting: \n";
 
 function Activity_fillTypeSelect(selectList, selectedText)
 {
@@ -763,7 +762,7 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
                 jobOrdersArrayStringTitle[statusIndex],
                 jobOrdersArrayStringCompany[statusIndex]
             );
-            if (activityEntry.value == '' || activityEntry.value.indexOf('Status change: ') != -1 || activityEntry.value.indexOf('Arrange: ') != -1 || activityEntry.value.indexOf('Confirm: ') != -1 || activityEntry.value.indexOf('Drifting: ') != -1)
+            if (activityEntry.value == '' || activityEntry.value.indexOf('Status change: ') != -1 || activityEntry.value.indexOf('Arrange: ') != -1 || activityEntry.value.indexOf('Confirm: ') != -1)
             {
                 activityEntry.value = 'Status change: ' +
                     statusSelectList[statusSelectList.selectedIndex].text + '\n';
@@ -782,13 +781,6 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
                     activityEntry.value = activityEntry.value.replace(/Arrange[\s\S]*/g, '');
                 }
             }
-            if(activityType[activityType.selectedIndex].text != 'Drifting')
-            {
-                if(activityEntry.value.indexOf('Drifting: ') != -1)
-                {
-                    activityEntry.value = activityEntry.value.replace(/Drifting[\s\S]*/g, '');
-                }
-            }
 
             if(activityType[activityType.selectedIndex].text == 'Arrange')
             {
@@ -802,13 +794,6 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
                 if (activityEntry.value.indexOf('Confirm: ') == -1)
                 {
                     activityEntry.value = activityEntry.value + CONFIRM_TEXT;
-                }
-            }
-            else if(activityType[activityType.selectedIndex].text == 'Drifting')
-            {
-                if (activityEntry.value.indexOf('Drifting: ') == -1)
-                {
-                    activityEntry.value = activityEntry.value + DRIFTING_TEXT;
                 }
             }
         }
@@ -925,13 +910,6 @@ function AS_onActivityChange(addActivityCheckboxID, activityTypeSelectID,
             activityNote.value = activityNote.value.replace(/Confirm[\s\S]*/g, '');
         }
     }
-    if(activityTypeSelect[activityTypeSelect.selectedIndex].text != 'Drifting')
-    {
-        if(activityNote.value.indexOf('Drifting: ') != -1)
-        {
-            activityNote.value = activityNote.value.replace(/Drifting[\s\S]*/g, '');
-        }
-    }
 
     if(activityTypeSelect[activityTypeSelect.selectedIndex].text == 'Arrange')
     {
@@ -945,13 +923,6 @@ function AS_onActivityChange(addActivityCheckboxID, activityTypeSelectID,
         if (activityNote.value.indexOf('Confirm: ') == -1)
         {
             activityNote.value = activityNote.value + CONFIRM_TEXT;
-        }
-    }
-    else if(activityTypeSelect[activityTypeSelect.selectedIndex].text == 'Drifting')
-    {
-        if (activityNote.value.indexOf('Drifting: ') == -1)
-        {
-            activityNote.value = activityNote.value + DRIFTING_TEXT;
         }
     }
 }
