@@ -749,6 +749,7 @@ function showNewFilter(filterCounter, filterAreaID, selectableColumns, instanceN
             {
                 selectColumnOption = document.createElement('option');
                 selectColumnOption.value = '=s';
+                selectColumnOption.innerHTML = 'is less than (date)';
                 selectOperatorColumn.appendChild(selectColumnOption);
             }
 
@@ -756,6 +757,7 @@ function showNewFilter(filterCounter, filterAreaID, selectableColumns, instanceN
             {
                 selectColumnOption = document.createElement('option');
                 selectColumnOption.value = '=g';
+                selectColumnOption.innerHTML = 'is greater than (date)';
                 selectOperatorColumn.appendChild(selectColumnOption);
             }
             
