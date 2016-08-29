@@ -745,6 +745,20 @@ function showNewFilter(filterCounter, filterAreaID, selectableColumns, instanceN
                 selectOperatorColumn.appendChild(selectColumnOption);
             }
 
+            if (possibleType == '=s')
+            {
+                selectColumnOption = document.createElement('option');
+                selectColumnOption.value = '=s';
+                selectOperatorColumn.appendChild(selectColumnOption);
+            }
+
+            if (possibleType == '=g')
+            {
+                selectColumnOption = document.createElement('option');
+                selectColumnOption.value = '=g';
+                selectOperatorColumn.appendChild(selectColumnOption);
+            }
+            
             if (possibleType == '=#')
             {
                 selectColumnOption = document.createElement('option');

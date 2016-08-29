@@ -840,6 +840,14 @@ class DataGrid
                     case '=<':
                         $filterOperatorHuman = ' is less than';
                         break;
+                        
+                    case '=g':
+                        $filterOperatorHuman = ' is greater than (date)';
+                        break;
+                        
+                    case '=s':
+                        $filterOperatorHuman = ' is less than (date)';
+                        break;
 
                     case '=#':
                         $filterOperatorHuman = ' has element';
@@ -1210,6 +1218,34 @@ class DataGrid
                         if (isset($this->_classColumns[$columnName]['filterHaving']))
                         {
                             $havingSQL_or[] = $this->_classColumns[$columnName]['filterHaving'] . ' >= ' . $db->makeQueryInteger($argument)  .' ';
+                        }
+                    }
+
+                    /* Is less than (=s) */
+                    if (strpos($data, '=s') !== false)
+                    {
+                        if (isset($this->_classColumns[$columnName]['filter']))
+                        {
+                            $whereSQL_or[] = $this->_classColumns[$columnName]['filter'] . ' <= ' . $db->makeQueryString($argument) .' ';
+                        }
+
+                        if (isset($this->_classColumns[$columnName]['filterHaving']))
+                        {
+                            $havingSQL_or[] = $this->_classColumns[$columnName]['filterHaving'] . ' <= ' . $db->makeQueryString($argument)  .' ';
+                        }
+                    }
+
+                    /* Is greater than (=g) */
+                    if (strpos($data, '=g') !== false)
+                    {
+                        if (isset($this->_classColumns[$columnName]['filter']))
+                        {
+                            $whereSQL_or[] = $this->_classColumns[$columnName]['filter'] . ' >= ' . $db->makeQueryString($argument) .' ';
+                        }
+
+                        if (isset($this->_classColumns[$columnName]['filterHaving']))
+                        {
+                            $havingSQL_or[] = $this->_classColumns[$columnName]['filterHaving'] . ' >= ' . $db->makeQueryString($argument)  .' ';
                         }
                     }
 
