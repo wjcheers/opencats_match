@@ -1472,6 +1472,9 @@ class JobOrdersUI extends UserInterface
 
         $this->_template->assign('candidateID', $candidateID);
         $this->_template->assign('personalAgreementPresent', $personalAgreementPresent);
+        $this->_template->assign('currentPay', $candidateData['currentPay']);
+        $this->_template->assign('desiredPay', $candidateData['desiredPay']);
+        $this->_template->assign('email1', $candidateData['email1']);
         $this->_template->assign('pipelineData', $pipelineData);
         $this->_template->assign('statusRS', $statusRS);
         $this->_template->assign('selectedJobOrderID', $jobOrderID);

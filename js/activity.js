@@ -632,6 +632,10 @@ function AS_onRegardingChange(statusesArray, jobOrdersArray, regardingSelectID,
     document.getElementById('triggerValid').checked = false;
     document.getElementById('triggerPersonalAgreementSpan').style.display = 'none';
     document.getElementById('triggerPersonalAgreement').checked = false;
+    document.getElementById('triggerCurrentPaySpan').style.display = 'none';
+    document.getElementById('triggerCurrentPay').checked = false;
+    document.getElementById('triggerDesiredPaySpan').style.display = 'none';
+    document.getElementById('triggerDesiredPay').checked = false;
     
     if (regardingID != '-1')
     {
@@ -701,6 +705,10 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
     document.getElementById('triggerValid').checked = false;
     document.getElementById('triggerPersonalAgreementSpan').style.display = 'none';
     document.getElementById('triggerPersonalAgreement').checked = false;
+    document.getElementById('triggerCurrentPaySpan').style.display = 'none';
+    document.getElementById('triggerCurrentPay').checked = false;
+    document.getElementById('triggerDesiredPaySpan').style.display = 'none';
+    document.getElementById('triggerDesiredPay').checked = false;
     
     if(statusSelectList[statusSelectList.selectedIndex].text == 'Qualifying')
     {
