@@ -1139,10 +1139,18 @@ class DataGrid
                 $argument = str_replace(' AND ', '/', $argument);
                 // ~Add
                 
-                /* The / character works as an OR clause for filters. */
-                $argument = str_replace(' or ', '/', $argument);
-                $argument = str_replace(' OR ', '/', $argument);
-                $arguments = explode('/', $argument);
+                /* The / character works as an OR clause for filters, exclude url and web_site */
+                if((strpos($this->_classColumns[$columnName]['filter'], 'web_site') !== false) ||
+                   (strpos($this->_classColumns[$columnName]['filter'], 'url') !== false))
+                {
+                    $arguments = array($argument);
+                }
+                else
+                {
+                    $argument = str_replace(' or ', '/', $argument);
+                    $argument = str_replace(' OR ', '/', $argument);
+                    $arguments = explode('/', $argument);
+                }
 
                 $whereSQL_or = array();
                 $havingSQL_or = array();
