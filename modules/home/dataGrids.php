@@ -166,7 +166,7 @@ class ImportantPipelineDashboard extends DataGrid
             LEFT JOIN candidate_joborder_status ON
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
-                joborder.recruiter = user.user_id
+                candidate.owner = user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -336,7 +336,7 @@ class QualifyingPipelineDashboard extends DataGrid
             LEFT JOIN candidate_joborder_status ON
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
-                joborder.recruiter = user.user_id
+                candidate.owner = user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -498,7 +498,7 @@ class VerifiedPipelineDashboard extends DataGrid
             LEFT JOIN candidate_joborder_status ON
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
-                joborder.recruiter = user.user_id
+                candidate.owner = user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -665,7 +665,7 @@ class EverVerifiedPipelineDashboard extends DataGrid
                 AND
                 candidate_joborder_status_history.candidate_id = candidate_joborder.candidate_id
             LEFT JOIN user ON
-                joborder.recruiter = user.user_id
+                candidate.owner = user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
