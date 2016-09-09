@@ -14,6 +14,8 @@ function checkAddForm(form)
 
     errorMessage += checkFirstName();
     errorMessage += checkLastName();
+    errorMessage += checkCurrentPay();
+    errorMessage += checkDesiredPay();
 
     if (errorMessage != '')
     {
@@ -30,6 +32,8 @@ function checkEditForm(form)
 
     errorMessage += checkFirstName();
     errorMessage += checkLastName();
+    errorMessage += checkCurrentPay();
+    errorMessage += checkDesiredPay();
 
     if (errorMessage != '')
     {
@@ -160,6 +164,46 @@ function checkLastName()
     if (fieldValue == '')
     {
         errorMessage = "    - You must enter a last name.\n";
+
+        fieldLabel.style.color = '#ff0000';
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+
+function checkCurrentPay()
+{
+    var errorMessage = '';
+
+    fieldValue = document.getElementById('currentPay').value;
+    fieldLabel = document.getElementById('currentPayLabel');
+    if (fieldValue != '' && isNaN(fieldValue))
+    {
+        errorMessage = "    - Current Pay is not a number. (Number Only)\n";
+
+        fieldLabel.style.color = '#ff0000';
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+
+function checkDesiredPay()
+{
+    var errorMessage = '';
+
+    fieldValue = document.getElementById('desiredPay').value;
+    fieldLabel = document.getElementById('desiredPayLabel');
+    if (fieldValue != '' && isNaN(fieldValue))
+    {
+        errorMessage = "    - Desired Pay is not a number. (Number Only)\n";
 
         fieldLabel.style.color = '#ff0000';
     }
