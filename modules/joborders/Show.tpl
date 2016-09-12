@@ -242,6 +242,7 @@
                                                     </a>
                                                 </td>
                                                 <td><?php $this->_($attachmentsData['dateCreated']) ?></td>
+                                                <td><?php $this->_($attachmentsData['enteredByFullName']) ?></td>
                                                 <td>
                                                     <?php if (!$this->isPopup): ?>
                                                         <?php if ($this->accessLevel >= ACCESS_LEVEL_DELETE): ?>
@@ -284,7 +285,7 @@
                             <tr>
                                 <td valign="top" class="vertical">Internal Notes:</td>
 
-                                <td class="data" style="width:320px;">
+                                <td class="data" style="width:620px;">
                                     <?php if($this->data['notes'] != ''): ?>
                                         <div id="shortDescription" style="overflow: auto; height:240px; border: #AAA 1px solid; padding:5px;">
                                             <?php echo($this->data['notes']); ?>
