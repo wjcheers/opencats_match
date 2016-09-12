@@ -170,7 +170,7 @@
                                                     </a>
                                                 </td>
                                                 <td><?php $this->_($attachmentsData['dateCreated']) ?></td>
-                                                <td><?php $this->_($attachmentsData['enteredByFullName']) ?></td>
+                                                <td>(<?php $this->_($attachmentsData['enteredByFullName']) ?>)</td>
                                                 <td>
                                                     <?php if ($this->accessLevel >= ACCESS_LEVEL_DELETE): ?>
                                                         <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=deleteAttachment&amp;companyID=<?php echo($this->companyID); ?>&amp;attachmentID=<?php $this->_($attachmentsData['attachmentID']) ?>"  title="Delete" onclick="javascript:return confirm('Delete this attachment?');">
