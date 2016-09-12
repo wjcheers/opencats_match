@@ -69,6 +69,7 @@ CREATE TABLE `attachment` (
   `md5_sum` varchar(40) collate utf8_unicode_ci NOT NULL default '',
   `file_size_kb` int(11) default '0',
   `md5_sum_text` varchar(40) collate utf8_unicode_ci NOT NULL default '',
+  `entered_by` int(11) NOT NULL default '0' COMMENT 'Created-by user.',
   PRIMARY KEY  (`attachment_id`),
   KEY `IDX_type_id` (`data_item_type`,`data_item_id`),
   KEY `IDX_data_item_id` (`data_item_id`),

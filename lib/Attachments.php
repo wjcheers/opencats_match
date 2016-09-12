@@ -45,10 +45,13 @@ class Attachments
 {
     private $_db;
     private $_siteID;
+    private $_userID;
 
 
     public function __construct($siteID)
     {
+        $this->_userID = $_SESSION['CATS']->getUserID();
+
         $this->_siteID = $siteID;
         $this->_db = DatabaseConnection::getInstance();
     }
@@ -73,7 +76,7 @@ class Attachments
     public function add($dataItemType, $dataItemID, $attachmentTitle,
         $originalFilename, $storedFilename, $contentType, $isResume,
         $resumeText, $isProfileImage, $directoryName, $fileSize = 0,
-        $md5sum = '')
+        $md5sum = '', $enteredBy)
     {
         /* If this is a profile image, delete all other profile images (users
          * can only have one).
@@ -112,7 +115,8 @@ class Attachments
                 directory_name,
                 md5_sum,
                 md5_sum_text,
-                file_size_kb
+                file_size_kb,
+                entered_by
             )
             VALUES (
                 %s,
@@ -127,6 +131,7 @@ class Attachments
                 %s,
                 NOW(),
                 NOW(),
+                %s,
                 %s,
                 %s,
                 %s,
@@ -145,7 +150,8 @@ class Attachments
             $this->_db->makeQueryString($directoryName),
             $this->_db->makeQueryString($md5sum),
             $this->_db->makeQueryString($md5sumText),
-            $this->_db->makeQueryInteger($fileSize)
+            $this->_db->makeQueryInteger($fileSize),
+            $this->_db->makeQueryInteger($enteredBy)
         );
 
         $queryResult = $this->_db->query($sql);
@@ -518,7 +524,7 @@ class Attachments
                 attachment_id AS attachmentID,
                 data_item_id AS dataItemID,
                 data_item_type AS dataItemType,
-                title AS title,
+                attachment.title AS title,
                 original_filename AS originalFilename,
                 stored_filename AS storedFilename,
                 content_type AS contentType,
@@ -526,15 +532,20 @@ class Attachments
                 directory_name AS directoryName,
                 md5_sum AS md5sum,
                 file_size_kb AS fileSizeKB,
-                DATE_FORMAT(date_created, '%%m-%%d-%%y (%%h:%%i:%%s %%p)') AS dateCreated
+                DATE_FORMAT(date_created, '%%m-%%d-%%y (%%h:%%i:%%s %%p)') AS dateCreated,
+                CONCAT(
+                    entered_by_user.first_name, ' ', entered_by_user.last_name
+                ) AS enteredByFullName
             FROM
                 attachment
+            LEFT JOIN user AS entered_by_user
+                ON attachment.entered_by = entered_by_user.user_id
             WHERE
                 data_item_id = %s
             AND
                 data_item_type = %s
             AND
-                site_id = %s",
+                attachment.site_id = %s",
             $this->_db->makeQueryInteger($dataItemID),
             $this->_db->makeQueryInteger($dataItemType),
             $this->_siteID
@@ -802,12 +813,14 @@ class AttachmentCreator
     private $_newFilePath = '';
     private $_containingDirectory = '';
     private $_attachmentID = -1;
+    private $_userID;
 
 
     // FIXME: Document me.
     public function __construct($siteID)
     {
         $this->_siteID = $siteID;
+        $this->_userID = $_SESSION['CATS']->getUserID();
     }
 
 
@@ -1168,7 +1181,7 @@ class AttachmentCreator
         $attachmentID = $attachments->add(
             $dataItemType, $dataItemID, $attachmentTitle, $originalFilename,
             $storedFilename, $contentType, $extractText, $extractedText,
-            $isProfileImage, '', $fileSize, $md5sum
+            $isProfileImage, '', $fileSize, $md5sum, $this->_userID
         );
 
         /* Were we successful? */

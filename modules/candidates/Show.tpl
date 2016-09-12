@@ -368,6 +368,7 @@
                                                     </td>
                                                     <td><?php echo($attachmentsData['previewLink']); ?></td>
                                                     <td><?php $this->_($attachmentsData['dateCreated']) ?></td>
+                                                    <td><?php $this->_($attachmentsData['enteredByFullName']) ?></td>
                                                     <td>
                                                         <?php if (!$this->isPopup): ?>
                                                             <?php if ($this->accessLevel >= ACCESS_LEVEL_DELETE): ?>
