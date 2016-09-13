@@ -172,12 +172,12 @@
 
                             <tr>
                                 <td class="vertical">Current Pay:</td>
-                                <td class="data"><?php $this->_($this->data['currentPay']); ?></td>
+                                <td class="data"><?php echo(number_format($this->data['currentPay'])); ?></td>
                             </tr>
 
                             <tr>
                                 <td class="vertical">Desired Pay:</td>
-                                <td class="data"><?php $this->_($this->data['desiredPay']); ?></td>
+                                <td class="data"><?php echo(number_format($this->data['desiredPay'])); ?></td>
                             </tr>
 
                             <tr>
