@@ -32,6 +32,7 @@ include_once('./lib/StringUtility.php');
 include_once('./lib/ActivityEntries.php');
 include_once('./lib/Pipelines.php');
 include_once('./lib/Mailer.php');
+include_once('./lib/EmailTemplates.php');
 
 
 $interface = new SecureAJAXInterface();
@@ -145,6 +146,89 @@ if ($type == ACTIVITY_DRIFTING)
     {
         $notificationHTML .= 'Error: An e-mail notification could not be sent to the activity entered owner, because the owner does not have a valid e-mail address.';
     }
+}
+if(($type == ACTIVITY_ARRANGE) || ($type == ACTIVITY_CONFIRM))
+{
+    if(!empty($activityEntry['enteredByEmail']) &&
+       $activityEntry['enteredByEmail'] != '' &&
+       $activityEntry['dataItemType'] == DATA_ITEM_CANDIDATE)
+    {
+        $candidateID = $activityEntry['dataItemID'];
+        $regardingID = $jobOrderID;
+        $pipelines = new Pipelines($siteID);
+                $pipelineUsers = $pipelines->getUser($candidateID, $regardingID);
+
+        if (!empty($pipelineUsers))
+        {
+            $pipelineUsers = $pipelineUsers[0];
+        }
+                
+        if(!empty($pipelineUsers) &&
+           !empty($pipelineUsers['jobOrderRecruiterEmail']) &&
+           !empty($pipelineUsers['candidateOwnerEmail']) &&
+           $pipelineUsers['jobOrderRecruiterEmail'] != '' &&
+           $pipelineUsers['candidateOwnerEmail'] != '')
+        {                
+            /* Get the change status email template. */
+            $emailTemplates = new EmailTemplates($siteID);
+            $statusChangeTemplateRS = $emailTemplates->getByTag('EMAIL_TEMPLATE_ARRANGEMENT');
+            
+            if (empty($statusChangeTemplateRS) ||
+                empty($statusChangeTemplateRS['textReplaced']))
+            {
+                $statusChangeTemplate = '';
+            }
+            else
+            {
+                $statusChangeTemplate = $statusChangeTemplateRS['textReplaced'];
+            }
+            
+            /* Replace e-mail template variables. */
+            $stringsToFind = array(
+                '%CANDOWNER%',
+                '%CANDFIRSTNAME%',
+                '%CANDFULLNAME%',
+                '%CANDCATSURL%',
+                '%JBODCATSURL%',
+                '%MESSAGE%'
+            );
+            $replacementStrings = array(
+                $pipelineUsers['candidateOwnerFirstName'] . ' ' . $pipelineUsers['candidateOwnerLastName'],
+                $pipelineUsers['candidateFirstName'],
+                $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'],
+                '<a href="http://' . $_SERVER['HTTP_HOST'] . $locationPathname . '?m=candidates&amp;a=show&amp;candidateID=' . $candidateID . '">'.
+                    'http://' . $_SERVER['HTTP_HOST'] . $locationPathname . '?m=candidates&amp;a=show&amp;candidateID=' . $candidateID . '</a>',
+                '<a href="http://' . $_SERVER['HTTP_HOST'] . $locationPathname . '?m=joborders&amp;a=show&amp;jobOrderID=' . $regardingID . '">'.
+                    'http://' . $_SERVER['HTTP_HOST'] . $locationPathname . '?m=joborders&amp;a=show&amp;jobOrderID=' . $regardingID . '</a>',
+                $activityNote
+            );
+            
+            $statusChangeTemplate = str_replace($stringsToFind, $replacementStrings, $statusChangeTemplate);
+
+            $email = $statusChangeTemplate;// . '<br><br><p>' . $activityNote . '</p>';
+            
+            /* Send e-mail notification. */
+            //FIXME: Make subject configurable.
+            $mailer = new Mailer($siteID);
+            $mailerStatus = $mailer->sendToMany(
+                array(array($pipelineUsers['candidateOwnerEmail'], ''), array($pipelineUsers['jobOrderRecruiterEmail'], '')),
+                'CATS Notification: Arrangement / Confirmation - ' . $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'] .
+                ' (' . $pipelineUsers['candidateOwnerFirstName'] . ' ' . $pipelineUsers['candidateOwnerLastName'] . ')', $email, true);
+                
+            $notificationHTML .= 'Send an e-mail notification to candidate owner and job order recruiter';
+        }
+        else
+        {
+            $notificationHTML .= 'Error: An e-mail notification' .
+                ' could not be sent to the candidate owner and job order recruiter' .
+                ' because the owner/recruiter does not have a valid e-mail address.';
+        }
+    }
+    else
+    {
+        $notificationHTML .= 'Error: An e-mail notification could not be sent to the activity entered owner, because the owner does not have a valid e-mail address.';
+    }
+    
 }
 
 
