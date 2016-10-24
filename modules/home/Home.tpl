@@ -132,6 +132,7 @@
                 </tr>
             </table>
             
+            <!--
             <table>
                 <tr>
                     <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
@@ -147,6 +148,7 @@
                     </td>
                 </tr>
             </table>
+            -->
         </div>
     </div>
     <div id="bottomShadow"></div>
