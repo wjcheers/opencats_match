@@ -545,7 +545,9 @@ class Attachments
             AND
                 data_item_type = %s
             AND
-                attachment.site_id = %s",
+                attachment.site_id = %s
+            ORDER BY
+                date_created asc",
             $this->_db->makeQueryInteger($dataItemID),
             $this->_db->makeQueryInteger($dataItemType),
             $this->_siteID
