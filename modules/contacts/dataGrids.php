@@ -78,7 +78,7 @@ class ContactsListByViewDataGrid extends ContactsDataGrid
     {
         $html = '';
 
-        $html .= $this->getInnerActionAreaItemPopup('Add To List', CATSUtility::getIndexName().'?m=lists&amp;a=addToListFromDatagridModal&amp;dataItemType='.DATA_ITEM_CONTACT, 450, 350);
+        $html .= $this->getInnerActionAreaItemPopup('Add To List', CATSUtility::getIndexName().'?m=lists&amp;a=addToListFromDatagridModal&amp;dataItemType='.DATA_ITEM_CONTACT, 750, 650);
         //$html .= $this->getInnerActionAreaItem('Export', CATSUtility::getIndexName().'?m=export&amp;a=exportByDataGrid');
 
         $html .= parent::getInnerActionArea();

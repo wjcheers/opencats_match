@@ -6,7 +6,7 @@
        </tr>
     </table>
             <div class="addToListListBox" id="addToListBox">
-                <input type="hidden" style="width:200px;" id="dataItemArray" value="<?php $this->_(implode(',', $this->dataItemIDArray)); ?>">
+                <input type="hidden" style="width:500px;" id="dataItemArray" value="<?php $this->_(implode(',', $this->dataItemIDArray)); ?>">
                 <?php foreach($this->savedListsRS as $index => $data): ?>
                     <div class="<?php TemplateUtility::printAlternatingDivClass($index); ?>" id="savedListRow<?php echo($data['savedListID']); ?>">
                         <span style="float:left;">
@@ -20,7 +20,7 @@
                     </div>
                     <div class="<?php TemplateUtility::printAlternatingDivClass($index); ?>" style="display:none;" id="savedListRowEditing<?php echo($data['savedListID']); ?>">
                         <span style="float:left;">
-                            <input class="inputbox" style="width:220px; padding-left:5px; margin-top:2px;" value="<?php $this->_($data['description']); ?>" id="savedListRowInput<?php echo($data['savedListID']); ?>">
+                            <input class="inputbox" style="width:520px; padding-left:5px; margin-top:2px;" value="<?php $this->_($data['description']); ?>" id="savedListRowInput<?php echo($data['savedListID']); ?>">
                         </span>
                         <span style="float:right; padding-right:25px;">
                             <a href="javascript:void(0);" onclick="deleteListRow(<?php echo($data['savedListID']); ?>, '<?php echo($this->sessionCookie); ?>', <?php echo($data['numberEntries']); ?>);" style="text-decoration:none;"><img src="images/actions/delete.gif" border="0">&nbsp;Delete</a>&nbsp;
@@ -33,7 +33,7 @@
                 <?php endforeach; ?>
                 <div class="<?php TemplateUtility::printAlternatingDivClass(count($this->savedListsRS)); ?>" style="display:none;" id="savedListNew">
                     <span style="float:left;">
-                        <input class="inputbox" style="width:220px; padding-left:5px; margin-top:2px;" value="" id="savedListNewInput">
+                        <input class="inputbox" style="width:520px; padding-left:5px; margin-top:2px;" value="" id="savedListNewInput">
                     </span>
                     <span style="float:right; padding-right:25px;">
                         <a href="javascript:void(0);" onclick="document.getElementById('savedListNew').style.display='none';" style="text-decoration:none;"><img src="images/actions/delete.gif" border="0">&nbsp;Delete</a>&nbsp;

@@ -1342,8 +1342,8 @@ td.contentContainerOld {
 .addToListListBox {
     overflow: auto;
     border: 1px solid #000;
-    width: 410px;
-    height: 260px;
+    width: 710px;
+    height: 560px;
     overflow-y: scroll;
     overflow-x: hidden;
     padding:0px;
@@ -1354,7 +1354,7 @@ td.contentContainerOld {
     padding-top:2px;
     padding-left:7px;
     padding-bottom:8px;
-    width: 395px;
+    width: 695px;
     height: 15px;
     background-color: #fff;
     border: 1px solid #999;
@@ -1365,7 +1365,7 @@ td.contentContainerOld {
     padding-top:2px;
     padding-left:7px;
     padding-bottom:8px;
-    width: 395px;
+    width: 695px;
     height: 15px;
     background-color: #E5EAF0;
     font: normal normal normal 12px/130% Arial, Tahoma, sans-serif;
