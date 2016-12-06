@@ -131,7 +131,7 @@ class SavedLists
                 site_id = %s
             %s
             ORDER BY
-                saved_list_id ASC",
+                description ASC",
             $this->_siteID,
             $typeCriterion
         );
