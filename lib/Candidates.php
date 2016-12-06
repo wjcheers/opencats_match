@@ -1146,7 +1146,7 @@ class CandidatesDataGrid extends DataGrid
 
         $this->_classColumns = array(
             'Attachments' => array('select' => 'IF(candidate_joborder_submitted.candidate_joborder_id, 1, 0) AS submitted,
-                                                IF(attachment_id, 1, 0) AS attachmentPresent',
+                                                IF(attachment.attachment_id, 1, 0) AS attachmentPresent',
 
                                      'pagerRender' => 'if ($rsData[\'submitted\'] == 1)
                                                     {
@@ -1183,6 +1183,88 @@ class CandidatesDataGrid extends DataGrid
                                      'sizable'  => false,
                                      'exportable' => false,
                                      'filter'         => 'candidate_joborder_submitted.candidate_joborder_id',
+                                     'filterable' => '===~'),
+                                     
+            'A' => array('select' => 'IF(attachmentA.attachment_id, 1, 0) AS haveAgreement',
+
+                                     'pagerRender' => 'if ($rsData[\'haveAgreement\'] == 1)
+                                                    {
+                                                        $return = \'<img src="images/job_orders.gif" alt="" width="16" height="16" title="Have Personal Agreement" />\';
+                                                    }
+                                                    else
+                                                    {
+                                                        $return = \'<img src="images/mru/blank.gif" alt="" width="16" height="16" />\';
+                                                    }
+
+                                                    return $return;
+                                                   ',
+
+                                     'join'     => 'LEFT JOIN attachment AS attachmentA
+                                                        ON candidate.candidate_id = attachmentA.data_item_id
+														AND attachmentA.data_item_type = '.DATA_ITEM_CANDIDATE.'
+                                                        AND attachmentA.title like \'%personalagreement%\'',
+
+                                     'pagerWidth'    => 17,
+                                     'sizable'  => false),
+
+            'R' => array('select' => 'IF(attachmentR.attachment_id, 1, 0) AS haveResume',
+
+                                     'pagerRender' => 'if ($rsData[\'haveResume\'] == 1)
+                                                    {
+                                                        $return = \'<img src="images/job_orders.gif" alt="" width="16" height="16" title="Have Resume" />\';
+                                                    }
+                                                    else
+                                                    {
+                                                        $return = \'<img src="images/mru/blank.gif" alt="" width="16" height="16" />\';
+                                                    }
+
+                                                    return $return;
+                                                   ',
+
+                                     'join'     => 'LEFT JOIN attachment AS attachmentR
+                                                        ON candidate.candidate_id = attachmentR.data_item_id
+														AND attachmentR.data_item_type = '.DATA_ITEM_CANDIDATE.'
+                                                        AND (attachmentR.title like \'%Resume%\' OR attachmentR.title like \'%Report%\')',
+
+                                     'pagerWidth'    => 17,
+                                     'sizable'  => false),
+
+            'E' => array('select' => 'candidate.email1 AS e1, candidate.email2 AS e2',
+
+                                     'pagerRender' => 'if (($rsData[\'e1\'] != \'\') || ($rsData[\'e2\'] != \'\'))
+                                                    {
+                                                        $return = \'<img src="images/job_orders.gif" alt="" width="16" height="16" title="Have Email" />\';
+                                                    }
+                                                    else
+                                                    {
+                                                        $return = \'<img src="images/mru/blank.gif" alt="" width="16" height="16" />\';
+                                                    }
+
+                                                    return $return;
+                                                   ',
+
+                                     'pagerWidth'    => 17,
+                                     'sizable'  => false,
+                                     'filter'         => 'candidate.email1',
+                                     'filterable' => '===~'),
+
+            'P' => array('select' => 'candidate.phone_home AS p1, candidate.phone_cell AS p2, candidate.phone_work AS p3',
+
+                                     'pagerRender' => 'if (($rsData[\'p1\'] != \'\') || ($rsData[\'p2\'] != \'\') || ($rsData[\'p3\'] != \'\'))
+                                                    {
+                                                        $return = \'<img src="images/job_orders.gif" alt="" width="16" height="16" title="Have Phone" />\';
+                                                    }
+                                                    else
+                                                    {
+                                                        $return = \'<img src="images/mru/blank.gif" alt="" width="16" height="16" />\';
+                                                    }
+
+                                                    return $return;
+                                                   ',
+
+                                     'pagerWidth'    => 17,
+                                     'sizable'  => false,
+                                     'filter'         => 'candidate.phone_cell',
                                      'filterable' => '===~'),
 
             'First Name' =>     array('select'         => 'candidate.first_name AS firstName',
