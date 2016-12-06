@@ -12,11 +12,13 @@
                         <img src="images/job_orders.gif" width="24" height="24" border="0" alt="Job Orders" style="margin-top: 3px;" />&nbsp;
                     </td>
                     <td><h2>Lists: <?php $this->_($this->listRS['description']); ?></h2></td>
+                    <?php if ($_SESSION['CATS']->getAccessLevel() >= ACCESS_LEVEL_DELETE): ?>
                     <td align="right">
                         <!--<a href="javascript:void(0);" onclick="" style="text-decoration:none;"><img src="images/actions/add_job_order.gif" border="0">&nbsp;Duplicate List&nbsp;&nbsp;&nbsp;-->
                         <!--<a href="javascript:void(0);" onclick="" style="text-decoration:none;"><img src="images/actions/edit.gif" border="0">&nbsp;Rename List&nbsp;&nbsp;&nbsp;-->
                         <a href="javascript:void(0);" onclick="deleteListFromListView(<?php $this->_($this->listRS['savedListID']); ?>, <?php $this->_($this->listRS['numberEntries']); ?>);" style="text-decoration:none;"><img src="images/actions/delete.gif" border="0">&nbsp;Delete List</a>
                     </td>
+                    <?php endif; ?>
                 </tr>
             </table>
 
