@@ -747,17 +747,21 @@ class Pipelines
                 candidate_owner.email AS candidateOwnerEmail,
                 jobOrderRecruiter.first_name AS jobOrderRecruiterFirstName,
                 jobOrderRecruiter.last_name AS jobOrderRecruiterLastName,
-                jobOrderRecruiter.email AS jobOrderRecruiterEmail
+                jobOrderRecruiter.email AS jobOrderRecruiterEmail,
+                joborder_1.title AS jobOrderTitle,
+                company_1.name AS jobOrderCompanyName
             FROM
                 candidate_joborder
             LEFT JOIN candidate AS candidate_name
                 ON candidate_name.candidate_id = candidate_joborder.candidate_id
-            LEFT JOIN joborder as joborder_recruiter
-                ON joborder_recruiter.joborder_id = candidate_joborder.joborder_id
+            LEFT JOIN joborder as joborder_1
+                ON joborder_1.joborder_id = candidate_joborder.joborder_id
+            LEFT JOIN company as company_1
+                ON joborder_1.company_id = company_1.company_id
             LEFT JOIN user AS candidate_owner
                 ON candidate_owner.user_id = candidate_name.owner
             LEFT JOIN user AS jobOrderRecruiter
-                ON jobOrderRecruiter.user_id = joborder_recruiter.recruiter
+                ON jobOrderRecruiter.user_id = joborder_1.recruiter
             WHERE
                 candidate_joborder.candidate_id = %s
             AND

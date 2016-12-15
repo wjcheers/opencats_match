@@ -2786,6 +2786,8 @@ class CandidatesUI extends UserInterface
                         '%CANDFULLNAME%',
                         '%CANDCATSURL%',
                         '%JBODCATSURL%',
+                        '%JBODCLIENT%',
+                        '%JBODTITLE%',
                         '%MESSAGE%'
                     );
                     $replacementStrings = array(
@@ -2796,6 +2798,8 @@ class CandidatesUI extends UserInterface
                             'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=candidates&amp;a=show&amp;candidateID=' . $candidateID . '</a>',
                         '<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $regardingID . '">'.
                             'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $regardingID . '</a>',
+                        $pipelineUsers['jobOrderCompanyName'],
+                        $pipelineUsers['jobOrderTitle'],
                         $activityNote
                     );
                     
