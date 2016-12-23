@@ -22,6 +22,8 @@
 
 <?php endif; ?>
 
+<?php $extraFieldRS = array();?>
+
             <p class="note<?php if ($this->isModal): ?>Unsized<?php endif; ?>">Basic Information</p>
 
             <table style="font-weight:bold; border: 1px solid #000; background-color: #ffed1a; padding:5px; display:none; margin-bottom:7px;" width="<?php if ($this->isModal): ?>100%<?php else: ?>1225<?php endif; ?>" id="candidateAlreadyInSystemTable">
@@ -168,6 +170,38 @@
                         </td>
                     </tr>
 
+                    <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
+                    <?php if ($this->extraFieldRS[$i]['fieldName'] == 'Chinese Name'): ?>
+                        <tr>
+                            <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
+                                <label id="extraFieldLbl<?php echo($i); ?>">
+                                    <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
+                                </label>
+                            </td>
+                            <td class="tdData" id="extraFieldData<?php echo($i); ?>">
+                                <?php echo($this->extraFieldRS[$i]['addHTML']); ?>
+                            </td>
+                        </tr>
+                        <?php $extraFieldRS[$i] = 1; break;?>
+                    <?php endif; ?>
+                    <?php endfor; ?>
+                    
+                    <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
+                    <?php if ($this->extraFieldRS[$i]['fieldName'] == 'Nationality'): ?>
+                        <tr>
+                            <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
+                                <label id="extraFieldLbl<?php echo($i); ?>">
+                                    <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
+                                </label>
+                            </td>
+                            <td class="tdData" id="extraFieldData<?php echo($i); ?>">
+                                <?php echo($this->extraFieldRS[$i]['addHTML']); ?>
+                            </td>
+                        </tr>
+                        <?php $extraFieldRS[$i] = 1; break;?>
+                    <?php endif; ?>
+                    <?php endfor; ?>
+                    
                     <tr>
                         <td class="tdVertical">
                             <label id="emailLabel" for="email1">E-Mail:</label>
@@ -192,6 +226,30 @@
                         </td>
                         <td class="tdData">
                             <input type="text" tabindex="5" name="webSite" id="webSite" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['webSite'])) $this->_($this->preassignedFields['webSite']); ?>" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="sourceLabel" for="sourceSelect">Source:</label>
+                        </td>
+                        <td class="tdData">
+<?php if ($this->isModal): ?>
+                            <select id="sourceSelect" tabindex="<?php echo($tabIndex++); ?>" name="source" class="inputbox" style="width: 150px;">
+<?php else: ?>
+                            <select id="sourceSelect" tabindex="<?php echo($tabIndex++); ?>" name="source" class="inputbox" style="width: 150px;" onchange="if (this.value == 'edit') { listEditor('Sources', 'sourceSelect', 'sourceCSV', false); this.value = '(none)'; } if (this.value == 'nullline') { this.value = '(none)'; }">
+                                <option value="edit">(Edit Sources)</option>
+                                <option value="nullline">-------------------------------</option>
+<?php endif; ?>
+                                    <option value="(none)" <?php if (!isset($this->preassignedFields['source'])): ?>selected="selected"<?php endif; ?>>(None)</option>
+                                    <?php if (isset($this->preassignedFields['source'])): ?>
+                                        <option value="<?php $this->_($this->_($this->preassignedFields['source'])); ?>" selected="selected"><?php $this->_($this->_($this->preassignedFields['source'])); ?></option>
+                                    <?php endif; ?>
+                                <?php foreach ($this->sourcesRS AS $index => $source): ?>
+                                    <option value="<?php $this->_($source['name']); ?>"><?php $this->_($source['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <input type="hidden" id="sourceCSV" name="sourceCSV" value="<?php $this->_($this->sourcesString); ?>" />
                         </td>
                     </tr>
 
@@ -234,6 +292,15 @@
 
                     <tr>
                         <td class="tdVertical">
+                            <label id="stateLabel" for="state">Best Time to Call:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" tabindex="13" name="bestTimeToCall" id="bestTimeToCall" class="inputbox" style="width: 150px" value="<?php if(isset($this->preassignedFields['bestTimeToCall'])) $this->_($this->preassignedFields['bestTimeToCall']); ?>" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="tdVertical">
                             <label id="addressLabel" for="address">Address:</label>
                         </td>
                         <td class="tdData">
@@ -260,6 +327,7 @@
                         </td>
                     </tr>
 
+                    <?php /*
                     <tr>
                         <td class="tdVertical">
                             <label id="zipLabel" for="zip">Postal Code:</label>
@@ -270,15 +338,7 @@
                             <img src="images/indicator2.gif" alt="AJAX" id="ajaxIndicator" style="vertical-align: middle; visibility: hidden; margin-left: 5px;" />
                         </td>
                     </tr>
-
-                    <tr>
-                        <td class="tdVertical">
-                            <label id="stateLabel" for="state">Best Time to Call:</label>
-                        </td>
-                        <td class="tdData">
-                            <input type="text" tabindex="13" name="bestTimeToCall" id="bestTimeToCall" class="inputbox" style="width: 150px" value="<?php if(isset($this->preassignedFields['bestTimeToCall'])) $this->_($this->preassignedFields['bestTimeToCall']); ?>" />
-                        </td>
-                    </tr>
+                    */ ?>
 
                     <?php $tabIndex = 15; ?>
                 </table>
@@ -402,19 +462,6 @@
                 <p class="note<?php if ($this->isModal): ?>Unsized<?php endif; ?>" style="margin-top: 5px;">Other</p>
                 <table class="editTable" width="<?php if ($this->isModal): ?>100%<?php else: ?>1225<?php endif; ?>">
 
-                    <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
-                        <tr>
-                            <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
-                                <label id="extraFieldLbl<?php echo($i); ?>">
-                                    <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
-                                </label>
-                            </td>
-                            <td class="tdData" id="extraFieldData<?php echo($i); ?>">
-                                <?php echo($this->extraFieldRS[$i]['addHTML']); ?>
-                            </td>
-                        </tr>
-                    <?php endfor; ?>
-
                     <tr>
                         <td class="tdVertical">
                             <label id="canRelocateLabel" for="canRelocate">Can Relocate:</label>
@@ -445,6 +492,22 @@
                         </td>
                     </tr>
 
+                    <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
+                    <?php if ($this->extraFieldRS[$i]['fieldName'] == 'Job Title'): ?>
+                        <tr>
+                            <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
+                                <label id="extraFieldLbl<?php echo($i); ?>">
+                                    <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
+                                </label>
+                            </td>
+                            <td class="tdData" id="extraFieldData<?php echo($i); ?>">
+                                <?php echo($this->extraFieldRS[$i]['addHTML']); ?>
+                            </td>
+                        </tr>
+                        <?php $extraFieldRS[$i] = 1; ?>
+                    <?php endif; ?>
+                    <?php endfor; ?>
+
                     <tr>
                         <td class="tdVertical">
                             <label id="currentPayLabel" for="currentEmployer">Current Pay:</label>
@@ -465,36 +528,27 @@
 
                     <tr>
                         <td class="tdVertical">
-                            <label id="sourceLabel" for="sourceSelect">Source:</label>
-                        </td>
-                        <td class="tdData">
-<?php if ($this->isModal): ?>
-                            <select id="sourceSelect" tabindex="<?php echo($tabIndex++); ?>" name="source" class="inputbox" style="width: 150px;">
-<?php else: ?>
-                            <select id="sourceSelect" tabindex="<?php echo($tabIndex++); ?>" name="source" class="inputbox" style="width: 150px;" onchange="if (this.value == 'edit') { listEditor('Sources', 'sourceSelect', 'sourceCSV', false); this.value = '(none)'; } if (this.value == 'nullline') { this.value = '(none)'; }">
-                                <option value="edit">(Edit Sources)</option>
-                                <option value="nullline">-------------------------------</option>
-<?php endif; ?>
-                                    <option value="(none)" <?php if (!isset($this->preassignedFields['source'])): ?>selected="selected"<?php endif; ?>>(None)</option>
-                                    <?php if (isset($this->preassignedFields['source'])): ?>
-                                        <option value="<?php $this->_($this->_($this->preassignedFields['source'])); ?>" selected="selected"><?php $this->_($this->_($this->preassignedFields['source'])); ?></option>
-                                    <?php endif; ?>
-                                <?php foreach ($this->sourcesRS AS $index => $source): ?>
-                                    <option value="<?php $this->_($source['name']); ?>"><?php $this->_($source['name']); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <input type="hidden" id="sourceCSV" name="sourceCSV" value="<?php $this->_($this->sourcesString); ?>" />
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td class="tdVertical">
                             <label id="keySkillsLabel" for="keySkills">Key Skills:</label>
                         </td>
                         <td class="tdData">
                             <input type="text" class="inputbox" tabindex="<?php echo($tabIndex++); ?>" name="keySkills" id="keySkills" style="width: 400px;" value="<?php if (isset($this->preassignedFields['keySkills'])) $this->_($this->preassignedFields['keySkills']); ?>" />
                         </td>
                     </tr>
+
+                    <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
+                    <?php if (!isset($extraFieldRS[$i])): ?>
+                        <tr>
+                            <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
+                                <label id="extraFieldLbl<?php echo($i); ?>">
+                                    <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
+                                </label>
+                            </td>
+                            <td class="tdData" id="extraFieldData<?php echo($i); ?>">
+                                <?php echo($this->extraFieldRS[$i]['addHTML']); ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                    <?php endfor; ?>
 
                     <tr>
                         <td class="tdVertical">
