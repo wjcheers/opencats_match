@@ -93,7 +93,8 @@ class ExportUtility
         return array(
             'header' => $header,
             'footer' => $footer,
-            'menu'   => $menu
+            'menu' => ''
+            /* 'menu'   => $menu*/
         );
     }
 }
