@@ -52,7 +52,7 @@ class candidatesListByViewDataGrid extends CandidatesDataGrid
         //  - Mass set rank (depends on each candidate having their own personal rank - are we going to do this?)
         $html = '';
 
-        $html .= $this->getInnerActionAreaItemPopup('Add To List', CATSUtility::getIndexName().'?m=lists&amp;a=addToListFromDatagridModal&amp;dataItemType='.DATA_ITEM_CANDIDATE, 750, 650);
+        $html .= $this->getInnerActionAreaItemPopup('Add To List', CATSUtility::getIndexName().'?m=lists&amp;a=addToListFromDatagridModal&amp;dataItemType='.DATA_ITEM_CANDIDATE, 750, 450);
         $html .= $this->getInnerActionAreaItemPopup('Add To Pipeline', CATSUtility::getIndexName().'?m=candidates&amp;a=considerForJobSearch', 750, 460);
         if(MAIL_MAILER != 0)
         {

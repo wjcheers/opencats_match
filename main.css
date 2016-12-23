@@ -1343,7 +1343,7 @@ td.contentContainerOld {
     overflow: auto;
     border: 1px solid #000;
     width: 710px;
-    height: 560px;
+    height: 360px;
     overflow-y: scroll;
     overflow-x: hidden;
     padding:0px;
