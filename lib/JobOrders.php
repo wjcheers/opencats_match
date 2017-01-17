@@ -503,12 +503,12 @@ class JobOrders
                     WHERE
                         candidate_joborder.joborder_id = %s
                     AND
-                        candidate_joborder.date_modified > \'1900-01-01\'
+                        candidate_joborder.date_modified > '1900-01-01'
                     AND
                         YEARWEEK(candidate_joborder.date_modified) = YEARWEEK(DATE_SUB(CURDATE(), INTERVAL 7 DAY))
                     AND
                         site_id = %s
-                ) AS lastWeekPipeline',
+                ) AS lastWeekPipeline,
                 (
                     SELECT
                         COUNT(*)
@@ -1120,7 +1120,7 @@ class JobOrdersDataGrid extends DataGrid
                                                             AND
                                                                 site_id = '.$this->_siteID.'
                                                             AND
-                                                                candidate_joborder.date_modified > \'1900-01-01\'
+                                                                candidate_joborder.date_modified > "1900-01-01"
                                                             AND
                                                                 YEARWEEK(candidate_joborder.date_modified) = YEARWEEK(DATE_SUB(CURDATE(), INTERVAL 7 DAY))
                                                         ) AS lastWeekPipeline',
@@ -1130,8 +1130,6 @@ class JobOrdersDataGrid extends DataGrid
                                      'pagerWidth'    => 25,
                                      'filterHaving'  => 'pipeline',
                                      'filterTypes'   => '===>=<'),
-
-                                      'pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'jobOrderID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'title\']).\'</a>\';',
 
              'Interviews' =>       array('select'   => '(
                                                              SELECT
