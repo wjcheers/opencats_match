@@ -61,6 +61,7 @@ class JobOrdersListByViewDataGrid extends JobOrdersDataGrid
             array('name' => 'Age', 'width' => 30),
             array('name' => 'Submitted', 'width' => 18),
             array('name' => 'Pipeline', 'width' => 18),
+            array('name' => 'LastWeekPipeline', 'width' => 18),
             array('name' => 'Recruiter', 'width' => 65),
             array('name' => 'Owner', 'width' => 55),
         );
@@ -120,6 +121,7 @@ class joborderSavedListByViewDataGrid extends JobOrdersDataGrid
             array('name' => 'Age', 'width' => 30),
             array('name' => 'Submitted', 'width' => 18),
             array('name' => 'Pipeline', 'width' => 18),
+            array('name' => 'LastWeekPipeline', 'width' => 18),
             array('name' => 'Recruiter', 'width' => 65),
             array('name' => 'Owner', 'width' => 55),
         );

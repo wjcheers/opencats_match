@@ -499,6 +499,20 @@ class JobOrders
                     SELECT
                         COUNT(*)
                     FROM
+                        candidate_joborder
+                    WHERE
+                        candidate_joborder.joborder_id = %s
+                    AND
+                        candidate_joborder.date_modified > \'1900-01-01\'
+                    AND
+                        YEARWEEK(candidate_joborder.date_modified) = YEARWEEK(DATE_SUB(CURDATE(), INTERVAL 7 DAY))
+                    AND
+                        site_id = %s
+                ) AS lastWeekPipeline',
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
                         candidate_joborder_status_history
                     WHERE
                         joborder_id = %s
@@ -530,6 +544,8 @@ class JobOrders
                 joborder.site_id = %s
             GROUP BY
                 joborder.joborder_id",
+            $this->_db->makeQueryInteger($jobOrderID),
+            $this->_siteID,
             $this->_db->makeQueryInteger($jobOrderID),
             PIPELINE_STATUS_SUBMITTED,
             $this->_siteID,
@@ -1093,6 +1109,29 @@ class JobOrdersDataGrid extends DataGrid
                                      'pagerWidth'    => 25,
                                      'filterHaving'  => 'pipeline',
                                      'filterTypes'   => '===>=<'),
+
+            'LastWeekPipeline' =>       array('select'   => '(
+                                                            SELECT
+                                                                COUNT(*)
+                                                            FROM
+                                                                candidate_joborder
+                                                            WHERE
+                                                                joborder_id = joborder.joborder_id
+                                                            AND
+                                                                site_id = '.$this->_siteID.'
+                                                            AND
+                                                                candidate_joborder.date_modified > \'1900-01-01\'
+                                                            AND
+                                                                YEARWEEK(candidate_joborder.date_modified) = YEARWEEK(DATE_SUB(CURDATE(), INTERVAL 7 DAY))
+                                                        ) AS lastWeekPipeline',
+                                     'pagerRender'      => 'return $rsData[\'lastWeekPipeline\'];',
+                                     'sortableColumn'     => 'lastWeekPipeline',                                     
+                                     'columnHeaderText' => 'LWP',
+                                     'pagerWidth'    => 25,
+                                     'filterHaving'  => 'pipeline',
+                                     'filterTypes'   => '===>=<'),
+
+                                      'pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'jobOrderID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'title\']).\'</a>\';',
 
              'Interviews' =>       array('select'   => '(
                                                              SELECT
