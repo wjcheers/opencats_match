@@ -1246,6 +1246,8 @@ class QuickSearch
     public function candidates($wildCardString)
     {
         $wildCardStringChineseName = $wildCardString;
+        $wildCardString = preg_replace('/\s+/', ' ',$wildCardString);
+        $wildCardString = str_replace(' ', '%', $wildCardString);
         $wildCardString = str_replace('-', '%', $wildCardString);
         $wildCardString = str_replace('_', '%', $wildCardString);
         $wildCardString = str_replace('*', '%', $wildCardString) . '%';
