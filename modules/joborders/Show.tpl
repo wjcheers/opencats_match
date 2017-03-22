@@ -126,7 +126,6 @@
                             <?php for ($i = 0; $i < intval(count($this->extraFieldRS)/2); $i++): ?>
                                <tr>
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>
-                                    <td class="data"><?php echo($this->extraFieldRS[$i]['display']); ?></td>
                                     <td class="data">
                                         <?php if(substr($this->extraFieldRS[$i]['display'], 0, 4) == 'http'): ?>
                                             <?php if(strlen($this->extraFieldRS[$i]['display']) > 50): ?>
