@@ -632,6 +632,8 @@ function AS_onRegardingChange(statusesArray, jobOrdersArray, regardingSelectID,
     document.getElementById('triggerValid').checked = false;
     document.getElementById('triggerPersonalAgreementSpan').style.display = 'none';
     document.getElementById('triggerPersonalAgreement').checked = false;
+    document.getElementById('triggerCurrentDesiredPayRatioSpan').style.display = 'none';
+    document.getElementById('triggerCurrentDesiredPayRatio').checked = false;
     document.getElementById('triggerCurrentPaySpan').style.display = 'none';
     document.getElementById('triggerCurrentPay').checked = false;
     document.getElementById('triggerDesiredPaySpan').style.display = 'none';
@@ -707,6 +709,8 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
     document.getElementById('triggerValid').checked = false;
     document.getElementById('triggerPersonalAgreementSpan').style.display = 'none';
     document.getElementById('triggerPersonalAgreement').checked = false;
+    document.getElementById('triggerCurrentDesiredPayRatioSpan').style.display = 'none';
+    document.getElementById('triggerCurrentDesiredPayRatio').checked = false;
     document.getElementById('triggerCurrentPaySpan').style.display = 'none';
     document.getElementById('triggerCurrentPay').checked = false;
     document.getElementById('triggerDesiredPaySpan').style.display = 'none';

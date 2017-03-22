@@ -2974,6 +2974,81 @@ class CandidatesUI extends UserInterface
                 }
             }
 
+            if ($newStatusDescription == "Qualifying" && $this->isChecked('triggerCurrentDesiredPayRatio', $_POST))
+            {                
+                $pipelineUsers = $pipelines->getUser($candidateID, $regardingID);
+                
+                if (!empty($pipelineUsers))
+                {
+                    $pipelineUsers = $pipelineUsers[0];
+                }
+                        
+                if(!empty($pipelineUsers) &&
+                   !empty($pipelineUsers['jobOrderRecruiterEmail']) &&
+                   !empty($pipelineUsers['candidateOwnerEmail']) &&
+                   $pipelineUsers['jobOrderRecruiterEmail'] != '' &&
+                   $pipelineUsers['candidateOwnerEmail'] != '')
+                {                
+                    /* Get the change status email template. */
+                    $emailTemplates = new EmailTemplates($this->_siteID);
+                    $statusChangeTemplateRS = $emailTemplates->getByTag(
+                        'EMAIL_TEMPLATE_HIGHDESIREDPAY'
+                    );
+                    
+                    if (empty($statusChangeTemplateRS) ||
+                        empty($statusChangeTemplateRS['textReplaced']))
+                    {
+                        $statusChangeTemplate = '';
+                    }
+                    else
+                    {
+                        $statusChangeTemplate = $statusChangeTemplateRS['textReplaced'];
+                    }
+                    
+                    /* Replace e-mail template variables. */
+                    $stringsToFind = array(
+                        '%CANDOWNER%',
+                        '%CANDFIRSTNAME%',
+                        '%CANDFULLNAME%',
+                        '%CANDCATSURL%',
+                        '%JBODCATSURL%'
+                    );
+                    $replacementStrings = array(
+                        $pipelineUsers['candidateOwnerFirstName'] . ' ' . $pipelineUsers['candidateOwnerLastName'],
+                        $pipelineUsers['candidateFirstName'],
+                        $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'],
+                        '<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=candidates&amp;a=show&amp;candidateID=' . $candidateID . '">'.
+                            'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=candidates&amp;a=show&amp;candidateID=' . $candidateID . '</a>',
+                        '<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $regardingID . '">'.
+                            'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $regardingID . '</a>'
+                    );
+                    
+                    $statusChangeTemplate = str_replace(
+                        $stringsToFind,
+                        $replacementStrings,
+                        $statusChangeTemplate
+                    );
+
+                    $email = $statusChangeTemplate;// . '<br><br><p>' . $activityNote . '</p>';
+                    
+                    /* Send e-mail notification. */
+                    //FIXME: Make subject configurable.
+                    $mailer = new Mailer($this->_siteID);
+                    $mailerStatus = $mailer->sendToMany(
+                        array(array($pipelineUsers['candidateOwnerEmail'], ''), array($pipelineUsers['jobOrderRecruiterEmail'], '')),
+                        'CATS Notification: Desired Pay is higher than general case - ' . $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName']
+                        . ' (' . $pipelineUsers['candidateOwnerFirstName'] . ' ' . $pipelineUsers['candidateOwnerLastName'] . ')',
+                        $email,
+                        true);
+                }
+                else
+                {
+                    $notificationHTML .= '<p><span class="bold" style="color: #ff0000;">Error: An e-mail notification'
+                        . ' could not be sent to the candidate owner and job order recruiter'
+                        . ' because the owner/recruiter does not have a valid e-mail address.</span></p>';                    
+                }
+            }
+
             if ($statusChanged && $this->isChecked('triggerEmail', $_POST))
             {
                 $customMessage = $this->getTrimmedInput('customMessage', $_POST);

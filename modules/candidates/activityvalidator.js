@@ -15,6 +15,7 @@ function checkActivityForm(form)
     errorMessage += checkEventTitle();
     errorMessage += checkValid();
     errorMessage += checkPersonalAgreement();
+    errorMessage += checkCurrentDesiredPayRatio();
     errorMessage += checkCurrentPay();
     errorMessage += checkDesiredPay();
     errorMessage += checkValidEmail();
@@ -97,6 +98,43 @@ function checkPersonalAgreement()
         {
             errorMessage  = "    - Did you upload the candidate's Personal Agreement?\n";
             errorMessage += "      File name: PersonalAgreement...\n\n";
+
+            fieldLabel.style.color = '#ff0000';        
+        }
+        else
+        {
+            fieldLabel.style.color = '#000';
+        }
+    }
+
+    return errorMessage;
+}
+
+
+function checkCurrentDesiredPayRatio()
+{
+    var errorMessage = '';
+    fieldLabel = document.getElementById('triggerCurrentDesiredPayRatioSpan');
+
+    var currentPay = fieldLabel.getAttribute('data-current-pay');
+    var desiredPay = fieldLabel.getAttribute('data-desired-pay');
+    var currentDesiredPayRatioCount = fieldLabel.getAttribute('data-current-desired-pay-ratio-count');
+    currentDesiredPayRatioCount ++;
+    fieldLabel.setAttribute('data-current-desired-pay-ratio-count', currentDesiredPayRatioCount);
+
+    if((currentPay && currentPay != '')
+        && (desiredPay && desiredPay != '')
+        && (desiredPay > (currentPay * 1.2))
+        && document.getElementById('changeStatus').checked == true
+        && document.changePipelineStatusForm.statusID.options[document.changePipelineStatusForm.statusID.selectedIndex].text == "Qualifying")
+    {
+        if(currentDesiredPayRatioCount >= 1)
+        {
+            document.getElementById('triggerCurrentDesiredPayRatioSpan').style.display = 'inline';
+        }
+        if(document.getElementById('triggerCurrentDesiredPayRatio').checked == false)
+        {
+            errorMessage  = "    - The candidate's Desired Pay / Current Pay > 1.2. Are you sure?\n\n";
 
             fieldLabel.style.color = '#ff0000';        
         }
