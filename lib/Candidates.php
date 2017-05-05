@@ -1267,6 +1267,11 @@ class CandidatesDataGrid extends DataGrid
                                      'filter'         => 'candidate.phone_cell',
                                      'filterable' => '===~'),
 
+            'ID/2' =>         array( 'select'   => 'candidate.candidate_id AS candId',
+                                     'pagerRender'    => 'return $rsData[\'candId\']%2;',
+                                     'pagerWidth'    => 17,
+                                     'filter'         => 'candidate.candidate_id%2'),
+
             'First Name' =>     array('select'         => 'candidate.first_name AS firstName',
                                       'pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'firstName\']).\'</a>\';',
                                       'sortableColumn' => 'firstName',
