@@ -296,7 +296,7 @@
 
                                 <td class="data" colspan="2">
                                     <?php if($this->data['description'] != ''): ?>
-                                    <div id="shortDescription" style="overflow: auto; height:170px; border: #AAA 1px solid; padding:5px;">
+                                    <div id="shortDescription" style="word-break: break-all; overflow: auto; height:170px; border: #AAA 1px solid; padding:5px;">
                                         <?php echo($this->data['description']); ?>
                                     </div>
                                     <?php endif; ?>
@@ -309,7 +309,7 @@
 
                                 <td class="data" style="width:620px;">
                                     <?php if($this->data['notes'] != ''): ?>
-                                        <div id="shortDescription" style="overflow: auto; height:240px; border: #AAA 1px solid; padding:5px;">
+                                        <div id="shortDescription" style="word-break: break-all; overflow: auto; height:240px; border: #AAA 1px solid; padding:5px;">
                                             <?php echo($this->data['notes']); ?>
                                         </div>
                                     <?php endif; ?>
