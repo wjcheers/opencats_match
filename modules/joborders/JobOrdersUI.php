@@ -1039,6 +1039,59 @@ class JobOrdersUI extends UserInterface
             $email = '';
             $emailAddress = '';
         }
+        
+        /* notify assistant to sync this status */      
+        if ($this->isChecked('statusChange', $_POST))  
+        {
+            $jobOrderDetails = $jobOrders->get($jobOrderID);
+            
+            /* Get the change status email template. */
+            $emailTemplatesJecho = new EmailTemplates($this->_siteID);
+            $statusChangeTemplateRSJecho = $emailTemplatesJecho->getByTag(
+                'EMAIL_TEMPLATE_OWNERSHIPASSIGNJOBORDER'
+            );
+
+            if (empty($statusChangeTemplateRSJecho) ||
+                empty($statusChangeTemplateRSJecho['textReplaced']))
+            {
+                $statusChangeTemplateJecho = '';
+            }
+            else
+            {
+                $statusChangeTemplateJecho = $statusChangeTemplateRSJecho['textReplaced'];
+            }
+
+            /* Replace e-mail template variables. */
+            $stringsToFind = array(
+                '%JBODOWNER%',
+                '%JBODTITLE%',
+                '%JBODCLIENT%',
+                '%JBODID%',
+                '%JBODCATSURL%',
+                'has been assigned to you'
+            );
+            $replacementStrings = array(
+                'Sir',
+                $jobOrderDetails['title'],
+                $jobOrderDetails['companyName'],
+                $jobOrderID,
+                '<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $jobOrderID . '">'.
+                    'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $jobOrderID . '</a>',
+                'has been changed'
+            );
+            $statusChangeTemplateJecho = str_replace(
+                $stringsToFind,
+                $replacementStrings,
+                $statusChangeTemplateJecho
+            );
+
+            /* Send e-mail notification. */
+            //FIXME: Make subject configurable.
+            $mailer = new Mailer($this->_siteID);
+            $mailerStatus = $mailer->sendToOne(
+                array('cats@example.com', ''),
+                'CATS Notification: Job Order Modified', $statusChangeTemplateJecho, true);
+        }
 
         $title       = $this->getTrimmedInput('title', $_POST);
         $companyJobID = $this->getTrimmedInput('companyJobID', $_POST);
