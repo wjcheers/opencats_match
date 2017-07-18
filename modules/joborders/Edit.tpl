@@ -21,7 +21,7 @@
                 <input type="hidden" name="postback" id="postback" value="postback" />
                 <input type="hidden" id="jobOrderID" name="jobOrderID" value="<?php echo($this->jobOrderID); ?>" />
 
-                <table class="editTable" width="700">
+                <table class="editTable" width="1000">
                     <tr>
                         <td class="tdVertical">
                             <label id="titleLabel" for="title">Title:</label>
@@ -295,7 +295,7 @@
 
                 </table>
 
-                <table class="editTable" width="700">
+                <table class="editTable" width="1000">
 
                     <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
                         <tr>
@@ -315,7 +315,7 @@
                             <label id="descriptionLabel" for="description">Description:</label>
                         </td>
                         <td class="tdData">
-                            <textarea tabindex="20" class="mceEditor" name="description" id="description" rows="45" style="width: 500px;"><?php $this->_($this->data['description']); ?></textarea>
+                            <textarea tabindex="20" class="mceEditor" name="description" id="description" rows="45" style="width: 800px;"><?php $this->_($this->data['description']); ?></textarea>
                         </td>
                     </tr>
 
@@ -324,7 +324,7 @@
                             <label id="notesLabel" for="notes">Internal Notes:</label>
                         </td>
                         <td class="tdData">
-                            <textarea tabindex="21" class="mceEditor" name="notes" id="notes" rows="15" style="width: 500px;"><?php $this->_($this->data['notes']); ?></textarea>
+                            <textarea tabindex="21" class="mceEditor" name="notes" id="notes" rows="15" style="width: 800px;"><?php $this->_($this->data['notes']); ?></textarea>
                         </td>
                     </tr>
 

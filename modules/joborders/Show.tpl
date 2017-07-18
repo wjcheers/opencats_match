@@ -296,7 +296,7 @@
 
                                 <td class="data" colspan="2">
                                     <?php if($this->data['description'] != ''): ?>
-                                    <div id="shortDescription" style="word-break: break-all; overflow: auto; height:170px; border: #AAA 1px solid; padding:5px;">
+                                    <div id="shortDescription" style="word-break: break-all; overflow: auto; height:510px; border: #AAA 1px solid; padding:5px;">
                                         <?php echo($this->data['description']); ?>
                                     </div>
                                     <?php endif; ?>

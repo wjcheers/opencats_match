@@ -31,7 +31,7 @@
                 <form name="addJobOrderForm" id="addJobOrderForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=add" method="post" onsubmit="return checkAddForm(document.addJobOrderForm);" autocomplete="off">
                     <input type="hidden" name="postback" id="postback" value="postback" />
 
-                    <table class="editTable" width="700">
+                    <table class="editTable" width="1000">
                         <tr>
                             <td class="tdVertical">
                                 <label id="titleLabel" for="title">Title:</label>
@@ -244,7 +244,7 @@
                         </tr>
                     </table>
 
-                    <table class="editTable" width="700">
+                    <table class="editTable" width="1000">
 
                         <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
                             <tr>
@@ -264,7 +264,7 @@
                                 <label id="descriptionLabel" for="description">Description:</label>
                             </td>
                             <td class="tdData">
-                                <textarea tabindex="18" class="mceEditor" name="description" id="description" rows="45" style="width: 500px;"><?php if(isset($this->jobOrderSourceRS['description'])): ?><?php $this->_($this->jobOrderSourceRS['description']); ?><?php endif; ?></textarea>
+                                <textarea tabindex="18" class="mceEditor" name="description" id="description" rows="45" style="width: 800px;"><?php if(isset($this->jobOrderSourceRS['description'])): ?><?php $this->_($this->jobOrderSourceRS['description']); ?><?php endif; ?></textarea>
                             </td>
                         </tr>
 
@@ -273,7 +273,7 @@
                                 <label id="notesLabel" for="notes">Internal Notes:</label>
                             </td>
                             <td class="tdData">
-                                <textarea tabindex="19" class="mceEditor" name="notes" id="notes" rows="15" style="width: 500px;"><?php if(isset($this->jobOrderSourceRS['notes'])): ?><?php $this->_($this->jobOrderSourceRS['notes']); ?><?php endif; ?></textarea>
+                                <textarea tabindex="19" class="mceEditor" name="notes" id="notes" rows="15" style="width: 800px;"><?php if(isset($this->jobOrderSourceRS['notes'])): ?><?php $this->_($this->jobOrderSourceRS['notes']); ?><?php endif; ?></textarea>
                             </td>
                         </tr>
 
