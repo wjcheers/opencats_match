@@ -1,5 +1,5 @@
 <?php /* $Id: Edit.tpl 3093 2007-09-24 21:09:45Z brian $ */ ?>
-<?php TemplateUtility::printHeader('Companies', array('modules/companies/validator.js', 'js/sweetTitles.js', 'js/listEditor.js')); ?>
+<?php TemplateUtility::printHeader('Companies', array('modules/companies/validator.js', 'js/sweetTitles.js', 'js/listEditor.js', 'tinymce')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
 <?php TemplateUtility::printTabs($this->active); ?>
     <div id="main">
@@ -237,7 +237,7 @@
                             <label id="notesLabel" for="notes">Misc. Notes:</label>
                         </td>
                         <td>
-                            <textarea class="inputbox" name="notes" id="notes" rows="5" cols="40" style="width: 400px;"><?php $this->_($this->data['notes']); ?></textarea>
+                            <textarea class="mceEditor" name="notes" id="notes" rows="15" cols="40" style="width: 400px;"><?php $this->_($this->data['notes']); ?></textarea>
                         </td>
                     </tr>
                 </table>
