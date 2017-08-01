@@ -2,7 +2,7 @@
 <?php if ($this->isPopup): ?>
     <?php TemplateUtility::printHeader('Job Order - '.$this->data['title'], array('js/sorttable.js', 'js/match.js', 'js/pipeline.js', 'js/attachment.js')); ?>
 <?php else: ?>
-    <?php TemplateUtility::printHeader('Job Order - '.$this->data['title'], array( 'js/sorttable.js', 'js/match.js', 'js/pipeline.js', 'js/attachment.js')); ?>
+    <?php TemplateUtility::printHeader('Job Order - '.$this->data['title'], array( 'js/sorttable.js', 'js/match.js', 'js/pipeline.js', 'js/attachment.js', 'js/lib2.js')); ?>
     <?php TemplateUtility::printHeaderBlock(); ?>
     <?php TemplateUtility::printTabs($this->active); ?>
         <div id="main">
@@ -44,7 +44,7 @@
             <table class="detailsOutside" width="1225" height="<?php echo((count($this->extraFieldRS)/2 + 12) * 22); ?>">
                 <tr style="vertical-align:top;">
                     <td width="50%" height="100%">
-                        <table class="detailsInside" height="100%">
+                        <table class="detailsInside">
                             <tr>
                                 <td class="vertical">Title:</td>
                                 <td class="data" width="300">
@@ -118,11 +118,6 @@
                                 <td class="data"><?php $this->_($this->data['salary']); ?></td>
                             </tr>
 
-                            <tr>
-                                <td class="vertical">Start Date:</td>
-                                <td class="data"><?php $this->_($this->data['startDate']); ?></td>
-                            </tr>
-
                             <?php for ($i = 0; $i < intval(count($this->extraFieldRS)/2); $i++): ?>
                                <tr>
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>
@@ -135,7 +130,27 @@
                                                 <a href="<?php $this->_($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
                                             <?php endif; ?>
                                         <?php else: ?>
-                                        <?php echo($this->extraFieldRS[$i]['display']); ?>
+                                            <?php if(($this->extraFieldRS[$i]['fieldName']) == 'Current JD' || ($this->extraFieldRS[$i]['fieldName']) == 'Previous JD'): ?>
+                                            
+                                            <?php if (strlen($this->extraFieldRS[$i]['display']) > 50): ?>
+                                                <div id="shortNotes" style="display:block;" class="data shortNotes">
+                                                    <?php echo(substr($this->extraFieldRS[$i]['display'], 0, 50)); ?><span class="moreText">...</span>&nbsp;
+                                                    <p><a href="#" class="moreText" onclick="toggleNotesClass(); return false;">[More]</a></p>
+                                                </div>
+                                                <div id="fullNotes" style="display:none;" class="data fullNotes">
+                                                    <?php echo($this->extraFieldRS[$i]['display']); ?>&nbsp;
+                                                    <p><a href="#" class="moreText" onclick="toggleNotesClass(); return false;">[Less]</a></p>
+                                                </div>
+                                            <?php else: ?>
+                                                <div id="shortNotes" style="display:block;" class="data shortNotes">
+                                                    <?php echo($this->extraFieldRS[$i]['display']); ?>
+                                                </div>
+                                            <?php endif; ?>                                
+                                
+                                            
+                                            <?php else: ?>
+                                            <?php echo($this->extraFieldRS[$i]['display']); ?>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </td>
                               </tr>
@@ -147,7 +162,7 @@
                     </td>
 
                     <td width="50%" height="100%" style="vertical-align:top;" >
-                        <table class="detailsInside" height="100%">
+                        <table class="detailsInside">
                             <tr>
                                 <td class="vertical">Duration:</td>
                                 <td class="data"><?php $this->_($this->data['duration']); ?></td>
@@ -198,6 +213,11 @@
                                 <td class="data"><?php $this->_($this->data['ownerFullName']); ?></td>
                             </tr>
 
+                            <tr>
+                                <td class="vertical">Start Date:</td>
+                                <td class="data"><?php $this->_($this->data['startDate']); ?></td>
+                            </tr>
+
                             <?php for ($i = (intval(count($this->extraFieldRS))/2); $i < (count($this->extraFieldRS)); $i++): ?>
                                 <tr>
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>
@@ -210,7 +230,27 @@
                                                 <a href="<?php $this->_($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
                                             <?php endif; ?>
                                         <?php else: ?>
-                                        <?php echo($this->extraFieldRS[$i]['display']); ?>
+                                            <?php if(($this->extraFieldRS[$i]['fieldName']) == 'Current JD' || ($this->extraFieldRS[$i]['fieldName']) == 'Previous JD'): ?>
+                                            
+                                            <?php if (strlen($this->extraFieldRS[$i]['display']) > 50): ?>
+                                                <div id="shortNotes" style="display:block;" class="data shortNotes">
+                                                    <?php echo(substr($this->extraFieldRS[$i]['display'], 0, 50)); ?><span class="moreText">...</span>&nbsp;
+                                                    <p><a href="#" class="moreText" onclick="toggleNotesClass(); return false;">[More]</a></p>
+                                                </div>
+                                                <div id="fullNotes" style="display:none;" class="data fullNotes">
+                                                    <?php echo($this->extraFieldRS[$i]['display']); ?>&nbsp;
+                                                    <p><a href="#" class="moreText" onclick="toggleNotesClass(); return false;">[Less]</a></p>
+                                                </div>
+                                            <?php else: ?>
+                                                <div id="shortNotes" style="display:block;" class="data shortNotes">
+                                                    <?php echo($this->extraFieldRS[$i]['display']); ?>
+                                                </div>
+                                            <?php endif; ?>                                
+                                
+                                            
+                                            <?php else: ?>
+                                            <?php echo($this->extraFieldRS[$i]['display']); ?>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

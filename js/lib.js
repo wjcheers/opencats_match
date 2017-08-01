@@ -493,6 +493,23 @@ function toggleNotes()
     }
 }
 
+function toggleNotesClass()
+{
+    var shortNodes = document.getElementsByClassName('shortNotes');
+    var fullNodes  = document.getElementsByClassName('fullNotes');
+
+    toggleNodesClass(showFullNotes, shortNodes, fullNodes);
+
+    if (showFullNotes == true)
+    {
+        showFullNotes = false;
+    }
+    else
+    {
+        showFullNotes = true;
+    }
+}
+
 function toggleNode(showFull, shortNode, fullNode)
 {
     if (showFull == true)
@@ -504,6 +521,37 @@ function toggleNode(showFull, shortNode, fullNode)
     {
         shortNode.style.display = 'none';
         fullNode.style.display  = 'block';
+    }
+}
+
+function toggleNodesClass(showFull, shortNodes, fullNodes)
+{
+    var i;
+    if (showFull == true)
+    {
+        //shortNode.style.display = 'block';
+        //fullNode.style.display  = 'none';
+        for (i=0;i<shortNodes.length;i++)
+        {
+            shortNodes[i].style.display = 'block';
+        }
+        for (i=0;i<fullNodes.length;i++)
+        {
+            fullNodes[i].style.display = 'none';
+        }
+    }
+    else
+    {
+        //shortNode.style.display = 'none';
+        //fullNode.style.display  = 'block';
+        for (i=0;i<shortNodes.length;i++)
+        {
+            shortNodes[i].style.display = 'none';
+        }
+        for (i=0;i<fullNodes.length;i++)
+        {
+            fullNodes[i].style.display = 'block';
+        }
     }
 }
 
