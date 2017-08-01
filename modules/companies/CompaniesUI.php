@@ -223,9 +223,10 @@ class CompaniesUI extends UserInterface
          * Replace newlines with <br />, fix HTML "special" characters, and
          * strip leading empty lines and spaces.
          */
-        $data['notes'] = trim(
+        /*$data['notes'] = trim(
             nl2br(htmlspecialchars($data['notes'], ENT_QUOTES))
-        );
+        );*/
+        $data['notes'] = trim($data['notes']);
 
         /* Chop $data['notes'] to make $data['shortNotes']. */
         if (strlen($data['notes']) > self::NOTES_MAXLEN)
