@@ -68,18 +68,28 @@ class Reminders extends Task
             $emailSubject = 'CATS Event Reminder: ' . $data['title'];
 
             $emailContents = $GLOBALS['eventReminderEmail'];
+            
+            $URLpar = 'm=calendar';
+            if($data['dataItemType'] == DATA_ITEM_CANDIDATE) {
+                $URLpar = 'm=candidates&amp;a=show&amp;candidateID=' . $data['dataItemID'];
+            }
+            if($data['dataItemType'] == DATA_ITEM_CONTACT) {
+                $URLpar = 'm=contacts&amp;a=show&amp;contactID=' . $data['dataItemID'];
+            }
 
             $stringsToFind = array(
                 '%FULLNAME%',
                 '%NOTES%',
                 '%EVENTNAME%',
                 '%DUETIME%',
+                'm=calendar'
             );
             $replacementStrings = array(
                 $data['enteredByFirstName'] . ' ' . $data['enteredByLastName'],
                 $data['description'],
                 $data['title'],
-                self::_getReminderTimeString($data['reminderTime'])
+                self::_getReminderTimeString($data['reminderTime']),
+                $URLpar
             );
             $emailContents = str_replace(
                 $stringsToFind,
