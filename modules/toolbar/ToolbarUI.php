@@ -112,7 +112,8 @@ class ToolbarUI extends UserInterface
             die();
         }
 
-        if (!ModuleUtility::moduleExists('asp'))
+        // ilii, nbi, todo, temp disable
+        /*if (!ModuleUtility::moduleExists('asp'))
         {
             if (!LicenseUtility::isProfessional())
             {
@@ -121,7 +122,7 @@ class ToolbarUI extends UserInterface
                     . 'more information.';
                 die();
             }
-        }
+        }*/
 
         return true;
     }
@@ -181,7 +182,7 @@ class ToolbarUI extends UserInterface
         }
         else
         {
-            echo ':1';
+            echo ':candidateID=' . $candidateID;
         }
 
         flush();
