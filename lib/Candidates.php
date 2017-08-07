@@ -707,6 +707,73 @@ class Candidates
         }
          
         return $rs['candidateID'];
+    }    
+    public function getIDByLink($link)
+    {
+        // web_site and notes field
+        $sql = sprintf(
+            "SELECT
+                candidate.candidate_id AS candidateID
+            FROM
+                candidate
+            WHERE
+            (
+                candidate.web_site like %s
+                OR candidate.notes like %s
+            )
+            AND
+                candidate.site_id = %s",
+            $this->_db->makeQueryString('%' . trim($link) . '%'),
+            $this->_db->makeQueryString('%' . trim($link) . '%'),
+            $this->_siteID
+        );
+        $rs = $this->_db->getAssoc($sql);
+
+        if (!empty($rs))
+        {
+            return $rs['candidateID'];
+        }
+
+        // extra_field
+        $sql = sprintf(        
+            "SELECT
+                extra_field.field_name AS fieldName,
+                extra_field.value AS value,
+                extra_field.extra_field_id AS extraFieldSettingsID,
+                extra_field.data_item_id AS dataItemID
+            FROM
+                extra_field
+            WHERE
+            (
+                extra_field.field_name = %s
+                OR extra_field.field_name = %s
+                OR extra_field.field_name = %s
+                OR extra_field.field_name = %s
+                OR extra_field.field_name = %s
+            )
+            AND
+                extra_field.value like %s
+            AND
+                extra_field.data_item_type = %s
+            AND
+                extra_field.site_id = %s",
+            $this->_db->makeQueryString("Facebook"),
+            $this->_db->makeQueryString("Google"),
+            $this->_db->makeQueryString("Github"),
+            $this->_db->makeQueryString("Twitter"),
+            $this->_db->makeQueryString("Github"),
+            $this->_db->makeQueryString('%' . trim($link) . '%'),
+            DATA_ITEM_CANDIDATE,
+            $this->_siteID
+        );
+        $rs = $this->_db->getAssoc($sql);
+         
+        if (empty($rs))
+        {
+            return -1;
+        }
+         
+        return $rs['dataItemID'];        
     }
      
                                                                                                                                                                                                                                                                             
