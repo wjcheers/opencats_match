@@ -151,9 +151,25 @@
                             <label id="webSiteLabel" for="webSite">Web Site:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="webSite" name="webSite" value="<?php $this->_($this->data['webSite']); ?>" style="width: 150px" />
+                            <input type="text" class="inputbox" id="webSite" name="webSite" value="<?php $this->_($this->data['webSite']); ?>" style="width: 450px" />
                         </td>
                     </tr>
+
+                    <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
+                    <?php if (($this->extraFieldRS[$i]['fieldName'] == 'Facebook') || ($this->extraFieldRS[$i]['fieldName'] == 'Linkedin') || ($this->extraFieldRS[$i]['fieldName'] == 'Github') || ($this->extraFieldRS[$i]['fieldName'] == 'Google') || ($this->extraFieldRS[$i]['fieldName'] == 'Twitter') || ($this->extraFieldRS[$i]['fieldName'] == 'Link1')): ?>
+                        <tr>
+                            <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
+                                <label id="extraFieldLbl<?php echo($i); ?>">
+                                    <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
+                                </label>
+                            </td>
+                            <td class="tdData" id="extraFieldData<?php echo($i); ?>">
+                                <?php echo(str_replace("width: 150px", "width: 450px", $this->extraFieldRS[$i]['editHTML'])); ?>
+                            </td>
+                        </tr>
+                        <?php $extraFieldRS[$i] = 1;?>
+                    <?php endif; ?>
+                    <?php endfor; ?>
 
                     <tr>
                         <td class="tdVertical">
