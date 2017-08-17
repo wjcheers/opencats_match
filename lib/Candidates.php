@@ -38,6 +38,16 @@ include_once('./lib/ExtraFields.php');
 include_once('lib/DataGrid.php');
 
 
+// function from: https://stackoverflow.com/questions/9831077/how-to-url-encode-only-non-ascii-symbols-of-url-in-php-but-leave-reserved-symbo
+function url_path_encode($url) {
+    $path = parse_url($url, PHP_URL_PATH);
+    if (strpos($path,'%') !== false) return $url; //avoid double encoding
+    else {
+        $encoded_path = array_map('urlencode', explode('/', $path));
+        return str_replace($path, implode('/', $encoded_path), $url);
+    }   
+}
+    
 /**
  *  Candidates Library
  *  @package    CATS
@@ -707,7 +717,8 @@ class Candidates
         }
          
         return $rs['candidateID'];
-    }    
+    }
+        
     public function getIDByLink($link)
     {
         // web_site and notes field
@@ -719,12 +730,16 @@ class Candidates
             WHERE
             (
                 candidate.web_site like %s
+                OR candidate.web_site like %s
+                OR candidate.notes like %s
                 OR candidate.notes like %s
             )
             AND
                 candidate.site_id = %s",
-            $this->_db->makeQueryString('%' . trim($link) . '%'),
-            $this->_db->makeQueryString('%' . trim($link) . '%'),
+            $this->_db->makeQueryString('%' . trim(str_replace('%', '!%', urlEncode($link))) . '%'),
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            $this->_db->makeQueryString('%' . trim(str_replace('%', '!%', urlEncode($link))) . '%'),
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
             $this->_siteID
         );
         $rs = $this->_db->getAssoc($sql);
@@ -750,9 +765,13 @@ class Candidates
                 OR extra_field.field_name = %s
                 OR extra_field.field_name = %s
                 OR extra_field.field_name = %s
+                OR extra_field.field_name = %s
             )
             AND
+            (
                 extra_field.value like %s
+                OR extra_field.value like %s
+            )
             AND
                 extra_field.data_item_type = %s
             AND
@@ -761,8 +780,10 @@ class Candidates
             $this->_db->makeQueryString("Google"),
             $this->_db->makeQueryString("Github"),
             $this->_db->makeQueryString("Twitter"),
-            $this->_db->makeQueryString("Github"),
-            $this->_db->makeQueryString('%' . trim($link) . '%'),
+            $this->_db->makeQueryString("Linkedin"),
+            $this->_db->makeQueryString("Link1"),
+            $this->_db->makeQueryString('%' . trim(url_path_encode($link)) . '%'),
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
             DATA_ITEM_CANDIDATE,
             $this->_siteID
         );
