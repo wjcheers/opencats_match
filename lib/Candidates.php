@@ -777,7 +777,7 @@ class Candidates
             AND
                 extra_field.site_id = %s",
             $this->_db->makeQueryString("Facebook"),
-            $this->_db->makeQueryString("Google"),
+            $this->_db->makeQueryString("GooglePlus"),
             $this->_db->makeQueryString("Github"),
             $this->_db->makeQueryString("Twitter"),
             $this->_db->makeQueryString("Linkedin"),

@@ -156,7 +156,7 @@
                     </tr>
 
                     <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
-                    <?php if (($this->extraFieldRS[$i]['fieldName'] == 'Facebook') || ($this->extraFieldRS[$i]['fieldName'] == 'Linkedin') || ($this->extraFieldRS[$i]['fieldName'] == 'Github') || ($this->extraFieldRS[$i]['fieldName'] == 'Google') || ($this->extraFieldRS[$i]['fieldName'] == 'Twitter') || ($this->extraFieldRS[$i]['fieldName'] == 'Link1')): ?>
+                    <?php if (($this->extraFieldRS[$i]['fieldName'] == 'Facebook') || ($this->extraFieldRS[$i]['fieldName'] == 'Linkedin') || ($this->extraFieldRS[$i]['fieldName'] == 'Github') || ($this->extraFieldRS[$i]['fieldName'] == 'GooglePlus') || ($this->extraFieldRS[$i]['fieldName'] == 'Twitter') || ($this->extraFieldRS[$i]['fieldName'] == 'Link1')): ?>
                         <tr>
                             <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
                                 <label id="extraFieldLbl<?php echo($i); ?>">
