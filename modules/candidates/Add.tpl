@@ -225,9 +225,25 @@
                             <label id="webSiteLabel" for="webSite">Web Site:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="5" name="webSite" id="webSite" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['webSite'])) $this->_($this->preassignedFields['webSite']); ?>" />
+                            <input type="text" tabindex="5" name="webSite" id="webSite" class="inputbox" style="width: 450px" value="<?php if (isset($this->preassignedFields['webSite'])) $this->_($this->preassignedFields['webSite']); ?>" />
                         </td>
                     </tr>
+
+                    <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
+                    <?php if (($this->extraFieldRS[$i]['fieldName'] == 'Facebook') || ($this->extraFieldRS[$i]['fieldName'] == 'Linkedin') || ($this->extraFieldRS[$i]['fieldName'] == 'Github') || ($this->extraFieldRS[$i]['fieldName'] == 'GooglePlus') || ($this->extraFieldRS[$i]['fieldName'] == 'Twitter') || ($this->extraFieldRS[$i]['fieldName'] == 'Link1')): ?>
+                        <tr>
+                            <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
+                                <label id="extraFieldLbl<?php echo($i); ?>">
+                                    <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
+                                </label>
+                            </td>
+                            <td class="tdData" id="extraFieldData<?php echo($i); ?>">
+                                <?php echo(str_replace("width: 150px", "width: 450px", $this->extraFieldRS[$i]['addHTML'])); ?>
+                            </td>
+                        </tr>
+                        <?php $extraFieldRS[$i] = 1;?>
+                    <?php endif; ?>
+                    <?php endfor; ?>
 
                     <tr>
                         <td class="tdVertical">
@@ -531,7 +547,7 @@
                             <label id="keySkillsLabel" for="keySkills">Key Skills:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" tabindex="<?php echo($tabIndex++); ?>" name="keySkills" id="keySkills" style="width: 400px;" value="<?php if (isset($this->preassignedFields['keySkills'])) $this->_($this->preassignedFields['keySkills']); ?>" />
+                            <input type="text" class="inputbox" tabindex="<?php echo($tabIndex++); ?>" name="keySkills" id="keySkills" style="width: 700px;" value="<?php if (isset($this->preassignedFields['keySkills'])) $this->_($this->preassignedFields['keySkills']); ?>" />
                         </td>
                     </tr>
 
@@ -555,7 +571,7 @@
                             <label id="notesLabel" for="notes">Misc. Notes:</label>
                         </td>
                         <td class="tdData">
-                            <textarea class="inputbox" tabindex="<?php echo($tabIndex++); ?>" name="notes" id="notes" rows="5" cols="40" style="width: 400px;"><?php if (isset($this->preassignedFields['notes'])) $this->_($this->preassignedFields['notes']); ?></textarea>
+                            <textarea class="inputbox" tabindex="<?php echo($tabIndex++); ?>" name="notes" id="notes" rows="5" cols="40" style="width: 700px; height: 400px"><?php if (isset($this->preassignedFields['notes'])) $this->_($this->preassignedFields['notes']); ?></textarea>
                         </td>
                     </tr>
                 </table>
