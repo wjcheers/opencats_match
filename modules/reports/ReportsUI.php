@@ -71,6 +71,10 @@ class ReportsUI extends UserInterface
                 $this->showPlacementReport();
                 break;
 
+            case 'showUserReport':
+                $this->showUserReport();
+                break;
+
             case 'customizeJobOrderReport':
                 $this->customizeJobOrderReport();
                 break;
@@ -343,6 +347,86 @@ class ReportsUI extends UserInterface
         $this->_template->assign('reportTitle', $reportTitle);
         $this->_template->assign('placementsJobOrdersRS', $placementsJobOrdersRS);
         $this->_template->display('./modules/reports/PlacedReport.tpl');
+    }
+
+    private function showUserReport()
+    {
+        //FIXME: getTrimmedInput
+        if (isset($_GET['period']) && !empty($_GET['period']))
+        {
+            $period = $_GET['period'];
+        }
+        else
+        {
+            $period = '';
+        }
+
+
+        switch ($period)
+        {
+            case 'yesterday':
+                $period = TIME_PERIOD_YESTERDAY;
+                $reportTitle = 'Yesterday\'s Report';
+                break;
+
+            case 'thisWeek':
+                $period = TIME_PERIOD_THISWEEK;
+                $reportTitle = 'This Week\'s Report';
+                break;
+
+            case 'lastWeek':
+                $period = TIME_PERIOD_LASTWEEK;
+                $reportTitle = 'Last Week\'s Report';
+                break;
+
+            case 'thisMonth':
+                $period = TIME_PERIOD_THISMONTH;
+                $reportTitle = 'This Month\'s Report';
+                break;
+
+            case 'lastMonth':
+                $period = TIME_PERIOD_LASTMONTH;
+                $reportTitle = 'Last Month\'s Report';
+                break;
+
+            case 'thisYear':
+                $period = TIME_PERIOD_THISYEAR;
+                $reportTitle = 'This Year\'s Report';
+                break;
+
+            case 'lastYear':
+                $period = TIME_PERIOD_LASTYEAR;
+                $reportTitle = 'Last Year\'s Report';
+                break;
+
+            case 'toDate':
+                $period = TIME_PERIOD_TODATE;
+                $reportTitle = 'To Date Report';
+                break;
+
+            case 'today':
+            default:
+                $period = TIME_PERIOD_TODAY;
+                $reportTitle = 'Today\'s Report';
+                break;
+        }
+
+        $statistics = new Statistics($this->_siteID);
+        $UsersRS = $statistics->getReportUsers($period);
+
+        foreach ($UsersRS as $rowIndex => $UsersData)
+        {
+            /* Querys inside loops are bad, but I don't think there is any avoiding this. */
+            $UsersRS[$rowIndex]['reportRS'] = $statistics->getReportByUser(
+                $period, $UsersData['userID']
+            );
+        }
+        
+        if (!eval(Hooks::get('REPORTS_SHOW_USERS_REPORT'))) return;
+
+        $this->_template->assign('reportTitle', $reportTitle);
+        $this->_template->assign('UsersRS', $UsersRS);
+        $this->_template->display('./modules/reports/UsersReport.tpl');
     }
 
     private function customizeJobOrderReport()

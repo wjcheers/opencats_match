@@ -178,6 +178,13 @@
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsLastWeek']); ?>&nbsp;&nbsp;</td>
                             </tr>
+
+							<tr class="evenTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=lastWeek" target="_blank">User Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
                         </table>
                     </td>
 

@@ -436,6 +436,118 @@ class Statistics
         return $this->_db->getAllAssoc($sql);
     }
     
+    /**
+     * Returns all NBI
+     *
+     * @param flag statistics period flag
+     * @return integer candidate count
+     */
+    public function getReportUsers($period)
+    {
+        $sql = sprintf(
+            "SELECT
+                user.user_id AS userID,
+                CONCAT(
+                    user.first_name, ' ', user.last_name
+                ) AS ownerFullName
+            FROM
+                user
+            WHERE
+                user.access_level > 0
+            AND
+                user.site_id = %s",
+            $this->_siteID
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+
+    /**
+     * Returns all
+     * given period.
+     *
+     * @param flag statistics period flag
+     * @return integer candidate count
+     */
+    public function getReportByUser($period, $userID)
+    {
+        $criterion = $this->makePeriodCriterion(
+            'candidate.date_created', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS createdCount
+            FROM
+                candidate
+            WHERE
+                candidate.owner = %s
+            %s
+            AND
+                candidate.site_id = %s",
+            $userID,
+            $criterion,
+            $this->_siteID
+        );
+
+        $a = $this->_db->getAllAssoc($sql);
+        
+        $criterion = $this->makePeriodCriterion(
+            'candidate.date_modified', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS modifiedCount
+            FROM
+                candidate
+            WHERE
+                candidate.owner = %s
+            %s
+            AND
+                candidate.site_id = %s",
+            $userID,
+            $criterion,
+            $this->_siteID
+        );
+
+        $b = $this->_db->getAllAssoc($sql);
+
+        $criterion = $this->makePeriodCriterion(
+            'candidate_joborder_status_history.date', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS submittedCount
+            FROM
+                candidate_joborder_status_history
+            LEFT JOIN candidate
+                ON candidate.candidate_id = candidate_joborder_status_history.candidate_id
+            LEFT JOIN joborder
+                ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+            LEFT JOIN user AS owner_user
+                ON owner_user.user_id = candidate.owner
+            WHERE
+                candidate_joborder_status_history.status_to = 400
+            %s
+            AND
+                candidate.site_id = %s
+            AND
+                owner_user.user_id = %s",
+            $criterion,
+            $this->_siteID,
+            $userID
+        );
+
+        $c = $this->_db->getAllAssoc($sql);
+        $z = array();
+        $z[0]['createdCount'] = $a[0]['createdCount'];
+        $z[0]['modifiedCount'] = $b[0]['modifiedCount'];
+        $z[0]['submittedCount'] = $c[0]['submittedCount'];
+        return $z;
+    }
+    
     // FIXME: Document me.
     public function getActivitiesByPeriod($period)
     {
