@@ -384,7 +384,7 @@ class SearchCandidates
      */
     public function byFullName($wildCardString, $sortBy, $sortDirection)
     {
-        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
         $sql = sprintf(
@@ -495,7 +495,7 @@ class SearchCandidates
      */
     public function byEmail($wildCardString, $sortBy = 'firstName', $sortDirection = 'ASC')
     {
-        $wildCardString = str_replace('*', '%', $wildCardString);
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
         $sql = sprintf(
@@ -640,7 +640,7 @@ class SearchCompanies
      */
     public function byName($wildCardString, $sortBy, $sortDirection)
     {
-        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
         $sql = sprintf(
@@ -846,7 +846,7 @@ class SearchJobOrders
      */
     public function byCompanyName($wildCardString, $sortBy, $sortDirection, $activeOnly)
     {
-        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
         if ($activeOnly)
@@ -1037,7 +1037,7 @@ class ContactsSearch
      */
     public function byFullName($wildCardString, $sortBy, $sortDirection)
     {
-        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
         $sql = sprintf(
@@ -1103,7 +1103,7 @@ class ContactsSearch
     public function byCompanyName($wildCardString, $sortBy,
         $sortDirection)
     {
-        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
         $sql = sprintf(
@@ -1162,7 +1162,7 @@ class ContactsSearch
      */
     public function byTitle($wildCardString, $sortBy, $sortDirection)
     {
-        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
         $sql = sprintf(
@@ -1250,7 +1250,7 @@ class QuickSearch
         $wildCardString = str_replace(' ', '%', $wildCardString);
         $wildCardString = str_replace('-', '%', $wildCardString);
         $wildCardString = str_replace('_', '%', $wildCardString);
-        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
         $wildCardStringChineseName = '%' . str_replace('*', '%', $wildCardStringChineseName) . '%';
         $wildCardStringChineseName = $this->_db->makeQueryString($wildCardStringChineseName);
@@ -1366,7 +1366,7 @@ class QuickSearch
      */
     public function companies($wildCardString)
     {
-        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
         $sql = sprintf(
@@ -1421,7 +1421,7 @@ class QuickSearch
      */
     public function contacts($wildCardString)
     {
-        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
         $sql = sprintf(
@@ -1509,7 +1509,7 @@ class QuickSearch
      */
     public function jobOrders($wildCardString)
     {
-        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
         $sql = sprintf(
@@ -1574,7 +1574,7 @@ class QuickSearch
 
     public function jobOrdersKeySkills($wildCardString)
     {
-        $wildCardString = str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
         $sql = sprintf(
