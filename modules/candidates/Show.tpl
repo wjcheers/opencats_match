@@ -565,7 +565,7 @@
                         <td align="left" valign="top" id="activityType<?php echo($activityData['activityID']); ?>"><?php $this->_($activityData['typeDescription']) ?></td>
                         <td align="left" valign="top"><?php $this->_($activityData['enteredByAbbrName']) ?></td>
                         <td align="left" valign="top" id="activityRegarding<?php echo($activityData['activityID']); ?>"><?php $this->_($activityData['regarding']) ?></td>
-                        <td align="left" valign="top" id="activityNotes<?php echo($activityData['activityID']); ?>"><?php echo($activityData['notes']); ?></td>
+                        <td align="left" valign="top" id="activityNotes<?php echo($activityData['activityID']); ?>"><?php echo(nl2br($activityData['notes'])); ?></td>
 <?php if (!$this->isPopup): ?>
                         <td align="center" >
                             <?php if ($this->accessLevel >= ACCESS_LEVEL_EDIT): ?>
