@@ -721,80 +721,114 @@ class Candidates
         
     public function getIDByLink($link)
     {
+        $i = 10;
         // web_site and notes field
-        $sql = sprintf(
-            "SELECT
-                candidate.candidate_id AS candidateID
-            FROM
-                candidate
-            WHERE
-            (
-                candidate.web_site like %s
-                OR candidate.web_site like %s
-                OR candidate.notes like %s
-                OR candidate.notes like %s
-            )
-            AND
-                candidate.site_id = %s",
-            $this->_db->makeQueryString('%' . trim(str_replace('%', '!%', urlEncode($link))) . '%'),
-            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
-            $this->_db->makeQueryString('%' . trim(str_replace('%', '!%', urlEncode($link))) . '%'),
-            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
-            $this->_siteID
-        );
-        $rs = $this->_db->getAssoc($sql);
-
-        if (!empty($rs))
+        while ($i > 0)
         {
-            return $rs['candidateID'];
+            $sql = sprintf(
+                "SELECT
+                    candidate.candidate_id AS candidateID,
+                    candidate.web_site AS webSite,
+                    candidate.notes AS notes
+                FROM
+                    candidate
+                WHERE
+                (
+                    candidate.web_site like %s
+                    OR candidate.web_site like %s
+                    OR candidate.notes like %s
+                    OR candidate.notes like %s
+                )
+                AND
+                    candidate.site_id = %s",
+                $this->_db->makeQueryString('%' . trim(str_replace('%', '!%', urlEncode($link))) . '%'),
+                $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+                $this->_db->makeQueryString('%' . trim(str_replace('%', '!%', urlEncode($link))) . '%'),
+                $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+                $this->_siteID
+            );
+            $rs = $this->_db->getAssoc($sql);
+
+            if (!empty($rs))
+            {
+                // Remove the partial matches. Use Url's path to do reverse search
+                // ex.
+                // $link => linkedin.com/in/pohsien
+                // webSite => https://www.linkedin.com/in/pohsien-liu-83b38395
+                // 
+                $parsedUrl = parse_url($rs['webSite']);
+                // return $link . ' ' . $parsedUrl['path'];
+                if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    return $rs['candidateID'];                
+                }
+                $parsedUrl = parse_url($rs['notes']);
+                if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    return $rs['candidateID'];                
+                }
+            }
+            else //empty
+            {
+                break;
+            }
+            $i--;
         }
 
+        $i = 10;
         // extra_field
-        $sql = sprintf(        
-            "SELECT
-                extra_field.field_name AS fieldName,
-                extra_field.value AS value,
-                extra_field.extra_field_id AS extraFieldSettingsID,
-                extra_field.data_item_id AS dataItemID
-            FROM
-                extra_field
-            WHERE
-            (
-                extra_field.field_name = %s
-                OR extra_field.field_name = %s
-                OR extra_field.field_name = %s
-                OR extra_field.field_name = %s
-                OR extra_field.field_name = %s
-                OR extra_field.field_name = %s
-            )
-            AND
-            (
-                extra_field.value like %s
-                OR extra_field.value like %s
-            )
-            AND
-                extra_field.data_item_type = %s
-            AND
-                extra_field.site_id = %s",
-            $this->_db->makeQueryString("Facebook"),
-            $this->_db->makeQueryString("GooglePlus"),
-            $this->_db->makeQueryString("Github"),
-            $this->_db->makeQueryString("Twitter"),
-            $this->_db->makeQueryString("Linkedin"),
-            $this->_db->makeQueryString("Link1"),
-            $this->_db->makeQueryString('%' . trim(url_path_encode($link)) . '%'),
-            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
-            DATA_ITEM_CANDIDATE,
-            $this->_siteID
-        );
-        $rs = $this->_db->getAssoc($sql);
-         
-        if (empty($rs))
+        while ($i > 0)
         {
-            return -1;
+            $sql = sprintf(        
+                "SELECT
+                    extra_field.field_name AS fieldName,
+                    extra_field.value AS value,
+                    extra_field.extra_field_id AS extraFieldSettingsID,
+                    extra_field.data_item_id AS dataItemID
+                FROM
+                    extra_field
+                WHERE
+                (
+                    extra_field.field_name = %s
+                    OR extra_field.field_name = %s
+                    OR extra_field.field_name = %s
+                    OR extra_field.field_name = %s
+                    OR extra_field.field_name = %s
+                    OR extra_field.field_name = %s
+                )
+                AND
+                (
+                    extra_field.value like %s
+                    OR extra_field.value like %s
+                )
+                AND
+                    extra_field.data_item_type = %s
+                AND
+                    extra_field.site_id = %s",
+                $this->_db->makeQueryString("Facebook"),
+                $this->_db->makeQueryString("GooglePlus"),
+                $this->_db->makeQueryString("Github"),
+                $this->_db->makeQueryString("Twitter"),
+                $this->_db->makeQueryString("Linkedin"),
+                $this->_db->makeQueryString("Link1"),
+                $this->_db->makeQueryString('%' . trim(url_path_encode($link)) . '%'),
+                $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+                DATA_ITEM_CANDIDATE,
+                $this->_siteID
+            );
+            $rs = $this->_db->getAssoc($sql);
+             
+            if (!empty($rs))
+            {
+                // Remove the partial matches. Use Url's path to do reverse search
+                $parsedUrl = parse_url($rs['value']);
+                // return $link . ' ' . $parsedUrl['path'];
+                if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    return $rs['dataItemID'];                
+                }
+            }
+            $i--;
         }
-         
-        return $rs['dataItemID'];        
+
+        return -1;            
     }
      
                                                                                                                                                                                                                                                                             
