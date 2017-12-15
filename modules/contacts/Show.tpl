@@ -1,5 +1,5 @@
 <?php /* $Id: Show.tpl 3444 2007-11-06 23:16:27Z will $ */ ?>
-<?php TemplateUtility::printHeader('Contact - '.$this->data['firstName'].' '.$this->data['lastName'], array( 'js/activity.js', 'js/attachment.js')); ?>
+<?php TemplateUtility::printHeader($this->data['firstName'].' '.$this->data['lastName'].' - Contact', array( 'js/activity.js', 'js/attachment.js')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
 <?php TemplateUtility::printTabs($this->active); ?>
     <div id="main">

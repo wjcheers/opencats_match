@@ -1,5 +1,5 @@
 <?php /* $Id: Show.tpl 3582 2007-11-12 22:58:48Z brian $ */ ?>
-<?php TemplateUtility::printHeader('Company - '.$this->data['name'], array( 'js/sorttable.js', 'js/attachment.js')); ?>
+<?php TemplateUtility::printHeader($this->data['name'].' - Company', array( 'js/sorttable.js', 'js/attachment.js')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
 <?php TemplateUtility::printTabs($this->active); ?>
     <div id="main">
