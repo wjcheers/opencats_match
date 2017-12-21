@@ -13,7 +13,7 @@
     <p class="note">Submissions</p>
 
     <?php foreach ($this->submissionJobOrdersRS as $rowNumber => $submissionJobOrdersData): ?>
-        <span style="font: normal normal bold 13px/130% Arial, Tahoma, sans-serif;"><?php $this->_($submissionJobOrdersData['title']) ?> at <?php $this->_($submissionJobOrdersData['companyName']) ?> (<?php $this->_($submissionJobOrdersData['ownerFullName']) ?>)</span>
+        <span style="font: normal normal bold 13px/130% Arial, Tahoma, sans-serif;"><a href="<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=show&amp;jobOrderID=<?php $this->_($submissionJobOrdersData['jobOrderID']) ?>" target="_blank"><?php $this->_($submissionJobOrdersData['title']) ?></a> at <?php $this->_($submissionJobOrdersData['companyName']) ?> (<?php $this->_($submissionJobOrdersData['ownerFullName']) ?>)</span>
         <br />
         <table class="sortable" width="1225">
             <tr>
@@ -25,8 +25,12 @@
 
             <?php foreach ($submissionJobOrdersData['submissionsRS'] as $rowNumber => $submissionsData): ?>
                 <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
-                    <td valign="top" align="left"><?php $this->_($submissionsData['firstName']) ?>&nbsp;</td>
-                    <td valign="top" align="left"><?php $this->_($submissionsData['lastName']) ?>&nbsp;</td>
+                    <td valign="top" align="left">
+                        <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($submissionsData['candidateID']) ?>" target="_blank"><?php $this->_($submissionsData['firstName']) ?></a>
+                    &nbsp;</td>
+                    <td valign="top" align="left">
+                        <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($submissionsData['candidateID']) ?>" target="_blank"><?php $this->_($submissionsData['lastName']) ?></a>
+                    &nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($submissionsData['ownerFullName']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($submissionsData['dateSubmitted']) ?>&nbsp;</td>
                 </tr>
