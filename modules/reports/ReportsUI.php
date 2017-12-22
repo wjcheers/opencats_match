@@ -75,6 +75,10 @@ class ReportsUI extends UserInterface
                 $this->showUserReport();
                 break;
 
+            case 'showSubmitReport':
+                $this->showSubmitReport();
+                break;
+
             case 'customizeJobOrderReport':
                 $this->customizeJobOrderReport();
                 break;
@@ -267,6 +271,78 @@ class ReportsUI extends UserInterface
         $this->_template->assign('reportTitle', $reportTitle);
         $this->_template->assign('submissionJobOrdersRS', $submissionJobOrdersRS);
         $this->_template->display('./modules/reports/SubmissionReport.tpl');
+    }
+
+    private function showSubmitReport()
+    {
+        //FIXME: getTrimmedInput
+        if (isset($_GET['period']) && !empty($_GET['period']))
+        {
+            $period = $_GET['period'];
+        }
+        else
+        {
+            $period = '';
+        }
+
+
+        switch ($period)
+        {
+            case 'yesterday':
+                $period = TIME_PERIOD_YESTERDAY;
+                $reportTitle = 'Yesterday\'s Report';
+                break;
+
+            case 'thisWeek':
+                $period = TIME_PERIOD_THISWEEK;
+                $reportTitle = 'This Week\'s Report';
+                break;
+
+            case 'lastWeek':
+                $period = TIME_PERIOD_LASTWEEK;
+                $reportTitle = 'Last Week\'s Report';
+                break;
+
+            case 'thisMonth':
+                $period = TIME_PERIOD_THISMONTH;
+                $reportTitle = 'This Month\'s Report';
+                break;
+
+            case 'lastMonth':
+                $period = TIME_PERIOD_LASTMONTH;
+                $reportTitle = 'Last Month\'s Report';
+                break;
+
+            case 'thisYear':
+                $period = TIME_PERIOD_THISYEAR;
+                $reportTitle = 'This Year\'s Report';
+                break;
+
+            case 'lastYear':
+                $period = TIME_PERIOD_LASTYEAR;
+                $reportTitle = 'Last Year\'s Report';
+                break;
+
+            case 'toDate':
+                $period = TIME_PERIOD_TODATE;
+                $reportTitle = 'To Date Report';
+                break;
+
+            case 'today':
+            default:
+                $period = TIME_PERIOD_TODAY;
+                $reportTitle = 'Today\'s Report';
+                break;
+        }
+
+        $statistics = new Statistics($this->_siteID);
+        $submitRS = $statistics->getSubmitReport($period);
+
+        if (!eval(Hooks::get('REPORTS_SHOW_SUBMISSION'))) return;
+
+        $this->_template->assign('reportTitle', $reportTitle);
+        $this->_template->assign('submitRS', $submitRS);
+        $this->_template->display('./modules/reports/SubmitReport.tpl');
     }
 
     private function showPlacementReport()

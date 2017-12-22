@@ -326,7 +326,67 @@ class Statistics
 
         return $this->_db->getAllAssoc($sql);
     }
-    
+
+    /**
+     * Returns all submit created in the
+     * given period.
+     *
+     * @param flag statistics period flag
+     * @return integer candidate count
+     */
+    public function getSubmitReport($period)
+    {
+        $criterion = $this->makePeriodCriterion(
+            'candidate_joborder_status_history.date', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                candidate.candidate_id AS candidateID,
+                candidate.first_name AS firstName,
+                candidate.last_name AS lastName,
+                candidate.date_modified AS dateModified,
+                joborder.joborder_id AS jobOrderID,
+                joborder.title AS title,
+                joborder.company_id AS companyID,
+                CONCAT(
+                    owner_user.first_name, ' ', owner_user.last_name
+                ) AS ownerFullName,
+                DATE_FORMAT(
+                    candidate_joborder_status_history.date, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateSubmitted
+            FROM
+                candidate_joborder_status_history
+            LEFT JOIN candidate
+                ON candidate.candidate_id = candidate_joborder_status_history.candidate_id
+            LEFT JOIN joborder
+                ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+            LEFT JOIN company
+                ON company.company_id = joborder.company_id
+            LEFT JOIN user AS owner_user
+                ON owner_user.user_id = candidate.owner
+            WHERE
+                candidate_joborder_status_history.status_to = 400
+            %s
+            AND
+                candidate.site_id = %s
+            AND
+                joborder.site_id = %s
+            AND
+                company.site_id = %s
+            ORDER BY
+                candidate.date_modified ASC,
+                candidate.last_name ASC,
+                candidate.first_name ASC",
+            $criterion,
+            $this->_siteID,
+            $this->_siteID,
+            $this->_siteID
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+
     /**
      * Returns all job orders with placements created in the given period.
      *

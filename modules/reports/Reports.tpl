@@ -307,6 +307,13 @@
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsThisYear']); ?>&nbsp;&nbsp;</td>
                             </tr>
+
+							<tr class="evenTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=thisYear" target="_blank">Submit Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
                         </table>
                     </td>
 
@@ -346,6 +353,13 @@
                             <tr class="oddTableRow">
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsLastYear']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+
+							<tr class="evenTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=lastYear" target="_blank">Submit Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
                         </table>
                     </td>
