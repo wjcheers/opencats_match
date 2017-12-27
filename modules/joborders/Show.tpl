@@ -125,9 +125,9 @@
                                         <?php if(substr($this->extraFieldRS[$i]['display'], 0, 4) == 'http'): ?>
                                             <?php if(strlen($this->extraFieldRS[$i]['display']) > 50): ?>
                                                 <?php $url = parse_url($this->extraFieldRS[$i]['display']); ?>
-                                                <a href="<?php $this->_($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo $url['scheme'] . '://' . $url['host'] . '/'; ?></a>
+                                                <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo $url['scheme'] . '://' . $url['host'] . '/'; ?></a>
                                             <?php else: ?>
-                                                <a href="<?php $this->_($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
+                                                <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
                                             <?php endif; ?>
                                         <?php else: ?>
                                             <?php if(($this->extraFieldRS[$i]['fieldName']) == 'Current JD' || ($this->extraFieldRS[$i]['fieldName']) == 'Previous JD'): ?>
@@ -225,9 +225,9 @@
                                         <?php if(substr($this->extraFieldRS[$i]['display'], 0, 4) == 'http'): ?>
                                             <?php if(strlen($this->extraFieldRS[$i]['display']) > 50): ?>
                                                 <?php $url = parse_url($this->extraFieldRS[$i]['display']); ?>
-                                                <a href="<?php $this->_($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo $url['scheme'] . '://' . $url['host'] . '/'; ?></a>
+                                                <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo $url['scheme'] . '://' . $url['host'] . '/'; ?></a>
                                             <?php else: ?>
-                                                <a href="<?php $this->_($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
+                                                <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
                                             <?php endif; ?>
                                         <?php else: ?>
                                             <?php if(($this->extraFieldRS[$i]['fieldName']) == 'Current JD' || ($this->extraFieldRS[$i]['fieldName']) == 'Previous JD'): ?>

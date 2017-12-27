@@ -123,7 +123,7 @@
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>                         
                                     <td class="data">
                                         <?php if(substr($this->extraFieldRS[$i]['display'], 0, 4) == 'http'): ?>
-                                            <a href="<?php $this->_($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
+                                            <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
                                         <?php else: ?>
                                         <?php echo($this->extraFieldRS[$i]['display']); ?>
                                         <?php endif; ?>
@@ -211,7 +211,7 @@
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>
                                     <td class="data">
                                         <?php if(substr($this->extraFieldRS[$i]['display'], 0, 4) == 'http'): ?>
-                                            <a href="<?php $this->_($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
+                                            <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
                                         <?php else: ?>
                                         <?php echo($this->extraFieldRS[$i]['display']); ?>
                                         <?php endif; ?>
