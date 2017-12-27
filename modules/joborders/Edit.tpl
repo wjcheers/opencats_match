@@ -258,7 +258,7 @@
                         </td>
                         <td class="tdData">
                             <?php if(isset($this->overOpenJOQuota) && ($this->data['status'] == 'OnHold' || $this->data['status'] == 'Full' || $this->data['status'] == 'Closed' || $this->data['status'] == 'Canceled')): ?>
-                                <select tabindex="8" id="status" name="status" class="inputbox" style="width: 150px;"<?php if (!$this->emailTemplateDisabled): ?>onchange="document.getElementById('divStatusChange').style.display=''; <?php if ($this->canEmail): ?>document.getElementById('checkboxStatusChange').checked=true;<?php endif; ?>"<?php endif; ?>>
+                                <select tabindex="8" id="status" name="status" class="inputbox" style="width: 150px;"<?php if (!$this->emailTemplateDisabled): ?>onchange="document.getElementById('divStatusChange').style.display='';document.getElementById('divStatusChange2Owner').style.display='';<?php if ($this->canEmail): ?>document.getElementById('checkboxStatusChange').checked=true;document.getElementById('checkboxStatusChange2Owner').checked=true;<?php endif; ?>"<?php endif; ?>>
                                     <option <?php if ($this->data['status'] == 'OnHold'): ?>selected<?php endif; ?> value="OnHold">On Hold</option>
                                     <option <?php if ($this->data['status'] == 'Full'): ?>selected<?php endif; ?> value="Full">Full</option>
                                     <option <?php if ($this->data['status'] == 'Closed'): ?>selected<?php endif; ?> value="Closed">Closed</option>
@@ -267,7 +267,7 @@
                                 <span style="font-size:10px;">(You have already reached your limit of <?php echo(FREE_ACCOUNT_JOBORDERS); ?> open Job Orders, and cannot make this Job Order Active.)<br /></font>
 
                             <?php else: ?>
-                                <select tabindex="8" id="status" name="status" class="inputbox" style="width: 150px;"<?php if (!$this->emailTemplateDisabled): ?>onchange="document.getElementById('divStatusChange').style.display='';  <?php if ($this->canEmail): ?>document.getElementById('checkboxStatusChange').checked=true;<?php endif; ?>"<?php endif; ?>>
+                                <select tabindex="8" id="status" name="status" class="inputbox" style="width: 150px;"<?php if (!$this->emailTemplateDisabled): ?>onchange="document.getElementById('divStatusChange').style.display='';document.getElementById('divStatusChange2Owner').style.display='';<?php if ($this->canEmail): ?>document.getElementById('checkboxStatusChange').checked=true;document.getElementById('checkboxStatusChange2Owner').checked=true;<?php endif; ?>"<?php endif; ?>>
                                     <option <?php if ($this->data['status'] == 'Active'): ?>selected<?php endif; ?> value="Active">Active</option>
                                     <option <?php if ($this->data['status'] == 'Upcoming'): ?>selected<?php endif; ?> value="Upcoming">Upcoming</option>
                                     <option <?php if ($this->data['status'] == 'Lead'): ?>selected<?php endif; ?> value="Lead">Prospective / Lead</option>
@@ -279,6 +279,9 @@
                             <?php endif; ?>
                             <div style="display:none;" id="divStatusChange">
                                 <input type="checkbox" name="statusChange" id="checkboxStatusChange" <?php if (!$this->canEmail): ?>disabled<?php endif; ?> /> Notify Jecho status change
+                            </div>
+                            <div style="display:none;" id="divStatusChange2Owner">
+                                <input type="checkbox" name="statusChange2Owner" id="checkboxStatusChange2Owner" <?php if (!$this->canEmail): ?>disabled<?php endif; ?> /> Notify owner status change
                             </div>
                         </td>
 

@@ -693,7 +693,7 @@ class JobOrdersUI extends UserInterface
         $recruiter   = $_POST['recruiter'];
         $owner       = $_POST['owner'];
         $openings    = $_POST['openings'];
-
+		
         $title       = $this->getTrimmedInput('title', $_POST);
         $companyJobID = $this->getTrimmedInput('companyJobID', $_POST);
         $type        = $this->getTrimmedInput('type', $_POST);
@@ -731,6 +731,76 @@ class JobOrdersUI extends UserInterface
         $jobOrders->extraFields->setValuesOnEdit($jobOrderID);
 
         if (!eval(Hooks::get('JO_ON_ADD_POST'))) return;
+        
+        /* notify job order owner to sync this status */      
+        if ($owner > 0)  
+        {	
+            $users = new Users($this->_siteID);
+            $ownerDetails = $users->get($_POST['owner']);
+
+            if (!empty($ownerDetails))
+            {
+                $emailAddress = $ownerDetails['email'];
+				if (!empty($emailAddress))
+				{
+                    $companyName = '';
+                    $companies = new Companies($this->_siteID);
+                    if (!empty($companies))
+                    {
+                        $CompanyRS = $companies->get($companyID);
+                        if (!empty($CompanyRS))
+                        {
+                            $companyName = $CompanyRS['name'];
+                        }
+                    }
+                
+					/* Get the change status email template. */
+					$emailTemplates = new EmailTemplates($this->_siteID);
+					$statusChangeTemplateRS = $emailTemplates->getByTag(
+						'EMAIL_TEMPLATE_OWNERSHIPASSIGNJOBORDER'
+					);
+
+					if (empty($statusChangeTemplateRS) ||
+						empty($statusChangeTemplateRS['textReplaced']))
+					{
+						$statusChangeTemplate = '';
+					}
+					else
+					{
+						$statusChangeTemplate = $statusChangeTemplateRS['textReplaced'];
+					}
+
+					/* Replace e-mail template variables. */
+					$stringsToFind = array(
+						'%JBODOWNER%',
+						'%JBODTITLE%',
+						'%JBODCLIENT%',
+						'%JBODID%',
+						'%JBODCATSURL%'
+					);
+					$replacementStrings = array(
+						$ownerDetails['fullName'],
+						$title,
+						$companyName,
+						$jobOrderID,
+						'<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $jobOrderID . '">'.
+							'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $jobOrderID . '</a>'
+					);
+					$statusChangeTemplate = str_replace(
+						$stringsToFind,
+						$replacementStrings,
+						$statusChangeTemplate
+					);
+
+					/* Send e-mail notification. */
+					//FIXME: Make subject configurable.
+					$mailer = new Mailer($this->_siteID);
+					$mailerStatus = $mailer->sendToOne(
+						array($emailAddress, ''),
+						'CATS Notification: Job Order Added', $statusChangeTemplate, true);
+                }
+            }
+        }
 
         CATSUtility::transferRelativeURI(
             'm=joborders&a=show&jobOrderID=' . $jobOrderID
@@ -1091,6 +1161,71 @@ class JobOrdersUI extends UserInterface
             $mailerStatus = $mailer->sendToOne(
                 array('cats@example.com', ''),
                 'CATS Notification: Job Order Modified', $statusChangeTemplateJecho, true);
+        }
+		
+        /* notify job order owner to sync this status */      
+        if ($this->isChecked('statusChange2Owner', $_POST) && $owner > 0)  
+        {
+            $jobOrderDetails = $jobOrders->get($jobOrderID);
+			
+            $users = new Users($this->_siteID);
+            $ownerDetails = $users->get($_POST['owner']);
+
+            if (!empty($ownerDetails))
+            {
+                $emailAddressOwner = $ownerDetails['email'];
+				
+				if (!empty($emailAddressOwner))
+				{
+				
+					/* Get the change status email template. */
+					$emailTemplatesOwner = new EmailTemplates($this->_siteID);
+					$statusChangeTemplateRSOwner = $emailTemplatesOwner->getByTag(
+						'EMAIL_TEMPLATE_OWNERSHIPASSIGNJOBORDER'
+					);
+
+					if (empty($statusChangeTemplateRSOwner) ||
+						empty($statusChangeTemplateRSOwner['textReplaced']))
+					{
+						$statusChangeTemplateOwner = '';
+					}
+					else
+					{
+						$statusChangeTemplateOwner = $statusChangeTemplateRSOwner['textReplaced'];
+					}
+
+					/* Replace e-mail template variables. */
+					$stringsToFind = array(
+						'%JBODOWNER%',
+						'%JBODTITLE%',
+						'%JBODCLIENT%',
+						'%JBODID%',
+						'%JBODCATSURL%',
+						'has been assigned to you'
+					);
+					$replacementStrings = array(
+						'Sir',
+						$jobOrderDetails['title'],
+						$jobOrderDetails['companyName'],
+						$jobOrderID,
+						'<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $jobOrderID . '">'.
+							'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $jobOrderID . '</a>',
+						'has been changed'
+					);
+					$statusChangeTemplateOwner = str_replace(
+						$stringsToFind,
+						$replacementStrings,
+						$statusChangeTemplateOwner
+					);
+
+					/* Send e-mail notification. */
+					//FIXME: Make subject configurable.
+					$mailer = new Mailer($this->_siteID);
+					$mailerStatus = $mailer->sendToOne(
+						array($emailAddressOwner, ''),
+						'CATS Notification: Job Order Modified', $statusChangeTemplateOwner, true);
+				}
+			}
         }
 
         $title       = $this->getTrimmedInput('title', $_POST);
