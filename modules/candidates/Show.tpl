@@ -178,12 +178,20 @@
 
                             <tr>
                                 <td class="vertical">Current Pay:</td>
+                                <?php if(!empty($this->data['currentPay'])): ?>
                                 <td class="data"><?php echo(number_format($this->data['currentPay'])); ?></td>
+                                <?php else: ?>
+                                <td class="data"></td>
+                                <?php endif; ?>
                             </tr>
 
                             <tr>
                                 <td class="vertical">Desired Pay:</td>
+                                <?php if(!empty($this->data['currentPay'])): ?>
                                 <td class="data"><?php echo(number_format($this->data['desiredPay'])); ?></td>
+                                <?php else: ?>
+                                <td class="data"></td>
+                                <?php endif; ?>
                             </tr>
 
                             <tr>
