@@ -518,40 +518,83 @@ class Attachments
      */
     public function getAll($dataItemType, $dataItemID)
     {
-        $sql = sprintf(
-            "SELECT
-                IF(ISNULL(text), 0, 1) AS hasText,
-                attachment_id AS attachmentID,
-                data_item_id AS dataItemID,
-                data_item_type AS dataItemType,
-                attachment.title AS title,
-                original_filename AS originalFilename,
-                stored_filename AS storedFilename,
-                content_type AS contentType,
-                profile_image AS isProfileImage,
-                directory_name AS directoryName,
-                md5_sum AS md5sum,
-                file_size_kb AS fileSizeKB,
-                DATE_FORMAT(date_created, '%%m-%%d-%%y (%%h:%%i:%%s %%p)') AS dateCreated,
-                CONCAT(
-                    entered_by_user.first_name, ' ', entered_by_user.last_name
-                ) AS enteredByFullName
-            FROM
-                attachment
-            LEFT JOIN user AS entered_by_user
-                ON attachment.entered_by = entered_by_user.user_id
-            WHERE
-                data_item_id = %s
-            AND
-                data_item_type = %s
-            AND
-                attachment.site_id = %s
-            ORDER BY
-                date_created asc",
-            $this->_db->makeQueryInteger($dataItemID),
-            $this->_db->makeQueryInteger($dataItemType),
-            $this->_siteID
-        );
+        if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_CONTRACT)
+        {
+            $sql = sprintf(
+                "SELECT
+                    IF(ISNULL(text), 0, 1) AS hasText,
+                    attachment_id AS attachmentID,
+                    data_item_id AS dataItemID,
+                    data_item_type AS dataItemType,
+                    attachment.title AS title,
+                    original_filename AS originalFilename,
+                    stored_filename AS storedFilename,
+                    content_type AS contentType,
+                    profile_image AS isProfileImage,
+                    directory_name AS directoryName,
+                    md5_sum AS md5sum,
+                    file_size_kb AS fileSizeKB,
+                    DATE_FORMAT(date_created, '%%m-%%d-%%y (%%h:%%i:%%s %%p)') AS dateCreated,
+                    CONCAT(
+                        entered_by_user.first_name, ' ', entered_by_user.last_name
+                    ) AS enteredByFullName
+                FROM
+                    attachment
+                LEFT JOIN user AS entered_by_user
+                    ON attachment.entered_by = entered_by_user.user_id
+                WHERE
+                    data_item_id = %s
+                AND
+                    data_item_type = %s
+                AND
+                    attachment.title not like %s
+                AND
+                    attachment.site_id = %s
+                ORDER BY
+                    date_created asc",
+                $this->_db->makeQueryInteger($dataItemID),
+                $this->_db->makeQueryInteger($dataItemType),
+                $this->_db->makeQueryString('%service agreement%'),
+                $this->_siteID
+            );
+        }
+        else
+        {
+            $sql = sprintf(
+                "SELECT
+                    IF(ISNULL(text), 0, 1) AS hasText,
+                    attachment_id AS attachmentID,
+                    data_item_id AS dataItemID,
+                    data_item_type AS dataItemType,
+                    attachment.title AS title,
+                    original_filename AS originalFilename,
+                    stored_filename AS storedFilename,
+                    content_type AS contentType,
+                    profile_image AS isProfileImage,
+                    directory_name AS directoryName,
+                    md5_sum AS md5sum,
+                    file_size_kb AS fileSizeKB,
+                    DATE_FORMAT(date_created, '%%m-%%d-%%y (%%h:%%i:%%s %%p)') AS dateCreated,
+                    CONCAT(
+                        entered_by_user.first_name, ' ', entered_by_user.last_name
+                    ) AS enteredByFullName
+                FROM
+                    attachment
+                LEFT JOIN user AS entered_by_user
+                    ON attachment.entered_by = entered_by_user.user_id
+                WHERE
+                    data_item_id = %s
+                AND
+                    data_item_type = %s
+                AND
+                    attachment.site_id = %s
+                ORDER BY
+                    date_created asc",
+                $this->_db->makeQueryInteger($dataItemID),
+                $this->_db->makeQueryInteger($dataItemType),
+                $this->_siteID
+            );
+        }
         $rs = $this->_db->getAllAssoc($sql);
 
         foreach ($rs as $index => $data)

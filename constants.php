@@ -73,6 +73,7 @@ define('ACCESS_LEVEL_DISABLED', 0);
 define('ACCESS_LEVEL_READ',     100);
 define('ACCESS_LEVEL_EDIT',     200);
 define('ACCESS_LEVEL_DELETE',   300);
+define('ACCESS_LEVEL_CONTRACT', 310);
 define('ACCESS_LEVEL_DEMO',     350);
 define('ACCESS_LEVEL_SA',       400);
 define('ACCESS_LEVEL_MULTI_SA', 450);
