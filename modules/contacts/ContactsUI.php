@@ -76,6 +76,8 @@ class ContactsUI extends UserInterface
 
     public function handleRequest()
     {
+        if ($this->_accessLevel < ACCESS_LEVEL_DELETE) return;
+
         $action = $this->getAction();
 
         if (!eval(Hooks::get('CONTACTS_HANDLE_REQUEST'))) return;

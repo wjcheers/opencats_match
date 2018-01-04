@@ -315,6 +315,7 @@
             <br />
 
             <!-- CONTACT INFO -->
+            <?php if ($this->accessLevel >= ACCESS_LEVEL_DELETE): ?>
             <p class="note">Contacts</p>
             <table class="sortable" width="1225">
                 <tr>
@@ -421,6 +422,7 @@
                     <img src="images/actions/add_contact.gif" width="16" height="16" class="absmiddle" alt="add contact" border="0" title="Hide Some"/>
                     &nbsp;Hide contacts who have left (<?php echo(count($this->contactsRS) - count($this->contactsRSWC)); ?>)
                 </a>
+            <?php endif; ?>
             <?php endif; ?>
             <!-- /CONTACT INFO -->
         </div>

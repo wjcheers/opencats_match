@@ -153,121 +153,188 @@ class ActivityDataGrid extends DataGrid
      */
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {   
-        $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
-                activity.activity_id AS activityID,
-                activity.data_item_id AS dataItemID,
-                activity.data_item_type AS dataItemType,
-                activity.site_id AS siteID,
-                data_item_type.short_description AS item,
-                candidate.first_name AS firstName,
-                candidate.last_name AS lastName,
-                candidate.is_hot AS isHot,
-                joborder.is_hot AS jobIsHot,
-                company.is_hot AS companyIsHot,
-                company.company_id AS companyID,
-                activity.joborder_id AS jobOrderID,
-                activity.notes AS notes,
-                activity_type.short_description AS typeDescription,
-                DATE_FORMAT(
-                    activity.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
-                ) AS dateCreated,
-                activity.date_created AS dateCreatedSort,
-                entered_by_user.first_name AS enteredByFirstName,
-                entered_by_user.last_name AS enteredByLastName,
-                CONCAT(entered_by_user.last_name, entered_by_user.first_name) AS enteredBySort,
-                IF(ISNULL(joborder.title),
-                    'General',
-                    CONCAT(joborder.title, ' (', company.name, ')'))
-                AS regarding,
-                joborder.title AS regardingJobTitle,
-                company.name AS regardingCompanyName
-            FROM
-                activity
-            JOIN data_item_type
-                ON activity.data_item_type = data_item_type.data_item_type_id
-            LEFT JOIN user AS entered_by_user
-                ON activity.entered_by = entered_by_user.user_id
-            LEFT JOIN activity_type
-                ON activity.type = activity_type.activity_type_id
-            LEFT JOIN joborder
-                ON activity.joborder_id = joborder.joborder_id
-            LEFT JOIN company
-                ON joborder.company_id = company.company_id
-            INNER JOIN candidate
-                ON activity.data_item_id = candidate.candidate_id
-            WHERE
-                activity.data_item_type = %s
-            AND
-                activity.site_id = %s
+        if ($_SESSION['CATS']->getAccessLevel() >= ACCESS_LEVEL_DELETE)
+        {
+            $sql = sprintf(
+                "SELECT SQL_CALC_FOUND_ROWS %s
+                    activity.activity_id AS activityID,
+                    activity.data_item_id AS dataItemID,
+                    activity.data_item_type AS dataItemType,
+                    activity.site_id AS siteID,
+                    data_item_type.short_description AS item,
+                    candidate.first_name AS firstName,
+                    candidate.last_name AS lastName,
+                    candidate.is_hot AS isHot,
+                    joborder.is_hot AS jobIsHot,
+                    company.is_hot AS companyIsHot,
+                    company.company_id AS companyID,
+                    activity.joborder_id AS jobOrderID,
+                    activity.notes AS notes,
+                    activity_type.short_description AS typeDescription,
+                    DATE_FORMAT(
+                        activity.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
+                    ) AS dateCreated,
+                    activity.date_created AS dateCreatedSort,
+                    entered_by_user.first_name AS enteredByFirstName,
+                    entered_by_user.last_name AS enteredByLastName,
+                    CONCAT(entered_by_user.last_name, entered_by_user.first_name) AS enteredBySort,
+                    IF(ISNULL(joborder.title),
+                        'General',
+                        CONCAT(joborder.title, ' (', company.name, ')'))
+                    AS regarding,
+                    joborder.title AS regardingJobTitle,
+                    company.name AS regardingCompanyName
+                FROM
+                    activity
+                JOIN data_item_type
+                    ON activity.data_item_type = data_item_type.data_item_type_id
+                LEFT JOIN user AS entered_by_user
+                    ON activity.entered_by = entered_by_user.user_id
+                LEFT JOIN activity_type
+                    ON activity.type = activity_type.activity_type_id
+                LEFT JOIN joborder
+                    ON activity.joborder_id = joborder.joborder_id
+                LEFT JOIN company
+                    ON joborder.company_id = company.company_id
+                INNER JOIN candidate
+                    ON activity.data_item_id = candidate.candidate_id
+                WHERE
+                    activity.data_item_type = %s
+                AND
+                    activity.site_id = %s
+                    %s
+                    %s
+                UNION
+                SELECT %s
+                    activity.activity_id AS activityID,
+                    activity.data_item_id AS dataItemID,
+                    activity.data_item_type AS dataItemType,
+                    activity.site_id AS siteID,
+                    data_item_type.short_description AS item,
+                    contact.first_name AS firstName,
+                    contact.last_name AS lastName,
+                    contact.is_hot AS isHot,
+                    joborder.is_hot AS jobIsHot,
+                    company.is_hot AS companyIsHot,
+                    company.company_id AS companyID,
+                    activity.joborder_id AS jobOrderID,
+                    activity.notes AS notes,
+                    activity_type.short_description AS typeDescription,
+                    DATE_FORMAT(
+                        activity.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
+                    ) AS dateCreated,
+                    activity.date_created AS dateCreatedSort,
+                    entered_by_user.first_name AS enteredByFirstName,
+                    entered_by_user.last_name AS enteredByLastName,
+                    CONCAT(entered_by_user.last_name, entered_by_user.first_name) AS enteredBySort,
+                    IF(ISNULL(joborder.title),
+                        'General',
+                        CONCAT(joborder.title, ' (', company.name, ')'))
+                    AS regarding,
+                    joborder.title AS regardingJobTitle,
+                    company.name AS regardingCompanyName
+                FROM
+                    activity
+                JOIN data_item_type
+                    ON activity.data_item_type = data_item_type.data_item_type_id
+                LEFT JOIN user AS entered_by_user
+                    ON activity.entered_by = entered_by_user.user_id
+                LEFT JOIN activity_type
+                    ON activity.type = activity_type.activity_type_id
+                LEFT JOIN joborder
+                    ON activity.joborder_id = joborder.joborder_id
+                LEFT JOIN company
+                    ON joborder.company_id = company.company_id
+                INNER JOIN contact
+                    ON activity.data_item_id = contact.contact_id
+                WHERE
+                    activity.data_item_type = %s
+                AND
+                    activity.site_id = %s
+                    %s
+                    %s
                 %s
                 %s
-            UNION
-            SELECT %s
-                activity.activity_id AS activityID,
-                activity.data_item_id AS dataItemID,
-                activity.data_item_type AS dataItemType,
-                activity.site_id AS siteID,
-                data_item_type.short_description AS item,
-                contact.first_name AS firstName,
-                contact.last_name AS lastName,
-                contact.is_hot AS isHot,
-                joborder.is_hot AS jobIsHot,
-                company.is_hot AS companyIsHot,
-                company.company_id AS companyID,
-                activity.joborder_id AS jobOrderID,
-                activity.notes AS notes,
-                activity_type.short_description AS typeDescription,
-                DATE_FORMAT(
-                    activity.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
-                ) AS dateCreated,
-                activity.date_created AS dateCreatedSort,
-                entered_by_user.first_name AS enteredByFirstName,
-                entered_by_user.last_name AS enteredByLastName,
-                CONCAT(entered_by_user.last_name, entered_by_user.first_name) AS enteredBySort,
-                IF(ISNULL(joborder.title),
-                    'General',
-                    CONCAT(joborder.title, ' (', company.name, ')'))
-                AS regarding,
-                joborder.title AS regardingJobTitle,
-                company.name AS regardingCompanyName
-            FROM
-                activity
-            JOIN data_item_type
-                ON activity.data_item_type = data_item_type.data_item_type_id
-            LEFT JOIN user AS entered_by_user
-                ON activity.entered_by = entered_by_user.user_id
-            LEFT JOIN activity_type
-                ON activity.type = activity_type.activity_type_id
-            LEFT JOIN joborder
-                ON activity.joborder_id = joborder.joborder_id
-            LEFT JOIN company
-                ON joborder.company_id = company.company_id
-            INNER JOIN contact
-                ON activity.data_item_id = contact.contact_id
-            WHERE
-                activity.data_item_type = %s
-            AND
-                activity.site_id = %s
+                %s",
+                $distinct,
+                DATA_ITEM_CANDIDATE,
+                $this->_siteID,
+                $this->dateCriterion,
+                (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
+                $distinct,
+                DATA_ITEM_CONTACT,
+                $this->_siteID,
+                $this->dateCriterion,
+                (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
+                (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : '',
+                $orderSQL,
+                $limitSQL
+            );
+        }
+        else
+        {
+            $sql = sprintf(
+                "SELECT SQL_CALC_FOUND_ROWS %s
+                    activity.activity_id AS activityID,
+                    activity.data_item_id AS dataItemID,
+                    activity.data_item_type AS dataItemType,
+                    activity.site_id AS siteID,
+                    data_item_type.short_description AS item,
+                    candidate.first_name AS firstName,
+                    candidate.last_name AS lastName,
+                    candidate.is_hot AS isHot,
+                    joborder.is_hot AS jobIsHot,
+                    company.is_hot AS companyIsHot,
+                    company.company_id AS companyID,
+                    activity.joborder_id AS jobOrderID,
+                    activity.notes AS notes,
+                    activity_type.short_description AS typeDescription,
+                    DATE_FORMAT(
+                        activity.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
+                    ) AS dateCreated,
+                    activity.date_created AS dateCreatedSort,
+                    entered_by_user.first_name AS enteredByFirstName,
+                    entered_by_user.last_name AS enteredByLastName,
+                    CONCAT(entered_by_user.last_name, entered_by_user.first_name) AS enteredBySort,
+                    IF(ISNULL(joborder.title),
+                        'General',
+                        CONCAT(joborder.title, ' (', company.name, ')'))
+                    AS regarding,
+                    joborder.title AS regardingJobTitle,
+                    company.name AS regardingCompanyName
+                FROM
+                    activity
+                JOIN data_item_type
+                    ON activity.data_item_type = data_item_type.data_item_type_id
+                LEFT JOIN user AS entered_by_user
+                    ON activity.entered_by = entered_by_user.user_id
+                LEFT JOIN activity_type
+                    ON activity.type = activity_type.activity_type_id
+                LEFT JOIN joborder
+                    ON activity.joborder_id = joborder.joborder_id
+                LEFT JOIN company
+                    ON joborder.company_id = company.company_id
+                INNER JOIN candidate
+                    ON activity.data_item_id = candidate.candidate_id
+                WHERE
+                    activity.data_item_type = %s
+                AND
+                    activity.site_id = %s
+                    %s
+                    %s
                 %s
                 %s
-            %s
-            %s
-            %s",
-            $distinct,
-            DATA_ITEM_CANDIDATE,
-            $this->_siteID,
-            $this->dateCriterion,
-            (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
-            $distinct,
-            DATA_ITEM_CONTACT,
-            $this->_siteID,
-            $this->dateCriterion,
-            (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
-            (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : '',
-            $orderSQL,
-            $limitSQL
-        );
+                %s",
+                $distinct,
+                DATA_ITEM_CANDIDATE,
+                $this->_siteID,
+                $this->dateCriterion,
+                (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
+                (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : '',
+                $orderSQL,
+                $limitSQL
+            );
+        }
 
         return $sql;
     }

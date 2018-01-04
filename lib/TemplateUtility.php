@@ -597,6 +597,14 @@ class TemplateUtility
         foreach ($modules as $moduleName => $parameters)
         {
             $tabText = $parameters[1];
+            
+            if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_DELETE)
+            {
+                if ($tabText == 'Contacts')
+                {
+                    continue;
+                }
+            }
 
             /* Don't display a module's tab if $tabText is empty. */
             if (empty($tabText))

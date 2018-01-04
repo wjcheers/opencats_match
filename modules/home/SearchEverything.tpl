@@ -192,6 +192,7 @@
             <!-- /Companies -->
 
             <!-- Contacts -->
+            <?php if ($this->accessLevel >= ACCESS_LEVEL_DELETE): ?>
             <p class="note">Contacts Results</p>
             <?php if (!empty($this->contactsRS)): ?>
                 <table class="sortable" width="100%">
@@ -236,6 +237,7 @@
                 </table>
             <?php else: ?>
                 <p>No matching entries found.</p>
+            <?php endif; ?>
             <?php endif; ?>
             <!-- /Contacts -->
             
