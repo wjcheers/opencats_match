@@ -721,7 +721,23 @@ class Candidates
         
     public function getIDByLink($link)
     {
-        $i = 10;
+        // case: https://www.linkedin.com/in/%E5%B3%BB%E5%84%BC-%E6%9C%B1-a32399a3/
+        // use rawurlencode
+        // implode('/', array_map('rawurlencode', explode('/', $link)))
+        // linkedin.com/in/峻儼-??a32399a3 => linkedin.com/in/%E5%B3%BB%E5%84%BC-%E6%9C%B1-a32399a3
+        // str_replace('%', '\%', $link)
+        // linkedin.com/in/%E5%B3%BB%E5%84%BC-%E6%9C%B1-a32399a3 => linkedin.com/in/\%E5\%B3\%BB\%E5\%84\%BC-\%E6\%9C\%B1-a32399a3
+        if (strpos($link,'%') !== false) 
+        {
+            $encLink4Query = trim($link);
+        }
+        else
+        {
+            $encLink4Query = trim(implode('/', array_map('rawurlencode', explode('/', $link))));
+        }
+        $encLink4Query = "'%" . str_replace('%', '\%', $this->_db->escapeString($encLink4Query)) . "%'";
+        
+        $i = 1;
         // web_site and notes field
         while ($i > 0)
         {
@@ -741,9 +757,9 @@ class Candidates
                 )
                 AND
                     candidate.site_id = %s",
-                $this->_db->makeQueryString('%' . trim(str_replace('%', '!%', urlEncode($link))) . '%'),
+                $encLink4Query,
                 $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
-                $this->_db->makeQueryString('%' . trim(str_replace('%', '!%', urlEncode($link))) . '%'),
+                $encLink4Query,
                 $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
                 $this->_siteID
             );
@@ -756,12 +772,14 @@ class Candidates
                 // $link => linkedin.com/in/pohsien
                 // webSite => https://www.linkedin.com/in/pohsien-liu-83b38395
                 // 
-                $parsedUrl = parse_url($rs['webSite']);
+                // rtlim => remove the tail symbol
+                // parse_url input is "urlDecode" content
+                $parsedUrl = parse_url(urlDecode(rtrim($rs['webSite'], '/')));
                 // return $link . ' ' . $parsedUrl['path'];
                 if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                     return $rs['candidateID'];                
                 }
-                $parsedUrl = parse_url($rs['notes']);
+                $parsedUrl = parse_url(urlDecode(rtrim($rs['notes'], '/')));
                 if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                     return $rs['candidateID'];                
                 }
@@ -773,7 +791,7 @@ class Candidates
             $i--;
         }
 
-        $i = 10;
+        $i = 1;
         // extra_field
         while ($i > 0)
         {
@@ -809,7 +827,7 @@ class Candidates
                 $this->_db->makeQueryString("Twitter"),
                 $this->_db->makeQueryString("Linkedin"),
                 $this->_db->makeQueryString("Link1"),
-                $this->_db->makeQueryString('%' . trim(url_path_encode($link)) . '%'),
+                $encLink4Query,
                 $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
                 DATA_ITEM_CANDIDATE,
                 $this->_siteID
@@ -819,7 +837,7 @@ class Candidates
             if (!empty($rs))
             {
                 // Remove the partial matches. Use Url's path to do reverse search
-                $parsedUrl = parse_url($rs['value']);
+                $parsedUrl = parse_url(urlDecode(rtrim($rs['value'], '/')));
                 // return $link . ' ' . $parsedUrl['path'];
                 if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                     return $rs['dataItemID'];                
