@@ -40,6 +40,7 @@ define('ACTIVITY_CALL_MISSED', 700);
 define('ACTIVITY_ARRANGE',     800);
 define('ACTIVITY_CONFIRM',     900);
 define('ACTIVITY_DRIFTING',   1000);
+define('ACTIVITY_IM_LINKEDIN',1100);
 
 /**
  * Candidates library.

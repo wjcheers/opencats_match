@@ -39,6 +39,7 @@ ACTIVITY_CALL_MISSED = 700;
 ACTIVITY_ARRANGE     = 800;
 ACTIVITY_CONFIRM     = 900;
 ACTIVITY_DRIFTING    = 1000;
+ACTIVITY_IM_LINKEDIN = 1100;
 
 ARRANGE_TEXT = "Arrange: \nDate: 8/8/2017\nTime: 7:30am (Taiwan Time)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
 CONFIRM_TEXT = "Confirm: \nDate: 8/8/2017\nTime: 7:30am (Taiwan Time)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
@@ -96,6 +97,11 @@ function Activity_fillTypeSelect(selectList, selectedText)
     optionElements[9] = document.createElement('option');
     optionElements[9].value = ACTIVITY_DRIFTING;
     optionElements[9].appendChild(document.createTextNode('Drifting'));
+    
+    /* Linkedin Message option. */
+    optionElements[10] = document.createElement('option');
+    optionElements[10].value = ACTIVITY_IM_LINKEDIN;
+    optionElements[10].appendChild(document.createTextNode('IM (Linkedin)'));
 
     /* Select the correct option. */
     if (selectedText)
@@ -139,6 +145,10 @@ function Activity_fillTypeSelect(selectList, selectedText)
         else if (selectedText == 'Drifting')
         {
             optionElements[9].setAttribute('selected', 'selected');
+        }
+        else if (selectedText == 'IM (Linkedin)')
+        {
+            optionElements[10].setAttribute('selected', 'selected');
         }
     }
 

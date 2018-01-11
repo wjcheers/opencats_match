@@ -50,6 +50,7 @@
                             <option value="<?php echo(ACTIVITY_ARRANGE); ?>">Arrange</option>
                             <option value="<?php echo(ACTIVITY_CONFIRM); ?>">Confirm</option>
                             <option value="<?php echo(ACTIVITY_DRIFTING); ?>">Drifting</option>
+                            <option value="<?php echo(ACTIVITY_IM_LINKEDIN); ?>">IM (Linkedin)</option>
                         </select><br />
                         <span id="addActivitySpanB">Activity Notes</span><br />
                         <textarea name="activityNote" id="activityNote" cols="50" rows="10" style="margin-bottom: 4px;" class="inputbox"></textarea>
