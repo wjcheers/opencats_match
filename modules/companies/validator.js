@@ -13,6 +13,8 @@ function checkAddForm(form)
     var errorMessage = '';
 
     errorMessage += checkName();
+    errorMessage += checkPhone1();
+    errorMessage += checkPhone2();
 
     if (errorMessage != '')
     {
@@ -28,6 +30,8 @@ function checkEditForm(form)
     var errorMessage = '';
 
     errorMessage += checkName();
+    errorMessage += checkPhone1();
+    errorMessage += checkPhone2();
 
     if (errorMessage != '')
     {
@@ -92,6 +96,44 @@ function checkName()
     if (fieldValue == '')
     {
         errorMessage = "    - You must enter a name.\n";
+
+        fieldLabel.style.color = '#ff0000';
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+function checkPhone1()
+{
+    var errorMessage = '';
+
+    fieldValue = document.getElementById('phone1').value;
+    fieldLabel = document.getElementById('phone1Label');
+    if ((fieldValue != '') && new RegExp("[^0-9()#]").test(fieldValue))
+    {
+        errorMessage = "    - Phone1 Format (02)12345678#123, (886)12345678, 0912345678 \n";
+
+        fieldLabel.style.color = '#ff0000';
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+function checkPhone2()
+{
+    var errorMessage = '';
+
+    fieldValue = document.getElementById('phone2').value;
+    fieldLabel = document.getElementById('phone2Label');
+    if ((fieldValue != '') && new RegExp("[^0-9()#]").test(fieldValue))
+    {
+        errorMessage = "    - Phone2 Format (02)12345678#123, (886)12345678, 0912345678 \n";
 
         fieldLabel.style.color = '#ff0000';
     }

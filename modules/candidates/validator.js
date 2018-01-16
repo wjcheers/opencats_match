@@ -16,6 +16,9 @@ function checkAddForm(form)
     errorMessage += checkLastName();
     errorMessage += checkCurrentPay();
     errorMessage += checkDesiredPay();
+    errorMessage += checkPhoneHome();
+    errorMessage += checkPhoneCell();
+    errorMessage += checkPhoneWork();
 
     if (errorMessage != '')
     {
@@ -34,6 +37,9 @@ function checkEditForm(form)
     errorMessage += checkLastName();
     errorMessage += checkCurrentPay();
     errorMessage += checkDesiredPay();
+    errorMessage += checkPhoneHome();
+    errorMessage += checkPhoneCell();
+    errorMessage += checkPhoneWork();
 
     if (errorMessage != '')
     {
@@ -204,6 +210,64 @@ function checkDesiredPay()
     if (fieldValue != '' && isNaN(fieldValue))
     {
         errorMessage = "    - Desired Pay is not a number. (Number Only)\n";
+
+        fieldLabel.style.color = '#ff0000';
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+
+function checkPhoneHome()
+{
+    var errorMessage = '';
+
+    fieldValue = document.getElementById('phoneHome').value;
+    fieldLabel = document.getElementById('phoneHomeLabel');
+    if ((fieldValue != '') && new RegExp("[^0-9()#]").test(fieldValue))
+    {
+        errorMessage = "    - Phone Home Format (02)12345678#123, (886)12345678, 0912345678 \n";
+
+        fieldLabel.style.color = '#ff0000';
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+function checkPhoneCell()
+{
+    var errorMessage = '';
+
+    fieldValue = document.getElementById('phoneCell').value;
+    fieldLabel = document.getElementById('phoneCellLabel');
+    if ((fieldValue != '') && new RegExp("[^0-9()#]").test(fieldValue))
+    {
+        errorMessage = "    - Phone Cell Format (02)12345678#123, (886)12345678, 0912345678 \n";
+
+        fieldLabel.style.color = '#ff0000';
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+function checkPhoneWork()
+{
+    var errorMessage = '';
+
+    fieldValue = document.getElementById('phoneWork').value;
+    fieldLabel = document.getElementById('phoneWorkLabel');
+    if ((fieldValue != '') && new RegExp("[^0-9()#]").test(fieldValue))
+    {
+        errorMessage = "    - Phone Work Format (02)12345678#123, (886)12345678, 0912345678 \n";
 
         fieldLabel.style.color = '#ff0000';
     }
