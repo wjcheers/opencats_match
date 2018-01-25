@@ -1421,6 +1421,15 @@ class QuickSearch
      */
     public function contacts($wildCardString)
     {
+        // FIXME: Factor out Session dependency.
+        $userCriterion = '';
+        if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_DELETE)
+        {
+            $userCriterion = sprintf(
+                "AND contact.owner = %s", $_SESSION['CATS']->getUserID()
+            );
+        }
+        
         $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
 
@@ -1478,6 +1487,7 @@ class QuickSearch
                     ')', ''),
                 '(', '') LIKE %s
             )
+            %s
             AND
                 contact.site_id = %s
             AND
@@ -1493,6 +1503,7 @@ class QuickSearch
             $wildCardString,
             $wildCardString,
             $wildCardString,
+            $userCriterion,
             $this->_siteID,
             $this->_siteID
         );

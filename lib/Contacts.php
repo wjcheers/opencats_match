@@ -402,14 +402,23 @@ class Contacts
      */
     public function getCount()
     {
+        $userCriterion = '';
+        if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_DELETE)
+        {
+            $userCriterion = sprintf(
+                "AND contact.owner = %s", $_SESSION['CATS']->getUserID()
+            );
+        }
         $sql = sprintf(
             "SELECT
                 COUNT(*) AS totalContacts
             FROM
                 contact
             WHERE
-                contact.site_id = %s",
-            $this->_siteID
+                contact.site_id = %s
+            %s",
+            $this->_siteID,
+            $userCriterion
         );
 
         return $this->_db->getColumn($sql, 0, 0);
@@ -423,6 +432,13 @@ class Contacts
      */
     public function get($contactID)
     {
+        $userCriterion = '';
+        if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_DELETE)
+        {
+            $userCriterion = sprintf(
+                "AND contact.owner = %s", $_SESSION['CATS']->getUserID()
+            );
+        }
         $sql = sprintf(
             "SELECT
                 contact.contact_id AS contactID,
@@ -477,11 +493,13 @@ class Contacts
                 ON contact.reports_to  = reportsToContact.contact_id
             WHERE
                 contact.contact_id = %s
+            %s
             AND
                 contact.site_id = %s
             AND
                 company.site_id = %s",
             $this->_db->makeQueryInteger($contactID),
+            $userCriterion,
             $this->_siteID,
             $this->_siteID
         );
@@ -498,6 +516,13 @@ class Contacts
      */
     public function getForEditing($contactID)
     {
+        $userCriterion = '';
+        if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_DELETE)
+        {
+            $userCriterion = sprintf(
+                "AND contact.owner = %s", $_SESSION['CATS']->getUserID()
+            );
+        }
         $sql = sprintf(
             "SELECT
                 contact.contact_id AS contactID,
@@ -530,10 +555,11 @@ class Contacts
                 ON contact.company_department_id = company_department.company_department_id
             WHERE
                 contact.contact_id = %s
+            %s
             AND
                 contact.site_id = %s",
             $this->_db->makeQueryInteger($contactID),
-            $this->_siteID,
+            $userCriterion,
             $this->_siteID
         );
 
@@ -547,7 +573,15 @@ class Contacts
      */
     public function getAll($userID = -1, $companyID = -1)
     {
-        if ($userID >= 0)
+        // FIXME: Factor out Session dependency.
+        $userCriterion = '';
+        if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_DELETE)
+        {
+            $userCriterion = sprintf(
+                "AND contact.owner = %s", $_SESSION['CATS']->getUserID()
+            );
+        }
+        else if ($userID >= 0)
         {
             $userCriterion = sprintf(
                 'AND contact.owner = %s', $userID, $userID
@@ -697,7 +731,15 @@ class Contacts
      */
     public function getColdCallList($userID = -1, $companyID = -1)
     {
-        if ($userID >= 0)
+        // FIXME: Factor out Session dependency.
+        $userCriterion = '';
+        if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_EDIT)
+        {
+            $userCriterion = sprintf(
+                "AND contact.owner = %s", $_SESSION['CATS']->getUserID()
+            );
+        }
+        else if ($userID >= 0)
         {
             $userCriterion = sprintf(
                 "AND contact.owner = %s", $userID, $userID
@@ -989,6 +1031,13 @@ class ContactsDataGrid extends DataGrid
      */
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
+        $userCriterion = '';
+        if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_DELETE)
+        {
+            $userCriterion = sprintf(
+                "AND contact.owner = %s", $_SESSION['CATS']->getUserID()
+            );
+        }
         if ($this->getMiscArgument() != 0)
         {
             $savedListID = (int) $this->getMiscArgument();
@@ -1028,6 +1077,7 @@ class ContactsDataGrid extends DataGrid
                 contact.site_id = %s
             %s
             %s
+            %s
             GROUP BY contact.contact_id
             %s
             %s
@@ -1036,6 +1086,7 @@ class ContactsDataGrid extends DataGrid
             $selectSQL,
             $joinSQL,
             $this->_siteID,
+            $userCriterion,
             (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
             $this->_assignedCriterion,
             (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : '',
