@@ -32,6 +32,7 @@ include_once('./lib/DateUtility.php'); /* Depends on StringUtility. */
 include_once('./lib/ResultSetUtility.php');
 include_once('./lib/Companies.php');
 include_once('./lib/Contacts.php');
+include_once('./lib/ActivityEntries.php');
 include_once('./lib/JobOrders.php');
 include_once('./lib/Attachments.php');
 include_once('./lib/Export.php');
@@ -118,6 +119,18 @@ class CompaniesUI extends UserInterface
                 else
                 {
                     $this->search();
+                }
+
+                break;
+
+            case 'addActivityScheduleEvent':
+                if ($this->isPostBack())
+                {
+                    $this->onAddActivityScheduleEvent();
+                }
+                else
+                {
+                    $this->addActivityScheduleEvent();
                 }
 
                 break;
@@ -379,6 +392,32 @@ class CompaniesUI extends UserInterface
             }
         }
 
+        $activityEntries = new ActivityEntries($this->_siteID);
+        $activityRS = $activityEntries->getAllByDataItem($companyID, DATA_ITEM_COMPANY);
+        if (!empty($activityRS))
+        {
+            foreach ($activityRS as $rowIndex => $row)
+            {
+                if (empty($activityRS[$rowIndex]['notes']))
+                {
+                    $activityRS[$rowIndex]['notes'] = '(No Notes)';
+                }
+
+                if (empty($activityRS[$rowIndex]['jobOrderID']) ||
+                    empty($activityRS[$rowIndex]['regarding']))
+                {
+                    $activityRS[$rowIndex]['regarding'] = 'General';
+                }
+
+                $activityRS[$rowIndex]['enteredByAbbrName'] = StringUtility::makeInitialName(
+                    $activityRS[$rowIndex]['enteredByFirstName'],
+                    $activityRS[$rowIndex]['enteredByLastName'],
+                    false,
+                    LAST_NAME_MAXLEN
+                );
+            }
+        }
+
         /* Add an MRU entry. */
         $_SESSION['CATS']->getMRU()->addEntry(
             DATA_ITEM_COMPANY, $companyID, $data['name']
@@ -407,10 +446,12 @@ class CompaniesUI extends UserInterface
         $this->_template->assign('extraFieldRS', $extraFieldRS);
         $this->_template->assign('isShortNotes', $isShortNotes);
         $this->_template->assign('jobOrdersRS', $jobOrdersRS);
+        $this->_template->assign('activityRS', $activityRS);
         $this->_template->assign('contactsRS', $contactsRS);
         $this->_template->assign('contactsRSWC', $contactsRSWC);
         $this->_template->assign('privledgedUser', $privledgedUser);
         $this->_template->assign('companyID', $companyID);
+        $this->_template->assign('sessionCookie', $_SESSION['CATS']->getCookie());
 
         if (!eval(Hooks::get('CLIENTS_SHOW'))) return;
 
@@ -889,6 +930,30 @@ class CompaniesUI extends UserInterface
         CATSUtility::transferRelativeURI('m=companies&a=listByView');
     }
 
+    //TODO: Document me.
+    private function addActivityScheduleEvent()
+    {
+        /* Bail out if we don't have a valid candidate ID. */
+        if (!$this->isRequiredIDValid('companyID', $_GET))
+        {
+            CommonErrors::fatalModal(COMMONERROR_BADINDEX, $this, 'Invalid company ID.');
+        }
+
+        $companyID = $_GET['companyID'];
+
+        $this->_template->assign('companyID', $companyID);
+        $this->_template->assign('isFinishedMode', false);
+        $this->_template->display(
+            './modules/companies/AddActivityScheduleEventModal.tpl'
+        );
+    }
+
+    //TODO: Document me.
+    private function onAddActivityScheduleEvent()
+    {
+        $this->_addActivityScheduleEvent(-1);
+    }
+    
     /*
      * Called by handleRequest() to process loading the search page.
      */
@@ -1213,6 +1278,97 @@ class CompaniesUI extends UserInterface
         }
 
         return $resultSet;
+    }
+    
+    
+    /**
+     * Processes an Add Activity / Schedule Event form and displays
+     * contacts/AddActivityScheduleEventModal.tpl. This is factored out
+     * for code clarity.
+     *
+     * @param boolean from joborders module perspective
+     * @param integer "regarding" job order ID or -1
+     * @param string module directory
+     * @return void
+     */
+    private function _addActivityScheduleEvent($regardingID, $directoryOverride = '')
+    {
+        /* Module directory override for fatal() calls. */
+        if ($directoryOverride != '')
+        {
+            $moduleDirectory = $directoryOverride;
+        }
+        else
+        {
+            $moduleDirectory = $this->_moduleDirectory;
+        }
+
+        /* Bail out if we don't have a valid candidate ID. */
+        if (!$this->isRequiredIDValid('companyID', $_POST))
+        {
+            CommonErrors::fatalModal(COMMONERROR_BADINDEX, $this, 'Invalid contact ID.');
+        }
+
+        $companyID = $_POST['companyID'];
+
+        if ($this->isChecked('addActivity', $_POST))
+        {
+            /* Bail out if we don't have a valid job order ID. */
+            if (!$this->isOptionalIDValid('activityTypeID', $_POST))
+            {
+                CommonErrors::fatalModal(COMMONERROR_BADINDEX, $this, 'Invalid activity type ID.');
+            }
+
+            $activityTypeID = $_POST['activityTypeID'];
+
+            $activityNote = $this->getTrimmedInput('activityNote', $_POST);
+
+            $activityNote = htmlspecialchars($activityNote);
+
+            /* Add the activity entry. */
+            $activityEntries = new ActivityEntries($this->_siteID);
+            $activityID = $activityEntries->add(
+                $companyID,
+                DATA_ITEM_COMPANY,
+                $activityTypeID,
+                $activityNote,
+                $this->_userID,
+                $regardingID
+            );
+            $activityTypes = $activityEntries->getTypes();
+            $activityTypeDescription = ResultSetUtility::getColumnValueByIDValue(
+                $activityTypes, 'typeID', $activityTypeID, 'type'
+            );
+
+            $activityAdded = true;
+        }
+        else
+        {
+            $activityAdded = false;
+            $activityNote = '';
+            $activityTypeDescription = '';
+        }
+
+        if (!$activityAdded)
+        {
+            $changesMade = false;
+        }
+        else
+        {
+            $changesMade = true;
+        }
+
+        if (!eval(Hooks::get('CANDIDATE_ON_ADD_ACTIVITY_CHANGE_STATUS_POST'))) return;
+
+        $this->_template->assign('companyID', $companyID);
+        $this->_template->assign('activityAdded', $activityAdded);
+        $this->_template->assign('activityDescription', $activityNote);
+        $this->_template->assign('activityType', $activityTypeDescription);
+        $this->_template->assign('changesMade', $changesMade);
+        $this->_template->assign('isFinishedMode', true);
+        $this->_template->display(
+            './modules/companies/AddActivityScheduleEventModal.tpl'
+        );
     }
 }
 

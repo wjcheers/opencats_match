@@ -53,6 +53,11 @@ include_once('./lib/Candidates.php');
 include_once('./lib/Contacts.php');
 
 /**
+ * Companies library.
+ */
+include_once('./lib/Companies.php');
+
+/**
  * Job Orders library.
  */
 include_once('./lib/JobOrders.php');

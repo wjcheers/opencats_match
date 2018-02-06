@@ -1,5 +1,5 @@
 <?php /* $Id: Show.tpl 3582 2007-11-12 22:58:48Z brian $ */ ?>
-<?php TemplateUtility::printHeader($this->data['name'].' - Company', array( 'js/sorttable.js', 'js/attachment.js')); ?>
+<?php TemplateUtility::printHeader($this->data['name'].' - Company', array( 'js/sorttable.js', 'js/activity.js', 'js/attachment.js')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
 <?php TemplateUtility::printTabs($this->active); ?>
     <div id="main">
@@ -423,6 +423,55 @@
                 </a>
             <?php endif; ?>
             <!-- /CONTACT INFO -->
+            
+            
+
+            <br clear="all" />
+            <br />
+
+            <p class="note">Activity</p>
+            <table id="activityTable" class="sortable" width="1225">
+                <tr>
+                    <th align="left" width="125">Date</th>
+                    <th align="left" width="90">Type</th>
+                    <th align="left" width="90">Entered</th>
+                    <th align="left" width="250">Regarding</th>
+                    <th align="left">Notes</th>
+                    <th align="left" width="40">Action</th>
+                </tr>
+
+                <?php foreach ($this->activityRS as $rowNumber => $activityData): ?>
+                    <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
+                        <td align="left" valign="top" id="activityDate<?php echo($activityData['activityID']); ?>"><?php $this->_($activityData['dateCreated']) ?></td>
+                        <td align="left" valign="top" id="activityType<?php echo($activityData['activityID']); ?>"><?php $this->_($activityData['typeDescription']) ?></td>
+                        <td align="left" valign="top"><?php $this->_($activityData['enteredByAbbrName']) ?></td>
+                        <td align="left" valign="top" id="activityRegarding<?php echo($activityData['activityID']); ?>"><?php $this->_($activityData['regarding']) ?></td>
+                        <td align="left" valign="top" id="activityNotes<?php echo($activityData['activityID']); ?>"><?php echo(nl2br($activityData['notes'])); ?></td>
+                        <td align="center" >
+                            <?php if ($this->accessLevel >= ACCESS_LEVEL_EDIT): ?>
+                                <a href="#" id="editActivity<?php echo($activityData['activityID']); ?>" onclick="Activity_editEntry(<?php echo($activityData['activityID']); ?>, <?php echo($this->companyID); ?>, <?php echo(DATA_ITEM_COMPANY); ?>, '<?php echo($this->sessionCookie); ?>'); return false;">
+                                    <img src="images/actions/edit.gif" width="16" height="16" alt="" class="absmiddle" border="0" title="Edit"/>
+                                </a>
+                            <?php endif; ?>
+                            <?php if ($this->accessLevel >= ACCESS_LEVEL_EDIT): ?>
+                                <a href="#" id="deleteActivity<?php echo($activityData['activityID']); ?>" onclick="Activity_deleteEntry(<?php echo($activityData['activityID']); ?>, '<?php echo($this->sessionCookie); ?>'); return false;">
+                                    <img src="images/actions/delete.gif" width="16" height="16" alt="" class="absmiddle" border="0" title="Delete"/>
+                                </a>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+            <div id="addActivityDiv">
+                <?php if ($this->accessLevel >= ACCESS_LEVEL_EDIT): ?>
+                    <a href="#" id="addActivityLink" title="Log an Activity" onclick="showPopWin('<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=addActivityScheduleEvent&amp;companyID=<?php echo($this->companyID); ?>', 600, 375, null); return false;">
+                        <img src="images/new_activity_inline.gif" width="16" height="16" class="absmiddle" title="Log an Activity / Schedule Event" alt="Log an Activity" border="0" />&nbsp;Log an Activity
+                    </a>
+                <?php endif; ?>
+                <img src="images/indicator2.gif" id="addActivityIndicator" alt="" style="visibility: hidden; margin-left: 5px;" height="16" width="16" />
+            </div>
+            
+            
         </div>
     </div>
 
