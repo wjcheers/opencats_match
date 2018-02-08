@@ -453,7 +453,7 @@
                                     <img src="images/actions/edit.gif" width="16" height="16" alt="" class="absmiddle" border="0" title="Edit"/>
                                 </a>
                             <?php endif; ?>
-                            <?php if ($this->accessLevel >= ACCESS_LEVEL_EDIT): ?>
+                            <?php if ($this->accessLevel >= ACCESS_LEVEL_DELETE): ?>
                                 <a href="#" id="deleteActivity<?php echo($activityData['activityID']); ?>" onclick="Activity_deleteEntry(<?php echo($activityData['activityID']); ?>, '<?php echo($this->sessionCookie); ?>'); return false;">
                                     <img src="images/actions/delete.gif" width="16" height="16" alt="" class="absmiddle" border="0" title="Delete"/>
                                 </a>
