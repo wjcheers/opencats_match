@@ -118,7 +118,7 @@ class ActivityDataGrid extends DataGrid
                                      'pagerWidth'      => 125,
                                      'pagerOptional'   => true,
                                      'alphaNavigation' => true,
-									 'filter' 		   => 'CONCAT(joborder.title, company.name)'),        
+									 'filter' 		   => 'IF(ISNULL(joborder.title), company.name, CONCAT(joborder.title, company.name))'),        
 
              'Activity' =>      array('pagerRender'    => '$ret = $rsData[\'typeDescription\']; return $ret;', 
                                      'sortableColumn'  => 'typeDescription',
@@ -217,6 +217,53 @@ class ActivityDataGrid extends DataGrid
                     activity.data_item_type AS dataItemType,
                     activity.site_id AS siteID,
                     data_item_type.short_description AS item,
+                    '' AS firstName,
+                    '' AS lastName,
+                    '0' AS isHot,
+                    '0' AS jobIsHot,
+                    company.is_hot AS companyIsHot,
+                    company.company_id AS companyID,
+                    activity.joborder_id AS jobOrderID,
+                    activity.notes AS notes,
+                    activity_type.short_description AS typeDescription,
+                    DATE_FORMAT(
+                        activity.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
+                    ) AS dateCreated,
+                    activity.date_created AS dateCreatedSort,
+                    entered_by_user.first_name AS enteredByFirstName,
+                    entered_by_user.last_name AS enteredByLastName,
+                    CONCAT(entered_by_user.last_name, entered_by_user.first_name) AS enteredBySort,
+                    IF(ISNULL(joborder.title),
+                        company.name,
+                        CONCAT(joborder.title, ' (', company.name, ')'))
+                    AS regarding,
+                    ' ' AS regardingJobTitle,
+                    company.name AS regardingCompanyName
+                FROM
+                    activity
+                JOIN data_item_type
+                    ON activity.data_item_type = data_item_type.data_item_type_id
+                LEFT JOIN user AS entered_by_user
+                    ON activity.entered_by = entered_by_user.user_id
+                LEFT JOIN activity_type
+                    ON activity.type = activity_type.activity_type_id
+                LEFT JOIN joborder
+                    ON joborder.joborder_id = -1
+                LEFT JOIN company
+                    ON activity.data_item_id = company.company_id
+                WHERE
+                    activity.data_item_type = %s
+                AND
+                    activity.site_id = %s
+                    %s
+                    %s
+                UNION
+                SELECT %s
+                    activity.activity_id AS activityID,
+                    activity.data_item_id AS dataItemID,
+                    activity.data_item_type AS dataItemType,
+                    activity.site_id AS siteID,
+                    data_item_type.short_description AS item,
                     contact.first_name AS firstName,
                     contact.last_name AS lastName,
                     contact.is_hot AS isHot,
@@ -265,6 +312,11 @@ class ActivityDataGrid extends DataGrid
                 %s",
                 $distinct,
                 DATA_ITEM_CANDIDATE,
+                $this->_siteID,
+                $this->dateCriterion,
+                (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
+                $distinct,
+                DATA_ITEM_COMPANY,
                 $this->_siteID,
                 $this->dateCriterion,
                 (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
