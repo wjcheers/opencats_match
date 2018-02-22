@@ -304,6 +304,60 @@ class CandidatesUI extends UserInterface
 
         $this->_template->display('./modules/candidates/Candidates.tpl');
     }
+    
+    private function addDashInNumber($phoneNumber)
+    {
+        if(preg_match('/\d{5,}/', $phoneNumber, $matches, PREG_OFFSET_CAPTURE))
+        {
+            $strOrg = $phoneNumber;
+            $phoneNumber = '';
+            
+            $strMidPos = strpos($strOrg, $matches[0][0]);
+            
+            // first string
+            if($strMidPos != 0)
+            {
+                $phoneNumber .= substr($strOrg, 0, $strMidPos) . ' ';
+            }
+
+            $strMid = $matches[0][0];
+            $tmp1 = strlen($strMid);
+            if($tmp1 == 8)
+            {
+                $tmp1 = substr($strMid, 0, 4) . '-' . substr($strMid, 4);
+            }
+            else if($tmp1 == 9)
+            {
+                $tmp1 = substr($strMid, 0, 3) . '-' . substr($strMid, 3, 3) . '-' . substr($strMid, 6);
+            }
+            else if($tmp1 == 10)
+            {
+                $tmp1 = substr($strMid, 0, 4) . '-' . substr($strMid, 4, 3) . '-' . substr($strMid, 7);
+            }
+            else if($tmp1 == 11)
+            {
+                $tmp1 = substr($strMid, 0, 4) . '-' . substr($strMid, 4, 4) . '-' . substr($strMid, 8);
+            }
+            else if($tmp1 >= 5)
+            {
+                $split = str_split($strMid, 3);
+                $tmp1 = implode('-', $split);
+            }
+            else
+            {
+                //$strMid unchanged
+                $tmp1 = $strMid;
+            }
+            $phoneNumber .= $tmp1;
+            
+            // last string
+            if($strMidPos + strlen($strMid) < strlen($strOrg))
+            {
+                $phoneNumber .= ' ' . substr($strOrg, $strMidPos + strlen($strMid));
+            }
+        }
+        return $phoneNumber;
+    }
 
     /*
      * Called by handleRequest() to process loading the details page.
@@ -399,6 +453,20 @@ class CandidatesUI extends UserInterface
         {
             $data['titleClass'] = 'jobTitleCold';
         }
+
+        if ($data['phoneCell'] != '')
+        {
+            $data['phoneCell'] = $this->addDashInNumber($data['phoneCell']);
+        }
+        if ($data['phoneHome'] != '')
+        {
+            $data['phoneHome'] = $this->addDashInNumber($data['phoneHome']);
+        }
+        if ($data['phoneWork'] != '')
+        {
+            $data['phoneWork'] = $this->addDashInNumber($data['phoneWork']);
+        }
+
 
         $attachments = new Attachments($this->_siteID);
         $attachmentsRS = $attachments->getAll(
