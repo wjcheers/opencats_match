@@ -121,6 +121,10 @@ class HomeUI extends UserInterface
 
         $this->_template->assign('dataGridVerified', $dataGrid);
         
+        $dataGrid = DataGrid::get("home:ConfirmedPipelineDashboard", $dataGridProperties);
+
+        $this->_template->assign('dataGridConfirmed', $dataGrid);
+        
         $dataGrid = DataGrid::get("home:EverVerifiedPipelineDashboard", $dataGridProperties);
 
         $this->_template->assign('dataGridEverVerified', $dataGrid);

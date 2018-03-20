@@ -210,7 +210,7 @@ CREATE TABLE `candidate_joborder_status` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 LOCK TABLES `candidate_joborder_status` WRITE;
-INSERT INTO `candidate_joborder_status` VALUES (100,'No Contact',0,0,1),(200,'Contacted',0,0,1),(300,'Qualifying',0,1,1),(400,'Submitted',0,1,1),(500,'Interviewing',0,1,1),(600,'Offered',0,1,1),(700,'Client Declined',0,0,1),(800,'Placed',0,1,1),(0,'No Status',0,0,1),(650,'Not in Consideration',0,0,1),(250,'Candidate Responded',0,0,1),(350,'Verified',0,0,1);
+INSERT INTO `candidate_joborder_status` VALUES (100,'No Contact',0,0,1),(200,'Contacted',0,0,1),(300,'Qualifying',0,1,1),(400,'Submitted',0,1,1),(500,'Interviewing',0,1,1),(600,'Offered',0,1,1),(700,'Client Declined',0,0,1),(800,'Placed',0,1,1),(0,'No Status',0,0,1),(650,'Not in Consideration',0,0,1),(250,'Candidate Responded',0,0,1),(350,'Verified',0,0,1),(360,'Confirmed',0,0,1);
 UNLOCK TABLES;
 DROP TABLE IF EXISTS `candidate_joborder_status_history`;
 CREATE TABLE `candidate_joborder_status_history` (
