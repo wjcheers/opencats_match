@@ -774,14 +774,20 @@ class Candidates
                 // 
                 // rtlim => remove the tail symbol
                 // parse_url input is "urlDecode" content
-                $parsedUrl = parse_url(urlDecode(rtrim($rs['webSite'], '/')));
-                // return $link . ' ' . $parsedUrl['path'];
-                if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
-                    return $rs['candidateID'];                
+                if (!empty($rs['webSite']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($rs['webSite'], '/')));
+                    // return $link . ' ' . $parsedUrl['path'];
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $rs['candidateID'];                
+                    }
                 }
-                $parsedUrl = parse_url(urlDecode(rtrim($rs['notes'], '/')));
-                if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
-                    return $rs['candidateID'];                
+                if (!empty($rs['notes']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($rs['notes'], '/')));
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $rs['candidateID'];                
+                    }
                 }
             }
             else //empty
@@ -836,11 +842,14 @@ class Candidates
              
             if (!empty($rs))
             {
-                // Remove the partial matches. Use Url's path to do reverse search
-                $parsedUrl = parse_url(urlDecode(rtrim($rs['value'], '/')));
-                // return $link . ' ' . $parsedUrl['path'];
-                if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
-                    return $rs['dataItemID'];                
+                if (!empty($rs['value']))
+                {
+                    // Remove the partial matches. Use Url's path to do reverse search
+                    $parsedUrl = parse_url(urlDecode(rtrim($rs['value'], '/')));
+                    // return $link . ' ' . $parsedUrl['path'];
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $rs['dataItemID'];                
+                    }
                 }
             }
             $i--;
