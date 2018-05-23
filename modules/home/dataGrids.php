@@ -180,7 +180,7 @@ class ImportantPipelineDashboard extends DataGrid
                 (
                     joborder.status = 'Active'
                 OR
-                    joborder.status = 'On Hold'
+                    joborder.status = 'OnHold'
                 OR
                     joborder.status = 'Full'
                 )
@@ -268,7 +268,7 @@ class QualifyingPipelineDashboard extends DataGrid
                                      'alphaNavigation' => true,
                                      'filterHaving'    => 'status'),
 
-            'Position'    =>    array('pagerRender'    => 'if ($rsData[\'jobOrderIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'joborderID\'].\'"  style="font-size:11px;" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'jobOrderTitle\']).\'</a>\';',
+            'Position'    =>    array('pagerRender'    => 'if ($rsData[\'jobOrderIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; if ($rsData[\'joborderStatus\'] != \'Active\') $joborderStatus =  \' (\' . $rsData[\'joborderStatus\'] . \')\'; else $joborderStatus = \'\'; return \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'joborderID\'].\'"  style="font-size:11px;" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'jobOrderTitle\']).$joborderStatus.\'</a>\';',
                                      'sortableColumn'  => 'jobOrderTitle',
                                      'pagerWidth'      => 220,
                                      'alphaNavigation' => true,
@@ -318,6 +318,7 @@ class QualifyingPipelineDashboard extends DataGrid
                 joborder.title as jobOrderTitle,
                 joborder.is_hot as jobOrderIsHot,
                 joborder.joborder_id as joborderID,
+                joborder.status as joborderStatus,
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
@@ -341,14 +342,6 @@ class QualifyingPipelineDashboard extends DataGrid
                 candidate_joborder.site_id = %s
             AND
                 candidate_joborder.status = %s
-            AND
-                (
-                    joborder.status = 'Active'
-                OR
-                    joborder.status = 'On Hold'
-                OR
-                    joborder.status = 'Full'
-                )
             %s
             %s
             %s
@@ -430,7 +423,7 @@ class VerifiedPipelineDashboard extends DataGrid
                                      'alphaNavigation' => true,
                                      'filterHaving'    => 'status'),
 
-            'Position'    =>    array('pagerRender'    => 'if ($rsData[\'jobOrderIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'joborderID\'].\'"  style="font-size:11px;" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'jobOrderTitle\']).\'</a>\';',
+            'Position'    =>    array('pagerRender'    => 'if ($rsData[\'jobOrderIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; if ($rsData[\'joborderStatus\'] != \'Active\') $joborderStatus =  \' (\' . $rsData[\'joborderStatus\'] . \')\'; else $joborderStatus = \'\'; return \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'joborderID\'].\'"  style="font-size:11px;" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'jobOrderTitle\']).$joborderStatus.\'</a>\';',
                                      'sortableColumn'  => 'jobOrderTitle',
                                      'pagerWidth'      => 220,
                                      'alphaNavigation' => true,
@@ -480,6 +473,7 @@ class VerifiedPipelineDashboard extends DataGrid
                 joborder.title as jobOrderTitle,
                 joborder.is_hot as jobOrderIsHot,
                 joborder.joborder_id as joborderID,
+                joborder.status as joborderStatus,
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
@@ -503,14 +497,6 @@ class VerifiedPipelineDashboard extends DataGrid
                 candidate_joborder.site_id = %s
             AND
                 candidate_joborder.status = %s
-            AND
-                (
-                    joborder.status = 'Active'
-                OR
-                    joborder.status = 'On Hold'
-                OR
-                    joborder.status = 'Full'
-                )
             %s
             %s
             %s
@@ -530,7 +516,7 @@ class VerifiedPipelineDashboard extends DataGrid
 }
 
 
-class ConfirmedPipelineDashboard extends DataGrid
+class AwaitingPipelineDashboard extends DataGrid
 {
     protected $_siteID;
 
@@ -592,7 +578,7 @@ class ConfirmedPipelineDashboard extends DataGrid
                                      'alphaNavigation' => true,
                                      'filterHaving'    => 'status'),
 
-            'Position'    =>    array('pagerRender'    => 'if ($rsData[\'jobOrderIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'joborderID\'].\'"  style="font-size:11px;" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'jobOrderTitle\']).\'</a>\';',
+            'Position'    =>    array('pagerRender'    => 'if ($rsData[\'jobOrderIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; if ($rsData[\'joborderStatus\'] != \'Active\') $joborderStatus =  \' (\' . $rsData[\'joborderStatus\'] . \')\'; else $joborderStatus = \'\'; return \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'joborderID\'].\'"  style="font-size:11px;" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'jobOrderTitle\']).$joborderStatus.\'</a>\';',
                                      'sortableColumn'  => 'jobOrderTitle',
                                      'pagerWidth'      => 220,
                                      'alphaNavigation' => true,
@@ -618,7 +604,7 @@ class ConfirmedPipelineDashboard extends DataGrid
                                      'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
          );
 
-        parent::__construct("home:ConfirmedPipelineDashboard", $parameters);
+        parent::__construct("home:AwaitingPipelineDashboard", $parameters);
     }
 
     /**
@@ -642,6 +628,7 @@ class ConfirmedPipelineDashboard extends DataGrid
                 joborder.title as jobOrderTitle,
                 joborder.is_hot as jobOrderIsHot,
                 joborder.joborder_id as joborderID,
+                joborder.status as joborderStatus,
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
@@ -665,22 +652,14 @@ class ConfirmedPipelineDashboard extends DataGrid
                 candidate_joborder.site_id = %s
             AND
                 candidate_joborder.status = %s
-            AND
-                (
-                    joborder.status = 'Active'
-                OR
-                    joborder.status = 'On Hold'
-                OR
-                    joborder.status = 'Full'
-                )
             %s
             %s
             %s
             %s",
             $distinct,
-            PIPELINE_STATUS_CONFIRMED,
+            PIPELINE_STATUS_AWAITING,
             $this->_siteID,
-            PIPELINE_STATUS_CONFIRMED,
+            PIPELINE_STATUS_AWAITING,
             (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
             (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : '',
             $orderSQL,
@@ -754,7 +733,7 @@ class EverVerifiedPipelineDashboard extends DataGrid
                                      'alphaNavigation' => true,
                                      'filterHaving'    => 'status'),
 
-            'Position'    =>    array('pagerRender'    => 'if ($rsData[\'jobOrderIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'joborderID\'].\'"  style="font-size:11px;" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'jobOrderTitle\']).\'</a>\';',
+            'Position'    =>    array('pagerRender'    => 'if ($rsData[\'jobOrderIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; if ($rsData[\'joborderStatus\'] != \'Active\') $joborderStatus =  \' (\' . $rsData[\'joborderStatus\'] . \')\'; else $joborderStatus = \'\'; return \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'joborderID\'].\'"  style="font-size:11px;" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'jobOrderTitle\']).$joborderStatus.\'</a>\';',
                                      'sortableColumn'  => 'jobOrderTitle',
                                      'pagerWidth'      => 220,
                                      'alphaNavigation' => true,
@@ -804,6 +783,7 @@ class EverVerifiedPipelineDashboard extends DataGrid
                 joborder.title as jobOrderTitle,
                 joborder.is_hot as jobOrderIsHot,
                 joborder.joborder_id as joborderID,
+                joborder.status as joborderStatus,
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
@@ -832,14 +812,6 @@ class EverVerifiedPipelineDashboard extends DataGrid
                 candidate_joborder.site_id = %s
             AND
                 candidate_joborder_status_history.status_to = %s
-            AND
-                (
-                    joborder.status = 'Active'
-                OR
-                    joborder.status = 'On Hold'
-                OR
-                    joborder.status = 'Full'
-                )
             %s
             %s
             %s

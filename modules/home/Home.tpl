@@ -119,11 +119,11 @@
             <table>
                 <tr>
                     <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
-                        <div class="noteUnsizedSpan" style="width: 1220px;">Confirmed Candidates in Active Job Orders - Page <?php echo($this->dataGridConfirmed->getCurrentPageHTML()); ?> (<?php echo($this->dataGridConfirmed->getNumberOfRows()); ?> Items)</div>
-                        <?php $this->dataGridConfirmed->draw(); ?>
-                        <div style="float:right;"><?php $this->dataGridConfirmed->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridConfirmed->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                        <div class="noteUnsizedSpan" style="width: 1220px;">Awaiting Candidates in Active Job Orders - Page <?php echo($this->dataGridAwaiting->getCurrentPageHTML()); ?> (<?php echo($this->dataGridAwaiting->getNumberOfRows()); ?> Items)</div>
+                        <?php $this->dataGridAwaiting->draw(); ?>
+                        <div style="float:right;"><?php $this->dataGridAwaiting->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridAwaiting->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 
-                        <?php if (!$this->dataGridConfirmed->getNumberOfRows()): ?>
+                        <?php if (!$this->dataGridAwaiting->getNumberOfRows()): ?>
                         <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
                             &nbsp;
                         </div>
