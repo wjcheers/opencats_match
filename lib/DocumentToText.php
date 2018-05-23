@@ -77,6 +77,8 @@ class DocumentToText
         $this->_rawOutput   = '';
         $this->_fileName    = $fileName;
 
+        $nativeEncoding = '';
+        
         /* If we are trying to parse a DOC file, is it really a DOC file or is
          * it an RTF file?
          */
