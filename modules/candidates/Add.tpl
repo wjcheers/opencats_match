@@ -245,6 +245,7 @@
                     <?php endif; ?>
                     <?php endfor; ?>
 
+                    <?php $tabIndex = 6; ?>
                     <tr>
                         <td class="tdVertical">
                             <label id="sourceLabel" for="sourceSelect">Source:</label>
