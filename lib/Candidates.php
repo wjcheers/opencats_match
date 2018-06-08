@@ -763,30 +763,33 @@ class Candidates
                 $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
                 $this->_siteID
             );
-            $rs = $this->_db->getAssoc($sql);
+            $rs = $this->_db->getAllAssoc($sql);
 
             if (!empty($rs))
             {
-                // Remove the partial matches. Use Url's path to do reverse search
-                // ex.
-                // $link => linkedin.com/in/pohsien
-                // webSite => https://www.linkedin.com/in/pohsien-liu-83b38395
-                // 
-                // rtlim => remove the tail symbol
-                // parse_url input is "urlDecode" content
-                if (!empty($rs['webSite']))
+                foreach ($rs as $field)
                 {
-                    $parsedUrl = parse_url(urlDecode(rtrim($rs['webSite'], '/')));
-                    // return $link . ' ' . $parsedUrl['path'];
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
-                        return $rs['candidateID'];                
+                    // Remove the partial matches. Use Url's path to do reverse search
+                    // ex.
+                    // $link => linkedin.com/in/pohsien
+                    // webSite => https://www.linkedin.com/in/pohsien-liu-83b38395
+                    // 
+                    // rtlim => remove the tail symbol
+                    // parse_url input is "urlDecode" content
+                    if (!empty($field['webSite']))
+                    {
+                        $parsedUrl = parse_url(urlDecode(rtrim($field['webSite'], '/')));
+                        // return $link . ' ' . $parsedUrl['path'];
+                        if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                            return $field['candidateID'];                
+                        }
                     }
-                }
-                if (!empty($rs['notes']))
-                {
-                    $parsedUrl = parse_url(urlDecode(rtrim($rs['notes'], '/')));
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
-                        return $rs['candidateID'];                
+                    if (!empty($field['notes']))
+                    {
+                        $parsedUrl = parse_url(urlDecode(rtrim($field['notes'], '/')));
+                        if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                            return $field['candidateID'];                
+                        }
                     }
                 }
             }
@@ -838,17 +841,20 @@ class Candidates
                 DATA_ITEM_CANDIDATE,
                 $this->_siteID
             );
-            $rs = $this->_db->getAssoc($sql);
-             
+            $rs = $this->_db->getAllAssoc($sql);
+            
             if (!empty($rs))
             {
-                if (!empty($rs['value']))
+                foreach ($rs as $field)
                 {
-                    // Remove the partial matches. Use Url's path to do reverse search
-                    $parsedUrl = parse_url(urlDecode(rtrim($rs['value'], '/')));
-                    // return $link . ' ' . $parsedUrl['path'];
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
-                        return $rs['dataItemID'];                
+                    if (!empty($field['value']))
+                    {
+                        // Remove the partial matches. Use Url's path to do reverse search
+                        $parsedUrl = parse_url(urlDecode(rtrim($field['value'], '/')));
+                        // return $link . ' ' . $parsedUrl['path'];
+                        if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                            return $field['dataItemID'];                
+                        }
                     }
                 }
             }
