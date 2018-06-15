@@ -119,6 +119,7 @@
                 <table class="sortable" width="100%">
                     <tr>
                         <th align="left" nowrap="nowrap">First Name</th>
+                        <th align="left" nowrap="nowrap">Middle Name</th>
                         <th align="left" nowrap="nowrap">Last Name</th>
                         <th align="left" nowrap="nowrap">Chinese Name</th>
                         <th align="left" width="510">Key Skills</th>
@@ -132,6 +133,11 @@
                             <td>
                                 <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($candidatesData['candidateID']) ?>">
                                     <?php $this->_($candidatesData['firstName']) ?>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($candidatesData['candidateID']) ?>">
+                                    <?php $this->_($candidatesData['middleName']) ?>
                                 </a>
                             </td>
                             <td>

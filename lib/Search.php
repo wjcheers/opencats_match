@@ -1258,6 +1258,7 @@ class QuickSearch
         $sql = sprintf(
             "SELECT
                 candidate.candidate_id AS candidateID,
+                candidate.middle_name AS middleName,
                 candidate.first_name AS firstName,
                 candidate.last_name AS lastName,
                 extra_field_data.value AS chineseName,
@@ -1288,6 +1289,8 @@ class QuickSearch
                 CONCAT(candidate.first_name, ' ', candidate.last_name) LIKE %s
                 OR CONCAT(candidate.last_name, ' ', candidate.first_name) LIKE %s
                 OR CONCAT(candidate.last_name, ', ', candidate.first_name) LIKE %s
+                OR CONCAT(candidate.middle_name, ' ', candidate.last_name) LIKE %s
+                OR CONCAT(candidate.last_name, ' ', candidate.middle_name) LIKE %s
                 OR candidate.email1 LIKE %s
                 OR candidate.email2 LIKE %s
                 OR REPLACE(
@@ -1342,6 +1345,8 @@ class QuickSearch
                 candidate.date_modified DESC,
                 candidate.first_name ASC,
                 candidate.last_name ASC",
+            $wildCardString,
+            $wildCardString,
             $wildCardString,
             $wildCardString,
             $wildCardString,
