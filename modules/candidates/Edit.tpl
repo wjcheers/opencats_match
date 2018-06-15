@@ -1,5 +1,5 @@
 <?php /* $Id: Edit.tpl 3695 2007-11-26 22:01:04Z brian $ */ ?>
-<?php TemplateUtility::printHeader('Candidates', array('modules/candidates/validator.js', 'js/sweetTitles.js', 'js/listEditor.js', 'js/doubleListEditor.js')); ?>
+<?php TemplateUtility::printHeader('Candidates', array('modules/candidates/validator.js', 'js/sweetTitles.js', 'js/listEditor.js',  'js/candidate.js', 'js/doubleListEditor.js')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
 <?php TemplateUtility::printTabs($this->active); ?>
 
@@ -18,6 +18,19 @@
             </table>
 
             <p class="note">Edit Candidate</p>
+
+            <table style="font-weight:bold; border: 1px solid #000; background-color: #ffed1a; padding:5px; display:none; margin-bottom:7px;" width="1225" id="candidateAlreadyInSystemTable">
+                <tr>
+                    <td class="tdVertical">
+                        This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
+                        <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
+                            <img src="images/new_window.gif" border="0" />
+                            <img src="images/candidate_small.gif" border="0" />
+                            <span id="candidateAlreadyInSystemName"></span>
+                        </a>
+                    </td>
+                </tr>
+            </table>
 
             <form name="editCandidateForm" id="editCandidateForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=edit" method="post" onsubmit="return checkEditForm(document.editCandidateForm);" autocomplete="off">
                 <input type="hidden" name="postback" id="postback" value="postback" />
@@ -98,15 +111,14 @@
                             <label id="email1Label" for="email1">E-Mail:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="email1" name="email1" value="<?php $this->_($this->data['email1']); ?>" style="width: 150px;" />
-                        </td>
+                            <input type="text" class="inputbox" id="email1" name="email1" value="<?php $this->_($this->data['email1']); ?>" style="width: 150px;" onchange="checkEmailAlreadyInSystem(this.value);" />
                     </tr>
                     <tr>
                         <td class="tdVertical">
                             <label id="email2Label" for="email2">2nd E-Mail:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="email2" name="email2" value="<?php $this->_($this->data['email2']); ?>" style="width: 150px;" />
+                            <input type="text" class="inputbox" id="email2" name="email2" value="<?php $this->_($this->data['email2']); ?>" style="width: 150px;" onchange="checkEmailAlreadyInSystem(this.value);" />
                         </td>
                     </tr>
 
@@ -115,7 +127,7 @@
                             <label id="phoneHomeLabel" for="phoneHome">Home Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="phoneHome" name="phoneHome" value="<?php $this->_($this->data['phoneHome']); ?>" style="width: 150px;" />
+                            <input type="text" class="inputbox" id="phoneHome" name="phoneHome" value="<?php $this->_($this->data['phoneHome']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value);" />
                         </td>
                     </tr>
 
@@ -124,7 +136,7 @@
                             <label id="phoneCellLabel" for="phoneCell">Cell Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="phoneCell" name="phoneCell" value="<?php $this->_($this->data['phoneCell']); ?>" style="width: 150px;" />
+                            <input type="text" class="inputbox" id="phoneCell" name="phoneCell" value="<?php $this->_($this->data['phoneCell']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value);" />
                         </td>
                     </tr>
 
@@ -133,7 +145,7 @@
                             <label id="phoneWorkLabel" for="phoneWork">Work Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="phoneWork" name="phoneWork" value="<?php $this->_($this->data['phoneWork']); ?>" style="width: 150px;" />
+                            <input type="text" class="inputbox" id="phoneWork" name="phoneWork" value="<?php $this->_($this->data['phoneWork']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value);" />
                         </td>
                     </tr>
 
