@@ -32,7 +32,7 @@
                 </tr>
             </table>
 
-            <form name="editCandidateForm" id="editCandidateForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=edit" method="post" onsubmit="return checkEditForm(document.editCandidateForm);" autocomplete="off">
+            <form name="editCandidateForm" id="editCandidateForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=edit" method="post" onsubmit="return (checkEditForm(document.editCandidateForm) && onSubmitEmailInSystem() && onSubmitPhoneInSystem() && onSubmitLinkInSystem());" autocomplete="off">
                 <input type="hidden" name="postback" id="postback" value="postback" />
                 <input type="hidden" id="candidateID" name="candidateID" value="<?php $this->_($this->data['candidateID']); ?>" />
 
@@ -112,6 +112,7 @@
                         </td>
                         <td class="tdData">
                             <input type="text" class="inputbox" id="email1" name="email1" value="<?php $this->_($this->data['email1']); ?>" style="width: 150px;" onchange="checkEmailAlreadyInSystem(this.value);" />
+                        </td>
                     </tr>
                     <tr>
                         <td class="tdVertical">
@@ -163,7 +164,7 @@
                             <label id="webSiteLabel" for="webSite">Web Site:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="webSite" name="webSite" value="<?php $this->_($this->data['webSite']); ?>" style="width: 450px" />
+                            <input type="text" class="inputbox" id="webSite" name="webSite" value="<?php $this->_($this->data['webSite']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
                         </td>
                     </tr>
 
@@ -176,7 +177,7 @@
                                 </label>
                             </td>
                             <td class="tdData" id="extraFieldData<?php echo($i); ?>">
-                                <?php echo(str_replace("width: 150px", "width: 450px", $this->extraFieldRS[$i]['editHTML'])); ?>
+                                <?php echo(str_replace('width: 150px;"', 'width: 450px;" onchange="checkLinkAlreadyInSystem(this.value);"', $this->extraFieldRS[$i]['editHTML'])); ?>
                             </td>
                         </tr>
                         <?php $extraFieldRS[$i] = 1;?>

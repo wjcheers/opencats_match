@@ -45,7 +45,7 @@
                 <?php $URI = CATSUtility::getIndexName() . '?m=candidates&amp;a=add'; ?>
             <?php endif; ?>
 
-            <form name="addCandidateForm" id="addCandidateForm" enctype="multipart/form-data" action="<?php echo($URI); ?>" method="post" onsubmit="return (checkAddForm(document.addCandidateForm) && onSubmitEmailInSystem() && onSubmitPhoneInSystem());" autocomplete="off" enctype="multipart/form-data">
+            <form name="addCandidateForm" id="addCandidateForm" enctype="multipart/form-data" action="<?php echo($URI); ?>" method="post" onsubmit="return (checkAddForm(document.addCandidateForm) && onSubmitEmailInSystem() && onSubmitPhoneInSystem() && onSubmitLinkInSystem());" autocomplete="off" enctype="multipart/form-data">
                 <?php if ($this->isModal): ?>
                     <input type="hidden" name="jobOrderID" id="jobOrderID" value="<?php echo($this->jobOrderID); ?>" />
                 <?php endif; ?>
@@ -225,7 +225,7 @@
                             <label id="webSiteLabel" for="webSite">Web Site:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="5" name="webSite" id="webSite" class="inputbox" style="width: 450px" value="<?php if (isset($this->preassignedFields['webSite'])) $this->_($this->preassignedFields['webSite']); ?>" />
+                            <input type="text" tabindex="5" name="webSite" id="webSite" class="inputbox" style="width: 450px" value="<?php if (isset($this->preassignedFields['webSite'])) $this->_($this->preassignedFields['webSite']); ?>" onchange="checkLinkAlreadyInSystem(this.value);" />
                         </td>
                     </tr>
 
@@ -238,7 +238,7 @@
                                 </label>
                             </td>
                             <td class="tdData" id="extraFieldData<?php echo($i); ?>">
-                                <?php echo(str_replace("width: 150px", "width: 450px", $this->extraFieldRS[$i]['addHTML'])); ?>
+                                <?php echo(str_replace('width: 150px;"', 'width: 450px;" onchange="checkLinkAlreadyInSystem(this.value);"', $this->extraFieldRS[$i]['addHTML'])); ?>
                             </td>
                         </tr>
                         <?php $extraFieldRS[$i] = 1;?>
@@ -572,7 +572,7 @@
                             <label id="notesLabel" for="notes">Misc. Notes:</label>
                         </td>
                         <td class="tdData">
-                            <textarea class="inputbox" tabindex="<?php echo($tabIndex++); ?>" name="notes" id="notes" rows="5" cols="40" style="width: 700px; height: 400px"><?php if (isset($this->preassignedFields['notes'])) $this->_($this->preassignedFields['notes']); ?></textarea>
+                            <textarea class="inputbox" tabindex="<?php echo($tabIndex++); ?>" name="notes" id="notes" rows="5" cols="40" style="width: 700px; height: 400px;"><?php if (isset($this->preassignedFields['notes'])) $this->_($this->preassignedFields['notes']); ?></textarea>
                         </td>
                     </tr>
                 </table>
