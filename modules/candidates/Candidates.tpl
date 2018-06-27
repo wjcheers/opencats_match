@@ -29,6 +29,7 @@
                                     <td valign="top" align="right" nowrap="nowrap">
                                         <?php $this->dataGrid->printNavigation(false); ?>
                                     </td>
+                                    <?php /*
                                     <td valign="top" align="right" nowrap="nowrap">
                                         <input type="checkbox" name="p1" id="p1" <?php if ($this->dataGrid->getFilterValue('OwnerID') ==  $this->userID): ?>checked<?php endif; ?> onclick="<?php echo $this->dataGrid->getJSAddRemoveFilterFromCheckbox('OwnerID%2', '==',  0); ?>" />
                                         P1&nbsp;
@@ -37,6 +38,7 @@
                                         <input type="checkbox" name="p2" id="p2" <?php if ($this->dataGrid->getFilterValue('OwnerID') ==  $this->userID): ?>checked<?php endif; ?> onclick="<?php echo $this->dataGrid->getJSAddRemoveFilterFromCheckbox('OwnerID%2', '==',  1); ?>" />
                                         P2&nbsp;
                                     </td>
+                                    */ ?>
                                     <td valign="top" align="right" nowrap="nowrap">
                                         <input type="checkbox" name="onlyMyCandidates" id="onlyMyCandidates" <?php if ($this->dataGrid->getFilterValue('OwnerID') ==  $this->userID): ?>checked<?php endif; ?> onclick="<?php echo $this->dataGrid->getJSAddRemoveFilterFromCheckbox('OwnerID', '==',  $this->userID); ?>" />
                                         Only My Candidates&nbsp;
