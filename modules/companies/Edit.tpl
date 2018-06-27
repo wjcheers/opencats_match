@@ -237,7 +237,7 @@
                             <label id="notesLabel" for="notes">Misc. Notes:</label>
                         </td>
                         <td>
-                            <textarea class="mceEditor" name="notes" id="notes" rows="15" cols="40" style="width: 400px;"><?php $this->_($this->data['notes']); ?></textarea>
+                            <textarea class="mceEditor" name="notes" id="notes" rows="45" cols="40" style="width: 400px;"><?php $this->_($this->data['notes']); ?></textarea>
                         </td>
                     </tr>
                 </table>

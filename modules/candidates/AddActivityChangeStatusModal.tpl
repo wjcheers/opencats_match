@@ -171,7 +171,7 @@
                                         <input type="radio" name="allDay" id="allDay0" value="0" style="margin-left: 0px" checked="checked" onchange="AS_onEventAllDayChange('allDay1');" />
                                         <select id="hour" name="hour" class="inputbox" style="width: 40px;">
                                             <?php for ($i = 1; $i <= 12; ++$i): ?>
-                                                <option value="<?php echo($i); ?>"><?php echo(sprintf('%02d', $i)); ?></option>
+                                                <option value="<?php echo($i); ?>" <?php if ($i == 9) echo("selected=\"selected\""); ?> ><?php echo(sprintf('%02d', $i)); ?></option>
                                             <?php endfor; ?>
                                         </select>&nbsp;
                                         <select id="minute" name="minute" class="inputbox" style="width: 40px;">

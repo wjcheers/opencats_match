@@ -259,7 +259,7 @@ class JobOrdersUI extends UserInterface
         {
             $dataGridProperties = array('rangeStart'    => 0,
                                         'maxResults'    => 50,
-                                        'filter'        => 'Status==Active / OnHold / Full',
+                                        'filter'        => 'Status==Active',
                                         'filterVisible' => false);
         }
 

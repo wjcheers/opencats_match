@@ -337,7 +337,7 @@
                             <label id="notesLabel" for="notes">Questionnaire:</label>
                         </td>
                         <td class="tdData">
-                            <select id="questionnaire" name="questionnaire" class="inputbox" style="width: 500px;">
+                            <select id="questionnaire" name="questionnaire" class="inputbox" style="width: 800px;">
                             <option value="none">None</option>
                             <?php foreach ($this->questionnaires as $questionnaire): ?>
                                 <option value="<?php echo $questionnaire['questionnaireID']; ?>"<?php if ($this->questionnaireID == $questionnaire['questionnaireID']) echo ' selected'; ?>><?php echo $questionnaire['title']; ?></option>
