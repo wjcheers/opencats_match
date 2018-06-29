@@ -450,21 +450,33 @@
                 <?php endif; ?>
                 &nbsp;&nbsp;&nbsp;&nbsp;
             <?php endif; ?>
-            <img src="images/actions/screen.gif" width="16" height="16" class="absmiddle" alt="deliver form" border="0" />&nbsp;Agreement 
-            <a id="agreement_personal_zh_link" href="https://docs.google.com/forms/d/e/1FAIpQLSf5wxyGTzjHKdYo8wzDSsppQ5h7NGg9SbOf9Ivm6g2rWbYgsQ/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=<?php $this->_($this->data['keySkills']); ?>" target="_blank">
-                (Zh)
-            </a>
-            <a id="agreement_personal_cn_link" href="https://docs.google.com/forms/d/e/1FAIpQLSefn0TCXV8OgMreGpjRknn_Dvz_U0ykW5_K4RpipM_rkJC5MA/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=<?php $this->_($this->data['keySkills']); ?>" target="_blank">
-                (Cn)
-            </a>
-            <a id="agreement_personal_en_link" href="https://docs.google.com/forms/d/e/1FAIpQLSd9eiBpJQW4AZ-tHqqSPmEqoLIex-aeI-eyLntpKKxxBR9DFw/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=<?php $this->_($this->data['keySkills']); ?>" target="_blank">
-                (En)
-            </a>
-            &nbsp;&nbsp;&nbsp;&nbsp;
             <a id="agreement_personal_check_link" href="https://docs.google.com/spreadsheets/u/1/d/1ZpZGtAzFP8ISaWlG11y63_2jx5J5u4Y2Mt8D4r4ehtI/gviz/tq?tqx=out:html&tq=select+*+where+D+%3D+%27<?php $this->_($this->data['email1']); ?>%27+or+D+%3D+%27<?php $this->_($this->data['email2']); ?>%27&gid=1110772698" target="_black">
                 <img src="images/actions/view.gif" width="16" height="16" class="absmiddle"  border="0" />&nbsp;Check Agreement
             </a>
             &nbsp;&nbsp;&nbsp;&nbsp;
+            <img src="images/actions/screen.gif" width="16" height="16" class="absmiddle" alt="deliver form" border="0" />&nbsp;Agreement 
+            <a id="agreement_personal_zh_link" href="https://docs.google.com/forms/d/e/1FAIpQLSf5wxyGTzjHKdYo8wzDSsppQ5h7NGg9SbOf9Ivm6g2rWbYgsQ/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=" target="_blank">
+                (Zh)
+            </a>
+            <a id="agreement_personal_cn_link" href="https://docs.google.com/forms/d/e/1FAIpQLSefn0TCXV8OgMreGpjRknn_Dvz_U0ykW5_K4RpipM_rkJC5MA/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=" target="_blank">
+                (Cn)
+            </a>
+            <a id="agreement_personal_en_link" href="https://docs.google.com/forms/d/e/1FAIpQLSd9eiBpJQW4AZ-tHqqSPmEqoLIex-aeI-eyLntpKKxxBR9DFw/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=" target="_blank">
+                (En)
+            </a>            
+            <script>
+                document.getElementById('agreement_personal_en_link').onclick = function() {
+                    window.open(document.getElementById("agreement_personal_en_link").href.concat(encodeURI(document.getElementById("agreement_field").value)), "_blank");
+                }
+                document.getElementById('agreement_personal_cn_link').onclick = function() {
+                    window.open(document.getElementById("agreement_personal_cn_link").href.concat(encodeURI(document.getElementById("agreement_field").value)), "_blank");
+                }
+                document.getElementById('agreement_personal_zh_link').onclick = function() {
+                    window.open(document.getElementById("agreement_personal_zh_link").href.concat(encodeURI(document.getElementById("agreement_field").value)), "_blank");
+                }
+            </script>    
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <input id="agreement_field" class="inputbox" value="<?php $this->_($this->data['keySkills']); ?>" style="width: 150px;">
 <?php endif; ?>
             <br clear="all" />
             <br />
