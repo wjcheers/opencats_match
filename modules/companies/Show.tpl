@@ -293,7 +293,7 @@
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['dateCreated']) ?></td>
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['dateModified']) ?></td>
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['contactFullName']) ?></td>
-                        <td valign="top" align="left"><?php $this->_($jobOrdersData['city']) ?></td>
+                        <td valign="top" align="left" style="word-break: break-all;"><?php $this->_($jobOrdersData['city']) ?></td>
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['state']) ?></td>
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['startDate']) ?></td>
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['daysOld']) ?></td>
