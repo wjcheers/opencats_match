@@ -738,6 +738,11 @@ class JobOrders
                 company.name AS companyName,
                 company_department.name AS departmentName,
                 contact.contact_id AS contactID,
+                contact.first_name AS contactFirstName,
+                contact.last_name AS contactLastName,
+                CONCAT(
+                    contact.first_name, ' ', contact.last_name
+                ) AS contactFullName,
                 recruiter_user.first_name AS recruiterFirstName,
                 recruiter_user.last_name AS recruiterLastName,
                 owner_user.first_name AS ownerFirstName,

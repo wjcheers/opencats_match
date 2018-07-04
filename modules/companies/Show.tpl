@@ -268,6 +268,9 @@
                     <th align="left" width="15">Status</th>
                     <th align="left" width="60">Created</th>
                     <th align="left" width="60">Modified</th>
+                    <th align="left" width="15">Contact</th>
+                    <th align="left" width="15">City</th>
+                    <th align="left" width="15">State</th>
                     <th align="left" width="60">Start</th>
                     <th align="left" width="15">Age</th>
                     <th align="left" width="10">S</th>
@@ -289,6 +292,9 @@
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['status']) ?></td>
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['dateCreated']) ?></td>
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['dateModified']) ?></td>
+                        <td valign="top" align="left"><?php $this->_($jobOrdersData['contactFullName']) ?></td>
+                        <td valign="top" align="left"><?php $this->_($jobOrdersData['city']) ?></td>
+                        <td valign="top" align="left"><?php $this->_($jobOrdersData['state']) ?></td>
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['startDate']) ?></td>
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['daysOld']) ?></td>
                         <td valign="top" align="left"><?php $this->_($jobOrdersData['submitted']); ?></td>
