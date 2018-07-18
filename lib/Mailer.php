@@ -66,7 +66,7 @@ class Mailer
     private $_db;
 
 
-    public function __construct($siteID, $userID = -1)
+    public function __construct($siteID, $userID = -1, $userGmailUser = -1, $userGmailPassword = -1)
     {
         $this->_siteID = $siteID;
 
@@ -92,6 +92,12 @@ class Mailer
         else
         {
             $this->_userID = $_SESSION['CATS']->getUserID();
+        }
+        if (($userGmailUser != -1) && ($userGmailPassword != -1))
+        {
+            $this->_mailer->Username = $userGmailUser;
+            $this->_mailer->Password = $userGmailPassword;
+            $this->_settings['fromAddress'] = $userGmailUser;
         }
 
         $this->_db = DatabaseConnection::getInstance();

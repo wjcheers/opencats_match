@@ -149,6 +149,13 @@ class SettingsUI extends UserInterface
                 }
                 break;
 
+            case 'setGmailPassword':
+                if ($this->isPostBack())
+                {
+                    $this->onSetGmailPassword();
+                }
+                break;
+
             case 'newInstallPassword':
                 if ($this->isPostBack())
                 {
@@ -483,6 +490,10 @@ class SettingsUI extends UserInterface
             {
                 case 'changePassword':
                     $templateFile = './modules/settings/ChangePassword.tpl';
+                    break;
+
+                case 'setGmailPassword':
+                    $templateFile = './modules/settings/SetGmailPassword.tpl';
                     break;
 
                 default:
@@ -2659,6 +2670,59 @@ class SettingsUI extends UserInterface
         }
     }
 
+    /*
+     * Called by handleRequest() to process setting a user's gmail password.
+     */
+    private function onSetGmailPassword()
+    {
+        /* Bail out if the user is demo. */
+        if ($this->_realAccessLevel == ACCESS_LEVEL_DEMO)
+        {
+            $this->fatal(
+                'You are not allowed to set your gmail password.'
+            );
+        }
+
+        $newPassword = $this->getTrimmedInput(
+            'newPassword', $_POST
+        );
+        $retypeNewPassword = $this->getTrimmedInput(
+            'retypeNewPassword', $_POST
+        );
+
+        /* Bail out if the two passwords don't match. */
+        if ($retypeNewPassword !== $newPassword)
+        {
+            CommonErrors::fatal(COMMONERROR_NOPASSWORDMATCH, $this, 'Passwords do not match.');
+        }
+
+        /* Attempt to change the user's password. */
+        $users = new Users($this->_siteID);
+        $status = $users->setGmailPassword(
+            $this->_userID, $newPassword
+        );
+
+        switch ($status)
+        {
+            case LOGIN_SUCCESS:
+                $error[] = 'Your password has been successfully changed. Please log in again using your new password.';
+                break;
+
+            default:
+                $error[] = 'An unknown error occurred.';
+                break;
+        }
+
+        $isDemoUser = $_SESSION['CATS']->isDemo();
+        $this->_template->assign('userID', $this->_userID);
+        $this->_template->assign('isDemoUser', $isDemoUser);
+
+        $this->_template->assign('active', $this);
+        $this->_template->assign('subActive', 'My Profile');
+        $this->_template->assign('errorMessage', join('<br />', $error));
+        $this->_template->display('./modules/settings/MyProfile.tpl');
+    }
+    
     /*
      * Called by handleRequest() to process loading the login activity page.
      */

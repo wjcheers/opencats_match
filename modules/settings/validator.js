@@ -48,6 +48,29 @@ function checkChangePasswordForm(form)
     return true;
 }
 
+function checkSetGmailPasswordForm(form)
+{
+    /*
+    var errorMessage = '';
+
+    errorMessage += checkNewPassword();
+    errorMessage += checkRetypeNewPassword();
+
+    if (errorMessage == '')
+    {
+        errorMessage += checkPasswordsMatch();
+    }
+
+    if (errorMessage != '')
+    {
+        alert("Form Error:\n" + errorMessage);
+        return false;
+    }
+    */
+
+    return true;
+}
+
 function checkAddUserForm(form)
 {
     var errorMessage = '';

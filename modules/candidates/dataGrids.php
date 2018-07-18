@@ -56,9 +56,13 @@ class candidatesListByViewDataGrid extends CandidatesDataGrid
         $html .= $this->getInnerActionAreaItemPopup('Add To Pipeline', CATSUtility::getIndexName().'?m=candidates&amp;a=considerForJobSearch', 750, 460);
         if(MAIL_MAILER != 0)
         {
-            $html .= $this->getInnerActionAreaItem('Send E-Mail', CATSUtility::getIndexName().'?m=candidates&amp;a=emailCandidates');
+            if(!empty($_SESSION['CATS']->getGmailPassword()) && $_SESSION['CATS']->getGmailPassword() !== 0 && !empty($_SESSION['CATS']->getEmail()) && $_SESSION['CATS']->getEmail() !== 0)
+            {
+                $html .= $this->getInnerActionAreaItem('Send E-Mail', CATSUtility::getIndexName().'?m=candidates&amp;a=emailCandidates');
+            }
+            //$html .= $this->getInnerActionAreaItem('Send E-Mail', CATSUtility::getIndexName().'?m=candidates&amp;a=emailCandidates');
         }
-        $html .= $this->getInnerActionAreaItem('Export', CATSUtility::getIndexName().'?m=export&amp;a=exportByDataGrid');
+        //$html .= $this->getInnerActionAreaItem('Export', CATSUtility::getIndexName().'?m=export&amp;a=exportByDataGrid');
 
         $html .= parent::getInnerActionArea();
 
@@ -116,7 +120,11 @@ class candidatesSavedListByViewDataGrid extends CandidatesDataGrid
         $html .= $this->getInnerActionAreaItemPopup('Add To Pipeline', CATSUtility::getIndexName().'?m=candidates&amp;a=considerForJobSearch', 750, 460);
         if(MAIL_MAILER != 0)
         {
-            $html .= $this->getInnerActionAreaItem('Send E-Mail', CATSUtility::getIndexName().'?m=candidates&amp;a=emailCandidates');
+            if(!empty($_SESSION['CATS']->getGmailPassword()) && $_SESSION['CATS']->getGmailPassword() !== 0 && !empty($_SESSION['CATS']->getEmail()) && $_SESSION['CATS']->getEmail() !== 0)
+            {
+                $html .= $this->getInnerActionAreaItem('Send E-Mail', CATSUtility::getIndexName().'?m=candidates&amp;a=emailCandidates');
+            }
+            //$html .= $this->getInnerActionAreaItem('Send E-Mail', CATSUtility::getIndexName().'?m=candidates&amp;a=emailCandidates');
         }
         //$html .= $this->getInnerActionAreaItem('Export', CATSUtility::getIndexName().'?m=export&amp;a=exportByDataGrid');
 

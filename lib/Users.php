@@ -740,6 +740,66 @@ class Users
     }
 
     /**
+     * Set a user's gmail password to the password specified.
+     *
+     * @param integer user ID
+     * @param string current password
+     * @param string new password
+     * @return flag status
+     */
+    public function setGmailPassword($userID, $newPassword)
+    {
+        $sql = sprintf(
+            "SELECT
+                user.password AS password,
+                user.access_level AS accessLevel,
+                user.can_change_password AS canChangePassword
+            FROM
+                user
+            WHERE
+                user.user_id = %s",
+            $this->_db->makeQueryInteger($userID)
+        );
+        $rs = $this->_db->getAssoc($sql);
+
+        /* No results? Shouldn't happen, but it could if the user just got
+         * deleted or something.
+         */
+        if (!$rs || $this->_db->isEOF())
+        {
+            return LOGIN_INVALID_USER;
+        }
+
+        /* Is the user's account disabled? */
+        if ($rs['accessLevel'] <= ACCESS_LEVEL_DISABLED)
+        {
+            return LOGIN_DISABLED;
+        }
+
+        /* Is the user allowed to change his/her password? */
+        if ($rs['canChangePassword'] != '1')
+        {
+            return LOGIN_CANT_CHANGE_PASSWORD;
+        }
+
+        /* Change the user's password. */
+        $sql = sprintf(
+            "UPDATE
+                user
+            SET
+                gmail_password = %s
+            WHERE
+                user.user_id = %s",
+            $this->_db->makeQueryString($newPassword),
+            $this->_db->makeQueryInteger($userID)
+        );
+        $this->_db->query($sql);
+        // FIXME: Did the above query succeed? If not, fail.
+
+        return LOGIN_SUCCESS;
+    }
+    
+    /**
      * Returns a login status flag indicating whether or not the specified
      * password is correct for the specified user and whether or not the
      * account is enabled or disabled.

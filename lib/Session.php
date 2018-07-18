@@ -54,6 +54,7 @@ class CATSSession
     private $_unixName = '';
     private $_username = '';
     private $_password = '';
+    private $_gmailPassword = '';
     private $_firstName = '';
     private $_lastName = '';
     private $_email = '';
@@ -502,6 +503,17 @@ class CATSSession
     }
 
     /**
+     * Gets the current user's gmail password stored in the session. The
+     * database is not accessed.
+     *
+     * @return string Current user's gmail password.
+     */
+    public function getGmailPassword()
+    {
+        return $this->_gmailPassword;
+    }
+
+    /**
      * Gets the current user's time zone offset from the system time zone
      * (from config.php) stored in the session. The database is not accessed,
      * nor is config.php. 0 is returned if the session is not logged in.
@@ -656,6 +668,7 @@ class CATSSession
                 user.user_id AS userID,
                 user.user_name AS username,
                 user.password AS password,
+                user.gmail_password AS gmailPassword,
                 user.first_name AS firstName,
                 user.last_name AS lastName,
                 user.access_level AS accessLevel,
@@ -776,6 +789,7 @@ class CATSSession
             case LOGIN_SUCCESS:
                 $this->_username               = $rs['username'];
                 $this->_password               = $rs['password'];
+                $this->_gmailPassword          = $rs['gmailPassword'];
                 $this->_userID                 = $rs['userID'];
                 $this->_siteID                 = $rs['userSiteID'];
                 $this->_firstName              = $rs['firstName'];

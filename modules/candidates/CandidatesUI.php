@@ -3389,7 +3389,14 @@ class CandidatesUI extends UserInterface
                 $destination[] = array($emailDest, $emailDest);
             }
 
-            $mailer = new Mailer(CATS_ADMIN_SITE);
+            if(!empty($_SESSION['CATS']->getGmailPassword()) && $_SESSION['CATS']->getGmailPassword() !== 0 && !empty($_SESSION['CATS']->getEmail()) && $_SESSION['CATS']->getEmail() !== 0)
+            {
+                $mailer = new Mailer(CATS_ADMIN_SITE, -1, $_SESSION['CATS']->getEmail(), $_SESSION['CATS']->getGmailPassword());
+            }
+            else
+            {
+                $mailer = new Mailer(CATS_ADMIN_SITE);
+            }
             // FIXME: Use sendToOne()?
             $mailerStatus = $mailer->send(
                 array($_SESSION['CATS']->getEmail(), $_SESSION['CATS']->getEmail()),

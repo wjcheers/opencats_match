@@ -46,6 +46,16 @@
                                     Change your CATS login password.
                                 </td>
                             </tr>
+                            <tr>
+                                <td>
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=myProfile&amp;s=setGmailPassword">
+                                        <img src="images/bullet_black.gif" alt="" border="0" />Set Gmail Password
+                                    </a>
+                                </td>
+                                <td>
+                                    Set your Gmail password.
+                                </td>
+                            </tr>
                             <!--<tr>
                                 <td>
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=myProfile&amp;s=notificationOptions">
