@@ -3379,16 +3379,19 @@ class CandidatesUI extends UserInterface
         if (isset($_POST['postback']))
         {
             $emailTo = $_POST['emailTo'];
+            $firstTo = $_POST['firstTo'];
+            $lastTo = $_POST['lastTo'];
+            $fullTo = $_POST['fullTo'];
+            $chTo = $_POST['chTo'];
             $emailSubject = $_POST['emailSubject'];
             $emailBody = $_POST['emailBody'];
 
             $tmpDestination = explode(', ', $emailTo);
-            $destination = array();
-            foreach($tmpDestination as $emailDest)
-            {
-                $destination[] = array($emailDest, $emailDest);
-            }
-
+            $firstDestination = explode(', ', $firstTo);
+            $lastDestination = explode(', ', $lastTo);
+            $fullDestination = explode(', ', $fullTo);
+            $chDestination = explode(', ', $chTo);
+            
             if(!empty($_SESSION['CATS']->getGmailPassword()) && $_SESSION['CATS']->getGmailPassword() !== 0 && !empty($_SESSION['CATS']->getEmail()) && $_SESSION['CATS']->getEmail() !== 0)
             {
                 $mailer = new Mailer(CATS_ADMIN_SITE, -1, $_SESSION['CATS']->getEmail(), $_SESSION['CATS']->getGmailPassword());
@@ -3397,15 +3400,43 @@ class CandidatesUI extends UserInterface
             {
                 $mailer = new Mailer(CATS_ADMIN_SITE);
             }
-            // FIXME: Use sendToOne()?
-            $mailerStatus = $mailer->send(
-                array($_SESSION['CATS']->getEmail(), $_SESSION['CATS']->getEmail()),
-                $destination,
-                $emailSubject,
-                $emailBody,
-                true,
-                true
+            
+            $stringsToFind = array(
+                '%CANDFIRSTNAME%',
+                '%CANDLASTNAME%',
+                '%CANDFULLNAME%',
+                '%CANDCHNAME%'
             );
+
+            $i = 0;
+            foreach($tmpDestination as $emailDest)
+            {
+                $destination = array($emailDest, $emailDest);
+                
+                $replacementStrings = array(
+                    $firstDestination[$i],
+                    $lastDestination[$i],
+                    $fullDestination[$i],
+                    $chDestination[$i]
+                );
+                $emailBodyReplaced = str_replace(
+                    $stringsToFind,
+                    $replacementStrings,
+                    $emailBody
+                );
+                
+                // FIXME: Use sendToOne()?
+                $mailerStatus = $mailer->send(
+                    array($_SESSION['CATS']->getEmail(), $_SESSION['CATS']->getEmail()),
+                    array($destination),
+                    $emailSubject,
+                    $emailBodyReplaced,
+                    true,
+                    true
+                );
+                $i++;
+            }
+
 
             $this->_template->assign('active', $this);
             $this->_template->assign('success', true);
@@ -3433,8 +3464,13 @@ class CandidatesUI extends UserInterface
             $db = DatabaseConnection::getInstance();
 
             $rs = $db->getAllAssoc(sprintf(
-                'SELECT candidate_id, email1, email2 '
+                "SELECT candidate_id, first_name AS firstName, last_name AS lastName, CONCAT(first_name, ' ', last_name) AS candidateFullName, 
+                extra_field_data.value AS chineseName, email1, email2 "
                 . 'FROM candidate '
+                . "LEFT JOIN extra_field AS extra_field_data
+                    ON extra_field_data.data_item_id = candidate.candidate_id
+                    AND extra_field_data.field_name = 'Chinese Name'
+                    AND extra_field_data.data_item_type = '100'"
                 . 'WHERE candidate_id IN (%s)',
                 $db_str
             ));

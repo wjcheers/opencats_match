@@ -37,6 +37,10 @@
             else
             {
                 $emailTo = '';
+                $firstTo = '';
+                $lastTo = '';
+                $fullTo = '';
+                $chTo = '';
                 foreach($this->recipients as $recipient)
                 {
                         if(strlen($recipient['email1']) > 0)
@@ -56,12 +60,25 @@
                             if($emailTo != '')
                             {
                                 $emailTo .= ', ';
+                                $firstTo .= ', ';
+                                $lastTo .= ', ';
+                                $fullTo .= ', ';
+                                $chTo .= ', ';
                             }
                             $emailTo .= $eml;
+                            $firstTo .= $recipient['firstName'];
+                            $lastTo .= $recipient['lastName'];
+                            $fullTo .= $recipient['candidateFullName'];
+                            $chTo .= $recipient['chineseName'];
                         }
                 }
                 $tabIndex = 1;
                 ?>
+                
+                <p>%CANDFIRSTNAME% => First Name</BR>
+                %CANDLASTNAME%  => Last Name</BR>
+                %CANDFULLNAME%  => Full Name</BR>
+                %CANDCHNAME%    => Chinese Name</p>
 
             <table class="editTable" width="100%">
                 <tr>
@@ -75,6 +92,10 @@
                                 </td>
                                 <td class="tdData">
                                     <textarea class="inputbox" name="emailTo" rows="2", cols="90" tabindex="99" style="width: 600px;" readonly><?php echo($emailTo); ?></textarea>
+                                    <textarea style="display:none;" class="inputbox" name="firstTo" rows="2", cols="90" tabindex="99" style="width: 600px;" readonly><?php echo($firstTo); ?></textarea>
+                                    <textarea style="display:none;" class="inputbox" name="lastTo" rows="2", cols="90" tabindex="99" style="width: 600px;" readonly><?php echo($lastTo); ?></textarea>
+                                    <textarea style="display:none;" class="inputbox" name="fullTo" rows="2", cols="90" tabindex="99" style="width: 600px;" readonly><?php echo($fullTo); ?></textarea>
+                                    <textarea style="display:none;" class="inputbox" name="chTo" rows="2", cols="90" tabindex="99" style="width: 600px;" readonly><?php echo($chTo); ?></textarea>
                                 </td>
                             </tr>
                             <tr>
