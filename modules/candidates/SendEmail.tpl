@@ -46,17 +46,23 @@
                         if(strlen($recipient['email1']) > 0)
                         {
                             $eml = $recipient['email1'];
+                            if($emailTo != '')
+                            {
+                                $emailTo .= ', ';
+                                $firstTo .= ', ';
+                                $lastTo .= ', ';
+                                $fullTo .= ', ';
+                                $chTo .= ', ';
+                            }
+                            $emailTo .= $eml;
+                            $firstTo .= $recipient['firstName'];
+                            $lastTo .= $recipient['lastName'];
+                            $fullTo .= $recipient['candidateFullName'];
+                            $chTo .= $recipient['chineseName'];
                         }
-                        else if(strlen($recipient['email2']) > 0)
+                        if(strlen($recipient['email2']) > 0)
                         {
                             $eml = $recipient['email2'];
-                        }
-                        else
-                        {
-                            $eml = '';
-                        }
-                        if($eml != '')
-                        {
                             if($emailTo != '')
                             {
                                 $emailTo .= ', ';
