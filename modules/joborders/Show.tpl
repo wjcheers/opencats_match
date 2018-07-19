@@ -1,8 +1,8 @@
 <?php /* $Id: Show.tpl 3814 2007-12-06 17:54:28Z brian $ */ ?>
 <?php if ($this->isPopup): ?>
-    <?php TemplateUtility::printHeader($this->data['title'].' - Job Order', array('js/sorttable.js', 'js/match.js', 'js/pipeline.js', 'js/attachment.js')); ?>
+    <?php TemplateUtility::printHeader($this->data['title'].' - Job Order', array('js/sorttable.js', 'js/match.js', 'js/pipeline.js', 'js/attachment.js', 'js/lib.js')); ?>
 <?php else: ?>
-    <?php TemplateUtility::printHeader($this->data['title'].' - Job Order', array( 'js/sorttable.js', 'js/match.js', 'js/pipeline.js', 'js/attachment.js', 'js/lib2.js')); ?>
+    <?php TemplateUtility::printHeader($this->data['title'].' - Job Order', array('js/sorttable.js', 'js/match.js', 'js/pipeline.js', 'js/attachment.js', 'js/lib.js')); ?>
     <?php TemplateUtility::printHeaderBlock(); ?>
     <?php TemplateUtility::printTabs($this->active); ?>
         <div id="main">

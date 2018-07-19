@@ -41,8 +41,8 @@ ACTIVITY_CONFIRM     = 900;
 ACTIVITY_DRIFTING    = 1000;
 ACTIVITY_IM_LINKEDIN = 1100;
 
-ARRANGE_TEXT = "Arrange: \nDate: 8/8/2017\nTime: 7:30am (Taiwan Time)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
-CONFIRM_TEXT = "Confirm: \nDate: 8/8/2017\nTime: 7:30am (Taiwan Time)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
+ARRANGE_TEXT = "Arrange: \nDate: 8/8/2018\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
+CONFIRM_TEXT = "Confirm: \nDate: 8/8/2018\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
 
 function Activity_fillTypeSelect(selectList, selectedText)
 {
@@ -769,6 +769,7 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
         }
         else
         {
+            /* disable trigger email to candidate...
             if (statusTriggersEmailArray[statusSelectList.selectedIndex-1] == 1 && emailIsDisabled.value == "0")
             {
                 sendEmailSpan.style.display = 'inline';
@@ -779,6 +780,7 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
                 sendEmailSpan.style.display = 'inline';
                 triggerEmail.checked = false;
             }
+            */
             AS_onSendEmailChange('triggerEmail', 'sendEmailCheckTR', 'visibleTR');
             AS_onChangeStatusChangeGenerateEmail(
                 emailText,

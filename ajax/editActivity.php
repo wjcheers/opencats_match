@@ -84,7 +84,8 @@ if (!DateUtility::validate('-', $activityDate, DATE_FORMAT_MMDDYY))
 /* Convert formatted time to UNIX timestamp. */
 $time = strtotime(
     sprintf('%02d:%02d %s', $activityHour, $activityMinute, $activityAMPM)
-);            
+);
+
 /* Create MySQL date string w/ 24hr time (YYYY-MM-DD HH:MM:SS). */
 $date = sprintf(
     '%s %s',

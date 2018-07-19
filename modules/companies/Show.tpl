@@ -74,7 +74,7 @@
                                         <?php else: ?>
                                         <?php echo($this->extraFieldRS[$i]['display']); ?>
                                         <?php endif; ?>
-                                     </td>
+                                    </td>
                                </tr>
                             <?php endfor; ?>
 
@@ -142,7 +142,7 @@
                                         <?php else: ?>
                                         <?php echo($this->extraFieldRS[$i]['display']); ?>
                                         <?php endif; ?>
-                                    </td>                                    
+                                    </td>
                                 </tr>
                             <?php endfor; ?>
 
