@@ -493,6 +493,20 @@ function toggleNotes()
     }
 }
 
+function toggleNode(showFull, shortNode, fullNode)
+{
+    if (showFull == true)
+    {
+        shortNode.style.display = 'block';
+        fullNode.style.display  = 'none';
+    }
+    else
+    {
+        shortNode.style.display = 'none';
+        fullNode.style.display  = 'block';
+    }
+}
+
 function toggleNotesClass()
 {
     var shortNodes = document.getElementsByClassName('shortNotes');
@@ -507,20 +521,6 @@ function toggleNotesClass()
     else
     {
         showFullNotes = true;
-    }
-}
-
-function toggleNode(showFull, shortNode, fullNode)
-{
-    if (showFull == true)
-    {
-        shortNode.style.display = 'block';
-        fullNode.style.display  = 'none';
-    }
-    else
-    {
-        shortNode.style.display = 'none';
-        fullNode.style.display  = 'block';
     }
 }
 
