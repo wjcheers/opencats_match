@@ -117,7 +117,7 @@
                                     <label id="emailBodyLabel" for="emailBody">Body</label>
                                 </td>
                                 <td class="tdData">
-                                    <textarea id="emailBody" tabindex="<?php echo($tabIndex++); ?>" name="emailBody" rows="10" cols="90" style="width: 600px;" class="mceEditor"></textarea />
+                                    <textarea id="emailBody" tabindex="<?php echo($tabIndex++); ?>" name="emailBody" rows="25" cols="90" style="width: 600px;" class="mceEditor"></textarea />
                                 </td>
                             </tr>
                             <tr>
