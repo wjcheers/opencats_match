@@ -1,5 +1,5 @@
 <?php /* $Id: SendEmail.tpl 3078 2007-09-21 20:25:28Z will $ */ ?>
-<?php TemplateUtility::printHeader('Candidates', array('modules/candidates/validator.js', 'js/searchSaved.js', 'js/sweetTitles.js', 'js/searchAdvanced.js', 'js/highlightrows.js', 'js/export.js')); ?>
+<?php TemplateUtility::printHeader('Candidates', array('modules/candidates/validator.js', 'js/searchSaved.js', 'js/sweetTitles.js', 'js/searchAdvanced.js', 'js/highlightrows.js', 'js/export.js', 'tinymce')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
 <?php TemplateUtility::printTabs($this->active); ?>
     <div id="main">
@@ -117,7 +117,7 @@
                                     <label id="emailBodyLabel" for="emailBody">Body</label>
                                 </td>
                                 <td class="tdData">
-                                    <textarea id="emailBody" tabindex="<?php echo($tabIndex++); ?>" name="emailBody" rows="10" cols="90" style="width: 600px;" class="inputbox"></textarea />
+                                    <textarea id="emailBody" tabindex="<?php echo($tabIndex++); ?>" name="emailBody" rows="10" cols="90" style="width: 600px;" class="mceEditor"></textarea />
                                 </td>
                             </tr>
                             <tr>

@@ -405,7 +405,18 @@ function checkEmailBody()
 {
     var errorMessage = '';
 
-    fieldValue = document.getElementById('emailBody').value;
+    fieldValue = '';
+    emailBodyParentElement = document.getElementById('emailBody').parentElement;
+    mceEditorIframe = getElementsByAttribute(emailBodyParentElement, 'class', "mceEditorIframe");
+    if (mceEditorIframe.length > 0) {
+        innerDoc = (mceEditorIframe[0].contentDocument) ? mceEditorIframe[0].contentDocument : mceEditorIframe[0].contentWindow.document;
+        if(innerDoc) {
+            bodyElements = innerDoc.getElementsByClassName('mceContentBody');
+            if (bodyElements.length > 0) {
+                fieldValue = bodyElements[0].innerHTML;
+            }
+        }
+    }
     fieldLabel = document.getElementById('emailBodyLabel');
 
     if (fieldValue == '')
@@ -421,3 +432,29 @@ function checkEmailBody()
 
     return errorMessage;
 }
+
+var getElementsByAttribute = function (el, attr, value) {
+    var match = [];
+
+    /* Get the droids we're looking for*/
+    var elements = el.getElementsByTagName("*");
+
+    /* Loop through all elements */
+    for (var ii = 0, ln = elements.length; ii < ln; ii++) {
+
+        if (elements[ii].hasAttribute(attr)) {
+
+            /* If a value was passed, make sure it matches the element's */
+            if (value) {
+
+                if (elements[ii].getAttribute(attr) === value) {
+                    match.push(elements[ii]);
+                }
+            } else {
+                /* Else, simply push it */
+                match.push(elements[ii]);
+            }
+        }
+    }
+    return match;
+};
