@@ -1194,7 +1194,7 @@ class TemplateUtility
                             editor_selector : "mceEditor",
                             width : "100%",
                         	theme : "advanced",
-                        	theme_advanced_buttons1 : "fontselect,fontsizeselect,bold,italic,strikethrough,separator,bullist,numlist,outdent,indent,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,link,unlink,separator,underline,forecolor,separator,removeformat,cleanup,separator,charmap,separator,undo,redo",
+                        	theme_advanced_buttons1 : "fontselect,fontsizeselect,bold,italic,strikethrough,separator,bullist,numlist,outdent,indent,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,link,unlink,image,separator,underline,forecolor,separator,removeformat,cleanup,separator,charmap,separator,undo,redo",
                         	theme_advanced_buttons2 : "",
                         	theme_advanced_buttons3 : "",
                         	language : "en",
