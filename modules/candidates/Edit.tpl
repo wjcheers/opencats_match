@@ -74,37 +74,23 @@
                         </td>
                     </tr>
 
-                    <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
-                    <?php if ($this->extraFieldRS[$i]['fieldName'] == 'Chinese Name'): ?>
-                        <tr>
-                            <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
-                                <label id="extraFieldLbl<?php echo($i); ?>">
-                                    <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
-                                </label>
-                            </td>
-                            <td class="tdData" id="extraFieldData<?php echo($i); ?>">
-                                <?php echo($this->extraFieldRS[$i]['editHTML']); ?>
-                            </td>
-                        </tr>
-                        <?php $extraFieldRS[$i] = 1; break;?>
-                    <?php endif; ?>
-                    <?php endfor; ?>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="chineseNameLabel" for="chineseName">Chinese Name:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="chineseName" name="chineseName" value="<?php $this->_($this->data['chineseName']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
 
-                    <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
-                    <?php if ($this->extraFieldRS[$i]['fieldName'] == 'Nationality'): ?>
-                        <tr>
-                            <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
-                                <label id="extraFieldLbl<?php echo($i); ?>">
-                                    <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
-                                </label>
-                            </td>
-                            <td class="tdData" id="extraFieldData<?php echo($i); ?>">
-                                <?php echo($this->extraFieldRS[$i]['editHTML']); ?>
-                            </td>
-                        </tr>
-                        <?php $extraFieldRS[$i] = 1; break;?>
-                    <?php endif; ?>
-                    <?php endfor; ?>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="nationalityLabel" for="nationality">Nationality:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="nationality" name="nationality" value="<?php $this->_($this->data['nationality']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
 
                     <tr>
                         <td class="tdVertical">
@@ -168,21 +154,72 @@
                         </td>
                     </tr>
 
-                    <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
-                    <?php if (($this->extraFieldRS[$i]['fieldName'] == 'Facebook') || ($this->extraFieldRS[$i]['fieldName'] == 'Linkedin') || ($this->extraFieldRS[$i]['fieldName'] == 'Github') || ($this->extraFieldRS[$i]['fieldName'] == 'GooglePlus') || ($this->extraFieldRS[$i]['fieldName'] == 'Twitter') || ($this->extraFieldRS[$i]['fieldName'] == 'Link1')): ?>
-                        <tr>
-                            <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
-                                <label id="extraFieldLbl<?php echo($i); ?>">
-                                    <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
-                                </label>
-                            </td>
-                            <td class="tdData" id="extraFieldData<?php echo($i); ?>">
-                                <?php echo(str_replace('width: 150px;"', 'width: 450px;" onchange="checkLinkAlreadyInSystem(this.value);"', $this->extraFieldRS[$i]['editHTML'])); ?>
-                            </td>
-                        </tr>
-                        <?php $extraFieldRS[$i] = 1;?>
-                    <?php endif; ?>
-                    <?php endfor; ?>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="facebookLabel" for="facebook">Facebook:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="facebook" name="facebook" value="<?php $this->_($this->data['facebook']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="linkedinLabel" for="linkedin">Linkedin:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="linkedin" name="linkedin" value="<?php $this->_($this->data['linkedin']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="githubLabel" for="github">Github:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="github" name="github" value="<?php $this->_($this->data['github']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="googleplusLabel" for="googleplus">GooglePlus:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="googleplus" name="googleplus" value="<?php $this->_($this->data['googleplus']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="twitterLabel" for="twitter">Twitter:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="twitter" name="twitter" value="<?php $this->_($this->data['twitter']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="link1Label" for="link1">Link1:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="link1" name="link1" value="<?php $this->_($this->data['link1']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="link2Label" for="link2">Link2:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="link2" name="link2" value="<?php $this->_($this->data['link2']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="link3Label" for="link3">Link3:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="link3" name="link3" value="<?php $this->_($this->data['link3']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                        </td>
+                    </tr>
 
                     <tr>
                         <td class="tdVertical">
@@ -402,22 +439,15 @@
                         </td>
                     </tr>
 
-                    <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
-                    <?php if ($this->extraFieldRS[$i]['fieldName'] == 'Job Title'): ?>
-                        <tr>
-                            <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
-                                <label id="extraFieldLbl<?php echo($i); ?>">
-                                    <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
-                                </label>
-                            </td>
-                            <td class="tdData" id="extraFieldData<?php echo($i); ?>">
-                                <?php echo($this->extraFieldRS[$i]['editHTML']); ?>
-                            </td>
-                        </tr>
-                        <?php $extraFieldRS[$i] = 1; ?>
-                    <?php endif; ?>
-                    <?php endfor; ?>
-
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="jobTitleLabel" for="jobTitle">Job Title:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="jobTitle" name="jobTitle" value="<?php $this->_($this->data['jobTitle']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+                    
                     <tr>
                         <td class="tdVertical">
                             <label id="currentPayLabel" for="currentEmployer">Current Pay:</label>
@@ -445,6 +475,97 @@
                         </td>
                     </tr>
 
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="extraGenderLabel" for="extraGender">Gender:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="extraGender" name="extraGender" value="<?php $this->_($this->data['extraGender']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="maritalStatusLabel" for="maritalStatus">Marital Status:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="maritalStatus" name="maritalStatus" value="<?php $this->_($this->data['maritalStatus']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="birthYearLabel" for="birthYear">Birth Year:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="birthYear" name="birthYear" value="<?php $this->_($this->data['birthYear']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="highestDegreeLabel" for="highestDegree">Highest Education Degree:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="highestDegree" name="highestDegree" value="<?php $this->_($this->data['highestDegree']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="majorLabel" for="major">Major:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="major" name="major" value="<?php $this->_($this->data['major']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="lineLabel" for="line">Line:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="line" name="line" value="<?php $this->_($this->data['line']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="qqLabel" for="qq">QQ:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="qq" name="qq" value="<?php $this->_($this->data['qq']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="skypeLabel" for="skype">Skype:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="skype" name="skype" value="<?php $this->_($this->data['skype']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="wechatLabel" for="wechat">Wechat:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="wechat" name="wechat" value="<?php $this->_($this->data['wechat']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="functionsLabel" for="functions">Functions:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="functions" name="functions" value="<?php $this->_($this->data['functions']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="jobLevelLabel" for="jobLevel">Job Level:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" class="inputbox" id="jobLevel" name="jobLevel" value="<?php $this->_($this->data['jobLevel']); ?>" style="width: 150px;" />
+                        </td>
+                    </tr>
+
+                    
                     <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
                     <?php if (!isset($extraFieldRS[$i])): ?>
                         <tr>

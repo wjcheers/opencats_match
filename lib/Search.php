@@ -1345,7 +1345,7 @@ class QuickSearch
                 candidate.middle_name AS middleName,
                 candidate.first_name AS firstName,
                 candidate.last_name AS lastName,
-                extra_field_data.value AS chineseName,
+                candidate.chinese_name AS chineseName,
                 candidate.phone_home AS phoneHome,
                 candidate.phone_cell AS phoneCell,
                 candidate.phone_cell AS phoneWork,
@@ -1364,10 +1364,6 @@ class QuickSearch
                 candidate
             LEFT JOIN user AS owner_user
                 ON candidate.owner = owner_user.user_id
-            LEFT JOIN extra_field AS extra_field_data
-                ON extra_field_data.data_item_id = candidate.candidate_id
-                AND extra_field_data.field_name = 'Chinese Name'
-                AND extra_field_data.data_item_type = '100'
             WHERE
             (
                 CONCAT(candidate.first_name, ' ', candidate.last_name) LIKE %s
@@ -1419,8 +1415,8 @@ class QuickSearch
 							'.', ''),
 						')', ''),
 					'(', '')
-                OR extra_field_data.value LIKE %s
-                OR extra_field_data.value LIKE %s
+                OR candidate.chinese_name LIKE %s
+                OR candidate.chinese_name LIKE %s
             )
             AND
                 candidate.site_id = %s

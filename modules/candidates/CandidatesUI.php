@@ -955,7 +955,7 @@ class CandidatesUI extends UserInterface
         {
             return $this->add($mp[0], $mp[1]);
         }
-
+        
         $candidateID = $this->_addCandidate(false);
 
         if ($candidateID <= 0)
@@ -1244,7 +1244,30 @@ class CandidatesUI extends UserInterface
         $race            = $this->getTrimmedInput('race', $_POST);
         $veteran         = $this->getTrimmedInput('veteran', $_POST);
         $disability      = $this->getTrimmedInput('disability', $_POST);
-
+        
+        $chineseName     = $this->getTrimmedInput('chineseName', $_POST);
+        $jobTitle        = $this->getTrimmedInput('jobTitle', $_POST);
+        $extraGender     = $this->getTrimmedInput('extraGender', $_POST);
+        $maritalStatus   = $this->getTrimmedInput('maritalStatus', $_POST);
+        $birthYear       = $this->getTrimmedInput('birthYear', $_POST);
+        $highestDegree   = $this->getTrimmedInput('highestDegree', $_POST);
+        $major           = $this->getTrimmedInput('major', $_POST);
+        $nationality     = $this->getTrimmedInput('nationality', $_POST);
+        $facebook        = $this->getTrimmedInput('facebook', $_POST);
+        $github          = $this->getTrimmedInput('github', $_POST);
+        $linkedin        = $this->getTrimmedInput('linkedin', $_POST);
+        $googleplus      = $this->getTrimmedInput('googleplus', $_POST);
+        $twitter         = $this->getTrimmedInput('twitter', $_POST);
+        $link1           = $this->getTrimmedInput('link1', $_POST);
+        $link2           = $this->getTrimmedInput('link2', $_POST);
+        $link3           = $this->getTrimmedInput('link3', $_POST);
+        $line            = $this->getTrimmedInput('line', $_POST);
+        $qq              = $this->getTrimmedInput('qq', $_POST);
+        $skype           = $this->getTrimmedInput('skype', $_POST);
+        $wechat          = $this->getTrimmedInput('wechat', $_POST);
+        $functions       = $this->getTrimmedInput('functions', $_POST);
+        $jobLevel        = $this->getTrimmedInput('jobLevel', $_POST);
+        
         /* Candidate source list editor. */
         $sourceCSV = $this->getTrimmedInput('sourceCSV', $_POST);
 
@@ -1286,6 +1309,9 @@ class CandidatesUI extends UserInterface
             $isHot,
             $email,
             $emailAddress,
+            
+            $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree, $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
+            
             $gender,
             $race,
             $veteran,
@@ -2498,6 +2524,29 @@ class CandidatesUI extends UserInterface
         $race            = $this->getTrimmedInput('race', $_POST);
         $veteran         = $this->getTrimmedInput('veteran', $_POST);
         $disability      = $this->getTrimmedInput('disability', $_POST);
+        
+        $chineseName     = $this->getTrimmedInput('chineseName', $_POST);
+        $jobTitle        = $this->getTrimmedInput('jobTitle', $_POST);
+        $extraGender     = $this->getTrimmedInput('extraGender', $_POST);
+        $maritalStatus   = $this->getTrimmedInput('maritalStatus', $_POST);
+        $birthYear       = $this->getTrimmedInput('birthYear', $_POST);
+        $highestDegree   = $this->getTrimmedInput('highestDegree', $_POST);
+        $major           = $this->getTrimmedInput('major', $_POST);
+        $nationality     = $this->getTrimmedInput('nationality', $_POST);
+        $facebook        = $this->getTrimmedInput('facebook', $_POST);
+        $github          = $this->getTrimmedInput('github', $_POST);
+        $linkedin        = $this->getTrimmedInput('linkedin', $_POST);
+        $googleplus      = $this->getTrimmedInput('googleplus', $_POST);
+        $twitter         = $this->getTrimmedInput('twitter', $_POST);
+        $link1           = $this->getTrimmedInput('link1', $_POST);
+        $link2           = $this->getTrimmedInput('link2', $_POST);
+        $link3           = $this->getTrimmedInput('link3', $_POST);
+        $line            = $this->getTrimmedInput('line', $_POST);
+        $qq              = $this->getTrimmedInput('qq', $_POST);
+        $skype           = $this->getTrimmedInput('skype', $_POST);
+        $wechat          = $this->getTrimmedInput('wechat', $_POST);
+        $functions       = $this->getTrimmedInput('functions', $_POST);
+        $jobLevel        = $this->getTrimmedInput('jobLevel', $_POST);
 
         /* Candidate source list editor. */
         $sourceCSV = $this->getTrimmedInput('sourceCSV', $_POST);
@@ -2516,7 +2565,7 @@ class CandidatesUI extends UserInterface
         }
 
         if (!eval(Hooks::get('CANDIDATE_ON_ADD_PRE'))) return;
-
+        
         $candidates = new Candidates($this->_siteID);
         $candidateID = $candidates->add(
             $firstName,
@@ -2543,6 +2592,9 @@ class CandidatesUI extends UserInterface
             $bestTimeToCall,
             $this->_userID,
             $this->_userID,
+            
+            $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree, $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
+            
             $gender,
             $race,
             $veteran,
@@ -3419,6 +3471,11 @@ class CandidatesUI extends UserInterface
                     $fullDestination[$i],
                     $chDestination[$i]
                 );
+                $emailSubjectReplaced = str_replace(
+                    $stringsToFind,
+                    $replacementStrings,
+                    $emailSubject
+                );
                 $emailBodyReplaced = str_replace(
                     $stringsToFind,
                     $replacementStrings,
@@ -3429,7 +3486,7 @@ class CandidatesUI extends UserInterface
                 $mailerStatus = $mailer->send(
                     array($_SESSION['CATS']->getEmail(), $_SESSION['CATS']->getEmail()),
                     array($destination),
-                    $emailSubject,
+                    $emailSubjectReplaced,
                     $emailBodyReplaced,
                     true,
                     true
@@ -3465,12 +3522,8 @@ class CandidatesUI extends UserInterface
 
             $rs = $db->getAllAssoc(sprintf(
                 "SELECT candidate_id, first_name AS firstName, last_name AS lastName, CONCAT(first_name, ' ', last_name) AS candidateFullName, 
-                extra_field_data.value AS chineseName, email1, email2 "
+                chinese_name AS chineseName, email1, email2 "
                 . 'FROM candidate '
-                . "LEFT JOIN extra_field AS extra_field_data
-                    ON extra_field_data.data_item_id = candidate.candidate_id
-                    AND extra_field_data.field_name = 'Chinese Name'
-                    AND extra_field_data.data_item_type = '100'"
                 . 'WHERE candidate_id IN (%s)',
                 $db_str
             ));

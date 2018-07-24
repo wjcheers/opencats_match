@@ -55,6 +55,11 @@
                             </tr>
 
                             <tr>
+                                <td class="vertical">Chinese Name:</td>
+                                <td class="data"><?php $this->_($this->data['chineseName']); ?></td>
+                            </tr>
+                            
+                            <tr>
                                 <td class="vertical">E-Mail:</td>
                                 <td class="data">
                                     <a href="mailto:<?php $this->_($this->data['email1']); ?>">
@@ -118,6 +123,51 @@
                                 <td class="data"><?php $this->_($this->data['source']); ?></td>
                             </tr>
 
+                            <tr>
+                                <td class="vertical">Functions:</td>
+                                <td class="data"><?php $this->_($this->data['functions']); ?></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Job Title:</td>
+                                <td class="data"><?php $this->_($this->data['jobTitle']); ?></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Job Level:</td>
+                                <td class="data"><?php $this->_($this->data['jobLevel']); ?></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Gender:</td>
+                                <td class="data"><?php $this->_($this->data['extraGender']); ?></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Marital Status:</td>
+                                <td class="data"><?php $this->_($this->data['maritalStatus']); ?></td>
+                            </tr>
+
+                            <tr>
+                                <td class="vertical">Birth Year:</td>
+                                <td class="data"><?php $this->_($this->data['birthYear']); ?></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Highest Education Degree:</td>
+                                <td class="data"><?php $this->_($this->data['highestDegree']); ?></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Major:</td>
+                                <td class="data"><?php $this->_($this->data['major']); ?></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Nationality:</td>
+                                <td class="data"><?php $this->_($this->data['nationality']); ?></td>
+                            </tr>
+                            
                             <?php for ($i = 0; $i < intval(count($this->extraFieldRS)/2); $i++): ?>
                                 <tr>
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>                         
@@ -214,6 +264,95 @@
                                 <td class="data"><?php $this->_($this->data['ownerFullName']); ?></td>
                             </tr>
 
+                            <tr>
+                                <td class="vertical">Facebook:</td>
+                                <td class="data">
+                                    <?php if (!empty($this->data['facebook'])): ?>
+                                        <a href="<?php $this->_($this->data['facebook']); ?>" target="_blank"><?php $this->_($this->data['facebook']); ?></a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Linkedin:</td>
+                                <td class="data">
+                                    <?php if (!empty($this->data['linkedin'])): ?>
+                                        <a href="<?php $this->_($this->data['linkedin']); ?>" target="_blank"><?php $this->_($this->data['linkedin']); ?></a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Github:</td>
+                                <td class="data">
+                                    <?php if (!empty($this->data['github'])): ?>
+                                        <a href="<?php $this->_($this->data['github']); ?>" target="_blank"><?php $this->_($this->data['github']); ?></a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">GooglePlus:</td>
+                                <td class="data">
+                                    <?php if (!empty($this->data['googleplus'])): ?>
+                                        <a href="<?php $this->_($this->data['googleplus']); ?>" target="_blank"><?php $this->_($this->data['googleplus']); ?></a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Twitter:</td>
+                                <td class="data">
+                                    <?php if (!empty($this->data['twitter'])): ?>
+                                        <a href="<?php $this->_($this->data['twitter']); ?>" target="_blank"><?php $this->_($this->data['twitter']); ?></a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="vertical">Link1:</td>
+                                <td class="data">
+                                    <?php if (!empty($this->data['link1'])): ?>
+                                        <a href="<?php $this->_($this->data['link1']); ?>" target="_blank"><?php $this->_($this->data['link1']); ?></a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="vertical">Link2:</td>
+                                <td class="data">
+                                    <?php if (!empty($this->data['link2'])): ?>
+                                        <a href="<?php $this->_($this->data['link2']); ?>" target="_blank"><?php $this->_($this->data['link2']); ?></a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="vertical">Link3:</td>
+                                <td class="data">
+                                    <?php if (!empty($this->data['link3'])): ?>
+                                        <a href="<?php $this->_($this->data['link3']); ?>" target="_blank"><?php $this->_($this->data['link3']); ?></a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Wechat:</td>
+                                <td class="data"><?php $this->_($this->data['wechat']); ?></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Skype:</td>
+                                <td class="data"><?php $this->_($this->data['skype']); ?></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">Line:</td>
+                                <td class="data"><?php $this->_($this->data['line']); ?></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="vertical">QQ:</td>
+                                <td class="data"><?php $this->_($this->data['qq']); ?></td>
+                            </tr>
+                            
                             <?php for ($i = (intval(count($this->extraFieldRS))/2); $i < (count($this->extraFieldRS)); $i++): ?>
                                 <tr>
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>

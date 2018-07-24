@@ -105,6 +105,9 @@ class Candidates
         $phoneHome, $phoneCell, $phoneWork, $address, $city, $state, $zip,
         $source, $keySkills, $dateAvailable, $currentEmployer, $canRelocate,
         $currentPay, $desiredPay, $notes, $webSite, $bestTimeToCall, $enteredBy, $owner,
+        $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree,
+        $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter,
+        $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
         $gender = '', $race = '', $veteran = '', $disability = '',
         $skipHistory = false)
     {
@@ -138,6 +141,9 @@ class Candidates
                 site_id,
                 date_created,
                 date_modified,
+                chinese_name, job_title, extra_gender, marital_status, birth_year, highest_degree,
+                major, nationality, facebook, github, linkedin, googleplus, twitter,
+                link1, link2, link3, line, qq, skype, wechat, functions, job_level,
                 eeo_ethnic_type_id,
                 eeo_veteran_type_id,
                 eeo_disability_status,
@@ -172,6 +178,9 @@ class Candidates
                 %s,
                 NOW(),
                 NOW(),
+                %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, 
                 %s,
                 %s,
                 %s,
@@ -202,6 +211,32 @@ class Candidates
             $this->_db->makeQueryInteger($enteredBy),
             $this->_db->makeQueryInteger($owner),
             $this->_siteID,
+            
+            $this->_db->makeQueryString($chineseName),
+            $this->_db->makeQueryString($jobTitle),
+            $this->_db->makeQueryString($extraGender),
+            $this->_db->makeQueryString($maritalStatus),
+            $this->_db->makeQueryString($birthYear),
+            $this->_db->makeQueryString($highestDegree),
+            
+            $this->_db->makeQueryString($major),
+            $this->_db->makeQueryString($nationality),
+            $this->_db->makeQueryString($facebook),
+            $this->_db->makeQueryString($github),
+            $this->_db->makeQueryString($linkedin),
+            $this->_db->makeQueryString($googleplus),
+            $this->_db->makeQueryString($twitter),
+            
+            $this->_db->makeQueryString($link1),
+            $this->_db->makeQueryString($link2),
+            $this->_db->makeQueryString($link3),
+            $this->_db->makeQueryString($line),
+            $this->_db->makeQueryString($qq),
+            $this->_db->makeQueryString($skype),
+            $this->_db->makeQueryString($wechat),
+            $this->_db->makeQueryString($functions),
+            $this->_db->makeQueryString($jobLevel),
+            
             $this->_db->makeQueryInteger($race),
             $this->_db->makeQueryInteger($veteran),
             $this->_db->makeQueryString($disability),
@@ -261,6 +296,9 @@ class Candidates
         $city, $state, $zip, $source, $keySkills, $dateAvailable,
         $currentEmployer, $canRelocate, $currentPay, $desiredPay,
         $notes, $webSite, $bestTimeToCall, $owner, $isHot, $email, $emailAddress,
+        $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree,
+        $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter,
+        $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
         $gender = '', $race = '', $veteran = '', $disability = '')
     {
         $sql = sprintf(
@@ -293,6 +331,32 @@ class Candidates
                 best_time_to_call     = %s,
                 owner                 = %s,
                 date_modified         = NOW(),
+                
+                chinese_name          = %s,
+                job_title             = %s,
+                extra_gender          = %s,
+                marital_status        = %s,
+                birth_year            = %s,
+                highest_degree        = %s,                
+
+                major                 = %s,
+                nationality           = %s,
+                facebook              = %s,
+                github                = %s,
+                linkedin              = %s,
+                googleplus            = %s,
+                twitter               = %s,
+                
+                link1                 = %s,
+                link2                 = %s,
+                link3                 = %s,
+                line                  = %s,
+                qq                    = %s,
+                skype                 = %s,
+                wechat                = %s,
+                functions             = %s,
+                job_level             = %s,
+                
                 eeo_ethnic_type_id    = %s,
                 eeo_veteran_type_id   = %s,
                 eeo_disability_status = %s,
@@ -326,6 +390,32 @@ class Candidates
             $this->_db->makeQueryString($webSite),
             $this->_db->makeQueryString($bestTimeToCall),
             $this->_db->makeQueryInteger($owner),
+            
+            $this->_db->makeQueryString($chineseName),
+            $this->_db->makeQueryString($jobTitle),
+            $this->_db->makeQueryString($extraGender),
+            $this->_db->makeQueryString($maritalStatus),
+            $this->_db->makeQueryString($birthYear),
+            $this->_db->makeQueryString($highestDegree),
+            
+            $this->_db->makeQueryString($major),
+            $this->_db->makeQueryString($nationality),
+            $this->_db->makeQueryString($facebook),
+            $this->_db->makeQueryString($github),
+            $this->_db->makeQueryString($linkedin),
+            $this->_db->makeQueryString($googleplus),
+            $this->_db->makeQueryString($twitter),
+            
+            $this->_db->makeQueryString($link1),
+            $this->_db->makeQueryString($link2),
+            $this->_db->makeQueryString($link3),
+            $this->_db->makeQueryString($line),
+            $this->_db->makeQueryString($qq),
+            $this->_db->makeQueryString($skype),
+            $this->_db->makeQueryString($wechat),
+            $this->_db->makeQueryString($functions),
+            $this->_db->makeQueryString($jobLevel),
+            
             $this->_db->makeQueryInteger($race),
             $this->_db->makeQueryInteger($veteran),
             $this->_db->makeQueryString($disability),
@@ -516,6 +606,30 @@ class Candidates
                 DATE_FORMAT(
                     candidate.date_available, '%%m-%%d-%%y'
                 ) AS dateAvailable,
+                
+                candidate.chinese_name AS chineseName,
+                candidate.job_title AS jobTitle,
+                candidate.extra_gender AS extraGender,
+                candidate.marital_status AS maritalStatus, 
+                candidate.birth_year AS birthYear, 
+                candidate.highest_degree AS highestDegree, 
+                candidate.major AS major, 
+                candidate.nationality AS nationality, 
+                candidate.facebook AS facebook, 
+                candidate.github AS github, 
+                candidate.linkedin AS linkedin, 
+                candidate.googleplus AS googleplus, 
+                candidate.twitter AS twitter, 
+                candidate.link1 AS link1, 
+                candidate.link2 AS link2, 
+                candidate.link3 AS link3, 
+                candidate.line AS line, 
+                candidate.qq AS qq, 
+                candidate.skype AS skype, 
+                candidate.wechat AS wechat, 
+                candidate.functions AS functions, 
+                candidate.job_level AS jobLevel,
+                
                 eeo_ethnic_type.type AS eeoEthnicType,
                 eeo_veteran_type.type AS eeoVeteranType,
                 candidate.eeo_disability_status AS eeoDisabilityStatus,
@@ -591,6 +705,30 @@ class Candidates
                 candidate.web_site AS webSite,
                 candidate.best_time_to_call AS bestTimeToCall,
                 candidate.is_hot AS isHot,
+                
+                candidate.chinese_name AS chineseName,
+                candidate.job_title AS jobTitle,
+                candidate.extra_gender AS extraGender,
+                candidate.marital_status AS maritalStatus, 
+                candidate.birth_year AS birthYear, 
+                candidate.highest_degree AS highestDegree, 
+                candidate.major AS major, 
+                candidate.nationality AS nationality, 
+                candidate.facebook AS facebook, 
+                candidate.github AS github, 
+                candidate.linkedin AS linkedin, 
+                candidate.googleplus AS googleplus, 
+                candidate.twitter AS twitter, 
+                candidate.link1 AS link1, 
+                candidate.link2 AS link2, 
+                candidate.link3 AS link3, 
+                candidate.line AS line, 
+                candidate.qq AS qq, 
+                candidate.skype AS skype, 
+                candidate.wechat AS wechat, 
+                candidate.functions AS functions, 
+                candidate.job_level AS jobLevel,
+                
                 candidate.eeo_ethnic_type_id AS eeoEthnicTypeID,
                 candidate.eeo_veteran_type_id AS eeoVeteranTypeID,
                 candidate.eeo_disability_status AS eeoDisabilityStatus,
@@ -737,128 +875,154 @@ class Candidates
         }
         $encLink4Query = "'%" . str_replace('%', '\%', $this->_db->escapeString($encLink4Query)) . "%'";
         
-        $i = 1;
-        // web_site and notes field
-        while ($i > 0)
-        {
-            $sql = sprintf(
-                "SELECT
-                    candidate.candidate_id AS candidateID,
-                    candidate.web_site AS webSite,
-                    candidate.notes AS notes
-                FROM
-                    candidate
-                WHERE
-                (
-                    candidate.web_site like %s
-                    OR candidate.web_site like %s
-                    OR candidate.notes like %s
-                    OR candidate.notes like %s
-                )
-                AND
-                    candidate.site_id = %s",
-                $encLink4Query,
-                $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
-                $encLink4Query,
-                $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
-                $this->_siteID
-            );
-            $rs = $this->_db->getAllAssoc($sql);
+        $sql = sprintf(
+            "SELECT
+                candidate.candidate_id AS candidateID,
+                candidate.web_site AS webSite,
+                candidate.notes AS notes,
+                
+                candidate.facebook AS facebook, 
+                candidate.github AS github, 
+                candidate.linkedin AS linkedin, 
+                candidate.googleplus AS googleplus, 
+                candidate.twitter AS twitter, 
+                candidate.link1 AS link1, 
+                candidate.link2 AS link2, 
+                candidate.link3 AS link3
+            FROM
+                candidate
+            WHERE
+            (
+                candidate.web_site like %s
+                OR candidate.web_site like %s
+                OR candidate.notes like %s
+                OR candidate.notes like %s
+                OR candidate.facebook like %s
+                OR candidate.facebook like %s
+                OR candidate.github like %s
+                OR candidate.github like %s
+                OR candidate.linkedin like %s
+                OR candidate.linkedin like %s
+                OR candidate.googleplus like %s
+                OR candidate.googleplus like %s
+                OR candidate.twitter like %s
+                OR candidate.twitter like %s
+                OR candidate.link1 like %s
+                OR candidate.link1 like %s
+                OR candidate.link2 like %s
+                OR candidate.link2 like %s
+                OR candidate.link3 like %s
+                OR candidate.link3 like %s
+            )
+            AND
+                candidate.site_id = %s",
+            $encLink4Query,
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            $encLink4Query,
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            $encLink4Query,
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            $encLink4Query,
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            $encLink4Query,
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            $encLink4Query,
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            $encLink4Query,
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            $encLink4Query,
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            $encLink4Query,
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            $encLink4Query,
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            $this->_siteID
+        );
+        $rs = $this->_db->getAllAssoc($sql);
 
-            if (!empty($rs))
+        if (!empty($rs))
+        {
+            foreach ($rs as $field)
             {
-                foreach ($rs as $field)
+                // Remove the partial matches. Use Url's path to do reverse search
+                // ex.
+                // $link => linkedin.com/in/pohsien
+                // webSite => https://www.linkedin.com/in/pohsien-liu-83b38395
+                // 
+                // rtlim => remove the tail symbol
+                // parse_url input is "urlDecode" content
+                if (!empty($field['webSite']))
                 {
-                    // Remove the partial matches. Use Url's path to do reverse search
-                    // ex.
-                    // $link => linkedin.com/in/pohsien
-                    // webSite => https://www.linkedin.com/in/pohsien-liu-83b38395
-                    // 
-                    // rtlim => remove the tail symbol
-                    // parse_url input is "urlDecode" content
-                    if (!empty($field['webSite']))
-                    {
-                        $parsedUrl = parse_url(urlDecode(rtrim($field['webSite'], '/')));
-                        // return $link . ' ' . $parsedUrl['path'];
-                        if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
-                            return $field['candidateID'];                
-                        }
+                    $parsedUrl = parse_url(urlDecode(rtrim($field['webSite'], '/')));
+                    // return $link . ' ' . $parsedUrl['path'];
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $field['candidateID'];                
                     }
-                    if (!empty($field['notes']))
-                    {
-                        $parsedUrl = parse_url(urlDecode(rtrim($field['notes'], '/')));
-                        if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
-                            return $field['candidateID'];                
-                        }
+                }
+                if (!empty($field['notes']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($field['notes'], '/')));
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $field['candidateID'];                
+                    }
+                }
+                if (!empty($field['facebook']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($field['facebook'], '/')));
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $field['candidateID'];                
+                    }
+                }
+                if (!empty($field['github']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($field['github'], '/')));
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $field['candidateID'];                
+                    }
+                }
+                if (!empty($field['linkedin']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($field['linkedin'], '/')));
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $field['candidateID'];                
+                    }
+                }
+                if (!empty($field['googleplus']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($field['googleplus'], '/')));
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $field['candidateID'];                
+                    }
+                }
+                if (!empty($field['twitter']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($field['twitter'], '/')));
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $field['candidateID'];                
+                    }
+                }
+                if (!empty($field['link1']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($field['link1'], '/')));
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $field['candidateID'];                
+                    }
+                }
+                if (!empty($field['link2']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($field['link2'], '/')));
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $field['candidateID'];                
+                    }
+                }
+                if (!empty($field['link3']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($field['link3'], '/')));
+                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $field['candidateID'];                
                     }
                 }
             }
-            else //empty
-            {
-                break;
-            }
-            $i--;
-        }
-
-        $i = 1;
-        // extra_field
-        while ($i > 0)
-        {
-            $sql = sprintf(        
-                "SELECT
-                    extra_field.field_name AS fieldName,
-                    extra_field.value AS value,
-                    extra_field.extra_field_id AS extraFieldSettingsID,
-                    extra_field.data_item_id AS dataItemID
-                FROM
-                    extra_field
-                WHERE
-                (
-                    extra_field.field_name = %s
-                    OR extra_field.field_name = %s
-                    OR extra_field.field_name = %s
-                    OR extra_field.field_name = %s
-                    OR extra_field.field_name = %s
-                    OR extra_field.field_name = %s
-                )
-                AND
-                (
-                    extra_field.value like %s
-                    OR extra_field.value like %s
-                )
-                AND
-                    extra_field.data_item_type = %s
-                AND
-                    extra_field.site_id = %s",
-                $this->_db->makeQueryString("Facebook"),
-                $this->_db->makeQueryString("GooglePlus"),
-                $this->_db->makeQueryString("Github"),
-                $this->_db->makeQueryString("Twitter"),
-                $this->_db->makeQueryString("Linkedin"),
-                $this->_db->makeQueryString("Link1"),
-                $encLink4Query,
-                $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
-                DATA_ITEM_CANDIDATE,
-                $this->_siteID
-            );
-            $rs = $this->_db->getAllAssoc($sql);
-            
-            if (!empty($rs))
-            {
-                foreach ($rs as $field)
-                {
-                    if (!empty($field['value']))
-                    {
-                        // Remove the partial matches. Use Url's path to do reverse search
-                        $parsedUrl = parse_url(urlDecode(rtrim($field['value'], '/')));
-                        // return $link . ' ' . $parsedUrl['path'];
-                        if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
-                            return $field['dataItemID'];                
-                        }
-                    }
-                }
-            }
-            $i--;
         }
 
         return -1;            
@@ -1593,7 +1757,177 @@ class CandidatesDataGrid extends DataGrid
                                      'filter'    => 'candidate.is_hot',
                                      'pagerOptional' => false,
                                      'filterable' => false,
-                                     'filterDescription' => 'Only Hot Candidates')
+                                     'filterDescription' => 'Only Hot Candidates'),
+                                     
+                                     
+            'Chinese Name' =>     array('select'         => 'candidate.chinese_name AS chineseName',
+                                      'pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'chineseName\']).\'</a>\';',
+                                      'sortableColumn' => 'chineseName',
+                                      'pagerWidth'     => 75,
+                                      'pagerOptional'  => false,
+                                      'alphaNavigation'=> true,
+                                      'filter'         => 'candidate.chinese_name'),
+                                      
+            'Job Title' => array('select'  => 'candidate.job_title AS jobTitle',
+                                     'sortableColumn'    => 'jobTitle',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'jobTitle\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.job_title'),
+                                     
+            'Gender' => array('select'  => 'candidate.extra_gender AS extraGender',
+                                     'sortableColumn'    => 'extraGender',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'extraGender\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.extra_gender'),
+                                     
+            'Marital Status' => array('select'  => 'candidate.marital_status AS maritalStatus',
+                                     'sortableColumn'    => 'maritalStatus',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'maritalStatus\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.marital_status'),
+                                     
+            'Birth Year' => array('select'  => 'candidate.birth_year AS birthYear',
+                                     'sortableColumn'    => 'birthYear',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'birthYear\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.birth_year'),
+                                     
+            'Highest Education Degree' => array('select'  => 'candidate.highest_degree AS highestDegree',
+                                     'sortableColumn'    => 'highestDegree',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'highestDegree\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.highest_degree'),
+                                     
+            'Major' => array('select'  => 'candidate.major AS major',
+                                     'sortableColumn'    => 'major',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'major\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.major'),
+                                     
+            'Nationality' => array('select'  => 'candidate.nationality AS nationality',
+                                     'sortableColumn'    => 'nationality',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'nationality\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.nationality'),
+                                     
+            'Facebook' => array('select'  => 'candidate.facebook AS facebook',
+                                     'sortableColumn'    => 'facebook',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return \'<a href="\'.htmlspecialchars($rsData[\'facebook\']).\'">\'.htmlspecialchars($rsData[\'facebook\']).\'</a>\';',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.facebook'),
+                                     
+            'Github' => array('select'  => 'candidate.github AS github',
+                                     'sortableColumn'    => 'github',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return \'<a href="\'.htmlspecialchars($rsData[\'github\']).\'">\'.htmlspecialchars($rsData[\'github\']).\'</a>\';',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.github'),
+                                     
+            'Linkedin' => array('select'  => 'candidate.linkedin AS linkedin',
+                                     'sortableColumn'    => 'linkedin',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return \'<a href="\'.htmlspecialchars($rsData[\'linkedin\']).\'">\'.htmlspecialchars($rsData[\'linkedin\']).\'</a>\';',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.linkedin'),
+                                     
+            'GooglePlus' => array('select'  => 'candidate.googleplus AS googleplus',
+                                     'sortableColumn'    => 'googleplus',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return \'<a href="\'.htmlspecialchars($rsData[\'googleplus\']).\'">\'.htmlspecialchars($rsData[\'googleplus\']).\'</a>\';',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.googleplus'),
+                                     
+            'Twitter' => array('select'  => 'candidate.twitter AS twitter',
+                                     'sortableColumn'    => 'twitter',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return \'<a href="\'.htmlspecialchars($rsData[\'twitter\']).\'">\'.htmlspecialchars($rsData[\'twitter\']).\'</a>\';',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.twitter'),
+                                     
+            'Link1' => array('select'  => 'candidate.link1 AS link1',
+                                     'sortableColumn'    => 'link1',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return \'<a href="\'.htmlspecialchars($rsData[\'link1\']).\'">\'.htmlspecialchars($rsData[\'link1\']).\'</a>\';',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.link1'),
+                                     
+            'Link2' => array('select'  => 'candidate.link2 AS link2',
+                                     'sortableColumn'    => 'link2',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return \'<a href="\'.htmlspecialchars($rsData[\'link2\']).\'">\'.htmlspecialchars($rsData[\'link2\']).\'</a>\';',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.link2'),
+                                     
+            'Link3' => array('select'  => 'candidate.link3 AS link3',
+                                     'sortableColumn'    => 'link3',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return \'<a href="\'.htmlspecialchars($rsData[\'link3\']).\'">\'.htmlspecialchars($rsData[\'link3\']).\'</a>\';',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.link3'),
+                                     
+            'Line' => array('select'  => 'candidate.line AS line',
+                                     'sortableColumn'    => 'line',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'line\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.line'),
+                                     
+            'QQ' => array('select'  => 'candidate.qq AS qq',
+                                     'sortableColumn'    => 'qq',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'qq\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.qq'),
+                                     
+            'QQ' => array('select'  => 'candidate.qq AS qq',
+                                     'sortableColumn'    => 'qq',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'qq\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.qq'),
+                                     
+            'Skype' => array('select'  => 'candidate.skype AS skype',
+                                     'sortableColumn'    => 'skype',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'skype\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.skype'),
+                                     
+            'Wechat' => array('select'  => 'candidate.wechat AS wechat',
+                                     'sortableColumn'    => 'wechat',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'wechat\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.wechat'),
+                                     
+            'Wechat' => array('select'  => 'candidate.wechat AS wechat',
+                                     'sortableColumn'    => 'wechat',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'wechat\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.wechat'),
+                                     
+            'Functions' => array('select'  => 'candidate.functions AS functions',
+                                     'sortableColumn'    => 'functions',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'functions\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.functions'),
+                                     
+            'Job Level' => array('select'  => 'candidate.job_level AS jobLevel',
+                                     'sortableColumn'    => 'jobLevel',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'jobLevel\']);',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.job_level')                                     
         );
 
         if (US_ZIPS_ENABLED)
