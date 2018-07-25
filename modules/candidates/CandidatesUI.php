@@ -1438,7 +1438,7 @@ class CandidatesUI extends UserInterface
                 break;
 
             default:
-                $rs = $search->recentlyModified('DESC', true, 5);
+                $rs = $search->recentlyModified('DESC', true, 8);
                 $resultsMode = false;
                 break;
         }

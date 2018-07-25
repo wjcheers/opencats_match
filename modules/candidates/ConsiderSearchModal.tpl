@@ -59,6 +59,9 @@
                         <th align="left">Company</th>
                         <th align="left">Type</th>
                         <th align="left">Status</th>
+                        <th align="left">Contact</th>
+                        <th align="left">City</th>
+                        <th align="left">State</th>
                         <th align="left">Created</th>
                         <th align="left">Start</th>
                         <th align="left">Recruiter</th>
@@ -80,6 +83,9 @@
                             <td align="left" valign="top"><?php $this->_($data['companyName']); ?></td>
                             <td align="left" valign="top"><?php $this->_($data['type']); ?></td>
                             <td align="left" valign="top"><?php $this->_($data['status']); ?></td>
+                            <td align="left" valign="top"><?php $this->_($data['contactFullName']) ?></td>
+                            <td align="left" valign="top" style="word-break: break-all;"><?php $this->_($data['city']) ?></td>
+                            <td align="left" valign="top"><?php $this->_($data['state']) ?></td>
                             <td align="left" valign="top" nowrap="nowrap"><?php $this->_($data['dateCreated']); ?></td>
                             <td align="left" valign="top" nowrap="nowrap"><?php $this->_($data['startDate']); ?></td>
                             <td align="left" valign="top" nowrap="nowrap"><?php $this->_($data['recruiterAbbrName']); ?></td>
@@ -107,6 +113,9 @@
                         <th align="left">Company</th>
                         <th align="left">Type</th>
                         <th align="left">Status</th>
+                        <th align="left">Contact</th>
+                        <th align="left">City</th>
+                        <th align="left">State</th>
                         <th align="left">Modified</th>
                         <th align="left">Start</th>
                         <th align="left">Recruiter</th>
@@ -128,6 +137,9 @@
                             <td align="left" valign="top"><?php $this->_($data['companyName']); ?></td>
                             <td align="left" valign="top"><?php $this->_($data['type']); ?></td>
                             <td align="left" valign="top"><?php $this->_($data['status']); ?></td>
+                            <td align="left" valign="top"><?php $this->_($data['contactFullName']) ?></td>
+                            <td align="left" valign="top" style="word-break: break-all;"><?php $this->_($data['city']) ?></td>
+                            <td align="left" valign="top"><?php $this->_($data['state']) ?></td>
                             <td align="left" valign="top" nowrap="nowrap"><?php $this->_($data['dateModified']); ?></td>
                             <td align="left" valign="top" nowrap="nowrap"><?php $this->_($data['startDate']); ?></td>
                             <td align="left" valign="top" nowrap="nowrap"><?php $this->_($data['recruiterAbbrName']); ?></td>

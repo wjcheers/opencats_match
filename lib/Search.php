@@ -793,6 +793,13 @@ class SearchJobOrders
                 joborder.rate_max AS maxRate,
                 joborder.salary AS salary,
                 joborder.status AS status,
+                joborder.city AS city,
+                joborder.state AS state,
+                contact.first_name AS contactFirstName,
+                contact.last_name AS contactLastName,
+                CONCAT(
+                    contact.first_name, ' ', contact.last_name
+                ) AS contactFullName,
                 recruiter_user.first_name AS recruiterFirstName,
                 recruiter_user.last_name AS recruiterLastName,
                 owner_user.first_name AS ownerFirstName,
@@ -814,6 +821,8 @@ class SearchJobOrders
                 ON joborder.recruiter = recruiter_user.user_id
             LEFT JOIN user AS owner_user
                 ON joborder.owner = owner_user.user_id
+            LEFT JOIN contact
+                ON joborder.contact_id = contact.contact_id
             WHERE
                 %s
             %s
@@ -878,6 +887,13 @@ class SearchJobOrders
                 joborder.rate_max AS maxRate,
                 joborder.salary AS salary,
                 joborder.status AS status,
+                joborder.city AS city,
+                joborder.state AS state,
+                contact.first_name AS contactFirstName,
+                contact.last_name AS contactLastName,
+                CONCAT(
+                    contact.first_name, ' ', contact.last_name
+                ) AS contactFullName,
                 recruiter_user.first_name AS recruiterFirstName,
                 recruiter_user.last_name AS recruiterLastName,
                 owner_user.first_name AS ownerFirstName,
@@ -899,6 +915,8 @@ class SearchJobOrders
                 ON joborder.recruiter = recruiter_user.user_id
             LEFT JOIN user AS owner_user
                 ON joborder.owner = owner_user.user_id
+            LEFT JOIN contact
+                ON joborder.contact_id = contact.contact_id
             WHERE
                 company.name LIKE %s
             %s
@@ -962,6 +980,13 @@ class SearchJobOrders
                 joborder.rate_max AS maxRate,
                 joborder.salary AS salary,
                 joborder.status AS status,
+                joborder.city AS city,
+                joborder.state AS state,
+                contact.first_name AS contactFirstName,
+                contact.last_name AS contactLastName,
+                CONCAT(
+                    contact.first_name, ' ', contact.last_name
+                ) AS contactFullName,
                 recruiter_user.first_name AS recruiterFirstName,
                 recruiter_user.last_name AS recruiterLastName,
                 owner_user.first_name AS ownerFirstName,
@@ -984,6 +1009,8 @@ class SearchJobOrders
                 ON joborder.recruiter = recruiter_user.user_id
             LEFT JOIN user AS owner_user
                 ON joborder.owner = owner_user.user_id
+            LEFT JOIN contact
+                ON joborder.contact_id = contact.contact_id
             WHERE
                 joborder.site_id = %s
                 %s
