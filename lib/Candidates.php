@@ -1764,7 +1764,6 @@ class CandidatesDataGrid extends DataGrid
                                       'pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'chineseName\']).\'</a>\';',
                                       'sortableColumn' => 'chineseName',
                                       'pagerWidth'     => 75,
-                                      'pagerOptional'  => false,
                                       'alphaNavigation'=> true,
                                       'filter'         => 'candidate.chinese_name'),
                                       

@@ -592,7 +592,11 @@
                             <label id="extraGenderLabel" for="extraGender">Gender:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="extraGender" id="extraGender" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['extraGender'])) $this->_($this->preassignedFields['extraGender']); ?>" />
+                            <select id="extraGender" tabindex="<?php echo($tabIndex++); ?>" class="selectBox" name="extraGender" style="width: 150px;">
+                                <option value="" selected="">- Select from List -</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
                         </td>
                     </tr>
                     <tr>
@@ -600,7 +604,13 @@
                             <label id="maritalStatusLabel" for="maritalStatus">Marital Status:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="maritalStatus" id="maritalStatus" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['maritalStatus'])) $this->_($this->preassignedFields['maritalStatus']); ?>" />
+                            <select id="maritalStatus" tabindex="<?php echo($tabIndex++); ?>" class="selectBox" name="maritalStatus" style="width: 150px;">
+                                <option value="" selected="">- Select from List -</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Divorced">Divorced</option>
+                                <option value="Widowed">Widowed</option>
+                            </select>
                         </td>
                     </tr>
                     <tr>

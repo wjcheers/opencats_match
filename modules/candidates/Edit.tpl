@@ -480,15 +480,25 @@
                             <label id="extraGenderLabel" for="extraGender">Gender:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="extraGender" name="extraGender" value="<?php $this->_($this->data['extraGender']); ?>" style="width: 150px;" />
+                            <select id="extraGender" class="selectBox" name="extraGender" style="width: 150px;">
+                                <option value=""></option>
+                                <option value="Male"<?php if($this->data['extraGender'] == 'Male') echo ' selected=""'; ?>>Male</option>
+                                <option value="Female"<?php if($this->data['extraGender'] == 'Female') echo ' selected=""'; ?>>Female</option>
+                            </select>
                         </td>
                     </tr>
                     <tr>
                         <td class="tdVertical">
                             <label id="maritalStatusLabel" for="maritalStatus">Marital Status:</label>
                         </td>
-                        <td class="tdData">
-                            <input type="text" class="inputbox" id="maritalStatus" name="maritalStatus" value="<?php $this->_($this->data['maritalStatus']); ?>" style="width: 150px;" />
+                        <td class="tdData">                        
+                            <select id="maritalStatus" class="selectBox" name="maritalStatus" style="width: 150px;">
+                                <option value=""></option>
+                                <option value="Single"<?php if($this->data['maritalStatus'] == 'Single') echo ' selected=""'; ?>>Single</option>
+                                <option value="Married"<?php if($this->data['maritalStatus'] == 'Married') echo ' selected=""'; ?>>Married</option>
+                                <option value="Divorced"<?php if($this->data['maritalStatus'] == 'Divorced') echo ' selected=""'; ?>>Divorced</option>
+                                <option value="Widowed"<?php if($this->data['maritalStatus'] == 'Widowed') echo ' selected=""'; ?>>Widowed</option>
+                            </select>
                         </td>
                     </tr>
                     <tr>
