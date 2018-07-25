@@ -21,9 +21,9 @@ class candidatesListByViewDataGrid extends CandidatesDataGrid
         $this->defaultSortDirection = 'DESC';
 
         $this->_defaultColumns = array(
-            array('name' => 'Attachments', 'width' => 31),
             array('name' => 'First Name', 'width' => 75),
             array('name' => 'Last Name', 'width' => 85),
+            array('name' => 'Chinese Name', 'width' => 75),
             array('name' => 'City', 'width' => 75),
             array('name' => 'State', 'width' => 50),
             array('name' => 'Key Skills', 'width' => 215),
@@ -86,9 +86,9 @@ class candidatesSavedListByViewDataGrid extends CandidatesDataGrid
         $this->defaultSortDirection = 'DESC';
 
         $this->_defaultColumns = array(
-            array('name' => 'Attachments', 'width' => 31),
             array('name' => 'First Name', 'width' => 75),
             array('name' => 'Last Name', 'width' => 85),
+            array('name' => 'Chinese Name', 'width' => 75),
             array('name' => 'City', 'width' => 75),
             array('name' => 'State', 'width' => 50),
             array('name' => 'Key Skills', 'width' => 200),
