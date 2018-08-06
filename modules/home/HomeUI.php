@@ -238,8 +238,6 @@ class HomeUI extends UserInterface
         }
         $wildCardQuickSearch = $query;
 
-        $search = new QuickSearch($this->_siteID);
-
         if (!empty($candidatesRS))
         {
             foreach ($candidatesRS as $rowIndex => $row)

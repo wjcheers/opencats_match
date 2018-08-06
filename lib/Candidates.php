@@ -955,70 +955,70 @@ class Candidates
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['webSite'], '/')));
                     // return $link . ' ' . $parsedUrl['path'];
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                         return $field['candidateID'];                
                     }
                 }
                 if (!empty($field['notes']))
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['notes'], '/')));
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                         return $field['candidateID'];                
                     }
                 }
                 if (!empty($field['facebook']))
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['facebook'], '/')));
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                         return $field['candidateID'];                
                     }
                 }
                 if (!empty($field['github']))
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['github'], '/')));
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                         return $field['candidateID'];                
                     }
                 }
                 if (!empty($field['linkedin']))
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['linkedin'], '/')));
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                         return $field['candidateID'];                
                     }
                 }
                 if (!empty($field['googleplus']))
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['googleplus'], '/')));
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                         return $field['candidateID'];                
                     }
                 }
                 if (!empty($field['twitter']))
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['twitter'], '/')));
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                         return $field['candidateID'];                
                     }
                 }
                 if (!empty($field['link1']))
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['link1'], '/')));
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                         return $field['candidateID'];                
                     }
                 }
                 if (!empty($field['link2']))
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['link2'], '/')));
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                         return $field['candidateID'];                
                     }
                 }
                 if (!empty($field['link3']))
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['link3'], '/')));
-                    if (strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                         return $field['candidateID'];                
                     }
                 }
