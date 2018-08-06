@@ -18,7 +18,7 @@
             <?php if ($this->matchKeySkills): ?>
             
             <!-- JO KeySkills-->
-            <p class="note">Job Orders Key Skills Matched</p>
+            <p class="note">Job Orders Key Skills Matched (First 500 results)</p>
             <?php if (!empty($this->jobOrdersKeySkillsRS)): ?>
                 <table class="sortable" width="100%">
                     <tr>
@@ -68,7 +68,7 @@
             <! -- matchKeySkills -->
             
             <!-- JO -->
-            <p class="note">Job Orders Results</p>
+            <p class="note">Job Orders Results (First 500 results)</p>
             <?php if (!empty($this->jobOrdersRS)): ?>
                 <table class="sortable" width="100%">
                     <tr>
@@ -114,7 +114,7 @@
             <!-- /JO -->
 
             <!-- Candidates -->
-            <p class="note">Candidates Results</p>
+            <p class="note">Candidates Results (First 1000 results)</p>
             <?php if (!empty($this->candidatesRS)): ?>
                 <table class="sortable" width="100%">
                     <tr>
@@ -164,7 +164,7 @@
             <!-- /Candidates -->
 
             <!-- Companies -->
-            <p class="note">Companies Results</p>
+            <p class="note">Companies Results (First 100 results)</p>
             <?php if (!empty($this->companiesRS)): ?>
                 <table class="sortable" width="100%">
                     <thead>
@@ -198,7 +198,7 @@
             <!-- /Companies -->
 
             <!-- Contacts -->
-            <p class="note">Contacts Results</p>
+            <p class="note">Contacts Results (First 100 results)</p>
             <?php if (!empty($this->contactsRS)): ?>
                 <table class="sortable" width="100%">
                     <tr>

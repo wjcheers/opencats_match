@@ -1452,7 +1452,8 @@ class QuickSearch
             ORDER BY
                 candidate.date_modified DESC,
                 candidate.first_name ASC,
-                candidate.last_name ASC",
+                candidate.last_name ASC
+            LIMIT 1000",
             $wildCardString,
             $wildCardString,
             $wildCardString,
@@ -1515,7 +1516,8 @@ class QuickSearch
             AND
                 company.site_id = %s
             ORDER BY
-                company.name ASC",
+                company.name ASC
+            LIMIT 100",
             $wildCardString,
             $wildCardString,
             $wildCardString,
@@ -1607,7 +1609,8 @@ class QuickSearch
             AND
                 company.site_id = %s
             ORDER BY
-                name ASC",
+                name ASC
+            LIMIT 100",
             $wildCardString,
             $wildCardString,
             $wildCardString,
@@ -1684,7 +1687,8 @@ class QuickSearch
             AND
                 company.site_id = %s
             ORDER BY
-                name ASC",
+                name ASC
+            LIMIT 500",
             $wildCardString,
             $wildCardString,
             $this->_siteID,
@@ -1812,7 +1816,8 @@ class QuickSearch
             AND
                 company.site_id = %s
             ORDER BY
-                name ASC",
+                name ASC
+            LIMIT 500",
             $sql_in,
             $this->_siteID,
             $this->_siteID
