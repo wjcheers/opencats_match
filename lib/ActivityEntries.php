@@ -156,6 +156,46 @@ class ActivityEntries
             $this->_updateDataItemModified($jobOrderID, DATA_ITEM_JOBORDER);
         }
 
+        if(($dataItemType == DATA_ITEM_CANDIDATE) && ($jobOrderID != -1))
+        {
+            $sql = sprintf(
+                "UPDATE
+                    candidate_joborder
+                SET
+                    last_notes  = 
+                        CONCAT(
+                            '<strong>',
+                            DATE_FORMAT(NOW(), '%%m-%%d-%%y'),
+                            ' (',
+                            %s,
+                            '):</strong> ',
+                            IF(
+                                ISNULL(%s) OR %s = '',
+                                '(No Notes)',
+                                %s
+                            )
+                        )
+                WHERE
+                    candidate_id    = %s
+                AND
+                    joborder_id     = %s                
+                AND
+                    site_id = %s",
+                $this->_db->makeQueryString($_SESSION['CATS']->getFullName()),
+                $this->_db->makeQueryString($activityNotes),
+                $this->_db->makeQueryString($activityNotes),
+                $this->_db->makeQueryString($activityNotes),
+                $this->_db->makeQueryInteger($dataItemID),
+                $this->_db->makeQueryInteger($jobOrderID),
+                $this->_siteID
+            );
+            $queryResult = $this->_db->query($sql);
+            if (!$queryResult)
+            {
+                return -1;
+            }
+        }
+
         return $activityEntryID;
     }
 
@@ -288,6 +328,73 @@ class ActivityEntries
             $jobOrderID != $newJobOrderID)
         {
             $this->_updateDataItemModified($newJobOrderID, DATA_ITEM_JOBORDER);
+        }
+
+        if($activityIDRS['dataItemType'] == DATA_ITEM_CANDIDATE)
+        {            
+            if(!empty($newJobOrderID) && ctype_digit((string) $newJobOrderID))
+            {
+                $sql = sprintf(
+                    "UPDATE
+                        candidate_joborder
+                    SET
+                        last_notes  = 
+                            CONCAT(
+                                '<strong>',
+                                DATE_FORMAT(NOW(), '%%m-%%d-%%y'),
+                                ' (',
+                                %s,
+                                '):</strong> ',
+                                IF(
+                                    ISNULL(%s) OR %s = '',
+                                    '(No Notes)',
+                                    %s
+                                )
+                            )
+                    WHERE
+                        candidate_id    = %s
+                    AND
+                        joborder_id     = %s                
+                    AND
+                        site_id = %s",
+                    $this->_db->makeQueryString($_SESSION['CATS']->getFullName()),
+                    $this->_db->makeQueryString($activityNotes),
+                    $this->_db->makeQueryString($activityNotes),
+                    $this->_db->makeQueryString($activityNotes),
+                    $this->_db->makeQueryInteger($activityIDRS['dataItemID']),
+                    $this->_db->makeQueryInteger($newJobOrderID),
+                    $this->_siteID
+                );
+                $queryResult = $this->_db->query($sql);
+                if (!$queryResult)
+                {
+                    return false;
+                }
+            }
+            else if(!empty($activityIDRS['jobOrderID']) && ctype_digit((string) $activityIDRS['jobOrderID']))
+            {
+                // this is job order ID change case. erase last_notes of original candidate_joborder.last_notes
+                $sql = sprintf(
+                    "UPDATE
+                        candidate_joborder
+                    SET
+                        last_notes      = ''
+                    WHERE
+                        candidate_id    = %s
+                    AND
+                        joborder_id     = %s                
+                    AND
+                        site_id = %s",
+                    $this->_db->makeQueryInteger($activityIDRS['dataItemID']),
+                    $this->_db->makeQueryInteger($activityIDRS['jobOrderID']),
+                    $this->_siteID
+                );
+                $queryResult = $this->_db->query($sql);
+                if (!$queryResult)
+                {
+                    return false;
+                }
+            }
         }
 
         return true;

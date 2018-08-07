@@ -555,40 +555,9 @@ class Pipelines
                 candidate_joborder_status.short_description AS status,
                 candidate_joborder.candidate_joborder_id AS candidateJobOrderID,
                 candidate_joborder.rating_value AS ratingValue,
+                candidate_joborder.last_notes AS lastActivity,
                 owner_user.first_name AS ownerFirstName,
                 owner_user.last_name AS ownerLastName,
-                (
-                    SELECT
-                        CONCAT(
-                            '<strong>',
-                            DATE_FORMAT(activity.date_created, '%%m-%%d-%%y'),
-                            ' (',
-                            entered_by_user.first_name,
-                            ' ',
-                            entered_by_user.last_name,
-                            '):</strong> ',
-                            IF(
-                                ISNULL(activity.notes) OR activity.notes = '',
-                                '(No Notes)',
-                                activity.notes
-                            )
-                        )
-                    FROM
-                        activity
-                    LEFT JOIN activity_type
-                        ON activity.type = activity_type.activity_type_id
-                    LEFT JOIN user AS entered_by_user
-                        ON activity.entered_by = entered_by_user.user_id
-                    WHERE
-                        activity.data_item_id = candidate.candidate_id
-                    AND
-                        activity.data_item_type = %s
-                    AND
-                        activity.joborder_id = %s
-                    ORDER BY
-                        activity.date_created DESC
-                    LIMIT 1
-                ) AS lastActivity,
                 IF((
                     SELECT
                         COUNT(*)
@@ -626,8 +595,6 @@ class Pipelines
             GROUP BY
                 candidate_joborder.candidate_id
             %s",
-            DATA_ITEM_CANDIDATE,
-            $this->_db->makeQueryInteger($jobOrderID),
             $this->_db->makeQueryInteger($jobOrderID),
             PIPELINE_STATUS_SUBMITTED,
             $this->_siteID,

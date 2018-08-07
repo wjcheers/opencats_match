@@ -273,7 +273,14 @@ if (!eval(Hooks::get('JO_AJAX_GET_PIPELINE'))) return;
             <td valign="top" nowrap="nowrap"><?php echo(htmlspecialchars($pipelinesData['dateCreated'])); ?></td>
             <td valign="top" nowrap="nowrap"><?php echo(htmlspecialchars($pipelinesData['addedByAbbrName'])); ?></td>
             <td valign="top" nowrap="nowrap"><?php echo(htmlspecialchars($pipelinesData['status'])); ?></td>
-            <td valign="top"><?php echo($pipelinesData['lastActivity']); ?></td>
+            <td valign="top">
+                <?php if($pipelinesData['lastActivity']) : echo($pipelinesData['lastActivity']); ?>
+                <?php else : ?>
+                        <a href="javascript:void(0);" onclick="if(document.getElementById('pipelineEntryOpen<?php echo($rowNumber); ?>').style.display == '') { document.getElementById('pipelineDetails<?php echo($rowNumber); ?>').style.display = ''; document.getElementById('pipelineEntryClose<?php echo($rowNumber); ?>').style.display = ''; document.getElementById('pipelineEntryOpen<?php echo($rowNumber); ?>').style.display = 'none'; PipelineDetails_populate(<?php echo($pipelinesData['candidateJobOrderID']); ?>, 'pipelineEntryInner<?php echo($rowNumber); ?>', '<?php echo($_SESSION['CATS']->getCookie()); ?>'); } else {document.getElementById('pipelineDetails<?php echo($rowNumber); ?>').style.display = 'none'; document.getElementById('pipelineEntryClose<?php echo($rowNumber); ?>').style.display = 'none'; document.getElementById('pipelineEntryOpen<?php echo($rowNumber); ?>').style.display = '';}">
+                            Show/Hide History
+                        </a>           
+                <?php endif; ?>
+            </td>
 <?php if (!$isPopup): ?>
             <td align="center" nowrap="nowrap">
                 <?php if ($_SESSION['CATS']->getAccessLevel() >= ACCESS_LEVEL_EDIT && !$_SESSION['CATS']->hasUserCategory('sourcer')): ?>
