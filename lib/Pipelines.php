@@ -346,6 +346,29 @@ class Pipelines
         );
         $this->_db->query($sql);
 
+        if(($statusID >= PIPELINE_STATUS_SUBMITTED) && ($statusID != PIPELINE_STATUS_NOTINCONSIDERATION))
+        {            
+            $sql = sprintf(
+                "UPDATE
+                    candidate
+                SET
+                    candidate.is_submitted = 1
+                WHERE
+                    candidate_id = %d
+                AND
+                    site_id = %s",
+                $this->_db->makeQueryInteger($candidateID),
+                $this->_db->makeQueryInteger($this->_siteID)  
+            );
+            $queryResult = $this->_db->query($sql);
+            /*
+            if (!$queryResult)
+            {
+                return;
+            }
+            */
+        }
+
         /* Add history. */
         $historyID = $this->addStatusHistory(
             $candidateID, $jobOrderID, $statusID, $oldStatusID

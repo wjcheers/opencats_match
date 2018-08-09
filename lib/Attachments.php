@@ -167,6 +167,40 @@ class Attachments
 
         $this->updateSiteSize();
 
+        if($dataItemType == DATA_ITEM_CANDIDATE)
+        {
+            $sql = "UPDATE
+                        candidate
+                    SET
+                        candidate.is_attachment = 1
+                    ";
+            
+            if((strpos($attachmentTitle, 'Resume') !== false) ||
+               (strpos($attachmentTitle, 'Report') !== false))
+            {
+                $sql .= ", candidate.is_resume = 1
+                        ";
+            }
+            if(strpos($attachmentTitle, 'PersonalAgreement') !== false)
+            {
+                $sql .= ", candidate.is_agreement = 1
+                        ";
+            }
+            $sql .= sprintf(
+                "WHERE
+                    candidate_id = %s
+                AND
+                    site_id = %s",
+                $this->_db->makeQueryInteger($dataItemID),
+                $this->_db->makeQueryInteger($this->_siteID)                    
+            );
+            $queryResult = $this->_db->query($sql);
+            if (!$queryResult)
+            {
+                return -1;
+            }
+        }
+        
         return $lastInsertID;
     }
 

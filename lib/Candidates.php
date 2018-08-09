@@ -1464,8 +1464,8 @@ class CandidatesDataGrid extends DataGrid
         $this->_dataItemIDColumn = 'candidate.candidate_id';
 
         $this->_classColumns = array(
-            'Attachments' => array('select' => 'IF(candidate_joborder_submitted.candidate_joborder_id, 1, 0) AS submitted,
-                                                IF(attachment.attachment_id, 1, 0) AS attachmentPresent',
+            'Attachments' => array('select' => 'candidate.is_submitted AS submitted,
+                                                candidate.is_attachment AS attachmentPresent',
 
                                      'pagerRender' => 'if ($rsData[\'submitted\'] == 1)
                                                     {
@@ -1487,24 +1487,15 @@ class CandidatesDataGrid extends DataGrid
 
                                                     return $return;
                                                    ',
-
-                                     'join'     => 'LEFT JOIN attachment
-                                                        ON candidate.candidate_id = attachment.data_item_id
-														AND attachment.data_item_type = '.DATA_ITEM_CANDIDATE.'
-                                                    LEFT JOIN candidate_joborder AS candidate_joborder_submitted
-                                                        ON candidate_joborder_submitted.candidate_id = candidate.candidate_id
-                                                        AND candidate_joborder_submitted.status >= '.PIPELINE_STATUS_SUBMITTED.'
-                                                        AND candidate_joborder_submitted.site_id = '.$this->_siteID.'
-                                                        AND candidate_joborder_submitted.status != '.PIPELINE_STATUS_NOTINCONSIDERATION,
                                      'pagerWidth'    => 34,
                                      'pagerOptional' => true,
                                      'pagerNoTitle' => true,
                                      'sizable'  => false,
                                      'exportable' => false,
-                                     'filter'         => 'candidate_joborder_submitted.candidate_joborder_id',
+                                     'filter'         => 'candidate.is_submitted',
                                      'filterable' => '===~'),
                                      
-            'A' => array('select' => 'IF(attachmentA.attachment_id, 1, 0) AS haveAgreement',
+            'A' => array('select' => 'candidate.is_agreement AS haveAgreement',
 
                                      'pagerRender' => 'if ($rsData[\'haveAgreement\'] == 1)
                                                     {
@@ -1517,16 +1508,11 @@ class CandidatesDataGrid extends DataGrid
 
                                                     return $return;
                                                    ',
-
-                                     'join'     => 'LEFT JOIN attachment AS attachmentA
-                                                        ON candidate.candidate_id = attachmentA.data_item_id
-														AND attachmentA.data_item_type = '.DATA_ITEM_CANDIDATE.'
-                                                        AND attachmentA.title like \'%personalagreement%\'',
-
                                      'pagerWidth'    => 17,
+                                     'filter'         => 'candidate.is_agreement',
                                      'sizable'  => false),
 
-            'R' => array('select' => 'IF(attachmentR.attachment_id, 1, 0) AS haveResume',
+            'R' => array('select' => 'candidate.is_resume AS haveResume',
 
                                      'pagerRender' => 'if ($rsData[\'haveResume\'] == 1)
                                                     {
@@ -1539,13 +1525,8 @@ class CandidatesDataGrid extends DataGrid
 
                                                     return $return;
                                                    ',
-
-                                     'join'     => 'LEFT JOIN attachment AS attachmentR
-                                                        ON candidate.candidate_id = attachmentR.data_item_id
-														AND attachmentR.data_item_type = '.DATA_ITEM_CANDIDATE.'
-                                                        AND (attachmentR.title like \'%Resume%\' OR attachmentR.title like \'%Report%\')',
-
                                      'pagerWidth'    => 17,
+                                     'filter'         => 'candidate.is_resume',
                                      'sizable'  => false),
 
             'E' => array('select' => 'candidate.email1 AS e1, candidate.email2 AS e2',
