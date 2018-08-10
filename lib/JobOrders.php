@@ -195,6 +195,33 @@ class JobOrders
 
         $jobOrderID = $this->_db->getLastInsertID();
 
+        // update jobs number for company
+        $sql = sprintf(
+            "UPDATE
+                company
+            SET
+                company.jobs = (
+                    SELECT COUNT(*) FROM joborder
+                                    WHERE
+                                        company_id = %s
+                                    AND
+                                        site_id = %s
+                                )
+            WHERE
+                company_id = %s
+            AND
+                site_id = %s",
+            $this->_db->makeQueryInteger($companyID),
+            $this->_db->makeQueryInteger($this->_siteID),
+            $this->_db->makeQueryInteger($companyID),
+            $this->_db->makeQueryInteger($this->_siteID)
+        );
+        $queryResult = $this->_db->query($sql);
+        if (!$queryResult)
+        {
+            return -1;
+        }
+
         /* Store history. */
         $history = new History($this->_siteID);
         $history->storeHistoryNew(DATA_ITEM_JOBORDER, $jobOrderID);
@@ -337,6 +364,25 @@ class JobOrders
      */
     public function delete($jobOrderID)
     {
+        $companyID = -1;
+        $sql = sprintf(
+            "SELECT
+                company_id AS companyID
+            FROM
+                joborder
+            WHERE
+                joborder_id = %s
+            AND
+                site_id = %s",
+            $this->_db->makeQueryInteger($jobOrderID),
+            $this->_siteID
+        );
+        $rs = $this->_db->getAssoc($sql);
+        if (!empty($rs))
+        {
+            $companyID = $rs['companyID'];
+        }
+
         /* Delete the job order. */
         $sql = sprintf(
             "DELETE FROM
@@ -409,6 +455,32 @@ class JobOrders
 
         /* Delete extra fields. */
         $this->extraFields->deleteValueByDataItemID($jobOrderID);
+        
+        if ($companyID != -1)
+        {
+            // update jobs number for company
+            $sql = sprintf(
+                "UPDATE
+                    company
+                SET
+                    company.jobs = (
+                        SELECT COUNT(*) FROM joborder
+                                        WHERE
+                                            company_id = %s
+                                        AND
+                                            site_id = %s
+                                    )
+                WHERE
+                    company_id = %s
+                AND
+                    site_id = %s",
+                $this->_db->makeQueryInteger($companyID),
+                $this->_db->makeQueryInteger($this->_siteID),
+                $this->_db->makeQueryInteger($companyID),
+                $this->_db->makeQueryInteger($this->_siteID)
+            );
+            $queryResult = $this->_db->query($sql);
+        }
     }
 
     /**

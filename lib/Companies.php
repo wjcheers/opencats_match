@@ -804,16 +804,7 @@ class CompaniesDataGrid extends DataGrid
                                       'alphaNavigation'=> true,
                                       'filter'         => 'company.name'),
 
-            'Jobs' =>       array('select'   => '(
-                                                            SELECT
-                                                                COUNT(*)
-                                                            FROM
-                                                                joborder
-                                                            WHERE
-                                                                company_id = company.company_id
-                                                            AND
-                                                                site_id = '.$this->_siteID.'
-                                                        ) AS jobs',
+            'Jobs' =>       array('select'   => 'company.jobs AS jobs',
                                      'pagerRender'      => 'if ($rsData[\'jobs\'] != 0) {return $rsData[\'jobs\'];} else {return \'\';}',
                                      'sortableColumn'     => 'jobs',
                                      'pagerWidth'    => 40,
