@@ -176,14 +176,6 @@ class ImportantPipelineDashboard extends DataGrid
                 OR
                     candidate_joborder.status = %s
                 )
-            AND
-                (
-                    joborder.status = 'Active'
-                OR
-                    joborder.status = 'OnHold'
-                OR
-                    joborder.status = 'Full'
-                )
             %s
             %s
             %s

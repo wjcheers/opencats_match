@@ -71,7 +71,7 @@
             <table>
                 <tr>
                     <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
-                        <div class="noteUnsizedSpan" style="width: 1220px;">Important Candidates (Submitted, Interviewing, Offered in Active Job Orders) - Page <?php echo($this->dataGrid->getCurrentPageHTML()); ?> (<?php echo($this->dataGrid->getNumberOfRows()); ?> Items)</div>
+                        <div class="noteUnsizedSpan" style="width: 1220px;">Important Candidates (Submitted, Interviewing, Offered in Job Orders) - Page <?php echo($this->dataGrid->getCurrentPageHTML()); ?> (<?php echo($this->dataGrid->getNumberOfRows()); ?> Items)</div>
                         <?php $this->dataGrid->draw(); ?>
                         <div style="float:right;"><?php $this->dataGrid->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGrid->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 
