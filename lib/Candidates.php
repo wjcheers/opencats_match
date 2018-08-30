@@ -1495,6 +1495,23 @@ class CandidatesDataGrid extends DataGrid
                                      'filter'         => 'candidate.is_submitted',
                                      'filterable' => '===~'),
                                      
+            'I' => array('select' => 'candidate.is_interviewed AS haveInterview',
+
+                                     'pagerRender' => 'if ($rsData[\'haveInterview\'] == 1)
+                                                    {
+                                                        $return = \'<img src="images/job_orders.gif" alt="" width="16" height="16" title="Have Interview" />\';
+                                                    }
+                                                    else
+                                                    {
+                                                        $return = \'<img src="images/mru/blank.gif" alt="" width="16" height="16" />\';
+                                                    }
+
+                                                    return $return;
+                                                   ',
+                                     'pagerWidth'    => 17,
+                                     'filter'         => 'candidate.is_interviewed',
+                                     'sizable'  => false),
+
             'A' => array('select' => 'candidate.is_agreement AS haveAgreement',
 
                                      'pagerRender' => 'if ($rsData[\'haveAgreement\'] == 1)

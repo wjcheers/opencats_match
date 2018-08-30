@@ -368,6 +368,28 @@ class Pipelines
             }
             */
         }
+        if($statusID == PIPELINE_STATUS_INTERVIEWING)
+        {            
+            $sql = sprintf(
+                "UPDATE
+                    candidate
+                SET
+                    candidate.is_interviewed = 1
+                WHERE
+                    candidate_id = %d
+                AND
+                    site_id = %s",
+                $this->_db->makeQueryInteger($candidateID),
+                $this->_db->makeQueryInteger($this->_siteID)  
+            );
+            $queryResult = $this->_db->query($sql);
+            /*
+            if (!$queryResult)
+            {
+                return;
+            }
+            */
+        }
 
         /* Add history. */
         $historyID = $this->addStatusHistory(
