@@ -589,7 +589,15 @@
                 <?php endif; ?>
                 &nbsp;&nbsp;&nbsp;&nbsp;
             <?php endif; ?>
-            <a id="agreement_personal_check_link" href="https://docs.google.com/spreadsheets/u/1/d/1ZpZGtAzFP8ISaWlG11y63_2jx5J5u4Y2Mt8D4r4ehtI/gviz/tq?tqx=out:html&tq=select+*+where+D+%3D+%27<?php $this->_($this->data['email1']); ?>%27+or+D+%3D+%27<?php $this->_($this->data['email2']); ?>%27&gid=1110772698" target="_black">
+            <?php if (!empty($this->data['email1']) && !empty($this->data['email2'])): ?>
+            <a id="agreement_personal_check_link" href="https://docs.google.com/spreadsheets/u/1/d/1ZpZGtAzFP8ISaWlG11y63_2jx5J5u4Y2Mt8D4r4ehtI/gviz/tq?tqx=out:html&tq=select+*+where+D+contains+%27<?php $this->_($this->data['email1']); ?>%27+or+D+contains+%27<?php $this->_($this->data['email2']); ?>%27&gid=1110772698" target="_black">
+            <?php elseif (!empty($this->data['email1'])) : ?>
+            <a id="agreement_personal_check_link" href="https://docs.google.com/spreadsheets/u/1/d/1ZpZGtAzFP8ISaWlG11y63_2jx5J5u4Y2Mt8D4r4ehtI/gviz/tq?tqx=out:html&tq=select+*+where+D+contains+%27<?php $this->_($this->data['email1']); ?>%27&gid=1110772698" target="_black">
+            <?php elseif (!empty($this->data['email2'])) : ?>
+            <a id="agreement_personal_check_link" href="https://docs.google.com/spreadsheets/u/1/d/1ZpZGtAzFP8ISaWlG11y63_2jx5J5u4Y2Mt8D4r4ehtI/gviz/tq?tqx=out:html&tq=select+*+where+D+contains+%27<?php $this->_($this->data['email2']); ?>%27&gid=1110772698" target="_black">
+            <?php else : ?>
+            <a id="agreement_personal_check_link" href="https://docs.google.com/spreadsheets/u/1/d/1ZpZGtAzFP8ISaWlG11y63_2jx5J5u4Y2Mt8D4r4ehtI/gviz/tq?tqx=out:html&tq=select+*&gid=1110772698" target="_black">
+            <?php endif; ?>            
                 <img src="images/actions/view.gif" width="16" height="16" class="absmiddle"  border="0" />&nbsp;Check Agreement
             </a>
             &nbsp;&nbsp;&nbsp;&nbsp;
