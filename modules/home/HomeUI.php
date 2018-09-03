@@ -112,7 +112,7 @@ class HomeUI extends UserInterface
         $dataGrid = DataGrid::get("home:ImportantPipelineDashboard", $dataGridProperties);
 
         $this->_template->assign('dataGrid', $dataGrid);
-        
+                
         $dataGrid = DataGrid::get("home:QualifyingPipelineDashboard", $dataGridProperties);
 
         $this->_template->assign('dataGridQualifying', $dataGrid);
@@ -133,9 +133,21 @@ class HomeUI extends UserInterface
 
         $this->_template->assign('dataGridEverVerified', $dataGrid);
         
-        $dataGrid = DataGrid::get("home:DriftingDashboard", $dataGridProperties);
+        $dataGrid = DataGrid::get("home:SubmittedPipelineDashboard", $dataGridProperties);
+
+        $this->_template->assign('dataGridSubmitted', $dataGrid);
         
-        $this->_template->assign('dataGridDrifting', $dataGrid);
+        $dataGrid = DataGrid::get("home:InterviewingPipelineDashboard", $dataGridProperties);
+
+        $this->_template->assign('dataGridInterviewing', $dataGrid);
+        
+        $dataGrid = DataGrid::get("home:OfferedPipelineDashboard", $dataGridProperties);
+
+        $this->_template->assign('dataGridOffered', $dataGrid);
+        
+        //$dataGrid = DataGrid::get("home:DriftingDashboard", $dataGridProperties);
+        
+        //$this->_template->assign('dataGridDrifting', $dataGrid);
 
         $dataGridProperties = array(
             'rangeStart'    => 0,

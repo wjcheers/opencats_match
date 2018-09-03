@@ -68,6 +68,7 @@
                 </tr>
             </table>
 
+            
             <table>
                 <tr>
                     <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
@@ -83,7 +84,7 @@
                     </td>
                 </tr>
             </table>
-
+                        
             <table>
                 <tr>
                     <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
@@ -151,7 +152,7 @@
             <table>
                 <tr>
                     <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
-                        <div class="noteUnsizedSpan" style="width: 1220px;">Ever Verified Candidates in Active Job Orders - Page <?php echo($this->dataGridEverVerified->getCurrentPageHTML()); ?> (<?php echo($this->dataGridEverVerified->getNumberOfRows()); ?> Items)</div>
+                        <div class="noteUnsizedSpan" style="width: 1220px;">Ever Verified Candidates in Active Job Orders (Last 6 months) - Page <?php echo($this->dataGridEverVerified->getCurrentPageHTML()); ?> (<?php echo($this->dataGridEverVerified->getNumberOfRows()); ?> Items)</div>
                         <?php $this->dataGridEverVerified->draw(); ?>
                         <div style="float:right;"><?php $this->dataGridEverVerified->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridEverVerified->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 
@@ -164,7 +165,55 @@
                 </tr>
             </table>
             
-            <!--
+            <table>
+                <tr>
+                    <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
+                        <div class="noteUnsizedSpan" style="width: 1220px;">Submitted Candidates - Page <?php echo($this->dataGridSubmitted->getCurrentPageHTML()); ?> (<?php echo($this->dataGridSubmitted->getNumberOfRows()); ?> Items)</div>
+                        <?php $this->dataGridSubmitted->draw(); ?>
+                        <div style="float:right;"><?php $this->dataGridSubmitted->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridSubmitted->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+
+                        <?php if (!$this->dataGridSubmitted->getNumberOfRows()): ?>
+                        <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
+                            &nbsp;
+                        </div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            </table>
+          
+            <table>
+                <tr>
+                    <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
+                        <div class="noteUnsizedSpan" style="width: 1220px;">Interviewing Candidates - Page <?php echo($this->dataGridInterviewing->getCurrentPageHTML()); ?> (<?php echo($this->dataGridInterviewing->getNumberOfRows()); ?> Items)</div>
+                        <?php $this->dataGridInterviewing->draw(); ?>
+                        <div style="float:right;"><?php $this->dataGridInterviewing->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridInterviewing->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+
+                        <?php if (!$this->dataGridInterviewing->getNumberOfRows()): ?>
+                        <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
+                            &nbsp;
+                        </div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            </table>
+         
+            <table>
+                <tr>
+                    <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
+                        <div class="noteUnsizedSpan" style="width: 1220px;">Offered Candidates - Page <?php echo($this->dataGridOffered->getCurrentPageHTML()); ?> (<?php echo($this->dataGridOffered->getNumberOfRows()); ?> Items)</div>
+                        <?php $this->dataGridOffered->draw(); ?>
+                        <div style="float:right;"><?php $this->dataGridOffered->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridOffered->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+
+                        <?php if (!$this->dataGridOffered->getNumberOfRows()): ?>
+                        <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
+                            &nbsp;
+                        </div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            </table>
+            
+            <?php /*
             <table>
                 <tr>
                     <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
@@ -180,7 +229,7 @@
                     </td>
                 </tr>
             </table>
-            -->
+            */ ?>
         </div>
     </div>
     <div id="bottomShadow"></div>
