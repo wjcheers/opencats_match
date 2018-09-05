@@ -1398,6 +1398,8 @@ class QuickSearch
                 OR CONCAT(candidate.last_name, ', ', candidate.first_name) LIKE %s
                 OR CONCAT(candidate.middle_name, ' ', candidate.last_name) LIKE %s
                 OR CONCAT(candidate.last_name, ' ', candidate.middle_name) LIKE %s
+                OR CONCAT(candidate.first_name, ' ', candidate.middle_name, ' ', candidate.last_name) LIKE %s
+                OR CONCAT(candidate.last_name, ', ', candidate.first_name, ' ', candidate.middle_name) LIKE %s
                 OR candidate.email1 LIKE %s
                 OR candidate.email2 LIKE %s
                 OR REPLACE(
@@ -1454,6 +1456,8 @@ class QuickSearch
                 candidate.first_name ASC,
                 candidate.last_name ASC
             LIMIT 1000",
+            $wildCardString,
+            $wildCardString,
             $wildCardString,
             $wildCardString,
             $wildCardString,
