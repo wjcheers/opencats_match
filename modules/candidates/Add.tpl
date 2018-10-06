@@ -672,6 +672,14 @@
                     </tr>
                     <tr>
                         <td class="tdVertical">
+                            <label id="whatsappLabel" for="whatsapp">WhatsApp:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="whatsapp" id="whatsapp" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['whatsapp'])) $this->_($this->preassignedFields['whatsapp']); ?>" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tdVertical">
                             <label id="functionsLabel" for="functions">Functions:</label>
                         </td>
                         <td class="tdData">

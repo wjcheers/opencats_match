@@ -337,6 +337,11 @@
                                 <td class="vertical">Wechat:</td>
                                 <td class="data"><?php $this->_($this->data['wechat']); ?></td>
                             </tr>
+
+                            <tr>
+                                <td class="vertical">WhatsApp:</td>
+                                <td class="data"><?php $this->_($this->data['whatsapp']); ?></td>
+                            </tr>
                             
                             <tr>
                                 <td class="vertical">Skype:</td>

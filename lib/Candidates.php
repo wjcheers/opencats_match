@@ -107,7 +107,7 @@ class Candidates
         $currentPay, $desiredPay, $notes, $webSite, $bestTimeToCall, $enteredBy, $owner,
         $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree,
         $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter,
-        $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
+        $link1, $link2, $link3, $line, $qq, $skype, $wechat, $whatsapp, $functions, $jobLevel,
         $gender = '', $race = '', $veteran = '', $disability = '',
         $skipHistory = false)
     {
@@ -143,7 +143,7 @@ class Candidates
                 date_modified,
                 chinese_name, job_title, extra_gender, marital_status, birth_year, highest_degree,
                 major, nationality, facebook, github, linkedin, googleplus, twitter,
-                link1, link2, link3, line, qq, skype, wechat, functions, job_level,
+                link1, link2, link3, line, qq, skype, wechat, whatsapp, functions, job_level,
                 eeo_ethnic_type_id,
                 eeo_veteran_type_id,
                 eeo_disability_status,
@@ -180,7 +180,7 @@ class Candidates
                 NOW(),
                 %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s,
                 %s,
                 %s,
@@ -234,6 +234,7 @@ class Candidates
             $this->_db->makeQueryString($qq),
             $this->_db->makeQueryString($skype),
             $this->_db->makeQueryString($wechat),
+            $this->_db->makeQueryString($whatsapp),
             $this->_db->makeQueryString($functions),
             $this->_db->makeQueryString($jobLevel),
             
@@ -298,7 +299,7 @@ class Candidates
         $notes, $webSite, $bestTimeToCall, $owner, $isHot, $email, $emailAddress,
         $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree,
         $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter,
-        $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
+        $link1, $link2, $link3, $line, $qq, $skype, $wechat, $whatsapp, $functions, $jobLevel,
         $gender = '', $race = '', $veteran = '', $disability = '')
     {
         $sql = sprintf(
@@ -354,6 +355,7 @@ class Candidates
                 qq                    = %s,
                 skype                 = %s,
                 wechat                = %s,
+                whatsapp              = %s,
                 functions             = %s,
                 job_level             = %s,
                 
@@ -413,6 +415,7 @@ class Candidates
             $this->_db->makeQueryString($qq),
             $this->_db->makeQueryString($skype),
             $this->_db->makeQueryString($wechat),
+            $this->_db->makeQueryString($whatsapp),
             $this->_db->makeQueryString($functions),
             $this->_db->makeQueryString($jobLevel),
             
@@ -627,6 +630,7 @@ class Candidates
                 candidate.qq AS qq, 
                 candidate.skype AS skype, 
                 candidate.wechat AS wechat, 
+                candidate.whatsapp AS whatsapp, 
                 candidate.functions AS functions, 
                 candidate.job_level AS jobLevel,
                 
@@ -726,6 +730,7 @@ class Candidates
                 candidate.qq AS qq, 
                 candidate.skype AS skype, 
                 candidate.wechat AS wechat, 
+                candidate.whatsapp AS whatsapp, 
                 candidate.functions AS functions, 
                 candidate.job_level AS jobLevel,
                 
@@ -1906,13 +1911,13 @@ class CandidatesDataGrid extends DataGrid
                                      'filterTypes'   => '=~==',
                                      'filter'         => 'candidate.wechat'),
                                      
-            'Wechat' => array('select'  => 'candidate.wechat AS wechat',
-                                     'sortableColumn'    => 'wechat',
+            'Whatsapp' => array('select'  => 'candidate.whatsapp AS whatsapp',
+                                     'sortableColumn'    => 'whatsapp',
                                      'pagerWidth'   => 110,
-                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'wechat\']);',
+                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'whatsapp\']);',
                                      'filterTypes'   => '=~==',
-                                     'filter'         => 'candidate.wechat'),
-                                     
+                                     'filter'         => 'candidate.whatsapp'),
+                                                                          
             'Functions' => array('select'  => 'candidate.functions AS functions',
                                      'sortableColumn'    => 'functions',
                                      'pagerWidth'   => 110,
