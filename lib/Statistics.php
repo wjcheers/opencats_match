@@ -541,7 +541,7 @@ class Statistics
             FROM
                 candidate
             WHERE
-                candidate.owner = %s
+                candidate.entered_by = %s
             %s
             AND
                 candidate.site_id = %s",

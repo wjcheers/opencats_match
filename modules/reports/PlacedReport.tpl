@@ -31,8 +31,6 @@
                     <td valign="top" align="left">
                         <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($placementsData['candidateID']) ?>" target="_blank"><?php $this->_($placementsData['lastName']) ?></a>
                     &nbsp;</td>
-                    <td valign="top" align="left"><?php $this->_($placementsData['firstName']) ?>&nbsp;</td>
-                    <td valign="top" align="left"><?php $this->_($placementsData['lastName']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($placementsData['ownerFullName']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($placementsData['dateSubmitted']) ?>&nbsp;</td>
                 </tr>
