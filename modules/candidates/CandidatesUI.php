@@ -2840,6 +2840,7 @@ class CandidatesUI extends UserInterface
 
         if (!eval(Hooks::get('CANDIDATE_ON_ADD_ACTIVITY_CHANGE_STATUS_PRE'))) return;
 
+        $pipelineUsers = 0;
         if ($this->isChecked('addActivity', $_POST))
         {
             /* Bail out if we don't have a valid job order ID. */
@@ -3168,6 +3169,49 @@ class CandidatesUI extends UserInterface
                     $notificationHTML .= '<p><span class="bold" style="color: #ff0000;">Error: An e-mail notification'
                         . ' could not be sent to the candidate owner and job order recruiter'
                         . ' because the owner/recruiter does not have a valid e-mail address.</span></p>';                    
+                }
+            }
+            
+            if ($newStatusDescription == "Placed")
+            {                
+                if (empty($pipelineUsers))
+                {
+                    $pipelineUsers = $pipelines->getUser($candidateID, $regardingID);
+                    if (!empty($pipelineUsers))
+                    {
+                        $pipelineUsers = $pipelineUsers[0];
+                    }
+                }
+
+                        
+                if(!empty($pipelineUsers) &&
+                   !empty($pipelineUsers['jobOrderRecruiterEmail']) &&
+                   !empty($pipelineUsers['candidateOwnerEmail']) &&
+                   $pipelineUsers['jobOrderRecruiterEmail'] != '' &&
+                   $pipelineUsers['candidateOwnerEmail'] != '')
+                {
+                    $description = 'Please care about your candidate. Keep in touch with him/her!';
+
+                    $nodifyDays = [7, 14, 21, 28, 42, 56, 84];
+                    foreach($nodifyDays as $days)
+                    {
+                        /* Create MySQL date string w/ 24hr time (YYYY-MM-DD HH:MM:SS). */
+                        $date = date('Y-m-d H:i:s', strtotime("+" . $days . " day", time()));
+                        
+                        $calendar = new Calendar($this->_siteID);
+                        $eventID = $calendar->addEvent(
+                            600, $date, $description, 0, $this->_userID,
+                            $candidateID, DATA_ITEM_CANDIDATE, -1, 'Placed for ' . $days . ' days',
+                            15, 1, $pipelineUsers['candidateOwnerEmail'] . ',' . $pipelineUsers['jobOrderRecruiterEmail'], 15,
+                            false, $_SESSION['CATS']->getTimeZoneOffset()
+                        );
+                        if ($eventID <= 0)
+                        {
+                            $this->fatalModal(
+                                'Failed to add calendar event.', $moduleDirectory
+                            );
+                        }
+                    }
                 }
             }
 
