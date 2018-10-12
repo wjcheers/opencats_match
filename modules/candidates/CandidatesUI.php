@@ -1265,7 +1265,6 @@ class CandidatesUI extends UserInterface
         $qq              = $this->getTrimmedInput('qq', $_POST);
         $skype           = $this->getTrimmedInput('skype', $_POST);
         $wechat          = $this->getTrimmedInput('wechat', $_POST);
-        $whatsapp        = $this->getTrimmedInput('whatsapp', $_POST);
         $functions       = $this->getTrimmedInput('functions', $_POST);
         $jobLevel        = $this->getTrimmedInput('jobLevel', $_POST);
         
@@ -1311,7 +1310,7 @@ class CandidatesUI extends UserInterface
             $email,
             $emailAddress,
             
-            $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree, $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $link1, $link2, $link3, $line, $qq, $skype, $wechat, $whatsapp, $functions, $jobLevel,
+            $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree, $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
             
             $gender,
             $race,
@@ -2546,7 +2545,6 @@ class CandidatesUI extends UserInterface
         $qq              = $this->getTrimmedInput('qq', $_POST);
         $skype           = $this->getTrimmedInput('skype', $_POST);
         $wechat          = $this->getTrimmedInput('wechat', $_POST);
-        $whatsapp        = $this->getTrimmedInput('whatsapp', $_POST);
         $functions       = $this->getTrimmedInput('functions', $_POST);
         $jobLevel        = $this->getTrimmedInput('jobLevel', $_POST);
 
@@ -2595,7 +2593,7 @@ class CandidatesUI extends UserInterface
             $this->_userID,
             $this->_userID,
             
-            $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree, $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $link1, $link2, $link3, $line, $qq, $skype, $wechat, $whatsapp, $functions, $jobLevel,
+            $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree, $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
             
             $gender,
             $race,

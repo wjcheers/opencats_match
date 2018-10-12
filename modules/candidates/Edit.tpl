@@ -560,14 +560,6 @@
                     </tr>
                     <tr>
                         <td class="tdVertical">
-                            <label id="whatsappLabel" for="whatsapp">WhatsApp:</label>
-                        </td>
-                        <td class="tdData">
-                            <input type="text" class="inputbox" id="whatsapp" name="whatsapp" value="<?php $this->_($this->data['whatsapp']); ?>" style="width: 150px;" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="tdVertical">
                             <label id="functionsLabel" for="functions">Functions:</label>
                         </td>
                         <td class="tdData">
