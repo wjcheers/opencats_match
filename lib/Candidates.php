@@ -1905,14 +1905,7 @@ class CandidatesDataGrid extends DataGrid
                                      'pagerRender'     => 'return htmlspecialchars($rsData[\'wechat\']);',
                                      'filterTypes'   => '=~==',
                                      'filter'         => 'candidate.wechat'),
-                                     
-            'Wechat' => array('select'  => 'candidate.wechat AS wechat',
-                                     'sortableColumn'    => 'wechat',
-                                     'pagerWidth'   => 110,
-                                     'pagerRender'     => 'return htmlspecialchars($rsData[\'wechat\']);',
-                                     'filterTypes'   => '=~==',
-                                     'filter'         => 'candidate.wechat'),
-                                     
+                                                                          
             'Functions' => array('select'  => 'candidate.functions AS functions',
                                      'sortableColumn'    => 'functions',
                                      'pagerWidth'   => 110,
