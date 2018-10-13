@@ -81,6 +81,10 @@ class ToolbarUI extends UserInterface
                 $this->checkLinkIsInSystem();
                 break;
 
+            case 'checkSocialMediaIsInSystem':
+                $this->checkSocialMediaIsInSystem();
+                break;
+
             case 'storeMonsterResumeText':
                 $this->storeMonsterResumeText();
                 break;
@@ -220,6 +224,49 @@ class ToolbarUI extends UserInterface
         flush();
     }
 
+    private function checkSocialMediaIsInSystem()
+    {
+        if (!eval(Hooks::get('TOOLBAR_CHECK_LINK'))) return;
+
+        $this->_authenticate();
+
+        $social = array();
+        if (isset($_GET['skype']))
+        {
+            $social['skype'] = $this->getTrimmedInput('skype', $_GET);
+        }
+        if (isset($_GET['qq']))
+        {
+            $social['qq'] = $this->getTrimmedInput('qq', $_GET);
+        }
+        if (isset($_GET['wechat']))
+        {
+            $social['wechat'] = $this->getTrimmedInput('wechat', $_GET);
+        }
+        if (isset($_GET['line']))
+        {
+            $social['line'] = $this->getTrimmedInput('line', $_GET);
+        }
+        if (empty($social))
+        {
+            $this->fatal('No e-mail address.');
+            return;
+        }
+
+        $candidates = new Candidates($this->_siteID);
+        $candidateID = $candidates->getIDBySocialMedia($social);
+        if ($candidateID < 0)
+        {
+            echo ':0';
+        }
+        else
+        {
+            echo ':candidateID=' . $candidateID;
+        }
+
+        flush();
+    }
+    
     private function storeMonsterResumeText()
     {
         $this->_authenticate();

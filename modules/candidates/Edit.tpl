@@ -19,14 +19,14 @@
 
             <p class="note">Edit Candidate</p>
 
-            <table style="font-weight:bold; border: 1px solid #000; background-color: #ffed1a; padding:5px; display:none; margin-bottom:7px;" width="1225" id="candidateAlreadyInSystemTable">
+            <table style="font-weight:bold; border: 1px solid #000; background-color: #ffed1a; padding:5px; display:none; margin-bottom:7px;" width="1225" class="candidateAlreadyInSystemTable">
                 <tr>
                     <td class="tdVertical">
                         This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
                         <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
                             <img src="images/new_window.gif" border="0" />
                             <img src="images/candidate_small.gif" border="0" />
-                            <span id="candidateAlreadyInSystemName"></span>
+                            <span class="candidateAlreadyInSystemName"></span>
                         </a>
                     </td>
                 </tr>
@@ -406,6 +406,19 @@
                     </table>
                 <?php endif; ?>
 
+                <table style="font-weight:bold; border: 1px solid #000; background-color: #ffed1a; padding:5px; display:none; margin-bottom:7px;" width="1225" class="candidateAlreadyInSystemTable">
+                    <tr>
+                        <td class="tdVertical">
+                            This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
+                            <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
+                                <img src="images/new_window.gif" border="0" />
+                                <img src="images/candidate_small.gif" border="0" />
+                                <span class="candidateAlreadyInSystemName"></span>
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                
                 <table class="editTable" width="1000">
                     <tr>
                         <td class="tdVertical">
@@ -531,7 +544,7 @@
                             <label id="lineLabel" for="line">Line:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="line" name="line" value="<?php $this->_($this->data['line']); ?>" style="width: 150px;" />
+                            <input type="text" class="inputbox" id="line" name="line" value="<?php $this->_($this->data['line']); ?>" style="width: 150px;" onchange="checkSocialMediaAlreadyInSystem('line', this.value);" />
                         </td>
                     </tr>
                     <tr>
@@ -539,7 +552,7 @@
                             <label id="qqLabel" for="qq">QQ:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="qq" name="qq" value="<?php $this->_($this->data['qq']); ?>" style="width: 150px;" />
+                            <input type="text" class="inputbox" id="qq" name="qq" value="<?php $this->_($this->data['qq']); ?>" style="width: 150px;" onchange="checkSocialMediaAlreadyInSystem('qq', this.value);" />
                         </td>
                     </tr>
                     <tr>
@@ -547,7 +560,7 @@
                             <label id="skypeLabel" for="skype">Skype:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="skype" name="skype" value="<?php $this->_($this->data['skype']); ?>" style="width: 150px;" />
+                            <input type="text" class="inputbox" id="skype" name="skype" value="<?php $this->_($this->data['skype']); ?>" style="width: 150px;" onchange="checkSocialMediaAlreadyInSystem('skype', this.value);" />
                         </td>
                     </tr>
                     <tr>
@@ -555,7 +568,7 @@
                             <label id="wechatLabel" for="wechat">Wechat:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="wechat" name="wechat" value="<?php $this->_($this->data['wechat']); ?>" style="width: 150px;" />
+                            <input type="text" class="inputbox" id="wechat" name="wechat" value="<?php $this->_($this->data['wechat']); ?>" style="width: 150px;" onchange="checkSocialMediaAlreadyInSystem('wechat', this.value);" />
                         </td>
                     </tr>
                     <tr>
@@ -600,6 +613,20 @@
                         </td>
                     </tr>
                 </table>
+                
+                <table style="font-weight:bold; border: 1px solid #000; background-color: #ffed1a; padding:5px; display:none; margin-bottom:7px;" width="1225" class="candidateAlreadyInSystemTable">
+                    <tr>
+                        <td class="tdVertical">
+                            This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
+                            <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
+                                <img src="images/new_window.gif" border="0" />
+                                <img src="images/candidate_small.gif" border="0" />
+                                <span class="candidateAlreadyInSystemName"></span>
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                
                 <input type="submit" class="button" name="submit" id="submit" value="Save" />&nbsp;
                 <input type="reset"  class="button" name="reset"  id="reset"  value="Reset" onclick="resetFormForeign();" />&nbsp;
                 <input type="button" class="button" name="back"   id="back"   value="Back to Details" onclick="javascript:goToURL('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php echo($this->candidateID); ?>');" />

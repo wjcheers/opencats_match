@@ -827,6 +827,60 @@ class Candidates
 
         return $rs['candidateID'];
     }
+    /**
+     * Returns a candidate ID that matches the specified social media id
+     *
+     * @param string Candidate social media type: id,
+     * @return integer Candidate ID, or -1 if no matching candidates were
+     *                 found.
+     */
+    public function getIDBySocialMedia($social)
+    {
+        $query = array();
+        if (!empty($social['wechat']))
+        {
+            $query[] = 'candidate.wechat=' . $this->_db->makeQueryString($social['wechat']);
+        }
+        if (!empty($social['line']))
+        {
+            $query[] = 'candidate.line=' . $this->_db->makeQueryString($social['line']);
+        }
+        if (!empty($social['skype']))
+        {
+            $query[] = 'candidate.skype=' . $this->_db->makeQueryString($social['skype']);
+        }
+        if (!empty($social['qq']))
+        {
+            $query[] = 'candidate.qq=' . $this->_db->makeQueryString($social['qq']);
+        }
+        if (empty($query))
+        {
+            return -1;
+        }
+        $query = join(" OR ",$query);
+        $sql = sprintf(
+            "SELECT
+                candidate.candidate_id AS candidateID
+            FROM
+                candidate
+            WHERE
+            (
+                %s
+            )
+            AND
+                candidate.site_id = %s",
+            $query,
+            $this->_siteID
+        );
+        $rs = $this->_db->getAssoc($sql);
+
+        if (empty($rs))
+        {
+            return -1;
+        }
+
+        return $rs['candidateID'];
+    }
     public function getIDByPhone($phone)
     {
         $sql = sprintf(

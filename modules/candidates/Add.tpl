@@ -26,14 +26,14 @@
 
             <p class="note<?php if ($this->isModal): ?>Unsized<?php endif; ?>">Basic Information</p>
 
-            <table style="font-weight:bold; border: 1px solid #000; background-color: #ffed1a; padding:5px; display:none; margin-bottom:7px;" width="<?php if ($this->isModal): ?>100%<?php else: ?>1225<?php endif; ?>" id="candidateAlreadyInSystemTable">
+            <table style="font-weight:bold; border: 1px solid #000; background-color: #ffed1a; padding:5px; display:none; margin-bottom:7px;" width="<?php if ($this->isModal): ?>100%<?php else: ?>1225<?php endif; ?>" class="candidateAlreadyInSystemTable">
                 <tr>
                     <td class="tdVertical">
                         This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
                         <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
                             <img src="images/new_window.gif" border="0" />
                             <img src="images/candidate_small.gif" border="0" />
-                            <span id="candidateAlreadyInSystemName"></span>
+                            <span class="candidateAlreadyInSystemName"></span>
                         </a>
                     </td>
                 </tr>
@@ -519,6 +519,20 @@
                 <?php endif; ?>
 
                 <p class="note<?php if ($this->isModal): ?>Unsized<?php endif; ?>" style="margin-top: 5px;">Other</p>
+                
+                <table style="font-weight:bold; border: 1px solid #000; background-color: #ffed1a; padding:5px; display:none; margin-bottom:7px;" width="<?php if ($this->isModal): ?>100%<?php else: ?>1225<?php endif; ?>" class="candidateAlreadyInSystemTable">
+                    <tr>
+                        <td class="tdVertical">
+                            This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
+                            <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
+                                <img src="images/new_window.gif" border="0" />
+                                <img src="images/candidate_small.gif" border="0" />
+                                <span class="candidateAlreadyInSystemName"></span>
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                
                 <table class="editTable" width="<?php if ($this->isModal): ?>100%<?php else: ?>1225<?php endif; ?>">
 
                     <tr>
@@ -643,7 +657,7 @@
                             <label id="lineLabel" for="line">Line:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="line" id="line" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['line'])) $this->_($this->preassignedFields['line']); ?>" />
+                            <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="line" id="line" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['line'])) $this->_($this->preassignedFields['line']); ?>" onchange="checkSocialMediaAlreadyInSystem('line', this.value);" />
                         </td>
                     </tr>
                     <tr>
@@ -651,7 +665,7 @@
                             <label id="qqLabel" for="qq">QQ:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="qq" id="qq" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['qq'])) $this->_($this->preassignedFields['qq']); ?>" />
+                            <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="qq" id="qq" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['qq'])) $this->_($this->preassignedFields['qq']); ?>" onchange="checkSocialMediaAlreadyInSystem('qq', this.value);" />
                         </td>
                     </tr>
                     <tr>
@@ -659,7 +673,7 @@
                             <label id="skypeLabel" for="skype">Skype:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="skype" id="skype" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['skype'])) $this->_($this->preassignedFields['skype']); ?>" />
+                            <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="skype" id="skype" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['skype'])) $this->_($this->preassignedFields['skype']); ?>" onchange="checkSocialMediaAlreadyInSystem('skype', this.value);" />
                         </td>
                     </tr>
                     <tr>
@@ -667,7 +681,7 @@
                             <label id="wechatLabel" for="wechat">Wechat:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="wechat" id="wechat" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['wechat'])) $this->_($this->preassignedFields['wechat']); ?>" />
+                            <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="wechat" id="wechat" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['wechat'])) $this->_($this->preassignedFields['wechat']); ?>" onchange="checkSocialMediaAlreadyInSystem('wechat', this.value);" />
                         </td>
                     </tr>
                     <tr>
@@ -713,6 +727,19 @@
                     </tr>
                 </table>
 
+                <table style="font-weight:bold; border: 1px solid #000; background-color: #ffed1a; padding:5px; display:none; margin-bottom:7px;" width="<?php if ($this->isModal): ?>100%<?php else: ?>1225<?php endif; ?>" class="candidateAlreadyInSystemTable">
+                    <tr>
+                        <td class="tdVertical">
+                            This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
+                            <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
+                                <img src="images/new_window.gif" border="0" />
+                                <img src="images/candidate_small.gif" border="0" />
+                                <span class="candidateAlreadyInSystemName"></span>
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                
                 <input type="submit" tabindex="<?php echo($tabIndex++); ?>" class="button" value="Add Candidate" />&nbsp;
                 <input type="reset"  tabindex="<?php echo($tabIndex++); ?>" class="button" value="Reset" />&nbsp;
                 <?php if ($this->isModal): ?>
@@ -729,16 +756,16 @@
     <?php endif; ?>
     <?php if(isset($this->preassignedFields['email2']) || isset($this->preassignedFields['email2'])): ?>
             checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['email2'])) echo(urlencode($this->preassignedFields['email2'])); else if(isset($this->preassignedFields['email2'])) echo(urlencode($this->preassignedFields['email2'])); ?>"));
-                <?php endif; ?>
-                    <?php if(isset($this->preassignedFields['phoneCell']) || isset($this->preassignedFields['phoneCell'])): ?>
-                            checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneCell'])) echo(urlencode($this->preassignedFields['phoneCell'])); else if(isset($this->preassignedFields['phoneCell'])) echo(urlencode($this->preassignedFields['phoneCell'])); ?>"));
-                                <?php endif; ?>
-                                    <?php if(isset($this->preassignedFields['phoneWork']) || isset($this->preassignedFields['phoneWork'])): ?>
-                                            checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneWork'])) echo(urlencode($this->preassignedFields['phoneWork'])); else if(isset($this->preassignedFields['phoneWork'])) echo(urlencode($this->preassignedFields['phoneWork'])); ?>"));
-                                                <?php endif; ?>
-                                                    <?php if(isset($this->preassignedFields['phoneHome']) || isset($this->preassignedFields['phoneHome'])): ?>
-                                                            checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneHome'])) echo(urlencode($this->preassignedFields['phoneHome'])); else if(isset($this->preassignedFields['phoneHome'])) echo(urlencode($this->preassignedFields['phoneHome'])); ?>"));
-                                                                <?php endif; ?>
+    <?php endif; ?>
+    <?php if(isset($this->preassignedFields['phoneCell']) || isset($this->preassignedFields['phoneCell'])): ?>
+            checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneCell'])) echo(urlencode($this->preassignedFields['phoneCell'])); else if(isset($this->preassignedFields['phoneCell'])) echo(urlencode($this->preassignedFields['phoneCell'])); ?>"));
+    <?php endif; ?>
+    <?php if(isset($this->preassignedFields['phoneWork']) || isset($this->preassignedFields['phoneWork'])): ?>
+            checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneWork'])) echo(urlencode($this->preassignedFields['phoneWork'])); else if(isset($this->preassignedFields['phoneWork'])) echo(urlencode($this->preassignedFields['phoneWork'])); ?>"));
+    <?php endif; ?>
+    <?php if(isset($this->preassignedFields['phoneHome']) || isset($this->preassignedFields['phoneHome'])): ?>
+            checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneHome'])) echo(urlencode($this->preassignedFields['phoneHome'])); else if(isset($this->preassignedFields['phoneHome'])) echo(urlencode($this->preassignedFields['phoneHome'])); ?>"));
+    <?php endif; ?>
 </script>
 
 <?php if ($this->isModal): ?>

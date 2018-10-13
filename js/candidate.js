@@ -65,14 +65,26 @@ function checkEmailAlreadyInSystem(email, sessionCookie)
             candidateIsAlreadyInSystem = true;
             candidateIsAlreadyInSystemID = idNode.firstChild.nodeValue;
             candidateIsAlreadyInSystemName = http.responseXML.getElementsByTagName('name').item(0).firstChild.nodeValue;
-            
-            document.getElementById('candidateAlreadyInSystemName').innerHTML = candidateIsAlreadyInSystemName;
-            document.getElementById('candidateAlreadyInSystemTable').style.display = '';
+
+            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].style.display = '';
+            }
+            linkOuter = document.getElementsByClassName("candidateAlreadyInSystemName");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].innerHTML = candidateIsAlreadyInSystemName;
+            }
         }
         else
         {
             candidateIsAlreadyInSystem = false;
-            document.getElementById('candidateAlreadyInSystemTable').style.display = 'none';
+            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].style.display = 'none';
+            }
         }
     }
 
@@ -139,14 +151,26 @@ function checkPhoneAlreadyInSystem(phone, sessionCookie)
             candidateIsAlreadyInSystem = true;
             candidateIsAlreadyInSystemID = idNode.firstChild.nodeValue;
             candidateIsAlreadyInSystemName = http.responseXML.getElementsByTagName('name').item(0).firstChild.nodeValue;
-            
-            document.getElementById('candidateAlreadyInSystemName').innerHTML = candidateIsAlreadyInSystemName;
-            document.getElementById('candidateAlreadyInSystemTable').style.display = '';
+
+            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].style.display = '';
+            }
+            linkOuter = document.getElementsByClassName("candidateAlreadyInSystemName");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].innerHTML = candidateIsAlreadyInSystemName;
+            }
         }
         else
         {
             candidateIsAlreadyInSystem = false;
-            document.getElementById('candidateAlreadyInSystemTable').style.display = 'none';
+            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].style.display = 'none';
+            }
         }
     }
 
@@ -213,14 +237,26 @@ function checkLinkAlreadyInSystem(link, sessionCookie)
             candidateIsAlreadyInSystem = true;
             candidateIsAlreadyInSystemID = idNode.firstChild.nodeValue;
             candidateIsAlreadyInSystemName = http.responseXML.getElementsByTagName('name').item(0).firstChild.nodeValue;
-            
-            document.getElementById('candidateAlreadyInSystemName').innerHTML = candidateIsAlreadyInSystemName;
-            document.getElementById('candidateAlreadyInSystemTable').style.display = '';
+
+            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].style.display = '';
+            }
+            linkOuter = document.getElementsByClassName("candidateAlreadyInSystemName");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].innerHTML = candidateIsAlreadyInSystemName;
+            }
         }
         else
         {
             candidateIsAlreadyInSystem = false;
-            document.getElementById('candidateAlreadyInSystemTable').style.display = 'none';
+            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].style.display = 'none';
+            }
         }
     }
 
@@ -251,4 +287,90 @@ function onSubmitLinkInSystem()
     }
 }
 
+
+function checkSocialMediaAlreadyInSystem(type, social, sessionCookie)
+{
+    if (social == '')
+    {
+        return;
+    }
+
+    var http = AJAX_getXMLHttpObject();
+
+    /* Build HTTP POST data. */
+    var POSTData = '&' + type + '=' + urlEncode(social);
+    // format: &wechat=xxxx, &skype=xxxx, &line=xxxx, &qq=xxxx
+
+    /* Anonymous callback function triggered when HTTP response is received. */
+    var callBack = function ()
+    {
+        if (http.readyState != 4)
+        {
+            return;
+        }
+
+        if (!http.responseXML)
+        {
+            var errorMessage = "An error occurred while receiving a response from the server.\n\n"
+                             + http.responseText;
+            /* alert(errorMessage); */
+            return;
+        }
+
+        var idNode = http.responseXML.getElementsByTagName('id').item(0);
+
+        if (idNode.firstChild.nodeValue != -1)
+        {
+            candidateIsAlreadyInSystem = true;
+            candidateIsAlreadyInSystemID = idNode.firstChild.nodeValue;
+            candidateIsAlreadyInSystemName = http.responseXML.getElementsByTagName('name').item(0).firstChild.nodeValue;
+
+            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].style.display = '';
+            }
+            linkOuter = document.getElementsByClassName("candidateAlreadyInSystemName");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].innerHTML = candidateIsAlreadyInSystemName;
+            }
+        }
+        else
+        {
+            candidateIsAlreadyInSystem = false;
+            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
+            for (i = 0; i < linkOuter.length; i++)
+            {
+                linkOuter[i].style.display = 'none';
+            }
+        }
+    }
+
+    AJAX_callCATSFunction(
+        http,
+        'getCandidateIdBySocialMedia',
+        POSTData,
+        callBack,
+        0,
+        sessionCookie,
+        false,
+        false
+    );
+}
+
+function onSubmitSocialMediaInSystem()
+{
+    if (candidateIsAlreadyInSystem)
+    {
+        var agree=confirm("Warning:  The candidate may already be in the system.\n\nAre you sure you want to add the candidate?");
+        if (agree)
+        {
+            candidateIsAlreadyInSystem = false;
+        	return true ;
+        }
+        else
+        	return false ;
+    }
+}
 
