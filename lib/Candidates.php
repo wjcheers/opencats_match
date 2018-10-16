@@ -36,17 +36,6 @@ include_once('./lib/History.php');
 include_once('./lib/SavedLists.php');
 include_once('./lib/ExtraFields.php');
 include_once('lib/DataGrid.php');
-
-
-// function from: https://stackoverflow.com/questions/9831077/how-to-url-encode-only-non-ascii-symbols-of-url-in-php-but-leave-reserved-symbo
-function url_path_encode($url) {
-    $path = parse_url($url, PHP_URL_PATH);
-    if (strpos($path,'%') !== false) return $url; //avoid double encoding
-    else {
-        $encoded_path = array_map('urlencode', explode('/', $path));
-        return str_replace($path, implode('/', $encoded_path), $url);
-    }   
-}
     
 /**
  *  Candidates Library
@@ -998,6 +987,13 @@ class Candidates
         {
             foreach ($rs as $field)
             {
+                // maimai id is the unique one.
+                if ((strpos($link, 'maimai.cn/contact/share/card') !== false) ||
+                    (strpos($link, 'maimai.cn/contact/detail/') !== false) ||
+                    (strpos($link, 'res_id_encode=') !== false)) // h.liepin.com/resume/showresumedetail
+                {
+                    return $field['candidateID'];
+                }
                 // Remove the partial matches. Use Url's path to do reverse search
                 // ex.
                 // $link => linkedin.com/in/pohsien
