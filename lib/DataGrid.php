@@ -1129,10 +1129,10 @@ class DataGrid
 
                 // Add AND condition
                 $and = false;
-                if (strpos($argument, 'and') !== false) {
+                if (strpos($argument, ' and ') !== false) {
                     $and = true;
                 }
-                if (strpos($argument, 'AND') !== false) {
+                if (strpos($argument, ' AND ') !== false) {
                     $and = true;
                 }
                 $argument = str_replace(' and ', '/', $argument);
