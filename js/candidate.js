@@ -30,7 +30,7 @@ var candidateIsAlreadyInSystem = false;
 var candidateIsAlreadyInSystemID = -1;
 var candidateIsAlreadyInSystemName = '';
 
-function checkEmailAlreadyInSystem(email, sessionCookie)
+function checkEmailAlreadyInSystem(email, currentID, sessionCookie)
 {
     if (email == '')
     {
@@ -65,6 +65,11 @@ function checkEmailAlreadyInSystem(email, sessionCookie)
             candidateIsAlreadyInSystem = true;
             candidateIsAlreadyInSystemID = idNode.firstChild.nodeValue;
             candidateIsAlreadyInSystemName = http.responseXML.getElementsByTagName('name').item(0).firstChild.nodeValue;
+
+            if ((currentID != '') && (currentID == candidateIsAlreadyInSystemID))
+            {
+                return;
+            }
 
             var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
             for (i = 0; i < linkOuter.length; i++)
@@ -116,7 +121,7 @@ function onSubmitEmailInSystem()
 }
 
 
-function checkPhoneAlreadyInSystem(phone, sessionCookie)
+function checkPhoneAlreadyInSystem(phone, currentID, sessionCookie)
 {
     if (phone == '')
     {
@@ -151,6 +156,11 @@ function checkPhoneAlreadyInSystem(phone, sessionCookie)
             candidateIsAlreadyInSystem = true;
             candidateIsAlreadyInSystemID = idNode.firstChild.nodeValue;
             candidateIsAlreadyInSystemName = http.responseXML.getElementsByTagName('name').item(0).firstChild.nodeValue;
+
+            if ((currentID != '') && (currentID == candidateIsAlreadyInSystemID))
+            {
+                return;
+            }
 
             var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
             for (i = 0; i < linkOuter.length; i++)
@@ -202,7 +212,7 @@ function onSubmitPhoneInSystem()
 }
 
 
-function checkLinkAlreadyInSystem(link, sessionCookie)
+function checkLinkAlreadyInSystem(link, currentID, sessionCookie)
 {
     if (link == '')
     {
@@ -237,6 +247,11 @@ function checkLinkAlreadyInSystem(link, sessionCookie)
             candidateIsAlreadyInSystem = true;
             candidateIsAlreadyInSystemID = idNode.firstChild.nodeValue;
             candidateIsAlreadyInSystemName = http.responseXML.getElementsByTagName('name').item(0).firstChild.nodeValue;
+
+            if ((currentID != '') && (currentID == candidateIsAlreadyInSystemID))
+            {
+                return;
+            }
 
             var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
             for (i = 0; i < linkOuter.length; i++)

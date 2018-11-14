@@ -97,7 +97,7 @@
                             <label id="email1Label" for="email1">E-Mail:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="email1" name="email1" value="<?php $this->_($this->data['email1']); ?>" style="width: 150px;" onchange="checkEmailAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="email1" name="email1" value="<?php $this->_($this->data['email1']); ?>" style="width: 150px;" onchange="checkEmailAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
                     <tr>
@@ -105,7 +105,7 @@
                             <label id="email2Label" for="email2">2nd E-Mail:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="email2" name="email2" value="<?php $this->_($this->data['email2']); ?>" style="width: 150px;" onchange="checkEmailAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="email2" name="email2" value="<?php $this->_($this->data['email2']); ?>" style="width: 150px;" onchange="checkEmailAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
 
@@ -114,7 +114,7 @@
                             <label id="phoneHomeLabel" for="phoneHome">Home Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="phoneHome" name="phoneHome" value="<?php $this->_($this->data['phoneHome']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="phoneHome" name="phoneHome" value="<?php $this->_($this->data['phoneHome']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
 
@@ -123,7 +123,7 @@
                             <label id="phoneCellLabel" for="phoneCell">Cell Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="phoneCell" name="phoneCell" value="<?php $this->_($this->data['phoneCell']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="phoneCell" name="phoneCell" value="<?php $this->_($this->data['phoneCell']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
 
@@ -132,7 +132,7 @@
                             <label id="phoneWorkLabel" for="phoneWork">Work Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="phoneWork" name="phoneWork" value="<?php $this->_($this->data['phoneWork']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="phoneWork" name="phoneWork" value="<?php $this->_($this->data['phoneWork']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
 
@@ -150,7 +150,7 @@
                             <label id="webSiteLabel" for="webSite">Web Site:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="webSite" name="webSite" value="<?php $this->_($this->data['webSite']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="webSite" name="webSite" value="<?php $this->_($this->data['webSite']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
 
@@ -159,7 +159,7 @@
                             <label id="facebookLabel" for="facebook">Facebook:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="facebook" name="facebook" value="<?php $this->_($this->data['facebook']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="facebook" name="facebook" value="<?php $this->_($this->data['facebook']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
                     
@@ -168,7 +168,7 @@
                             <label id="linkedinLabel" for="linkedin">Linkedin:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="linkedin" name="linkedin" value="<?php $this->_($this->data['linkedin']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="linkedin" name="linkedin" value="<?php $this->_($this->data['linkedin']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
                     
@@ -177,7 +177,7 @@
                             <label id="githubLabel" for="github">Github:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="github" name="github" value="<?php $this->_($this->data['github']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="github" name="github" value="<?php $this->_($this->data['github']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
                     <tr>
@@ -185,7 +185,7 @@
                             <label id="googleplusLabel" for="googleplus">GooglePlus:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="googleplus" name="googleplus" value="<?php $this->_($this->data['googleplus']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="googleplus" name="googleplus" value="<?php $this->_($this->data['googleplus']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
                     <tr>
@@ -193,7 +193,7 @@
                             <label id="twitterLabel" for="twitter">Twitter:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="twitter" name="twitter" value="<?php $this->_($this->data['twitter']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="twitter" name="twitter" value="<?php $this->_($this->data['twitter']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
                     <tr>
@@ -201,7 +201,7 @@
                             <label id="link1Label" for="link1">Link1:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="link1" name="link1" value="<?php $this->_($this->data['link1']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="link1" name="link1" value="<?php $this->_($this->data['link1']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
                     <tr>
@@ -209,7 +209,7 @@
                             <label id="link2Label" for="link2">Link2:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="link2" name="link2" value="<?php $this->_($this->data['link2']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="link2" name="link2" value="<?php $this->_($this->data['link2']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
                     <tr>
@@ -217,7 +217,7 @@
                             <label id="link3Label" for="link3">Link3:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="link3" name="link3" value="<?php $this->_($this->data['link3']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value);" />
+                            <input type="text" class="inputbox" id="link3" name="link3" value="<?php $this->_($this->data['link3']); ?>" style="width: 450px" onchange="checkLinkAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
                         </td>
                     </tr>
 
