@@ -59,8 +59,8 @@ class StringUtility
     const matchEmailUser  = '[a-z0-9._-]+';                                             /* PCRE */
     const matchEmailEUser = '(?P<user>[a-z0-9._-]+)';                                   /* PCRE */
 
-    const matchURLDomain  = '(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|(?:[a-z\d-]+\.)*[a-z\d-]+\.[a-z]{2,6})';         /* PCRE */
-    const matchEURLDomain = '(?P<domain>localhost|(?:\d{1,3}\.){3}\d{1,3}|(?:[a-z\d-]+\.)*[a-z\d-]+\.[a-z]{2,6})'; /* PCRE */
+    const matchURLDomain  = '(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|(?:[a-z\d-]+\.)*[a-z\d-]+\.[a-z]{2,7})';         /* PCRE */
+    const matchEURLDomain = '(?P<domain>localhost|(?:\d{1,3}\.){3}\d{1,3}|(?:[a-z\d-]+\.)*[a-z\d-]+\.[a-z]{2,7})'; /* PCRE */
 
     const matchEURLProtocol     = '(?:(?P<protocol>[a-z]+)(?:\:\/\/))?';                           /* PCRE */
     const matchEURLUserPassword = '(?:(?P<user>[a-z\d.-]+)(?:\:(?P<password>[a-z&%\$\d.-]+))*@)?'; /* PCRE */
