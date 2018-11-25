@@ -1516,7 +1516,9 @@ class Candidates
                 CONCAT(
                     entered_by_user.first_name, ' ', entered_by_user.last_name
                 ) AS enteredByFullName,
-                saved_list_entry.date_created AS dateAddedToList
+                DATE_FORMAT(
+                    saved_list_entry.date_created, '%%m-%%d-%%y'
+                ) AS dateAddedToList
             FROM
                 saved_list_entry
             LEFT JOIN saved_list
