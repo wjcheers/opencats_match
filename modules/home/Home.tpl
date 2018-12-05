@@ -87,29 +87,45 @@
                         
             <table>
                 <tr>
-                    <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
+                    <td align="left" valign="top" style="text-align: left; width: 50%;">
                         <div class="noteUnsizedSpan" style="width: 1220px;">Qualifying Candidates in Active Job Orders - Page <?php echo($this->dataGridQualifying->getCurrentPageHTML()); ?> (<?php echo($this->dataGridQualifying->getNumberOfRows()); ?> Items)</div>
                         <?php $this->dataGridQualifying->draw(); ?>
                         <div style="float:right;"><?php $this->dataGridQualifying->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridQualifying->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 
                         <?php if (!$this->dataGridQualifying->getNumberOfRows()): ?>
-                        <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
+                        <div style="width: 1226px; height: 47px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhiteSmall.jpg);">
                             &nbsp;
                         </div>
                         <?php endif; ?>
                     </td>
                 </tr>
             </table>
-
+     
             <table>
                 <tr>
-                    <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
+                    <td align="left" valign="top" style="text-align: left; width: 50%;">
+                        <div class="noteUnsizedSpan" style="width: 1220px;">Jechoing Candidates in Active Job Orders - Page <?php echo($this->dataGridJechoing->getCurrentPageHTML()); ?> (<?php echo($this->dataGridJechoing->getNumberOfRows()); ?> Items)</div>
+                        <?php $this->dataGridJechoing->draw(); ?>
+                        <div style="float:right;"><?php $this->dataGridJechoing->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridJechoing->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+
+                        <?php if (!$this->dataGridJechoing->getNumberOfRows()): ?>
+                        <div style="width: 1226px; height: 47px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhiteSmall.jpg);">
+                            &nbsp;
+                        </div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            </table>
+            
+            <table>
+                <tr>
+                    <td align="left" valign="top" style="text-align: left; width: 50%;">
                         <div class="noteUnsizedSpan" style="width: 1220px;">Verified Candidates in Active Job Orders - Page <?php echo($this->dataGridVerified->getCurrentPageHTML()); ?> (<?php echo($this->dataGridVerified->getNumberOfRows()); ?> Items)</div>
                         <?php $this->dataGridVerified->draw(); ?>
                         <div style="float:right;"><?php $this->dataGridVerified->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridVerified->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 
                         <?php if (!$this->dataGridVerified->getNumberOfRows()): ?>
-                        <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
+                        <div style="width: 1226px; height: 47px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhiteSmall.jpg);">
                             &nbsp;
                         </div>
                         <?php endif; ?>
@@ -119,13 +135,13 @@
 
             <table>
                 <tr>
-                    <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
+                    <td align="left" valign="top" style="text-align: left; width: 50%;">
                         <div class="noteUnsizedSpan" style="width: 1220px;">Awaiting Candidates in Active Job Orders - Page <?php echo($this->dataGridAwaiting->getCurrentPageHTML()); ?> (<?php echo($this->dataGridAwaiting->getNumberOfRows()); ?> Items)</div>
                         <?php $this->dataGridAwaiting->draw(); ?>
                         <div style="float:right;"><?php $this->dataGridAwaiting->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridAwaiting->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 
                         <?php if (!$this->dataGridAwaiting->getNumberOfRows()): ?>
-                        <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
+                        <div style="width: 1226px; height: 47px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhiteSmall.jpg);">
                             &nbsp;
                         </div>
                         <?php endif; ?>
@@ -135,13 +151,13 @@
 
             <table>
                 <tr>
-                    <td align="left" valign="top" style="text-align: left; width: 50%; height: 260px;">
+                    <td align="left" valign="top" style="text-align: left; width: 50%;">
                         <div class="noteUnsizedSpan" style="width: 1220px;">Uploaded Candidates in Active Job Orders - Page <?php echo($this->dataGridUploaded->getCurrentPageHTML()); ?> (<?php echo($this->dataGridUploaded->getNumberOfRows()); ?> Items)</div>
                         <?php $this->dataGridUploaded->draw(); ?>
                         <div style="float:right;"><?php $this->dataGridUploaded->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridUploaded->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
 
                         <?php if (!$this->dataGridUploaded->getNumberOfRows()): ?>
-                        <div style="width: 1226px; height: 208px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhite.jpg);">
+                        <div style="width: 1226px; height: 47px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhiteSmall.jpg);">
                             &nbsp;
                         </div>
                         <?php endif; ?>

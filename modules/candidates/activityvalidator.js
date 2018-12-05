@@ -88,7 +88,9 @@ function checkPersonalAgreement()
 
     if(personalAgreement == "0"
         && document.getElementById('changeStatus').checked == true
-        && document.changePipelineStatusForm.statusID.options[document.changePipelineStatusForm.statusID.selectedIndex].text == "Qualifying")
+        && 
+        (document.changePipelineStatusForm.statusID.options[document.changePipelineStatusForm.statusID.selectedIndex].text == "Qualifying" ||
+         document.changePipelineStatusForm.statusID.options[document.changePipelineStatusForm.statusID.selectedIndex].text == "Jechoing"))
     {
         if(personalAgreementCount >= 1)
         {
