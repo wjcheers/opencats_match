@@ -91,7 +91,7 @@
                                         <?php else: ?>
                                         <?php echo($this->extraFieldRS[$i]['display']); ?>
                                         <?php endif; ?>
-                                     </td>
+                                    </td>
                               </tr>
                             <?php endfor; ?>
                         </table>
@@ -154,7 +154,18 @@
                             <?php for ($i = (intval(count($this->extraFieldRS))/2); $i < (count($this->extraFieldRS)); $i++): ?>
                                 <tr>
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>
-                                    <td class="data"><?php echo($this->extraFieldRS[$i]['display']); ?></td>
+                                    <td class="data">
+                                        <?php if(substr($this->extraFieldRS[$i]['display'], 0, 4) == 'http'): ?>
+                                            <?php if(strlen($this->extraFieldRS[$i]['display']) > 50): ?>
+                                                <?php $url = parse_url($this->extraFieldRS[$i]['display']); ?>
+                                                <a href="<?php $this->_($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo $url['scheme'] . '://' . $url['host'] . '/'; ?></a>
+                                            <?php else: ?>
+                                                <a href="<?php $this->_($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                        <?php echo($this->extraFieldRS[$i]['display']); ?>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endfor; ?>
                         </table>
