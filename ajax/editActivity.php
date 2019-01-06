@@ -68,12 +68,14 @@ $type       = $_REQUEST['type'];
 $jobOrderID = $_REQUEST['jobOrderID'];
 
 /* Decode and trim the activity notes from the company. */
-$activityNote = trim(urldecode($_REQUEST['notes']));
-$activityDate = trim(urldecode($_REQUEST['date']));
-$activityHour = trim(urldecode($_REQUEST['hour']));
-$activityMinute = trim(urldecode($_REQUEST['minute']));
-$activityAMPM = trim(urldecode($_REQUEST['ampm']));
-$locationPathname = trim(urldecode($_REQUEST['locationPathname']));
+// _REQUEST comes from _GET and _POST. _GET and _POST are passed through urldecode()
+// '+' is removed after urldecode(). So remove urldecode below.
+$activityNote = trim($_REQUEST['notes']);
+$activityDate = trim($_REQUEST['date']);
+$activityHour = trim($_REQUEST['hour']);
+$activityMinute = trim($_REQUEST['minute']);
+$activityAMPM = trim($_REQUEST['ampm']);
+$locationPathname = trim($_REQUEST['locationPathname']);
 
 if (!DateUtility::validate('-', $activityDate, DATE_FORMAT_MMDDYY))
 {
