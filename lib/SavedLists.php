@@ -140,6 +140,74 @@ class SavedLists
     }
 
     /**
+     * Returns relevant data for all saved lists, optionally restricted by data
+     * item type and list name.
+     *
+     * define('ALL_LISTS',     0);
+     * define('STATIC_LISTS',  1);
+     * define('DYNAMIC_LISTS', 2);
+     *
+     * @param flag data item type
+     * @return array saved lists data
+     */
+     
+    public function getAllByDescription($dataItemType = -1, $description = '', $listType = ALL_LISTS)
+    {
+        if ($dataItemType != -1)
+        {
+            $typeCriterion = sprintf(
+                'AND data_item_type = %s',
+                $this->_db->makeQueryInteger($dataItemType)
+            );
+        }
+        else
+        {
+            $typeCriterion = '';
+        }
+        
+        if ($description != '')
+        {
+            $typeCriterion .= sprintf(
+                ' AND description like %s',
+                $this->_db->makeQueryString('%' . trim($description) . '%')
+            );
+        }
+        
+        if ($listType == STATIC_LISTS)
+        {
+            $typeCriterion .= ' AND is_dynamic = false';
+        }
+
+        if ($listType == DYNAMIC_LISTS)
+        {
+            $typeCriterion .= ' AND is_dynamic = true';
+        }
+
+        $sql = sprintf(
+            "SELECT
+                saved_list_id AS savedListID,
+                data_item_type as dataItemType,
+                description AS description,
+                is_dynamic AS isDynamic,
+                datagrid_instance as datagridInstance,
+                parameters as parameters,
+                created_by as createdBy,
+                number_entries as numberEntries
+            FROM
+                saved_list
+            WHERE
+                site_id = %s
+            %s
+            ORDER BY
+                description ASC",
+            $this->_siteID,
+            $typeCriterion
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+    
+    /**
      * Returns the ID of a saved list based on its description.
      *
      * @param string saved list description

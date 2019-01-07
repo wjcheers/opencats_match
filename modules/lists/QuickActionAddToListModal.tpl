@@ -1,10 +1,34 @@
 <?php /* $Id: QuickActionAddToListModal.tpl 3198 2007-10-14 23:36:43Z will $ */ ?>
 <?php TemplateUtility::printModalHeader('Candidates', array('js/lists.js'), 'Add to '.$this->dataItemDesc.' Static Lists'); ?>
+
+    <table class="searchTable">
+        <form id="searchByJobTitleForm" name="searchByJobTitleForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=lists&amp;a=quickActionAddToListModal" method="post">
+            <input type="hidden" name="postback" id="postback" value="postback" />
+            <input type="hidden" id="dataItemType" name="dataItemType" value="<?php echo($this->dataItemType); ?>" />
+            <input type="hidden" id="dataItemID" name="dataItemID" value="<?php echo($this->dataItemID); ?>" />
+
+            <tr>
+                <td>Search by List Name:&nbsp;</td>
+                <td><input type="text" class="inputbox" id="description" name="description" style="width:200px;" value="<?php echo($this->description); ?>"/>&nbsp;*</td>
+            </tr>
+            <tr>
+                <td><input type="submit" class="button" id="search" name="search" value="Search by List Name" /></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+        </form>
+    </table>
+    
     <table>
         <tr>
             <td><!--Add to Static Lists-->Select the lists you want to add the item<?php if (count($this->dataItemIDArray) > 1): ?>s<?php endif; ?> too.</td>
        </tr>
     </table>
+        <?php if (!empty($this->savedListsRS)): ?>
+        <?php else: ?>
+            <p>No matching entries found.</p>
+        <?php endif; ?>
             <div class="addToListListBox" id="addToListBox">
                 <input type="hidden" style="width:500px;" id="dataItemArray" value="<?php $this->_(implode(',', $this->dataItemIDArray)); ?>">
                 <?php foreach($this->savedListsRS as $index => $data): ?>

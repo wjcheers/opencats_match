@@ -212,32 +212,42 @@ class ListsUI extends UserInterface
     private function quickActionAddToListModal()
     {
         /* Bail out if we don't have a valid type. */
-        if (!$this->isRequiredIDValid('dataItemType', $_GET))
+        if (!$this->isRequiredIDValid('dataItemType', $_REQUEST))
         {
             CommonErrors::fatalModal(COMMONERROR_BADINDEX, $this);
             return;
         }
 
         /* Bail out if we don't have a valid id. */
-        if (!$this->isRequiredIDValid('dataItemID', $_GET))
+        if (!$this->isRequiredIDValid('dataItemID', $_REQUEST))
         {
             CommonErrors::fatalModal(COMMONERROR_BADINDEX, $this);
             return;
         }
 
-        $dataItemType = $_GET['dataItemType'];
-        $dataItemID = $_GET['dataItemID'];
+        $dataItemType = $_REQUEST['dataItemType'];
+        $dataItemID = $_REQUEST['dataItemID'];
+        if (isset($_REQUEST['description']))
+        {
+            $description = $_REQUEST['description'];
+        }
+        else
+        {
+            $description = '';
+        }
         $dataItemIDArray = array($dataItemID);
 
         $savedLists = new SavedLists($this->_siteID);
 
-        $savedListsRS = $savedLists->getAll($dataItemType, STATIC_LISTS);
+        $savedListsRS = $savedLists->getAllByDescription($dataItemType, $description, STATIC_LISTS);
 
         $dataItemDesc = TemplateUtility::getDataItemTypeDescription($dataItemType);
 
         $this->_template->assign('dataItemDesc', $dataItemDesc);
         $this->_template->assign('savedListsRS', $savedListsRS);
         $this->_template->assign('dataItemType', $dataItemType);
+        $this->_template->assign('dataItemID', $dataItemID);
+        $this->_template->assign('description', $description);
         $this->_template->assign('dataItemIDArray', $dataItemIDArray);
         $this->_template->assign('sessionCookie', $_SESSION['CATS']->getCookie());
 

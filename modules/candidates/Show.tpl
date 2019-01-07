@@ -759,7 +759,7 @@
             
 <?php if (!$this->isPopup): ?>
             <?php if ($this->accessLevel >= ACCESS_LEVEL_EDIT): ?>
-                <a href="#" onclick="showPopWin('<?php echo(CATSUtility::getIndexName()); ?>?m=lists&amp;a=quickActionAddToListModal&amp;dataItemType=100&amp;dataItemID=<?php echo($this->candidateID); ?>', 750, 450, null); return false;">
+                <a href="#" onclick="showPopWin('<?php echo(CATSUtility::getIndexName()); ?>?m=lists&amp;a=quickActionAddToListModal&amp;dataItemType=100&amp;dataItemID=<?php echo($this->candidateID); ?>', 750, 570, null); return false;">
                     <img src="images/actions/add.gif" width="16" height="16" class="absmiddle" alt="Add to List" border="0" />&nbsp;Add This Candidate to Lists
                 </a>
             <?php endif; ?>
