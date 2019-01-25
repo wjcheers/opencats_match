@@ -760,6 +760,9 @@ class SearchJobOrders
     public function byTitle($wildCardString, $sortBy, $sortDirection,
         $activeOnly)
     {
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = $this->_db->makeQueryString($wildCardString);
+        
         if ($activeOnly)
         {
             //FIXME:  Remove session dependancy.
@@ -777,9 +780,11 @@ class SearchJobOrders
             $activeCriterion = "";
         }
 
+        /* this not handle "(abc) (abc>" correctly....
         $WHERE = DatabaseSearch::makeBooleanSQLWhere(
             $wildCardString, $this->_db, 'joborder.title'
         );
+        */
 
         $sql = sprintf(
             "SELECT
@@ -824,7 +829,7 @@ class SearchJobOrders
             LEFT JOIN contact
                 ON joborder.contact_id = contact.contact_id
             WHERE
-                %s
+                joborder.title like %s
             %s
             AND
                 joborder.is_admin_hidden = 0
@@ -832,7 +837,7 @@ class SearchJobOrders
                 joborder.site_id = %s
             ORDER BY
                 %s %s",
-            $WHERE,
+            $wildCardString,
             $activeCriterion,
             $this->_siteID,
             $sortBy,
