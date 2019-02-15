@@ -1160,7 +1160,8 @@ class JobOrdersUI extends UserInterface
             $mailer = new Mailer($this->_siteID);
             $mailerStatus = $mailer->sendToOne(
                 array('cats@example.com', ''),
-                'CATS Notification: Job Order Modified', $statusChangeTemplateJecho, true);
+                'CATS: Job Order Modified - ' . $jobOrderDetails['title'] . ' (' . $jobOrderDetails['companyName'] . ')',
+                $statusChangeTemplateJecho, true);
         }
 		
         /* notify job order owner to sync this status */      
