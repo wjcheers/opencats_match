@@ -218,7 +218,7 @@
                                 <?php endforeach; ?>
                             </select>&nbsp;*
                             <div style="display:none;" id="divOwnershipChange">
-                                <input type="checkbox" name="ownershipChange" id="checkboxOwnershipChange" onclick="return false;" <?php if (!$this->canEmail): ?>disabled<?php endif; ?>> E-Mail new owner of change
+                                <input type="checkbox" name="ownershipChange" id="checkboxOwnershipChange" <?php if (!$this->canEmail): ?>disabled<?php endif; ?>> E-Mail new owner of change
                             </div>
                         </td>
                     </tr>
