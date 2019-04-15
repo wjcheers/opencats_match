@@ -49,7 +49,7 @@ if (!isset($_REQUEST['addressBlock']))
 /* Figure out what phone number type we are supposed to recognize a solitary
  * phone number as.
  */
-switch ($_REQUEST['mode'])
+switch (rawurldecode($_REQUEST['mode']))
 {
     case 'contact':
         $mode = ADDRESSPARSER_MODE_CONTACT;
@@ -71,7 +71,7 @@ $addressParser = new AddressParser();
 /* Feed the AddressParser a the address block from POST data and parse
  * the address.
  */
-$addressBlock = $_REQUEST['addressBlock'];
+$addressBlock = rawurldecode($_REQUEST['addressBlock']);
 $addressParser->parse($addressBlock, $mode);
 
 /* Get the parsed address as an associative array. */
