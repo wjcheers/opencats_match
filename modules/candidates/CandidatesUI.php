@@ -1802,8 +1802,10 @@ class CandidatesUI extends UserInterface
         $this->_template->assign('subActive', 'Search Candidates');
         $this->_template->assign('isResultsMode', false);
         $this->_template->assign('isResumeMode', false);
+        $this->_template->assign('isKeywordsMode', false);
         $this->_template->assign('resumeWildCardString', '');
         $this->_template->assign('keySkillsWildCardString', '');
+        $this->_template->assign('keywordsWildCardString', '');
         $this->_template->assign('fullNameWildCardString', '');
         $this->_template->assign('phoneNumberWildCardString', '');
         $this->_template->assign('mode', '');
@@ -1829,6 +1831,7 @@ class CandidatesUI extends UserInterface
         /* Initialize stored wildcard strings to safe default values. */
         $resumeWildCardString      = '';
         $keySkillsWildCardString   = '';
+        $keywordsWildCardString   = '';
         $phoneNumberWildCardString = '';
         $fullNameWildCardString    = '';
 
@@ -1905,6 +1908,7 @@ class CandidatesUI extends UserInterface
                 }
 
                 $isResumeMode = false;
+                $isKeywordsMode = false;
 
                 $fullNameWildCardString = $query;
                 break;
@@ -1936,8 +1940,46 @@ class CandidatesUI extends UserInterface
                 }
 
                 $isResumeMode = false;
+                $isKeywordsMode = false;
 
                 $keySkillsWildCardString = $query;
+
+                break;
+
+            case 'searchByKeywords':
+                $rs = $search->byKeywords($query, $sortBy, $sortDirection);
+
+                foreach ($rs as $rowIndex => $row)
+                {
+                    $rs[$rowIndex]['excerpt'] = SearchUtility::searchExcerpt(
+                        $query, $row['text']
+                    );
+                    
+                    if (!empty($row['ownerFirstName']))
+                    {
+                        $rs[$rowIndex]['ownerAbbrName'] = StringUtility::makeInitialName(
+                            $row['ownerFirstName'],
+                            $row['ownerLastName'],
+                            false,
+                            LAST_NAME_MAXLEN
+                        );
+                    }
+                    else
+                    {
+                        $rs[$rowIndex]['ownerAbbrName'] = 'None';
+                    }
+
+                    $rsResume = $candidates->getResumes($row['candidateID']);
+                    if (isset($rsResume[0]))
+                    {
+                        $rs[$rowIndex]['resumeID'] = $rsResume[0]['attachmentID'];
+                    }
+                }
+
+                $isResumeMode = false;
+                $isKeywordsMode = true;
+
+                $keywordsWildCardString = $query;
 
                 break;
 
@@ -1997,6 +2039,7 @@ class CandidatesUI extends UserInterface
                 }
 
                 $isResumeMode = true;
+                $isKeywordsMode = false;
 
                 $this->_template->assign('active', $this);
                 $this->_template->assign('currentPage', $currentPage);
@@ -2035,6 +2078,7 @@ class CandidatesUI extends UserInterface
                 }
 
                 $isResumeMode = false;
+                $isKeywordsMode = false;
 
                 $phoneNumberWildCardString = $query;
                 break;
@@ -2069,9 +2113,11 @@ class CandidatesUI extends UserInterface
         $this->_template->assign('pager', $searchPager);
         $this->_template->assign('isResultsMode', true);
         $this->_template->assign('isResumeMode', $isResumeMode);
+        $this->_template->assign('isKeywordsMode', $isKeywordsMode);
         $this->_template->assign('wildCardString', $query);
         $this->_template->assign('resumeWildCardString', $resumeWildCardString);
         $this->_template->assign('keySkillsWildCardString', $keySkillsWildCardString);
+        $this->_template->assign('keywordsWildCardString', $keywordsWildCardString);
         $this->_template->assign('fullNameWildCardString', $fullNameWildCardString);
         $this->_template->assign('phoneNumberWildCardString', $phoneNumberWildCardString);
         $this->_template->assign('mode', $mode);

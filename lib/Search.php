@@ -392,6 +392,7 @@ class SearchCandidates
                 candidate.candidate_id AS candidateID,
                 candidate.first_name AS firstName,
                 candidate.last_name AS lastName,
+                candidate.chinese_name AS chineseName,
                 candidate.city AS city,
                 candidate.state AS state,
                 candidate.phone_home AS phoneHome,
@@ -421,7 +422,8 @@ class SearchCandidates
             AND
                 candidate.site_id = %s
             ORDER BY
-                %s %s",
+                %s %s
+            LIMIT 1000",
             $wildCardString,
             $wildCardString,
             $wildCardString,
@@ -450,6 +452,7 @@ class SearchCandidates
                 candidate.candidate_id AS candidateID,
                 candidate.first_name AS firstName,
                 candidate.last_name AS lastName,
+                candidate.chinese_name AS chineseName,
                 candidate.city AS city,
                 candidate.state AS state,
                 candidate.phone_home AS phoneHome,
@@ -477,7 +480,8 @@ class SearchCandidates
             AND
                 candidate.is_active = 1
             ORDER BY
-                %s %s",
+                %s %s
+            LIMIT 1000",
             $WHERE,
             $this->_siteID,
             $sortBy,
@@ -487,6 +491,78 @@ class SearchCandidates
         return $this->_db->getAllAssoc($sql);
     }
 
+    /**
+     * Returns all candidates with some fields matching $wildCardString.
+     *
+     * @param string wildcard match string
+     * @return array candidates data
+     */
+    public function byKeywords($wildCardString, $sortBy, $sortDirection)
+    {
+        $WHERE = DatabaseSearch::makeBooleanSQLWhere(
+            $wildCardString, $this->_db, "CONCAT (candidate.key_skills
+                    , ' ', candidate.current_employer
+                    , ' ', candidate.email1
+                    , ' ', candidate.job_title
+                    , ' ', candidate.major
+                    , ' ', candidate.city
+                    , ' ', candidate.state
+                    , ' ', candidate.address)"
+        );
+
+        $sql = sprintf(
+            "SELECT
+                CONCAT (candidate.key_skills
+                    , ' ', candidate.current_employer
+                    , ' ', candidate.email1
+                    , ' ', candidate.job_title
+                    , ' ', candidate.major
+                    , ' ', candidate.city
+                    , ' ', candidate.state
+                    , ' ', candidate.address)
+                    AS text,
+                candidate.candidate_id AS candidateID,
+                candidate.first_name AS firstName,
+                candidate.last_name AS lastName,
+                candidate.chinese_name AS chineseName,
+                candidate.city AS city,
+                candidate.state AS state,
+                candidate.phone_home AS phoneHome,
+                candidate.phone_cell AS phoneCell,
+                candidate.key_skills AS keySkills,
+                candidate.email1 AS email1,
+                owner_user.first_name AS ownerFirstName,
+                owner_user.last_name AS ownerLastName,
+                DATE_FORMAT(
+                    candidate.date_created, '%%m-%%d-%%y'
+                ) AS dateCreated,
+                DATE_FORMAT(
+                    candidate.date_modified, '%%m-%%d-%%y'
+                ) AS dateModified
+            FROM
+                candidate
+            LEFT JOIN user AS owner_user
+                ON candidate.owner = owner_user.user_id
+            WHERE
+                %s
+            AND
+                candidate.is_admin_hidden = 0
+            AND
+                candidate.site_id = %s
+            AND
+                candidate.is_active = 1
+            ORDER BY
+                %s %s
+            LIMIT 1000",
+            $WHERE,
+            $this->_siteID,
+            $sortBy,
+            $sortDirection
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+    
     /**
      * Returns all candidates with E-Mail addresses matching $wildCardString.
      *
@@ -503,6 +579,7 @@ class SearchCandidates
                 candidate.candidate_id AS candidateID,
                 candidate.first_name AS firstName,
                 candidate.last_name AS lastName,
+                candidate.chinese_name AS chineseName,
                 candidate.city AS city,
                 candidate.state AS state,
                 candidate.phone_home AS phoneHome,
@@ -528,7 +605,8 @@ class SearchCandidates
             AND
                 candidate.site_id = %s
             ORDER BY
-                %s %s",
+                %s %s
+            LIMIT 1000",
             $wildCardString,
             $this->_siteID,
             $sortBy,
@@ -558,6 +636,7 @@ class SearchCandidates
                 candidate.candidate_id AS candidateID,
                 candidate.first_name AS firstName,
                 candidate.last_name AS lastName,
+                candidate.chinese_name AS chineseName,
                 candidate.city AS city,
                 candidate.state AS state,
                 candidate.phone_home AS phoneHome,
@@ -598,7 +677,8 @@ class SearchCandidates
             AND
                 candidate.site_id = %s
             ORDER BY
-                %s %s",
+                %s %s
+            LIMIT 1000",
             $wildCardString,
             $wildCardString,
             $this->_siteID,
@@ -2215,6 +2295,7 @@ class SearchByResumePager extends Pager
                 attachment.text AS text,
                 candidate.first_name AS firstName,
                 candidate.last_name AS lastName,
+                candidate.chinese_name AS chineseName,
                 candidate.city AS city,
                 candidate.state AS state,
                 DATE_FORMAT(
