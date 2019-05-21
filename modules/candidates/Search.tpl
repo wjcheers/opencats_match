@@ -30,9 +30,9 @@
                             <label id="searchModeLabel" for="searchMode">Search By:</label>&nbsp;
                             <select id="searchMode" name="mode" onclick="advancedSearchConsider();" class="selectBox">
                                 <option value="searchByFullName"<?php if ($this->mode == "searchByFullName"): ?> selected<?php endif; ?>>Candidate Name</option>
-                                <option value="searchByResume"<?php if ($this->mode == "searchByResume" || empty($this->mode)): ?> selected<?php endif; ?>>Resume Keywords</option>
+                                <option value="searchByResume"<?php if ($this->mode == "searchByResume"): ?> selected<?php endif; ?>>Resume Keywords</option>
                                 <option value="searchByKeySkills"<?php if ($this->mode == "searchByKeySkills"): ?> selected<?php endif; ?>>Key Skills</option>
-                                <option value="searchByKeywords"<?php if ($this->mode == "searchByKeywords"): ?> selected<?php endif; ?>>Keywords</option>
+                                <option value="searchByKeywords"<?php if ($this->mode == "searchByKeywords" || empty($this->mode)): ?> selected<?php endif; ?>>Keywords</option>
                                 <option value="phoneNumber"<?php if ($this->mode == "phoneNumber"): ?> selected<?php endif; ?>>Phone Number</option>
                             </select>&nbsp;
                             <input type="text" class="inputbox" id="searchText" name="wildCardString" value="<?php if (!empty($this->wildCardString)) $this->_($this->wildCardString); ?>" style="width:550px" />&nbsp;*&nbsp;
