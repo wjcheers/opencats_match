@@ -366,6 +366,26 @@ class Pipelines
             {
                 return;
             }
+            */            
+                 
+            $sql = sprintf(
+                "UPDATE
+                    candidate
+                SET
+                    candidate.date_submitted = NOW()
+                WHERE
+                    candidate_id = %d
+                AND
+                    site_id = %s",
+                $this->_db->makeQueryInteger($candidateID),
+                $this->_db->makeQueryInteger($this->_siteID)  
+            );
+            $queryResult = $this->_db->query($sql);
+            /*
+            if (!$queryResult)
+            {
+                return;
+            }
             */
         }
         if($statusID == PIPELINE_STATUS_INTERVIEWING)

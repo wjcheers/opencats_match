@@ -567,6 +567,11 @@ class Candidates
                 DATE_FORMAT(
                     candidate.date_modified, '%%m-%%d-%%y (%%h:%%i %%p)'
                 ) AS dateModified,
+                CASE
+                    WHEN (COALESCE(candidate.date_submitted, 0) > (NOW() - INTERVAL 365 DAY))
+                        THEN 1 
+                    ELSE 0 
+                END AS isRecentSubmitted, 
                 COUNT(
                     candidate_joborder.joborder_id
                 ) AS pipeline,
@@ -1147,6 +1152,11 @@ class Candidates
                 DATE_FORMAT(
                     candidate.date_modified, '%%m-%%d-%%y'
                 ) AS dateModified,
+                CASE 
+                    WHEN (COALESCE(candidate.date_submitted, 0) > (NOW() - INTERVAL 365 DAY))
+                        THEN 1 
+                    ELSE 0 
+                END AS isRecentSubmitted, 
                 candidate.date_created AS dateCreatedSort,
                 owner_user.first_name AS ownerFirstName,
                 owner_user.last_name AS ownerLastName
@@ -1682,7 +1692,7 @@ class CandidatesDataGrid extends DataGrid
                                      'filter'         => 'candidate.candidate_id%2'),
 
             'First Name' =>     array('select'         => 'candidate.first_name AS firstName',
-                                      'pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'firstName\']).\'</a>\';',
+                                      'pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else if ($rsData[\'isRecentSubmitted\'] == 1) $className = \'jobLinkSubmitted\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'firstName\']).\'</a>\';',
                                       'sortableColumn' => 'firstName',
                                       'pagerWidth'     => 75,
                                       'pagerOptional'  => false,
@@ -1691,7 +1701,7 @@ class CandidatesDataGrid extends DataGrid
 
             'Last Name' =>      array('select'         => 'candidate.last_name AS lastName',
                                      'sortableColumn'  => 'lastName',
-                                     'pagerRender'     => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'lastName\']).\'</a>\';',
+                                     'pagerRender'     => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else if ($rsData[\'isRecentSubmitted\'] == 1) $className = \'jobLinkSubmitted\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'lastName\']).\'</a>\';',
                                      'pagerWidth'      => 85,
                                      'pagerOptional'   => false,
                                      'alphaNavigation' => true,
@@ -1824,6 +1834,14 @@ class CandidatesDataGrid extends DataGrid
                                      'pagerOptional' => false,
                                      'filterHaving' => 'DATE(candidate.date_modified)',
                                      'filterTypes'   => '===g=s'),
+                                     
+            'Submitted' =>      array('select'   => 'DATE_FORMAT(candidate.date_submitted, \'%m-%d-%y\') AS dateSubmitted',
+                                     'pagerRender'      => 'return $rsData[\'dateSubmitted\'];',
+                                     'sortableColumn'     => 'dateSubmittedSort',
+                                     'pagerWidth'    => 60,
+                                     'pagerOptional' => false,
+                                     'filterHaving' => 'DATE(candidate.date_submitted)',
+                                     'filterTypes'   => '===g=s'),
 
             /* This one only works when called from the saved list view.  Thats why it is not optional, filterable, or exportable.
              * FIXME:  Somehow make this defined in the associated savedListDataGrid class child.
@@ -1857,7 +1875,7 @@ class CandidatesDataGrid extends DataGrid
                                      
                                      
             'Chinese Name' =>     array('select'         => 'candidate.chinese_name AS chineseName',
-                                      'pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'chineseName\']).\'</a>\';',
+                                      'pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else if ($rsData[\'isRecentSubmitted\'] == 1) $className = \'jobLinkSubmitted\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'chineseName\']).\'</a>\';',
                                       'sortableColumn' => 'chineseName',
                                       'pagerWidth'     => 75,
                                       'pagerOptional'   => false,
@@ -2091,6 +2109,11 @@ class CandidatesDataGrid extends DataGrid
                 candidate.is_hot AS isHot,
                 candidate.date_modified AS dateModifiedSort,
                 candidate.date_created AS dateCreatedSort,
+                CASE 
+                    WHEN (COALESCE(candidate.date_submitted, 0) > (NOW() - INTERVAL 365 DAY))
+                        THEN 1 
+                    ELSE 0 
+                END AS isRecentSubmitted, 
             %s
             FROM
                 candidate
