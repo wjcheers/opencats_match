@@ -567,6 +567,9 @@ class Candidates
                 DATE_FORMAT(
                     candidate.date_modified, '%%m-%%d-%%y (%%h:%%i %%p)'
                 ) AS dateModified,
+                DATE_FORMAT(
+                    candidate.date_submitted, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateSubmitted,
                 CASE
                     WHEN (COALESCE(candidate.date_submitted, 0) > (NOW() - INTERVAL 365 DAY))
                         THEN 1 
@@ -1152,6 +1155,9 @@ class Candidates
                 DATE_FORMAT(
                     candidate.date_modified, '%%m-%%d-%%y'
                 ) AS dateModified,
+                DATE_FORMAT(
+                    candidate.date_submitted, '%%m-%%d-%%y'
+                ) AS dateSubmitted,
                 CASE 
                     WHEN (COALESCE(candidate.date_submitted, 0) > (NOW() - INTERVAL 365 DAY))
                         THEN 1 
@@ -2109,6 +2115,7 @@ class CandidatesDataGrid extends DataGrid
                 candidate.is_hot AS isHot,
                 candidate.date_modified AS dateModifiedSort,
                 candidate.date_created AS dateCreatedSort,
+                candidate.date_submitted AS dateSubmittedSort,
                 CASE 
                     WHEN (COALESCE(candidate.date_submitted, 0) > (NOW() - INTERVAL 365 DAY))
                         THEN 1 
