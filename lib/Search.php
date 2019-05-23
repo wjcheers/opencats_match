@@ -750,7 +750,8 @@ class SearchCompanies
             AND
                 company.site_id = %s
             ORDER BY
-                %s %s",
+                %s %s
+            LIMIT 1000",
             $wildCardString,
             $this->_siteID,
             $sortBy,

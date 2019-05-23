@@ -73,7 +73,7 @@ $jobOrderID = $_REQUEST['jobOrderID'];
 // '+' is removed after urldecode(). So remove urldecode below.
 //
 // 20190415 WJ: after remove urldecode, _REQUEST['notes'] with "i'm '''" will becomes "i'm %27%27%27"
-// so I use rawurldecode instead of urldecode. rawurldecode keep "+" but urldecode not.
+// so I use rawurldecode instead of urldecode. rawurldecode keep "+" sign but urldecode not.
 $activityNote = trim(rawurldecode($_REQUEST['notes']));
 $activityDate = trim(rawurldecode($_REQUEST['date']));
 $activityHour = trim(rawurldecode($_REQUEST['hour']));

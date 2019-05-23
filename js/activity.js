@@ -41,8 +41,8 @@ ACTIVITY_CONFIRM     = 900;
 ACTIVITY_DRIFTING    = 1000;
 ACTIVITY_IM_LINKEDIN = 1100;
 
-ARRANGE_TEXT = "Arrange: \nDate: 8/8/2018\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
-CONFIRM_TEXT = "Confirm: \nDate: 8/8/2018\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
+ARRANGE_TEXT = "Arrange: \nDate: 9/9/2019\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
+CONFIRM_TEXT = "Confirm: \nDate: 9/9/2019\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
 
 function Activity_fillTypeSelect(selectList, selectedText)
 {

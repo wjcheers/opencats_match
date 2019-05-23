@@ -281,7 +281,7 @@
                                 <input type="checkbox" name="statusChange" id="checkboxStatusChange" onclick="return false;" <?php if (!$this->canEmail): ?>disabled<?php endif; ?> /> Notify Jecho status change
                             </div>
                             <div style="display:none;" id="divStatusChange2Owner">
-                                <input type="checkbox" name="statusChange2Owner" id="checkboxStatusChange2Owner" onclick="return false;" <?php if (!$this->canEmail): ?>disabled<?php endif; ?> /> Notify owner status change
+                                <input type="checkbox" name="statusChange2Owner" id="checkboxStatusChange2Owner" /> Notify owner status change
                             </div>
                         </td>
 
