@@ -1837,6 +1837,12 @@ class CandidatesDataGrid extends DataGrid
                                      'filterable' => false,
                                      'exportable' => false),
 
+            'Keywords' =>      array('select'    => 'CONCAT_WS(" ", candidate.key_skills, candidate.current_employer, candidate.email1, candidate.job_title, candidate.major, candidate.city, candidate.state, candidate.address) AS keywords',
+                                     'filter'    => 'CONCAT_WS(" ", candidate.key_skills, candidate.current_employer, candidate.email1, candidate.job_title, candidate.major, candidate.city, candidate.state, candidate.address)',
+                                     'pagerRender'      => 'return $rsData[\'keywords\'];',
+                                     'exportable' => false,
+                                     'filterTypes'   => '=b=~',),
+                                      
             'OwnerID' =>       array('select'    => '',
                                      'filter'    => 'candidate.owner',
                                      'pagerOptional' => false,

@@ -260,7 +260,7 @@ class ListsUI extends UserInterface
     private function addToListFromDatagridModal()
     {
         /* Bail out if we don't have a valid type. */
-        if (!$this->isRequiredIDValid('dataItemType', $_GET))
+        if (!$this->isRequiredIDValid('dataItemType', $_REQUEST))
         {
             CommonErrors::fatalModal(COMMONERROR_BADINDEX, $this);
             return;
@@ -269,6 +269,15 @@ class ListsUI extends UserInterface
         $dataGrid = DataGrid::getFromRequest();
 
         $dataItemIDArray = $dataGrid->getExportIDs();
+
+        if (isset($_REQUEST['description']))
+        {
+            $description = $_REQUEST['description'];
+        }
+        else
+        {
+            $description = '';
+        }
 
         /* Validate each ID */
         foreach ($dataItemIDArray as $index => $dataItemID)
@@ -284,13 +293,14 @@ class ListsUI extends UserInterface
 
         $savedLists = new SavedLists($this->_siteID);
 
-        $savedListsRS = $savedLists->getAll($dataItemType, STATIC_LISTS);
+        $savedListsRS = $savedLists->getAllByDescription($dataItemType, $description, STATIC_LISTS);
 
         $dataItemDesc = TemplateUtility::getDataItemTypeDescription($dataItemType);
 
         $this->_template->assign('dataItemDesc', $dataItemDesc);
         $this->_template->assign('savedListsRS', $savedListsRS);
         $this->_template->assign('dataItemType', $dataItemType);
+        $this->_template->assign('description',  $description);
         $this->_template->assign('dataItemIDArray', $dataItemIDArray);
         $this->_template->assign('sessionCookie', $_SESSION['CATS']->getCookie());
 

@@ -760,6 +760,14 @@ function showNewFilter(filterCounter, filterAreaID, selectableColumns, instanceN
                 selectColumnOption.innerHTML = 'is greater than (date)';
                 selectOperatorColumn.appendChild(selectColumnOption);
             }
+
+            if (possibleType == '=b')
+            {
+                selectColumnOption = document.createElement('option');
+                selectColumnOption.value = '=b';
+                selectColumnOption.innerHTML = 'boolean';
+                selectOperatorColumn.appendChild(selectColumnOption);
+            }
             
             if (possibleType == '=#')
             {

@@ -500,26 +500,12 @@ class SearchCandidates
     public function byKeywords($wildCardString, $sortBy, $sortDirection)
     {
         $WHERE = DatabaseSearch::makeBooleanSQLWhere(
-            $wildCardString, $this->_db, "CONCAT (candidate.key_skills
-                    , ' ', candidate.current_employer
-                    , ' ', candidate.email1
-                    , ' ', candidate.job_title
-                    , ' ', candidate.major
-                    , ' ', candidate.city
-                    , ' ', candidate.state
-                    , ' ', candidate.address)"
+            $wildCardString, $this->_db, "CONCAT_WS(' ', candidate.key_skills, candidate.current_employer, candidate.email1, candidate.job_title, candidate.major, candidate.city, candidate.state, candidate.address)"
         );
 
         $sql = sprintf(
             "SELECT
-                CONCAT (candidate.key_skills
-                    , ' ', candidate.current_employer
-                    , ' ', candidate.email1
-                    , ' ', candidate.job_title
-                    , ' ', candidate.major
-                    , ' ', candidate.city
-                    , ' ', candidate.state
-                    , ' ', candidate.address)
+                CONCAT_WS(' ', candidate.key_skills, candidate.current_employer, candidate.email1, candidate.job_title, candidate.major, candidate.city, candidate.state, candidate.address)
                     AS text,
                 candidate.candidate_id AS candidateID,
                 candidate.first_name AS firstName,

@@ -848,6 +848,10 @@ class DataGrid
                     case '=s':
                         $filterOperatorHuman = ' is less than (date)';
                         break;
+                        
+                    case '=b':
+                        $filterOperatorHuman = ' boolean';
+                        break;
 
                     case '=#':
                         $filterOperatorHuman = ' has element';
@@ -1127,19 +1131,10 @@ class DataGrid
                     $joinSQL[md5($this->_classColumns[$columnName]['join'])] = $this->_classColumns[$columnName]['join'];
                 }
 
-                // Add AND condition
                 $and = false;
-                if (strpos($argument, ' and ') !== false) {
-                    $and = true;
-                }
-                if (strpos($argument, ' AND ') !== false) {
-                    $and = true;
-                }
-                $argument = str_replace(' and ', '/', $argument);
-                $argument = str_replace(' AND ', '/', $argument);
-                // ~Add
-
+                
                 /* The / character works as an OR clause for filters, exclude url and web_site */
+                // TODO: more http link should be skipped....
                 if((isset($this->_classColumns[$columnName]['filterHaving']) &&
                     ((strpos($this->_classColumns[$columnName]['filterHaving'], 'web_site') !== false) ||
                      (strpos($this->_classColumns[$columnName]['filterHaving'], 'url') !== false)))
@@ -1150,8 +1145,24 @@ class DataGrid
                 {
                     $arguments = array($argument);
                 }
+                // boolean search does not need to handle the arguments
+                else if (strpos($data, '=b') !== false)
+                {
+                    $arguments = array($argument);
+                }
                 else
                 {
+                    // Add AND condition
+                    if (strpos($argument, ' and ') !== false) {
+                        $and = true;
+                    }
+                    if (strpos($argument, ' AND ') !== false) {
+                        $and = true;
+                    }
+                    $argument = str_replace(' and ', '/', $argument);
+                    $argument = str_replace(' AND ', '/', $argument);
+                    // ~Add
+
                     $argument = str_replace(' or ', '/', $argument);
                     $argument = str_replace(' OR ', '/', $argument);
                     $arguments = explode('/', $argument);
@@ -1259,6 +1270,24 @@ class DataGrid
                         if (isset($this->_classColumns[$columnName]['filterHaving']))
                         {
                             $havingSQL_or[] = $this->_classColumns[$columnName]['filterHaving'] . ' >= ' . $db->makeQueryString($argument)  .' ';
+                        }
+                    }
+                    
+                    /* Boolean (=b) */
+                    if (strpos($data, '=b') !== false)
+                    {
+                        $WHERE = DatabaseSearch::makeBooleanSQLWhere(
+                            $argument, $db, $this->_classColumns[$columnName]['filter']
+                        );                        
+                        
+                        if (isset($this->_classColumns[$columnName]['filter']))
+                        {
+                            $whereSQL_or[] = $WHERE;
+                        }
+
+                        if (isset($this->_classColumns[$columnName]['filterHaving']))
+                        {
+                            $havingSQL_or[] = $WHERE;
                         }
                     }
 
@@ -1702,7 +1731,8 @@ class DataGrid
                         ($index == 'Cell Phone') ||
                         ($index == 'Work Phone') ||
                         ($index == 'E-Mail') ||
-                        ($index == '2nd E-Mail')) 
+                        ($index == '2nd E-Mail') ||
+                        ($index == 'Keywords')) 
                     {
                         continue;
                     }

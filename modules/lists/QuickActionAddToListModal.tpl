@@ -2,14 +2,23 @@
 <?php TemplateUtility::printModalHeader('Candidates', array('js/lists.js'), 'Add to '.$this->dataItemDesc.' Static Lists'); ?>
 
     <table class="searchTable">
-        <form id="searchByJobTitleForm" name="searchByJobTitleForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=lists&amp;a=quickActionAddToListModal" method="post">
+        <form id="searchByListNameForm" name="searchByListNameForm" action='<?php echo(CATSUtility::getIndexName()); ?>?<?php
+            $i = 0;
+            foreach($_REQUEST as $key => $value)
+            {
+                if($i != 0) {
+                    echo "&";
+                }
+                echo $key . '=' . urlencode($value);
+                $i++;
+            }
+            ?>
+            ' method="post">
             <input type="hidden" name="postback" id="postback" value="postback" />
-            <input type="hidden" id="dataItemType" name="dataItemType" value="<?php echo($this->dataItemType); ?>" />
-            <input type="hidden" id="dataItemID" name="dataItemID" value="<?php echo($this->dataItemID); ?>" />
 
             <tr>
                 <td>Search by List Name:&nbsp;</td>
-                <td><input type="text" class="inputbox" id="description" name="description" style="width:200px;" value="<?php echo($this->description); ?>"/>&nbsp;*</td>
+                <td><input type="text" class="inputbox" id="description" name="description" style="width:200px;" value="<?php if(isset($this->description)) { echo($this->description); } ?>"/>&nbsp;*</td>
             </tr>
             <tr>
                 <td><input type="submit" class="button" id="search" name="search" value="Search by List Name" /></td>
