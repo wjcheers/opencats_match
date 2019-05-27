@@ -15,7 +15,10 @@
             <tr>
                 <th align="left" nowrap="nowrap">First Name</th>
                 <th align="left" nowrap="nowrap">Last Name</th>
+                <th align="left" nowrap="nowrap">Chinese Name</th>
                 <th align="left" nowrap="nowrap">Candidate Owner</th>
+                <th align="left" nowrap="nowrap">JobOrder</th>
+                <th align="left" nowrap="nowrap">Company</th>
                 <th align="left" nowrap="nowrap">JobOrder Date Submitted</th>
                 <th align="left" nowrap="nowrap">Candiate Date Modified</th>
             </tr>
@@ -28,7 +31,12 @@
                     <td valign="top" align="left">
                         <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($submitData['candidateID']) ?>" target="_blank"><?php $this->_($submitData['lastName']) ?></a>
                     &nbsp;</td>
+                    <td valign="top" align="left">
+                        <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($submitData['candidateID']) ?>" target="_blank"><?php $this->_($submitData['chineseName']) ?></a>
+                    &nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($submitData['ownerFullName']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($submitData['jobOrderTitle']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($submitData['companyName']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($submitData['dateSubmitted']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($submitData['dateModified']) ?>&nbsp;</td>
                 </tr>

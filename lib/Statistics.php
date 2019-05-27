@@ -345,10 +345,11 @@ class Statistics
                 candidate.candidate_id AS candidateID,
                 candidate.first_name AS firstName,
                 candidate.last_name AS lastName,
+                candidate.chinese_name AS chineseName,
                 candidate.date_modified AS dateModified,
                 joborder.joborder_id AS jobOrderID,
-                joborder.title AS title,
-                joborder.company_id AS companyID,
+                joborder.title AS jobOrderTitle,
+                company.name AS companyName,
                 CONCAT(
                     owner_user.first_name, ' ', owner_user.last_name
                 ) AS ownerFullName,
