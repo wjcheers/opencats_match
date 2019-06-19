@@ -177,10 +177,10 @@
                                 <?php $this->pager->printSortLink('state', 'State'); ?>
                             </th>
                             <th align="left" nowrap="nowrap">
-                                <?php $this->pager->printSortLink('dateCreated', 'Created'); ?>
+                                <?php $this->pager->printSortLink('dateCreatedSort', 'Created'); ?>
                             </th>
                             <th align="left" nowrap="nowrap">
-                                <?php $this->pager->printSortLink('dateModified', 'Modified'); ?>
+                                <?php $this->pager->printSortLink('dateModifiedSort', 'Modified'); ?>
                             </th>
                             <th align="left" nowrap="nowrap">
                                 <?php $this->pager->printSortLink('owner_user.last_name', 'Owner'); ?>
@@ -242,7 +242,7 @@
                             <th nowrap>&nbsp;</th>
                             <th align="left" nowrap="nowrap">
                                 <?php $this->pager->printSortLink('firstName', 'First Name'); ?>
-                            </th
+                            </th>
                             <th align="left" nowrap="nowrap">
                                 <?php $this->pager->printSortLink('lastName', 'Last Name'); ?>
                             </th>
@@ -257,10 +257,10 @@
                                 <?php $this->pager->printSortLink('state', 'State'); ?>
                             </th>
                             <th align="left" nowrap="nowrap">
-                                <?php $this->pager->printSortLink('dateCreated', 'Created'); ?>
+                                <?php $this->pager->printSortLink('dateCreatedSort', 'Created'); ?>
                             </th>
                             <th align="left" nowrap="nowrap">
-                                <?php $this->pager->printSortLink('dateModified', 'Modified'); ?>
+                                <?php $this->pager->printSortLink('dateModifiedSort', 'Modified'); ?>
                             </th>
                             <th align="left" nowrap="nowrap">
                                 <?php $this->pager->printSortLink('owner_user.last_name', 'Owner'); ?>

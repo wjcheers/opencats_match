@@ -401,6 +401,8 @@ class SearchCandidates
                 candidate.email1 AS email1,
                 owner_user.first_name AS ownerFirstName,
                 owner_user.last_name AS ownerLastName,
+                candidate.date_created AS dateCreatedSort,
+                candidate.date_modified AS dateModifiedSort,
                 DATE_FORMAT(
                     candidate.date_created, '%%m-%%d-%%y'
                 ) AS dateCreated,
@@ -461,6 +463,8 @@ class SearchCandidates
                 candidate.email1 AS email1,
                 owner_user.first_name AS ownerFirstName,
                 owner_user.last_name AS ownerLastName,
+                candidate.date_created AS dateCreatedSort,
+                candidate.date_modified AS dateModifiedSort,
                 DATE_FORMAT(
                     candidate.date_created, '%%m-%%d-%%y'
                 ) AS dateCreated,
@@ -519,6 +523,8 @@ class SearchCandidates
                 candidate.email1 AS email1,
                 owner_user.first_name AS ownerFirstName,
                 owner_user.last_name AS ownerLastName,
+                candidate.date_created AS dateCreatedSort,
+                candidate.date_modified AS dateModifiedSort,
                 DATE_FORMAT(
                     candidate.date_created, '%%m-%%d-%%y'
                 ) AS dateCreated,
@@ -574,6 +580,8 @@ class SearchCandidates
                 candidate.email1 AS email1,
                 owner_user.first_name AS ownerFirstName,
                 owner_user.last_name AS ownerLastName,
+                candidate.date_created AS dateCreatedSort,
+                candidate.date_modified AS dateModifiedSort,
                 DATE_FORMAT(
                     candidate.date_created, '%%m-%%d-%%y'
                 ) AS dateCreated,
@@ -631,6 +639,8 @@ class SearchCandidates
                 candidate.email1 AS email1,
                 owner_user.first_name AS ownerFirstName,
                 owner_user.last_name AS ownerLastName,
+                candidate.date_created AS dateCreatedSort,
+                candidate.date_modified AS dateModifiedSort,
                 DATE_FORMAT(
                     candidate.date_created, '%%m-%%d-%%y'
                 ) AS dateCreated,
@@ -719,6 +729,8 @@ class SearchCompanies
                 company.url AS url,
                 company.key_technologies AS keyTechnologies,
                 company.is_hot AS isHot,
+                company.date_created AS dateCreatedSort,
+                company.date_modified AS dateModifiedSort,
                 DATE_FORMAT(
                     company.date_created, '%%m-%%d-%%y'
                 ) AS dateCreated,
@@ -2365,6 +2377,7 @@ class SearchPager extends Pager
         $this->_sortByFields = array(
             'firstName',
             'lastName',
+            'chineseName',
             'city',
             'state',
             'dateModified',
