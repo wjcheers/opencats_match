@@ -40,9 +40,12 @@ ACTIVITY_ARRANGE     = 800;
 ACTIVITY_CONFIRM     = 900;
 ACTIVITY_DRIFTING    = 1000;
 ACTIVITY_IM_LINKEDIN = 1100;
+ACTIVITY_INTERVIEW   = 1200;
 
 ARRANGE_TEXT = "Arrange: \nDate: 9/9/2019\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
 CONFIRM_TEXT = "Confirm: \nDate: 9/9/2019\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
+INTERVIEW_TEXT = "Interview: \n1.興趣程度(和前一次面試或投履歷時相比)\n2.面試感想\n  A.對面試官、環境(文化)評價\n  B.和自己技能的相符程度、可發揮空間\n  C.對工作內容的興趣程度\n3.其他(可以參考上方面試回饋範例)\n";
+QUALIFYING_TEXT = "1.必不能安排的時間\n2.其他面試及Offer\n3.預期到職日\n4.申請動機\n5.聯繫方式\n\n";
 
 function Activity_fillTypeSelect(selectList, selectedText)
 {
@@ -103,6 +106,11 @@ function Activity_fillTypeSelect(selectList, selectedText)
     optionElements[10].value = ACTIVITY_IM_LINKEDIN;
     optionElements[10].appendChild(document.createTextNode('IM (Linkedin)'));
 
+    /* Interview option. */
+    optionElements[11] = document.createElement('option');
+    optionElements[11].value = ACTIVITY_CONFIRM;
+    optionElements[11].appendChild(document.createTextNode('Interview'));
+    
     /* Select the correct option. */
     if (selectedText)
     {
@@ -149,6 +157,10 @@ function Activity_fillTypeSelect(selectList, selectedText)
         else if (selectedText == 'IM (Linkedin)')
         {
             optionElements[10].setAttribute('selected', 'selected');
+        }
+        else if (selectedText == 'Interview')
+        {
+            optionElements[11].setAttribute('selected', 'selected');
         }
     }
 
@@ -790,11 +802,17 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
                 jobOrdersArrayStringTitle[statusIndex],
                 jobOrdersArrayStringCompany[statusIndex]
             );
-            if (activityEntry.value == '' || activityEntry.value.indexOf('Status change: ') != -1 || activityEntry.value.indexOf('Arrange: ') != -1 || activityEntry.value.indexOf('Confirm: ') != -1)
+            if (activityEntry.value == '' || activityEntry.value.indexOf('Status change: ') != -1 || activityEntry.value.indexOf('Arrange: ') != -1 || activityEntry.value.indexOf('Confirm: ') != -1 || activityEntry.value.indexOf('Interview: ') != -1)
             {
                 activityEntry.value = 'Status change: ' +
                     statusSelectList[statusSelectList.selectedIndex].text + '\n';
+                    
+                if(statusSelectList[statusSelectList.selectedIndex].text == 'Qualifying')
+                {
+                    activityEntry.value = activityEntry.value + QUALIFYING_TEXT;
+                }
             }
+            
             if(activityType[activityType.selectedIndex].text != 'Confirm')
             {
                 if(activityEntry.value.indexOf('Confirm: ') != -1)
@@ -808,6 +826,14 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
                 {
                     activityEntry.value = activityEntry.value.replace(/Arrange[\s\S]*/g, '');
                 }
+            }
+            if(activityType[activityType.selectedIndex].text != 'Interview')
+            {
+                if(activityEntry.value.indexOf('Interview: ') != -1)
+                {
+                    activityEntry.value = activityEntry.value.replace(/Interview[\s\S]*/g, '');
+                }
+                document.getElementById('triggerInterviewSpan').style.display = 'none';
             }
 
             if(activityType[activityType.selectedIndex].text == 'Arrange')
@@ -823,6 +849,14 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
                 {
                     activityEntry.value = activityEntry.value + CONFIRM_TEXT;
                 }
+            }
+            else if(activityType[activityType.selectedIndex].text == 'Interview')
+            {
+                if (activityEntry.value.indexOf('Interview: ') == -1)
+                {
+                    activityEntry.value = activityEntry.value + INTERVIEW_TEXT;
+                }
+                document.getElementById('triggerInterviewSpan').style.display = 'inline';
             }
         }
     }
@@ -938,6 +972,14 @@ function AS_onActivityChange(addActivityCheckboxID, activityTypeSelectID,
             activityNote.value = activityNote.value.replace(/Confirm[\s\S]*/g, '');
         }
     }
+    if(activityTypeSelect[activityTypeSelect.selectedIndex].text != 'Interview')
+    {
+        if(activityNote.value.indexOf('Interview: ') != -1)
+        {
+            activityNote.value = activityNote.value.replace(/Interview[\s\S]*/g, '');
+        }
+        document.getElementById('triggerInterviewSpan').style.display = 'none';
+    }
 
     if(activityTypeSelect[activityTypeSelect.selectedIndex].text == 'Arrange')
     {
@@ -952,6 +994,14 @@ function AS_onActivityChange(addActivityCheckboxID, activityTypeSelectID,
         {
             activityNote.value = activityNote.value + CONFIRM_TEXT;
         }
+    }
+    else if(activityTypeSelect[activityTypeSelect.selectedIndex].text == 'Interview')
+    {
+        if (activityNote.value.indexOf('Interview: ') == -1)
+        {
+            activityNote.value = activityNote.value + INTERVIEW_TEXT;
+        }
+        document.getElementById('triggerInterviewSpan').style.display = 'inline';
     }
 }
 

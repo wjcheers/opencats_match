@@ -41,6 +41,7 @@ define('ACTIVITY_ARRANGE',     800);
 define('ACTIVITY_CONFIRM',     900);
 define('ACTIVITY_DRIFTING',   1000);
 define('ACTIVITY_IM_LINKEDIN',1100);
+define('ACTIVITY_INTERVIEW',  1200);
 
 /**
  * Candidates library.

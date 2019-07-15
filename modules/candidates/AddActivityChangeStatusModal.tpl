@@ -97,12 +97,12 @@
                         </select>
                         <span id="changeStatusSpanB" style="color: #aaaaaa;">&nbsp;*</span>&nbsp;&nbsp;
                         <span id="triggerEmailSpan" style="display: none;"><input type="checkbox" name="triggerEmail" id="triggerEmail" onclick="AS_onSendEmailChange('triggerEmail', 'sendEmailCheckTR', 'visibleTR');" />Send E-Mail Notification to Candidate</span>
-                        <br><span id="triggerValidSpan" style="display: none;"><input type="checkbox" name="triggerValid" id="triggerValid" /><b>Already checked the Effective Recommendation *<br>Never applied a job of this company or applied more than 1 year</b></span>
-                        <br><span id="triggerPersonalAgreementSpan" style="display: none;" data-personal-agreement-count=0 data-personal-agreement=<?php if ($this->personalAgreementPresent): ?>"1" <?php else: ?>"0"<?php endif; ?> ><input type="checkbox" name="triggerPersonalAgreement" id="triggerPersonalAgreement" /><b>Prepare Personal Agreement later.</b></span>
-                        <br><span id="triggerCurrentDesiredPayRatioSpan" style="display: none;" data-current-desired-pay-ratio-count=0 data-current-pay=<?php echo($this->currentPay) ?> data-desired-pay=<?php echo($this->desiredPay) ?> ><input type="checkbox" name="triggerCurrentDesiredPayRatio" id="triggerCurrentDesiredPayRatio" /><b>Confirm that Desired Pay is 1.2 times larger than Current Pay.</b></span>
-                        <br><span id="triggerCurrentPaySpan" style="display: none;" data-current-pay-count=0 data-current-pay=<?php echo($this->currentPay) ?> ><input type="checkbox" name="triggerCurrentPay" id="triggerCurrentPay" /><b>Prepare Current Pay later.</b></span>
-                        <br><span id="triggerDesiredPaySpan" style="display: none;" data-desired-pay-count=0 data-desired-pay=<?php echo($this->desiredPay) ?> ><input type="checkbox" name="triggerDesiredPay" id="triggerDesiredPay" /><b>Prepare Desired Pay later.</b></span>
-                        <br><span id="triggerValidEmailSpan" style="display: none;" data-email-count=0 data-email=<?php echo($this->email1) ?> ><input type="checkbox" name="triggerValidEmail" id="triggerValidEmail" /><b>Prepare Email later.</b></span>
+                        <span id="triggerValidSpan" style="display: none;"><br><input type="checkbox" name="triggerValid" id="triggerValid" /><b>檢查事項 *<br>1. 一年內沒投遞過<br>2. Salary Structure 是否寫進 Misc Notes 了</b></span>
+                        <span id="triggerPersonalAgreementSpan" style="display: none;" data-personal-agreement-count=0 data-personal-agreement=<?php if ($this->personalAgreementPresent): ?>"1" <?php else: ?>"0"<?php endif; ?> ><br><input type="checkbox" name="triggerPersonalAgreement" id="triggerPersonalAgreement" /><b>Prepare Personal Agreement later.</b></span>
+                        <span id="triggerCurrentDesiredPayRatioSpan" style="display: none;" data-current-desired-pay-ratio-count=0 data-current-pay=<?php echo($this->currentPay) ?> data-desired-pay=<?php echo($this->desiredPay) ?> ><br><input type="checkbox" name="triggerCurrentDesiredPayRatio" id="triggerCurrentDesiredPayRatio" /><b>Confirm that Desired Pay is 1.2 times larger than Current Pay.</b></span>
+                        <span id="triggerCurrentPaySpan" style="display: none;" data-current-pay-count=0 data-current-pay=<?php echo($this->currentPay) ?> ><br><input type="checkbox" name="triggerCurrentPay" id="triggerCurrentPay" /><b>Prepare Current Pay later.</b></span>
+                        <span id="triggerDesiredPaySpan" style="display: none;" data-desired-pay-count=0 data-desired-pay=<?php echo($this->desiredPay) ?> ><br><input type="checkbox" name="triggerDesiredPay" id="triggerDesiredPay" /><b>Prepare Desired Pay later.</b></span>
+                        <span id="triggerValidEmailSpan" style="display: none;" data-email-count=0 data-email=<?php echo($this->email1) ?> ><br><input type="checkbox" name="triggerValidEmail" id="triggerValidEmail" /><b>Prepare Email later.</b></span>
                     </div>
                 </td>
             </tr>
@@ -138,7 +138,11 @@
                             <option value="<?php echo(ACTIVITY_CONFIRM); ?>">Confirm</option>
                             <option value="<?php echo(ACTIVITY_DRIFTING); ?>">Drifting</option>
                             <option value="<?php echo(ACTIVITY_IM_LINKEDIN); ?>">IM (Linkedin)</option>
+                            <option value="<?php echo(ACTIVITY_INTERVIEW); ?>">Interview</option>
                         </select><br />
+                                                
+                        <span id="triggerInterviewSpan" style="display: none;"><b><a target="_black" href="https://docs.google.com/document/d/1qSIBtph2RZvqscrApepj4VYeEAin8tZuOAkI4N8ryv0">Interview Feedback Examples</a></b><br></span>
+                        
                         <span id="addActivitySpanB">Activity Notes</span><br />
                         <textarea name="activityNote" id="activityNote" cols="50" rows="10" style="margin-bottom: 4px;" class="inputbox"></textarea>
                     </div>

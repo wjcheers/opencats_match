@@ -250,3 +250,24 @@ function checkValidEmail()
 
     return errorMessage;
 }
+
+
+function checkQualifyingNotes()
+{
+    var errorMessage = '';
+    fieldLabel = document.getElementById('triggerQualifyingNotesSpan');
+
+    if((document.getElementById('triggerQualifyingNotesSpan').style.display != 'none') &&
+       (document.getElementById('triggerQualifyingNotes').checked == false))
+    {
+        errorMessage = "    - Did you confirm the Necessary Materials of this candidate?\n\n";
+
+        fieldLabel.style.color = '#ff0000';        
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
