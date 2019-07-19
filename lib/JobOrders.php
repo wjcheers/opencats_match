@@ -1009,6 +1009,47 @@ class JobOrders
 
         return (boolean) $this->_db->query($sql);
     }
+    
+    
+    /**
+     * Get the list which the job order belongs to.
+     *
+     * @param integer JobOrder ID.
+     * @return array Multi-dimensional associative result set array of
+     *               Job Order list data, or array() if no records were
+     *               returned.
+     */
+    public function getListsForJobOrder($jobOrderID){
+        $sql = sprintf("
+            SELECT
+                saved_list.description AS name,
+                saved_list.saved_list_id AS listID,
+                saved_list.number_entries AS numberEntries,
+                CONCAT(
+                    entered_by_user.first_name, ' ', entered_by_user.last_name
+                ) AS enteredByFullName,
+                saved_list_entry.date_created AS dateAddedToList
+            FROM
+                saved_list_entry
+            LEFT JOIN saved_list
+                ON saved_list.saved_list_id = saved_list_entry.saved_list_id
+            LEFT JOIN user AS entered_by_user
+                ON entered_by_user.user_id = saved_list.created_by
+            WHERE
+                saved_list_entry.site_id = %s 
+            AND
+                saved_list.data_item_type = %s 
+            AND
+                saved_list_entry.data_item_type = %s 
+            AND 
+                data_item_id = %s",
+            $this->_siteID,
+            DATA_ITEM_JOBORDER,
+            DATA_ITEM_JOBORDER,
+            $jobOrderID
+            );
+        return $this->_db->getAllAssoc($sql);
+    }
 }
 
 

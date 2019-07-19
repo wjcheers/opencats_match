@@ -213,6 +213,16 @@ class CompaniesUI extends UserInterface
             return;
         }
 
+        /* Is this a popup? */
+        if (isset($_GET['display']) && $_GET['display'] == 'popup')
+        {
+            $isPopup = true;
+        }
+        else
+        {
+            $isPopup = false;
+        }
+
         $companyID = $_GET['companyID'];
 
         $companies = new Companies($this->_siteID);
@@ -489,6 +499,8 @@ class CompaniesUI extends UserInterface
             $privledgedUser = true;
         }
 
+        $lists = $companies->getListsForCompany($companyID);
+
         $this->_template->assign('active', $this);
         $this->_template->assign('data', $data);
         $this->_template->assign('attachmentsRS', $attachmentsRS);
@@ -504,6 +516,8 @@ class CompaniesUI extends UserInterface
         $this->_template->assign('privledgedUser', $privledgedUser);
         $this->_template->assign('companyID', $companyID);
         $this->_template->assign('sessionCookie', $_SESSION['CATS']->getCookie());
+        $this->_template->assign('isPopup', $isPopup);
+        $this->_template->assign('lists', $lists);
 
         if (!eval(Hooks::get('CLIENTS_SHOW'))) return;
 

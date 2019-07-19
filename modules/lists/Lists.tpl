@@ -6,7 +6,7 @@
         <?php TemplateUtility::printQuickSearch(); ?>
 
         <div id="contents"<?php echo !$this->dataGrid->getNumberOfRows() ? ' style="background-color: #E6EEFF; padding: 0px;"' : ''; ?>>
-            <?php if ($this->dataGrid->getNumberOfRows()): ?>
+            <?php if ($this->totalSaveLists): ?>
             <table width="100%">
                 <tr>
                     <td width="3%">

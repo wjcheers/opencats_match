@@ -758,6 +758,46 @@ class Companies
         // currently, call by ActivityEntries.php when adding an activity
         return true;
     }
+    
+    /**
+     * Get the list which the company belongs to.
+     *
+     * @param integer Company ID.
+     * @return array Multi-dimensional associative result set array of
+     *               Company list data, or array() if no records were
+     *               returned.
+     */
+    public function getListsForCompany($CompanyID){
+        $sql = sprintf("
+            SELECT
+                saved_list.description AS name,
+                saved_list.saved_list_id AS listID,
+                saved_list.number_entries AS numberEntries,
+                CONCAT(
+                    entered_by_user.first_name, ' ', entered_by_user.last_name
+                ) AS enteredByFullName,
+                saved_list_entry.date_created AS dateAddedToList
+            FROM
+                saved_list_entry
+            LEFT JOIN saved_list
+                ON saved_list.saved_list_id = saved_list_entry.saved_list_id
+            LEFT JOIN user AS entered_by_user
+                ON entered_by_user.user_id = saved_list.created_by
+            WHERE
+                saved_list_entry.site_id = %s 
+            AND
+                saved_list.data_item_type = %s 
+            AND
+                saved_list_entry.data_item_type = %s 
+            AND 
+                data_item_id = %s",
+            $this->_siteID,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_COMPANY,
+            $CompanyID
+            );
+        return $this->_db->getAllAssoc($sql);
+    }
 }
 
 

@@ -49,6 +49,26 @@ class SavedLists
 
 
     /**
+     * Returns number of total activities (for joborders datagrid).
+     *
+     * @return integer count
+     */
+    public function getCount()
+    {
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS totalSaveLists
+            FROM
+                saved_list
+            WHERE
+                saved_list.site_id = %s",
+            $this->_siteID
+        );
+
+        return $this->_db->getColumn($sql, 0, 0);
+    }
+    
+    /**
      * Returns all saved lists that the specified data item belongs to.
      *
      * @param flag data item type

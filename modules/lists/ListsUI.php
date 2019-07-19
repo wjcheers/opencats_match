@@ -123,8 +123,11 @@ class ListsUI extends UserInterface
 
         $dataGrid = DataGrid::get("lists:ListsDataGrid", $dataGridProperties);
 
+        $savedLists = new SavedLists($this->_siteID);
+        
         $this->_template->assign('active', $this);
         $this->_template->assign('dataGrid', $dataGrid);
+        $this->_template->assign('totalSaveLists', $savedLists->getCount());
         $this->_template->assign('userID', $_SESSION['CATS']->getUserID());
 
         if (!eval(Hooks::get('LISTS_LIST_BY_VIEW'))) return;

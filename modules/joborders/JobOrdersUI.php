@@ -465,6 +465,8 @@ class JobOrdersUI extends UserInterface
         {
             $careerPortalURL = CATSUtility::getAbsoluteURI() . 'careers/';
         }
+        
+        $lists = $jobOrders->getListsForJobOrder($jobOrderID);
 
         $this->_template->assign('active', $this);
         $this->_template->assign('isPublic', $isPublic);
@@ -482,6 +484,7 @@ class JobOrdersUI extends UserInterface
         $this->_template->assign('careerPortalEnabled', $careerPortalEnabled);
         $this->_template->assign('privledgedUser', $privledgedUser);
         $this->_template->assign('sessionCookie', $_SESSION['CATS']->getCookie());
+        $this->_template->assign('lists', $lists);
 
         if (!eval(Hooks::get('JO_SHOW'))) return;
 
