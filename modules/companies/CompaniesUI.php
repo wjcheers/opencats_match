@@ -393,7 +393,7 @@ class CompaniesUI extends UserInterface
         }
 
         $activityEntries = new ActivityEntries($this->_siteID);
-        $activityRS = $activityEntries->getAllByDataItem($companyID, DATA_ITEM_COMPANY);
+        $activityRS = $activityEntries->getAllByDataItem($companyID, DATA_ITEM_COMPANY, "!= 'Interview'");
         if (!empty($activityRS))
         {
             foreach ($activityRS as $rowIndex => $row)
@@ -412,6 +412,56 @@ class CompaniesUI extends UserInterface
                 $activityRS[$rowIndex]['enteredByAbbrName'] = StringUtility::makeInitialName(
                     $activityRS[$rowIndex]['enteredByFirstName'],
                     $activityRS[$rowIndex]['enteredByLastName'],
+                    false,
+                    LAST_NAME_MAXLEN
+                );
+            }
+        }
+        
+        $interviewCompanyRS = $activityEntries->getAllRegardingByDataItem($companyID, DATA_ITEM_COMPANY, NULL, NULL, "= 'Interview'");
+        if (!empty($interviewCompanyRS))
+        {
+            foreach ($interviewCompanyRS as $rowIndex => $row)
+            {
+                if (empty($interviewCompanyRS[$rowIndex]['notes']))
+                {
+                    $interviewCompanyRS[$rowIndex]['notes'] = '(No Notes)';
+                }
+
+                if (empty($interviewCompanyRS[$rowIndex]['jobOrderID']) ||
+                    empty($interviewCompanyRS[$rowIndex]['regarding']))
+                {
+                    $interviewCompanyRS[$rowIndex]['regarding'] = 'General';
+                }
+
+                $interviewCompanyRS[$rowIndex]['enteredByAbbrName'] = StringUtility::makeInitialName(
+                    $interviewCompanyRS[$rowIndex]['enteredByFirstName'],
+                    $interviewCompanyRS[$rowIndex]['enteredByLastName'],
+                    false,
+                    LAST_NAME_MAXLEN
+                );
+            }
+        }
+        
+        $interviewRS = $activityEntries->getAllRegardingByDataItem(NULL, DATA_ITEM_CANDIDATE, NULL, $companyID, "= 'Interview'");
+        if (!empty($interviewRS))
+        {
+            foreach ($interviewRS as $rowIndex => $row)
+            {
+                if (empty($interviewRS[$rowIndex]['notes']))
+                {
+                    $interviewRS[$rowIndex]['notes'] = '(No Notes)';
+                }
+
+                if (empty($interviewRS[$rowIndex]['jobOrderID']) ||
+                    empty($interviewRS[$rowIndex]['regarding']))
+                {
+                    $interviewRS[$rowIndex]['regarding'] = 'General';
+                }
+
+                $interviewRS[$rowIndex]['enteredByAbbrName'] = StringUtility::makeInitialName(
+                    $interviewRS[$rowIndex]['enteredByFirstName'],
+                    $interviewRS[$rowIndex]['enteredByLastName'],
                     false,
                     LAST_NAME_MAXLEN
                 );
@@ -447,6 +497,8 @@ class CompaniesUI extends UserInterface
         $this->_template->assign('isShortNotes', $isShortNotes);
         $this->_template->assign('jobOrdersRS', $jobOrdersRS);
         $this->_template->assign('activityRS', $activityRS);
+        $this->_template->assign('interviewCompanyRS', $interviewCompanyRS);
+        $this->_template->assign('interviewRS', $interviewRS);
         $this->_template->assign('contactsRS', $contactsRS);
         $this->_template->assign('contactsRSWC', $contactsRSWC);
         $this->_template->assign('privledgedUser', $privledgedUser);
@@ -940,9 +992,18 @@ class CompaniesUI extends UserInterface
         }
 
         $companyID = $_GET['companyID'];
+        if(isset($_GET['activityType']))
+        {
+            $activityType = $_GET['activityType'];
+        }
+        else
+        {
+            $activityType = '';
+        }
 
         $this->_template->assign('companyID', $companyID);
         $this->_template->assign('isFinishedMode', false);
+        $this->_template->assign('activityType', $activityType);
         $this->_template->display(
             './modules/companies/AddActivityScheduleEventModal.tpl'
         );

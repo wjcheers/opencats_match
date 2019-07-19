@@ -103,6 +103,8 @@
                         <span id="triggerCurrentPaySpan" style="display: none;" data-current-pay-count=0 data-current-pay=<?php echo($this->currentPay) ?> ><br><input type="checkbox" name="triggerCurrentPay" id="triggerCurrentPay" /><b>Prepare Current Pay later.</b></span>
                         <span id="triggerDesiredPaySpan" style="display: none;" data-desired-pay-count=0 data-desired-pay=<?php echo($this->desiredPay) ?> ><br><input type="checkbox" name="triggerDesiredPay" id="triggerDesiredPay" /><b>Prepare Desired Pay later.</b></span>
                         <span id="triggerValidEmailSpan" style="display: none;" data-email-count=0 data-email=<?php echo($this->email1) ?> ><br><input type="checkbox" name="triggerValidEmail" id="triggerValidEmail" /><b>Prepare Email later.</b></span>
+                        <span id="triggerValidGenderSpan" style="display: none;" data-gender-count=0 data-gender=<?php echo($this->gender) ?> ><br><input type="checkbox" name="triggerValidGender" id="triggerValidGender" /><b>Prepare Gender later.</b></span>
+                        <span id="triggerValidNationalitySpan" style="display: none;" data-nationality-count=0 data-nationality=<?php echo($this->nationality) ?> ><br><input type="checkbox" name="triggerValidNationality" id="triggerValidNationality" /><b>Prepare Nationality later.</b></span>
                     </div>
                 </td>
             </tr>

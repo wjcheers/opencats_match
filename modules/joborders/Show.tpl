@@ -441,10 +441,37 @@
                 <a href="#" onclick="showPopWin('<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=considerCandidateSearch&amp;jobOrderID=<?php echo($this->jobOrderID); ?>', 820, 550, null); return false;">
                     <img src="images/consider.gif" width="16" height="16" class="absmiddle" alt="add candidate" border="0" />&nbsp;Add Candidate to This Job Order Pipeline
                 </a>
-            <?php endif; ?>
+            <?php endif; ?>            
+<?php endif; ?>
+            
+            <br clear="all" />
+            <br />
+
+            <p class="note">Interview</p>
+            <table id="interviewTable" class="sortable" width="1225">
+                <tr>
+                    <th align="left" width="125">Date</th>
+                    <th align="left" width="90">Candidate</th>
+                    <th align="left" width="90">Entered</th>
+                    <th align="left">Notes</th>
+                </tr>
+
+                <?php foreach ($this->interviewRS as $rowNumber => $interviewData): ?>
+                    <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
+                        <td align="left" valign="top" id="interviewDate<?php echo($interviewData['activityID']); ?>"><?php $this->_($interviewData['dateCreated']) ?></td>
+                        <td align="left" valign="top" id="interviewCandidate<?php echo($interviewData['activityID']); ?>">
+                            <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($interviewData['dataItemID']) ?>">
+                                <?php $this->_($interviewData['candidateFullName']) ?>
+                            </a>
+                        </td>
+                        <td align="left" valign="top"><?php $this->_($interviewData['enteredByAbbrName']) ?></td>
+                        <td align="left" valign="top" id="interviewNotes<?php echo($interviewData['activityID']); ?>"><?php echo(nl2br($interviewData['notes'])); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+            
         </div>
     </div>
 
-<?php endif; ?>
     <div id="bottomShadow"></div>
 <?php TemplateUtility::printFooter(); ?>

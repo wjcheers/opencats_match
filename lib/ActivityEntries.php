@@ -561,8 +561,13 @@ class ActivityEntries
      * @param flag Data Item type flag.
      * @return resultset Activity entries data.
      */
-    public function getAllByDataItem($dataItemID, $dataItemType)
+    public function getAllByDataItem($dataItemID, $dataItemType, $activityType = NULL)
     {
+        $activityCondition = '';
+        if($activityType != NULL)
+        {
+            $activityCondition = 'AND activity_type.short_description ' . $activityType;
+        }
         $sql = sprintf(
             "SELECT
                 activity.activity_id AS activityID,
@@ -599,18 +604,118 @@ class ActivityEntries
                 activity.data_item_id = %s
             AND
                 activity.data_item_type = %s
+            %s
             AND
                 activity.site_id = %s
             ORDER BY
                 dateCreatedSort ASC",
             $this->_db->makeQueryInteger($dataItemID),
             $this->_db->makeQueryInteger($dataItemType),
+            $activityCondition,
             $this->_siteID
         );
 
         return $this->_db->getAllAssoc($sql);
     }
 
+    /**
+     * Returns all activity entries for a Data Item.
+     *
+     * @param integer Data Item ID.
+     * @param flag Data Item type flag.
+     * @return resultset Activity entries data.
+     */
+    public function getAllRegardingByDataItem($dataItemID = NULL, $dataItemType = NULL, $jobOrderID = NULL, $companyID = NULL, $activityType = NULL)
+    {
+        $select = '';
+        $join = '';
+        
+        $dataItemCondition = '';
+        if($dataItemID != NULL)
+        {
+            $dataItemCondition = 'AND activity.data_item_id = ' . $dataItemID;
+        }
+        $dataItemTypeCondition = '';
+        if($dataItemType != NULL)
+        {
+            $dataItemTypeCondition = 'AND activity.data_item_type = ' . $dataItemType;
+            if($dataItemType == DATA_ITEM_CANDIDATE)
+            {
+                $select .= ",CONCAT(candidate.first_name, ' ', candidate.last_name) AS candidateFullName";
+                $join .= 'LEFT JOIN candidate ON candidate.candidate_id = activity.data_item_id';
+            }
+        }
+        $jobOrderCondition = '';
+        if($jobOrderID != NULL)
+        {
+            $jobOrderCondition = 'AND activity.joborder_id = ' . $jobOrderID;
+        }
+        $companyCondition = '';
+        if($companyID != NULL)
+        {
+            $companyCondition = 'AND joborder.company_id = ' . $companyID;
+        }
+        $activityCondition = '';
+        if($activityType != NULL)
+        {
+            $activityCondition = 'AND activity_type.short_description ' . $activityType;
+        }
+        $sql = sprintf(
+            "SELECT
+                activity.activity_id AS activityID,
+                activity.data_item_id AS dataItemID,
+                activity.joborder_id AS jobOrderID,
+                activity.notes AS notes,
+                DATE_FORMAT(
+                    activity.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateCreated,
+                activity.date_created AS dateCreatedSort,
+                activity.type AS type,
+                activity_type.short_description AS typeDescription,
+                activity.date_created AS dateCreatedSort,
+                entered_by_user.first_name AS enteredByFirstName,
+                entered_by_user.last_name AS enteredByLastName,
+                IF(
+                    ISNULL(joborder.title),
+                    'General',
+                    CONCAT(joborder.title, ' (', company.name, ')')
+                ) AS regarding,
+                joborder.title AS regardingJobTitle,
+                company.name AS regardingCompanyName
+                %s
+            FROM
+                activity
+            LEFT JOIN user AS entered_by_user
+                ON activity.entered_by = entered_by_user.user_id
+            LEFT JOIN activity_type
+                ON activity.type = activity_type.activity_type_id
+            LEFT JOIN joborder
+                ON activity.joborder_id = joborder.joborder_id
+            LEFT JOIN company
+                ON joborder.company_id = company.company_id
+            %s
+            WHERE
+                activity.site_id = %s
+            %s
+            %s
+            %s
+            %s
+            %s
+            ORDER BY
+                dateCreatedSort ASC",
+            $select,
+            $join,
+            $this->_siteID,
+            $dataItemCondition,
+            $dataItemTypeCondition,
+            $jobOrderCondition,
+            $companyCondition,
+            $activityCondition
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+    
     /**
      * Returns all activity types and their descriptions.
      *

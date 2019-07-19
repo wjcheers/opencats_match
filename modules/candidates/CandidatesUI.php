@@ -1713,6 +1713,8 @@ class CandidatesUI extends UserInterface
         $this->_template->assign('currentPay', $candidateData['currentPay']);
         $this->_template->assign('desiredPay', $candidateData['desiredPay']);
         $this->_template->assign('email1', $candidateData['email1']);
+        $this->_template->assign('gender', $candidateData['extraGender']);
+        $this->_template->assign('nationality', $candidateData['nationality']);
         $this->_template->assign('pipelineRS', $pipelineRS);
         $this->_template->assign('statusRS', $statusRS);
         $this->_template->assign('selectedJobOrderID', $selectedJobOrderID);

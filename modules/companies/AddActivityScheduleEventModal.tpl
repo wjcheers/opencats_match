@@ -22,7 +22,7 @@
                     <div id="activityNoteDiv" style="margin-top: 4px;">
                         <span id="addActivitySpanA">Activity Type</span><br />
                         <select id="activityTypeID" name="activityTypeID" class="inputbox" style="width: 150px; margin-bottom: 4px;">
-                            <option selected="selected" value="<?php echo(ACTIVITY_CALL); ?>">Call</option>
+                            <option value="<?php echo(ACTIVITY_CALL); ?>">Call</option>
                             <option value="<?php echo(ACTIVITY_CALL_TALKED); ?>">Call (Talked)</option>
                             <option value="<?php echo(ACTIVITY_CALL_LVM); ?>">Call (LVM)</option>
                             <option value="<?php echo(ACTIVITY_CALL_MISSED); ?>">Call (Missed)</option>
@@ -33,7 +33,7 @@
                             <option value="<?php echo(ACTIVITY_CONFIRM); ?>">Confirm</option>
                             <option value="<?php echo(ACTIVITY_DRIFTING); ?>">Drifting</option>
                             <option value="<?php echo(ACTIVITY_IM_LINKEDIN); ?>">IM (Linkedin)</option>
-                            <option value="<?php echo(ACTIVITY_INTERVIEW); ?>">Interview</option>
+                            <option <?php if($this->activityType == 'Interview') echo 'selected="selected"'; ?> value="<?php echo(ACTIVITY_INTERVIEW); ?>">Interview</option>
                         </select><br />
                         <span id="addActivitySpanB">Activity Notes</span><br />
                         <textarea name="activityNote" id="activityNote" cols="50" rows="10" style="margin-bottom: 4px;" class="inputbox"></textarea>
@@ -48,7 +48,7 @@
     </form>
 
     <script type="text/javascript">
-        document.changePipelineStatusForm.activityNote.focus();
+        document.logActivityForm.activityNote.focus();
     </script>
 
 <?php else: ?>

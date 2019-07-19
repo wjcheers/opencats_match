@@ -19,6 +19,8 @@ function checkActivityForm(form)
     errorMessage += checkCurrentPay();
     errorMessage += checkDesiredPay();
     errorMessage += checkValidEmail();
+    errorMessage += checkValidGender();
+    errorMessage += checkValidNationality();
 
     if (errorMessage != '')
     {
@@ -239,6 +241,76 @@ function checkValidEmail()
         if(document.getElementById('triggerValidEmail').checked == false)
         {
             errorMessage  = "    - Did you fill the candidate's Email?\n\n";
+
+            fieldLabel.style.color = '#ff0000';        
+        }
+        else
+        {
+            fieldLabel.style.color = '#000';
+        }
+    }
+
+    return errorMessage;
+}
+
+
+function checkValidGender()
+{
+    var errorMessage = '';
+    fieldLabel = document.getElementById('triggerValidGenderSpan');
+    
+    
+    var gender = fieldLabel.getAttribute('data-gender');
+    var genderCount = fieldLabel.getAttribute('data-gender-count');
+    genderCount ++;
+    fieldLabel.setAttribute('data-gender-count', genderCount);
+
+    if((!gender || gender == '')
+        && document.getElementById('changeStatus').checked == true
+        && document.changePipelineStatusForm.statusID.options[document.changePipelineStatusForm.statusID.selectedIndex].text == "Qualifying")
+    {
+        if(genderCount >= 3)
+        {
+            document.getElementById('triggerValidGenderSpan').style.display = 'inline';
+        }
+        if(document.getElementById('triggerValidGender').checked == false)
+        {
+            errorMessage  = "    - Did you fill the candidate's Gender?\n\n";
+
+            fieldLabel.style.color = '#ff0000';        
+        }
+        else
+        {
+            fieldLabel.style.color = '#000';
+        }
+    }
+
+    return errorMessage;
+}
+
+
+function checkValidNationality()
+{
+    var errorMessage = '';
+    fieldLabel = document.getElementById('triggerValidNationalitySpan');
+    
+    
+    var nationality = fieldLabel.getAttribute('data-nationality');
+    var nationalityCount = fieldLabel.getAttribute('data-nationality-count');
+    nationalityCount ++;
+    fieldLabel.setAttribute('data-nationality-count', nationalityCount);
+
+    if((!nationality || nationality == '')
+        && document.getElementById('changeStatus').checked == true
+        && document.changePipelineStatusForm.statusID.options[document.changePipelineStatusForm.statusID.selectedIndex].text == "Qualifying")
+    {
+        if(nationalityCount >= 3)
+        {
+            document.getElementById('triggerValidNationalitySpan').style.display = 'inline';
+        }
+        if(document.getElementById('triggerValidNationality').checked == false)
+        {
+            errorMessage  = "    - Did you fill the candidate's Nationality?\n\n";
 
             fieldLabel.style.color = '#ff0000';        
         }

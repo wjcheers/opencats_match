@@ -435,7 +435,7 @@
             <br clear="all" />
             <br />
 
-            <p class="note">Activity</p>
+            <p class="note">Company Activity</p>
             <table id="activityTable" class="sortable" width="1225">
                 <tr>
                     <th align="left" width="125">Date</th>
@@ -477,6 +477,84 @@
                 <img src="images/indicator2.gif" id="addActivityIndicator" alt="" style="visibility: hidden; margin-left: 5px;" height="16" width="16" />
             </div>
             
+            
+            <br clear="all" />
+            <br />
+
+            <p class="note">Company Activity (Interview)</p>
+            <table id="interviewCompanyTable" class="sortable" width="1225">
+                <tr>
+                    <th align="left" width="125">Date</th>
+                    <th align="left" width="90">Type</th>
+                    <th align="left" width="90">Entered</th>
+                    <th align="left" width="250">Regarding</th>
+                    <th align="left">Notes</th>
+                    <th align="left" width="40">Action</th>
+                </tr>
+
+                <?php foreach ($this->interviewCompanyRS as $rowNumber => $interviewCompanyData): ?>
+                    <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
+                        <td align="left" valign="top" id="activityDate<?php echo($interviewCompanyData['activityID']); ?>"><?php $this->_($interviewCompanyData['dateCreated']) ?></td>
+                        <td align="left" valign="top" id="activityType<?php echo($interviewCompanyData['activityID']); ?>"><?php $this->_($interviewCompanyData['typeDescription']) ?></td>
+                        <td align="left" valign="top"><?php $this->_($interviewCompanyData['enteredByAbbrName']) ?></td>
+                        <td align="left" valign="top" id="activityRegarding<?php echo($interviewCompanyData['activityID']); ?>"><?php $this->_($interviewCompanyData['regarding']) ?></td>
+                        <td align="left" valign="top" id="activityNotes<?php echo($interviewCompanyData['activityID']); ?>"><?php echo(nl2br($interviewCompanyData['notes'])); ?></td>
+                        <td align="center" >
+                            <?php if ($this->accessLevel >= ACCESS_LEVEL_EDIT): ?>
+                                <a href="#" id="editActivity<?php echo($interviewCompanyData['activityID']); ?>" onclick="Activity_editEntry(<?php echo($interviewCompanyData['activityID']); ?>, <?php echo($this->companyID); ?>, <?php echo(DATA_ITEM_COMPANY); ?>, '<?php echo($this->sessionCookie); ?>'); return false;">
+                                    <img src="images/actions/edit.gif" width="16" height="16" alt="" class="absmiddle" border="0" title="Edit"/>
+                                </a>
+                            <?php endif; ?>
+                            <?php if ($this->accessLevel >= ACCESS_LEVEL_DELETE): ?>
+                                <a href="#" id="deleteActivity<?php echo($interviewCompanyData['activityID']); ?>" onclick="Activity_deleteEntry(<?php echo($interviewCompanyData['activityID']); ?>, '<?php echo($this->sessionCookie); ?>'); return false;">
+                                    <img src="images/actions/delete.gif" width="16" height="16" alt="" class="absmiddle" border="0" title="Delete"/>
+                                </a>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+            <div id="addActivityDiv">
+                <?php if ($this->accessLevel >= ACCESS_LEVEL_EDIT): ?>
+                    <a href="#" id="addActivityLink" title="Log an Activity" onclick="showPopWin('<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=addActivityScheduleEvent&amp;companyID=<?php echo($this->companyID); ?>&amp;activityType=Interview', 600, 375, null); return false;">
+                        <img src="images/new_activity_inline.gif" width="16" height="16" class="absmiddle" title="Log an Activity / Schedule Event" alt="Log an Activity" border="0" />&nbsp;Log an Activity
+                    </a>
+                <?php endif; ?>
+                <img src="images/indicator2.gif" id="addActivityIndicator" alt="" style="visibility: hidden; margin-left: 5px;" height="16" width="16" />
+            </div>
+            
+            
+            <br clear="all" />
+            <br />
+
+            <p class="note">Interview</p>
+            <table id="interviewTable" class="sortable" width="1225">
+                <tr>
+                    <th align="left" width="125">Date</th>
+                    <th align="left" width="90">Candidate</th>
+                    <th align="left" width="90">Entered</th>
+                    <th align="left" width="250">Regarding</th>
+                    <th align="left">Notes</th>
+                </tr>
+
+                <?php foreach ($this->interviewRS as $rowNumber => $interviewData): ?>
+                    <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
+                        <td align="left" valign="top" id="interviewDate<?php echo($interviewData['activityID']); ?>"><?php $this->_($interviewData['dateCreated']) ?></td>
+                        <td align="left" valign="top" id="interviewCandidate<?php echo($interviewData['activityID']); ?>">
+                            <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($interviewData['dataItemID']) ?>">
+                                <?php $this->_($interviewData['candidateFullName']) ?>
+                            </a>
+                        </td>
+                        <td align="left" valign="top"><?php $this->_($interviewData['enteredByAbbrName']) ?></td>
+                        <td align="left" valign="top" id="interviewRegarding<?php echo($interviewData['activityID']); ?>">
+                            <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=show&amp;jobOrderID=<?php $this->_($interviewData['jobOrderID']) ?>">
+                                <?php $this->_($interviewData['regarding']) ?>
+                            </a>
+                        </td>
+                        <td align="left" valign="top" id="interviewNotes<?php echo($interviewData['activityID']); ?>"><?php echo(nl2br($interviewData['notes'])); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>  
             
         </div>
     </div>

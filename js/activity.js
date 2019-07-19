@@ -46,6 +46,7 @@ ARRANGE_TEXT = "Arrange: \nDate: 9/9/2019\nTime: 7:30am (UTC+8)\nVenue: Phone: /
 CONFIRM_TEXT = "Confirm: \nDate: 9/9/2019\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
 INTERVIEW_TEXT = "Interview: \n1.興趣程度(和前一次面試或投履歷時相比)\n2.面試感想\n  A.對面試官、環境(文化)評價\n  B.和自己技能的相符程度、可發揮空間\n  C.對工作內容的興趣程度\n3.其他(可以參考上方面試回饋範例)\n";
 QUALIFYING_TEXT = "1.必不能安排的時間\n2.其他面試及Offer\n3.預期到職日\n4.申請動機\n5.聯繫方式\n\n";
+DECLINE_TEXT = "拒絕原因：\n\n";
 
 function Activity_fillTypeSelect(selectList, selectedText)
 {
@@ -108,7 +109,7 @@ function Activity_fillTypeSelect(selectList, selectedText)
 
     /* Interview option. */
     optionElements[11] = document.createElement('option');
-    optionElements[11].value = ACTIVITY_CONFIRM;
+    optionElements[11].value = ACTIVITY_INTERVIEW;
     optionElements[11].appendChild(document.createTextNode('Interview'));
     
     /* Select the correct option. */
@@ -296,6 +297,10 @@ function Activity_editEntry(activityID, dataItemID, dataItemType, sessionCookie)
             regardingTD.firstChild.nodeValue
         );
         regardingSelectList.className = 'inputbox';
+        if(dataItemType == DATA_ITEM_COMPANY)
+        {
+            regardingSelectList.disabled  = true;
+        }
 
         /* Create the "Notes" TEXTAREA and fill it with the text from the cell,
          * as long as that text isn't "(No Notes)".
@@ -662,6 +667,10 @@ function AS_onRegardingChange(statusesArray, jobOrdersArray, regardingSelectID,
     document.getElementById('triggerDesiredPay').checked = false;
     document.getElementById('triggerValidEmailSpan').style.display = 'none';
     document.getElementById('triggerValidEmail').checked = false;
+    document.getElementById('triggerValidGenderSpan').style.display = 'none';
+    document.getElementById('triggerValidGender').checked = false;
+    document.getElementById('triggerValidNationalitySpan').style.display = 'none';
+    document.getElementById('triggerValidNationality').checked = false;
     
     if (regardingID != '-1')
     {
@@ -739,6 +748,10 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
     document.getElementById('triggerDesiredPay').checked = false;
     document.getElementById('triggerValidEmailSpan').style.display = 'none';
     document.getElementById('triggerValidEmail').checked = false;
+    document.getElementById('triggerValidGenderSpan').style.display = 'none';
+    document.getElementById('triggerValidGender').checked = false;
+    document.getElementById('triggerValidNationalitySpan').style.display = 'none';
+    document.getElementById('triggerValidNationality').checked = false;
     
     if(statusSelectList[statusSelectList.selectedIndex].text == 'Qualifying')
     {
@@ -810,6 +823,10 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
                 if(statusSelectList[statusSelectList.selectedIndex].text == 'Qualifying')
                 {
                     activityEntry.value = activityEntry.value + QUALIFYING_TEXT;
+                }
+                else if(statusSelectList[statusSelectList.selectedIndex].text == 'Client Declined')
+                {
+                    activityEntry.value = activityEntry.value + DECLINE_TEXT;
                 }
             }
             

@@ -385,6 +385,32 @@ class JobOrdersUI extends UserInterface
             $careerPortalEnabled = false;
         }
 
+        $activityEntries = new ActivityEntries($this->_siteID);
+        $interviewRS = $activityEntries->getAllRegardingByDataItem(NULL, DATA_ITEM_CANDIDATE, $jobOrderID, NULL, "= 'Interview'");
+        if (!empty($interviewRS))
+        {
+            foreach ($interviewRS as $rowIndex => $row)
+            {
+                if (empty($interviewRS[$rowIndex]['notes']))
+                {
+                    $interviewRS[$rowIndex]['notes'] = '(No Notes)';
+                }
+
+                if (empty($interviewRS[$rowIndex]['jobOrderID']) ||
+                    empty($interviewRS[$rowIndex]['regarding']))
+                {
+                    $interviewRS[$rowIndex]['regarding'] = 'General';
+                }
+
+                $interviewRS[$rowIndex]['enteredByAbbrName'] = StringUtility::makeInitialName(
+                    $interviewRS[$rowIndex]['enteredByFirstName'],
+                    $interviewRS[$rowIndex]['enteredByLastName'],
+                    false,
+                    LAST_NAME_MAXLEN
+                );
+            }
+        }
+        
         /* Add an MRU entry. */
         $_SESSION['CATS']->getMRU()->addEntry(
             DATA_ITEM_JOBORDER, $jobOrderID, $data['title']
@@ -448,6 +474,7 @@ class JobOrdersUI extends UserInterface
         $this->_template->assign('data', $data);
         $this->_template->assign('extraFieldRS', $extraFieldRS);
         $this->_template->assign('attachmentsRS', $attachmentsRS);
+        $this->_template->assign('interviewRS', $interviewRS);
         $this->_template->assign('pipelineEntriesPerPage', $pipelineEntriesPerPage);
         $this->_template->assign('pipelineGraph', $pipelineGraph);
         $this->_template->assign('jobOrderID', $jobOrderID);
