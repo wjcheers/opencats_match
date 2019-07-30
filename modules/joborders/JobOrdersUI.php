@@ -1241,7 +1241,7 @@ class JobOrdersUI extends UserInterface
 						$jobOrderID,
 						'<a href="http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $jobOrderID . '">'.
 							'http://' . $_SERVER['HTTP_HOST'] . substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) . '?m=joborders&amp;a=show&amp;jobOrderID=' . $jobOrderID . '</a>',
-						'has been changed'
+						'has been changed'. ' (' . $jobOrderDetails['status'] . ')'
 					);
 					$statusChangeTemplateOwner = str_replace(
 						$stringsToFind,
