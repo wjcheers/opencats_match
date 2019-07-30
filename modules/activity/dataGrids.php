@@ -113,7 +113,37 @@ class ActivityDataGrid extends DataGrid
                                      'filterable'      => false,
                                      'filterHaving'    => 'lastName'),
                                                              
-             'Regarding' =>      array('pagerRender'    => 'if ($rsData[\'jobIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; if ($rsData[\'companyIsHot\'] == 1) $companyClassName =  \'jobLinkHot\'; else $companyClassName = \'jobLinkCold\';  if ($rsData[\'regardingJobTitle\'] == \'\') {$ret = \'General\'; } else {$ret = \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'jobOrderID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'regardingJobTitle\']).\'</a>\'; if($rsData[\'regardingCompanyName\'] != \'\') {$ret .= \' <a href="'.CATSUtility::getIndexName().'?m=companies&amp;a=show&amp;companyID=\'.$rsData[\'companyID\'].\'" class="\'.$companyClassName.\'">(\'.htmlspecialchars($rsData[\'regardingCompanyName\']).\')\';}} return $ret;', 
+             'Regarding' =>      array('pagerRender'    => '
+                                                             if ($rsData[\'jobIsHot\'] == 1) 
+                                                                $className =  \'jobLinkHot\'; 
+                                                             else
+                                                                $className = \'jobLinkCold\';
+
+                                                             if ($rsData[\'companyIsHot\'] == 1)
+                                                                $companyClassName =  \'jobLinkHot\'; 
+                                                             else
+                                                                $companyClassName = \'jobLinkCold\';
+
+                                                             if ($rsData[\'regardingJobTitle\'] == \'\' && $rsData[\'regardingCompanyName\'] == \'\') 
+                                                             {
+                                                                $ret = \'General\';
+                                                             }
+                                                             else
+                                                             {
+                                                                $ret = \'\';
+                                                             }
+
+                                                             if($rsData[\'regardingJobTitle\'] != \'\')
+                                                             {
+                                                                $ret .= \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'jobOrderID\'].\'" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'regardingJobTitle\']).\'</a>\'; 
+                                                             } 
+                                                             
+                                                             if($rsData[\'regardingCompanyName\'] != \'\')
+                                                             {
+                                                                $ret .= \' <a href="'.CATSUtility::getIndexName().'?m=companies&amp;a=show&amp;companyID=\'.$rsData[\'companyID\'].\'" class="\'.$companyClassName.\'">(\'.htmlspecialchars($rsData[\'regardingCompanyName\']).\')\';
+                                                             }
+
+                                                             return $ret;', 
                                      'sortableColumn'  => 'regarding',
                                      'pagerWidth'      => 125,
                                      'pagerOptional'   => true,
@@ -185,7 +215,9 @@ class ActivityDataGrid extends DataGrid
                     entered_by_user.last_name AS enteredByLastName,
                     CONCAT(entered_by_user.last_name, entered_by_user.first_name) AS enteredBySort,
                     IF(ISNULL(joborder.title),
-                        'General',
+                        IF(ISNULL(company.name),
+                            'General',
+                            CONCAT('(', company.name, ')')),
                         CONCAT(joborder.title, ' (', company.name, ')'))
                     AS regarding,
                     joborder.title AS regardingJobTitle,
@@ -234,7 +266,9 @@ class ActivityDataGrid extends DataGrid
                     entered_by_user.last_name AS enteredByLastName,
                     CONCAT(entered_by_user.last_name, entered_by_user.first_name) AS enteredBySort,
                     IF(ISNULL(joborder.title),
-                        company.name,
+                        IF(ISNULL(company.name),
+                            'General',
+                            CONCAT('(', company.name, ')')),
                         CONCAT(joborder.title, ' (', company.name, ')'))
                     AS regarding,
                     ' ' AS regardingJobTitle,
@@ -281,7 +315,9 @@ class ActivityDataGrid extends DataGrid
                     entered_by_user.last_name AS enteredByLastName,
                     CONCAT(entered_by_user.last_name, entered_by_user.first_name) AS enteredBySort,
                     IF(ISNULL(joborder.title),
-                        'General',
+                        IF(ISNULL(company.name),
+                            'General',
+                            CONCAT('(', company.name, ')')),
                         CONCAT(joborder.title, ' (', company.name, ')'))
                     AS regarding,
                     joborder.title AS regardingJobTitle,
@@ -296,10 +332,10 @@ class ActivityDataGrid extends DataGrid
                     ON activity.type = activity_type.activity_type_id
                 LEFT JOIN joborder
                     ON activity.joborder_id = joborder.joborder_id
-                LEFT JOIN company
-                    ON joborder.company_id = company.company_id
                 INNER JOIN contact
                     ON activity.data_item_id = contact.contact_id
+                LEFT JOIN company
+                    ON contact.company_id = company.company_id
                 WHERE
                     activity.data_item_type = %s
                 %s
