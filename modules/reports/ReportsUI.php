@@ -70,6 +70,10 @@ class ReportsUI extends UserInterface
             case 'showPlacementReport':
                 $this->showPlacementReport();
                 break;
+                
+            case 'showOfferReport':
+                $this->showOfferReport();
+                break;
 
             case 'showUserReport':
                 $this->showUserReport();
@@ -158,6 +162,9 @@ class ReportsUI extends UserInterface
         $statisticsData['contactsThisYear']  = $statistics->getContactCount(TIME_PERIOD_THISYEAR);
         $statisticsData['contactsLastYear']  = $statistics->getContactCount(TIME_PERIOD_LASTYEAR);
 
+		/* Get offer statistics. */
+        $statisticsData['totalOffers']     = $statistics->getOfferCount(TIME_PERIOD_TODATE);
+        
         /* Get job order statistics. */
         $statisticsData['totalJobOrders']     = $statistics->getJobOrderCount(TIME_PERIOD_TODATE);
         $statisticsData['jobOrdersToday']     = $statistics->getJobOrderCount(TIME_PERIOD_TODAY);
@@ -425,6 +432,86 @@ class ReportsUI extends UserInterface
         $this->_template->display('./modules/reports/PlacedReport.tpl');
     }
 
+    private function showOfferReport()
+    {
+        //FIXME: getTrimmedInput
+        if (isset($_GET['period']) && !empty($_GET['period']))
+        {
+            $period = $_GET['period'];
+        }
+        else
+        {
+            $period = '';
+        }
+
+
+        switch ($period)
+        {
+            case 'yesterday':
+                $period = TIME_PERIOD_YESTERDAY;
+                $reportTitle = 'Yesterday\'s Report';
+                break;
+
+            case 'thisWeek':
+                $period = TIME_PERIOD_THISWEEK;
+                $reportTitle = 'This Week\'s Report';
+                break;
+
+            case 'lastWeek':
+                $period = TIME_PERIOD_LASTWEEK;
+                $reportTitle = 'Last Week\'s Report';
+                break;
+
+            case 'thisMonth':
+                $period = TIME_PERIOD_THISMONTH;
+                $reportTitle = 'This Month\'s Report';
+                break;
+
+            case 'lastMonth':
+                $period = TIME_PERIOD_LASTMONTH;
+                $reportTitle = 'Last Month\'s Report';
+                break;
+
+            case 'thisYear':
+                $period = TIME_PERIOD_THISYEAR;
+                $reportTitle = 'This Year\'s Report';
+                break;
+
+            case 'lastYear':
+                $period = TIME_PERIOD_LASTYEAR;
+                $reportTitle = 'Last Year\'s Report';
+                break;
+
+            case 'toDate':
+                $period = TIME_PERIOD_TODATE;
+                $reportTitle = 'To Date Report';
+                break;
+
+            case 'today':
+            default:
+                $period = TIME_PERIOD_TODAY;
+                $reportTitle = 'Today\'s Report';
+                break;
+        }
+
+        $statistics = new Statistics($this->_siteID);
+        $offersJobOrdersRS = $statistics->getOffersJobOrders($period);
+
+        foreach ($offersJobOrdersRS as $rowIndex => $offersJobOrdersData)
+        {
+            /* Querys inside loops are bad, but I don't think there is any avoiding this. */
+            $offersJobOrdersRS[$rowIndex]['offersRS'] = $statistics->getOffersByJobOrder(
+                $period, $offersJobOrdersData['jobOrderID'], $this->_siteID
+            );
+        }
+
+        if (!eval(Hooks::get('REPORTS_SHOW_SUBMISSION'))) return;
+
+        $this->_template->assign('reportTitle', $reportTitle);
+        $this->_template->assign('offersJobOrdersRS', $offersJobOrdersRS);
+        $this->_template->display('./modules/reports/OfferedReport.tpl');
+    }
+    
     private function showUserReport()
     {
         //FIXME: getTrimmedInput

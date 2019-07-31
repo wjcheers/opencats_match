@@ -393,13 +393,20 @@
 
 							<tr class="evenTableRow">
                                 <td align="left">
-                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=toDate" target="_blank">New Placements</a>
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=toDate" target="_blank">Total Placements</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['totalPlacements']); ?>&nbsp;&nbsp;</td>
                             </tr>
                             <tr class="oddTableRow">
                                 <td align="left">Total Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['totalContacts']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            
+							<tr class="evenTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showOfferReport&amp;period=toDate" target="_blank">Total Offers</a>
+                                </td>
+                                <td align="right"><?php $this->_($this->statisticsData['totalOffers']); ?>&nbsp;&nbsp;</td>
                             </tr>
                         </table>
                     </td>

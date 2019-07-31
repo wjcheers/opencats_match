@@ -140,6 +140,34 @@ class Statistics
         return $rs['placementCount'];
     }
 
+	/**
+     * Returns the total number of offers in the given period.
+     *
+     * @param flag statistics period flag
+     * @return integer candidate count
+     */
+    public function getOfferCount($period)
+    {
+        $criterion = $this->makePeriodCriterion('date', $period);
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS offerCount
+            FROM
+                candidate_joborder_status_history
+            WHERE
+                status_to = 600
+            AND
+                site_id = %s
+            %s",
+            $this->_siteID,
+            $criterion
+        );
+        $rs = $this->_db->getAssoc($sql);
+
+        return $rs['offerCount'];
+    }
+    
     /**
      * Returns the total number of companies created in the given period.
      *
@@ -477,6 +505,115 @@ class Statistics
                 candidate_joborder_status_history.joborder_id = %s
             AND
                 candidate_joborder_status_history.status_to = 800
+            %s
+            AND
+                candidate.site_id = %s
+            AND
+                joborder.site_id = %s
+            AND
+                company.site_id = %s
+            ORDER BY
+                candidate.last_name ASC,
+                candidate.first_name ASC",
+            $jobOrderID,
+            $criterion,
+            $this->_siteID,
+            $this->_siteID,
+            $this->_siteID
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+ 
+    /**
+     * Returns all job orders with offers created in the given period.
+     *
+     * @param flag statistics period flag
+     * @return integer candidate count
+     */
+    public function getOffersJobOrders($period)
+    {
+        $criterion = $this->makePeriodCriterion(
+            'candidate_joborder_status_history.date', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                joborder.joborder_id AS jobOrderID,
+                joborder.title AS title,
+                joborder.company_id AS companyID,
+                SUM(
+                    IF(candidate_joborder_status_history.status_to = 600, 1, 0)
+                ) AS offerCount,
+                CONCAT(
+                    owner_user.first_name, ' ', owner_user.last_name
+                ) AS ownerFullName,
+                company.name AS companyName
+            FROM
+                joborder
+            LEFT OUTER JOIN candidate_joborder_status_history
+                ON candidate_joborder_status_history.joborder_id = joborder.joborder_id
+                %s
+            LEFT JOIN company
+                ON company.company_id = joborder.company_id
+            LEFT JOIN user AS owner_user
+                ON owner_user.user_id = joborder.owner
+            WHERE
+                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
+            AND
+                joborder.site_id = %s
+            GROUP BY
+                jobOrderID
+            HAVING
+                offerCount > 0",
+            $criterion,
+            $this->_siteID
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+    
+    /**
+     * Returns all offers for the specified job order created in the
+     * given period.
+     *
+     * @param flag statistics period flag
+     * @return integer candidate count
+     */
+    public function getOffersByJobOrder($period, $jobOrderID)
+    {
+        $criterion = $this->makePeriodCriterion(
+            'candidate_joborder_status_history.date', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                candidate.candidate_id AS candidateID,
+                candidate.first_name AS firstName,
+                candidate.last_name AS lastName,
+                joborder.joborder_id AS jobOrderID,
+                joborder.title AS title,
+                joborder.company_id AS companyID,
+                CONCAT(
+                    owner_user.first_name, ' ', owner_user.last_name
+                ) AS ownerFullName,
+                DATE_FORMAT(
+                    candidate_joborder_status_history.date, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateSubmitted
+            FROM
+                candidate_joborder_status_history
+            LEFT JOIN candidate
+                ON candidate.candidate_id = candidate_joborder_status_history.candidate_id
+            LEFT JOIN joborder
+                ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+            LEFT JOIN company
+                ON company.company_id = joborder.company_id
+            LEFT JOIN user AS owner_user
+                ON owner_user.user_id = candidate.owner
+            WHERE
+                candidate_joborder_status_history.joborder_id = %s
+            AND
+                candidate_joborder_status_history.status_to = 600
             %s
             AND
                 candidate.site_id = %s
