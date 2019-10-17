@@ -605,21 +605,39 @@
             <a id="agreement_personal_zh_link" href="https://docs.google.com/forms/d/e/1FAIpQLSf5wxyGTzjHKdYo8wzDSsppQ5h7NGg9SbOf9Ivm6g2rWbYgsQ/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=" target="_blank">
                 (Zh)
             </a>
+            <a id="agreement_personal_zh2_link" href="https://docs.google.com/forms/d/e/1FAIpQLSd6oElDhYxqJjFnsrV-nExaCyD6HSbi5AcMfDPHo3rEa3z3pg/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=" target="_blank">
+                (Zh2)
+            </a>
             <a id="agreement_personal_cn_link" href="https://docs.google.com/forms/d/e/1FAIpQLSefn0TCXV8OgMreGpjRknn_Dvz_U0ykW5_K4RpipM_rkJC5MA/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=" target="_blank">
                 (Cn)
             </a>
+            <a id="agreement_personal_cn2_link" href="https://docs.google.com/forms/d/e/1FAIpQLSes3ok9xNKszNG-qZZlJNsDi0R-3sKVRwoEg3MZ1vGEdhIdaA/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=" target="_blank">
+                (Cn2)
+            </a>
             <a id="agreement_personal_en_link" href="https://docs.google.com/forms/d/e/1FAIpQLSd9eiBpJQW4AZ-tHqqSPmEqoLIex-aeI-eyLntpKKxxBR9DFw/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=" target="_blank">
                 (En)
+            </a>            
+            <a id="agreement_personal_en2_link" href="https://docs.google.com/forms/d/e/1FAIpQLScm8SzPKqcOYrzdoysM0-1onCt88lvUmydEzx4f64HQexi9SA/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=" target="_blank">
+                (En2)
             </a>            
             <script>
                 document.getElementById('agreement_personal_en_link').onclick = function() {
                     window.open(document.getElementById("agreement_personal_en_link").href.concat(encodeURI(document.getElementById("agreement_field").value)), "_blank");
                 }
+                document.getElementById('agreement_personal_en2_link').onclick = function() {
+                    window.open(document.getElementById("agreement_personal_en2_link").href.concat(encodeURI(document.getElementById("agreement_field").value)), "_blank");
+                }
                 document.getElementById('agreement_personal_cn_link').onclick = function() {
                     window.open(document.getElementById("agreement_personal_cn_link").href.concat(encodeURI(document.getElementById("agreement_field").value)), "_blank");
                 }
+                document.getElementById('agreement_personal_cn2_link').onclick = function() {
+                    window.open(document.getElementById("agreement_personal_cn2_link").href.concat(encodeURI(document.getElementById("agreement_field").value)), "_blank");
+                }
                 document.getElementById('agreement_personal_zh_link').onclick = function() {
                     window.open(document.getElementById("agreement_personal_zh_link").href.concat(encodeURI(document.getElementById("agreement_field").value)), "_blank");
+                }
+                document.getElementById('agreement_personal_zh2_link').onclick = function() {
+                    window.open(document.getElementById("agreement_personal_zh2_link").href.concat(encodeURI(document.getElementById("agreement_field").value)), "_blank");
                 }
             </script>    
             &nbsp;&nbsp;&nbsp;&nbsp;
@@ -701,11 +719,20 @@
                             <a id="agreement_pipeline_zh_link" href="https://docs.google.com/forms/d/e/1FAIpQLSf5wxyGTzjHKdYo8wzDSsppQ5h7NGg9SbOf9Ivm6g2rWbYgsQ/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=<?php $this->_($pipelinesData['companyName']) ?>: <?php $this->_($pipelinesData['title']) ?>" target="_blank">
                                 (Zh)
                             </a>
+                            <a id="agreement_pipeline_zh2_link" href="https://docs.google.com/forms/d/e/1FAIpQLSd6oElDhYxqJjFnsrV-nExaCyD6HSbi5AcMfDPHo3rEa3z3pg/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=<?php $this->_($pipelinesData['companyName']) ?>: <?php $this->_($pipelinesData['title']) ?>" target="_blank">
+                                (Zh2)
+                            </a>
                             <a id="agreement_pipeline_cn_link" href="https://docs.google.com/forms/d/e/1FAIpQLSefn0TCXV8OgMreGpjRknn_Dvz_U0ykW5_K4RpipM_rkJC5MA/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=<?php $this->_($pipelinesData['companyName']) ?>: <?php $this->_($pipelinesData['title']) ?>" target="_blank">
                                 (Cn)
                             </a>
+                            <a id="agreement_pipeline_cn2_link" href="https://docs.google.com/forms/d/e/1FAIpQLSes3ok9xNKszNG-qZZlJNsDi0R-3sKVRwoEg3MZ1vGEdhIdaA/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=<?php $this->_($pipelinesData['companyName']) ?>: <?php $this->_($pipelinesData['title']) ?>" target="_blank">
+                                (Cn2)
+                            </a>
                             <a id="agreement_pipeline_en_link" href="https://docs.google.com/forms/d/e/1FAIpQLSd9eiBpJQW4AZ-tHqqSPmEqoLIex-aeI-eyLntpKKxxBR9DFw/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=<?php $this->_($pipelinesData['companyName']) ?>: <?php $this->_($pipelinesData['title']) ?>" target="_blank">
                                 (En)
+                            </a>
+                            <a id="agreement_pipeline_en2_link" href="https://docs.google.com/forms/d/e/1FAIpQLScm8SzPKqcOYrzdoysM0-1onCt88lvUmydEzx4f64HQexi9SA/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=<?php $this->_($pipelinesData['companyName']) ?>: <?php $this->_($pipelinesData['title']) ?>" target="_blank">
+                                (En2)
                             </a>
                         </td>
 <?php endif; ?>
