@@ -95,7 +95,7 @@ class Candidates
         $source, $keySkills, $dateAvailable, $currentEmployer, $canRelocate,
         $currentPay, $desiredPay, $notes, $webSite, $bestTimeToCall, $enteredBy, $owner,
         $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree,
-        $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter,
+        $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $cakeresume,
         $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
         $gender = '', $race = '', $veteran = '', $disability = '',
         $skipHistory = false)
@@ -131,7 +131,7 @@ class Candidates
                 date_created,
                 date_modified,
                 chinese_name, job_title, extra_gender, marital_status, birth_year, highest_degree,
-                major, nationality, facebook, github, linkedin, googleplus, twitter,
+                major, nationality, facebook, github, linkedin, googleplus, twitter, cakeresume,
                 link1, link2, link3, line, qq, skype, wechat, functions, job_level,
                 eeo_ethnic_type_id,
                 eeo_veteran_type_id,
@@ -139,6 +139,7 @@ class Candidates
                 eeo_gender
             )
             VALUES (
+                %s,
                 %s,
                 %s,
                 %s,
@@ -215,6 +216,7 @@ class Candidates
             $this->_db->makeQueryString($linkedin),
             $this->_db->makeQueryString($googleplus),
             $this->_db->makeQueryString($twitter),
+            $this->_db->makeQueryString($cakeresume),
             
             $this->_db->makeQueryString($link1),
             $this->_db->makeQueryString($link2),
@@ -286,7 +288,7 @@ class Candidates
         $currentEmployer, $canRelocate, $currentPay, $desiredPay,
         $notes, $webSite, $bestTimeToCall, $owner, $isHot, $email, $emailAddress,
         $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree,
-        $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter,
+        $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $cakeresume,
         $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
         $gender = '', $race = '', $veteran = '', $disability = '')
     {
@@ -335,6 +337,7 @@ class Candidates
                 linkedin              = %s,
                 googleplus            = %s,
                 twitter               = %s,
+                cakeresume            = %s,
                 
                 link1                 = %s,
                 link2                 = %s,
@@ -394,6 +397,7 @@ class Candidates
             $this->_db->makeQueryString($linkedin),
             $this->_db->makeQueryString($googleplus),
             $this->_db->makeQueryString($twitter),
+            $this->_db->makeQueryString($cakeresume),
             
             $this->_db->makeQueryString($link1),
             $this->_db->makeQueryString($link2),
@@ -617,6 +621,7 @@ class Candidates
                 candidate.linkedin AS linkedin, 
                 candidate.googleplus AS googleplus, 
                 candidate.twitter AS twitter, 
+                candidate.cakeresume AS cakeresume, 
                 candidate.link1 AS link1, 
                 candidate.link2 AS link2, 
                 candidate.link3 AS link3, 
@@ -716,6 +721,7 @@ class Candidates
                 candidate.linkedin AS linkedin, 
                 candidate.googleplus AS googleplus, 
                 candidate.twitter AS twitter, 
+                candidate.cakeresume AS cakeresume, 
                 candidate.link1 AS link1, 
                 candidate.link2 AS link2, 
                 candidate.link3 AS link3, 
@@ -937,6 +943,7 @@ class Candidates
                 candidate.linkedin AS linkedin, 
                 candidate.googleplus AS googleplus, 
                 candidate.twitter AS twitter, 
+                candidate.cakeresume AS cakeresume, 
                 candidate.link1 AS link1, 
                 candidate.link2 AS link2, 
                 candidate.link3 AS link3
@@ -958,6 +965,8 @@ class Candidates
                 OR candidate.googleplus like %s
                 OR candidate.twitter like %s
                 OR candidate.twitter like %s
+                OR candidate.cakeresume like %s
+                OR candidate.cakeresume like %s
                 OR candidate.link1 like %s
                 OR candidate.link1 like %s
                 OR candidate.link2 like %s
@@ -967,6 +976,8 @@ class Candidates
             )
             AND
                 candidate.site_id = %s",
+            $encLink4Query,
+            $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
             $encLink4Query,
             $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
             $encLink4Query,
@@ -1055,6 +1066,13 @@ class Candidates
                 if (!empty($field['twitter']))
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['twitter'], '/')));
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && !empty(rtrim($parsedUrl['path'], '/')) &&  strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                        return $field['candidateID'];                
+                    }
+                }
+                if (!empty($field['cakeresume']))
+                {
+                    $parsedUrl = parse_url(urlDecode(rtrim($field['cakeresume'], '/')));
                     if (!empty($parsedUrl) && !empty($parsedUrl['path']) && !empty(rtrim($parsedUrl['path'], '/')) &&  strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
                         return $field['candidateID'];                
                     }
@@ -1972,6 +1990,13 @@ class CandidatesDataGrid extends DataGrid
                                      'filterTypes'   => '=~==',
                                      'filter'         => 'candidate.twitter'),
                                      
+            'Cakeresume' => array('select'  => 'candidate.cakeresume AS cakeresume',
+                                     'sortableColumn'    => 'cakeresume',
+                                     'pagerWidth'   => 110,
+                                     'pagerRender'     => 'return \'<a href="\'.htmlspecialchars($rsData[\'cakeresume\']).\'">\'.htmlspecialchars($rsData[\'cakeresume\']).\'</a>\';',
+                                     'filterTypes'   => '=~==',
+                                     'filter'         => 'candidate.cakeresume'),
+
             'Link1' => array('select'  => 'candidate.link1 AS link1',
                                      'sortableColumn'    => 'link1',
                                      'pagerWidth'   => 110,

@@ -262,6 +262,15 @@
                     
                     <tr>
                         <td class="tdVertical">
+                            <label id="cakeresumeLabel" for="cakeresume">Cakeresume:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="text" tabindex="5" name="cakeresume" id="cakeresume" class="inputbox" style="width: 450px" value="<?php if (isset($this->preassignedFields['cakeresume'])) $this->_($this->preassignedFields['cakeresume']); ?>" onchange="checkLinkAlreadyInSystem(this.value);" />
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td class="tdVertical">
                             <label id="link1Label" for="link1">Link1:</label>
                         </td>
                         <td class="tdData">

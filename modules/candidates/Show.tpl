@@ -308,6 +308,15 @@
                                     <?php endif; ?>
                                 </td>
                             </tr>
+
+                            <tr>
+                                <td class="vertical">Cakeresume:</td>
+                                <td class="data">
+                                    <?php if (!empty($this->data['cakeresume'])): ?>
+                                        <a href="<?php $this->_($this->data['cakeresume']); ?>" target="_blank"><?php $this->_($this->data['cakeresume']); ?></a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
                             <tr>
                                 <td class="vertical">Link1:</td>
                                 <td class="data">

@@ -1261,6 +1261,7 @@ class CandidatesUI extends UserInterface
         $linkedin        = $this->getTrimmedInput('linkedin', $_POST);
         $googleplus      = $this->getTrimmedInput('googleplus', $_POST);
         $twitter         = $this->getTrimmedInput('twitter', $_POST);
+        $cakeresume      = $this->getTrimmedInput('cakeresume', $_POST);
         $link1           = $this->getTrimmedInput('link1', $_POST);
         $link2           = $this->getTrimmedInput('link2', $_POST);
         $link3           = $this->getTrimmedInput('link3', $_POST);
@@ -1313,7 +1314,7 @@ class CandidatesUI extends UserInterface
             $email,
             $emailAddress,
             
-            $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree, $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
+            $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree, $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $cakeresume, $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
             
             $gender,
             $race,
@@ -2589,6 +2590,7 @@ class CandidatesUI extends UserInterface
         $linkedin        = $this->getTrimmedInput('linkedin', $_POST);
         $googleplus      = $this->getTrimmedInput('googleplus', $_POST);
         $twitter         = $this->getTrimmedInput('twitter', $_POST);
+        $cakeresume      = $this->getTrimmedInput('cakeresume', $_POST);
         $link1           = $this->getTrimmedInput('link1', $_POST);
         $link2           = $this->getTrimmedInput('link2', $_POST);
         $link3           = $this->getTrimmedInput('link3', $_POST);
@@ -2644,7 +2646,7 @@ class CandidatesUI extends UserInterface
             $this->_userID,
             $this->_userID,
             
-            $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree, $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
+            $chineseName, $jobTitle, $extraGender, $maritalStatus, $birthYear, $highestDegree, $major, $nationality, $facebook, $github, $linkedin, $googleplus, $twitter, $cakeresume, $link1, $link2, $link3, $line, $qq, $skype, $wechat, $functions, $jobLevel,
             
             $gender,
             $race,
