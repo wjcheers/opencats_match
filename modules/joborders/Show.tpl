@@ -41,25 +41,7 @@
                 </table>
             <?php endif; ?>
 
-            <?php
-                $jdlink = 0;
-                for ($i = 0; $i < intval(count($this->extraFieldRS)); $i++)
-                {
-                    if((($this->extraFieldRS[$i]['fieldName']) == 'JD Link') && $this->extraFieldRS[$i]['display'] != '')
-                    {
-                        $jdlink = 1;
-                        break;
-                    }
-                }
-            ?>
-            <table class="detailsOutside" width="1225" height="
-            <?php
-                if($jdlink == 1)
-                    echo((count($this->extraFieldRS)/2) * 22);
-                else
-                    echo((count($this->extraFieldRS)/2 + 12) * 22);
-            ?>
-            ">
+            <table class="detailsOutside" width="1225" height="<?php echo((count($this->extraFieldRS)/2 + 12) * 22); ?>">
                 <tr style="vertical-align:top;">
                     <td width="50%" height="100%">
                         <table class="detailsInside">
@@ -137,13 +119,6 @@
                             </tr>
 
                             <?php for ($i = 0; $i < intval(count($this->extraFieldRS)/2); $i++): ?>
-                                <?php
-                                    // hide the Current JD & Previous JD
-                                    if(($jdlink == 1) && (($this->extraFieldRS[$i]['fieldName']) == 'Current JD' || ($this->extraFieldRS[$i]['fieldName']) == 'Previous JD'))
-                                    {
-                                        continue;
-                                    }
-                                ?>
                                <tr>
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>
                                     <td class="data">
@@ -244,13 +219,6 @@
                             </tr>
 
                             <?php for ($i = (intval(count($this->extraFieldRS))/2); $i < (count($this->extraFieldRS)); $i++): ?>
-                                <?php
-                                    // hide the Current JD & Previous JD
-                                    if(($jdlink == 1) && (($this->extraFieldRS[$i]['fieldName']) == 'Current JD' || ($this->extraFieldRS[$i]['fieldName']) == 'Previous JD'))
-                                    {
-                                        continue;
-                                    }
-                                ?>
                                 <tr>
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>
                                     <td class="data">
