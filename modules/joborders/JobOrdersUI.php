@@ -828,6 +828,10 @@ class JobOrdersUI extends UserInterface
 					$mailerStatus = $mailer->sendToOne(
 						array($emailAddress, ''),
 						'CATS Notification: Job Order Added', $statusChangeTemplate, true);
+                        
+					$mailerStatus = $mailer->sendToOne(
+						array('cats@example.com', ''),
+						'CATS Notification: Job Order Added', $statusChangeTemplate, true);
                 }
             }
         }
