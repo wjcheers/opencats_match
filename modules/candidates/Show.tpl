@@ -610,6 +610,7 @@
                 <img src="images/actions/view.gif" width="16" height="16" class="absmiddle"  border="0" />&nbsp;Check Agreement
             </a>
             &nbsp;&nbsp;&nbsp;&nbsp;
+            <?php /*
             <img src="images/actions/screen.gif" width="16" height="16" class="absmiddle" alt="deliver form" border="0" />&nbsp;Agreement 
             <a id="agreement_personal_zh_link" href="https://docs.google.com/forms/d/e/1FAIpQLSf5wxyGTzjHKdYo8wzDSsppQ5h7NGg9SbOf9Ivm6g2rWbYgsQ/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=" target="_blank">
                 (Zh)
@@ -651,6 +652,7 @@
             </script>    
             &nbsp;&nbsp;&nbsp;&nbsp;
             <input id="agreement_field" class="inputbox" value="<?php $this->_($this->data['keySkills']); ?>" style="width: 150px;">
+            */ ?>
 <?php endif; ?>
             <br clear="all" />
             <br />
@@ -724,6 +726,7 @@
                                     <img src="images/actions/delete.gif" width="16" height="16" class="absmiddle" alt="" border="0" title="Remove from Pipeline"/>
                                 </a>
                             <?php endif; ?>
+                            <?php /*
                             <img src="images/actions/screen.gif" width="16" height="16" class="absmiddle" alt="deliver form" border="0" />
                             <a id="agreement_pipeline_zh_link" href="https://docs.google.com/forms/d/e/1FAIpQLSf5wxyGTzjHKdYo8wzDSsppQ5h7NGg9SbOf9Ivm6g2rWbYgsQ/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=<?php $this->_($pipelinesData['companyName']) ?>: <?php $this->_($pipelinesData['title']) ?>" target="_blank">
                                 (Zh)
@@ -743,6 +746,7 @@
                             <a id="agreement_pipeline_en2_link" href="https://docs.google.com/forms/d/e/1FAIpQLScm8SzPKqcOYrzdoysM0-1onCt88lvUmydEzx4f64HQexi9SA/viewform?entry.2050162818=<?php $this->_($this->data['firstName']); ?> <?php $this->_($this->data['lastName']); ?>&entry.1181995350=<?php $this->_($this->data['phoneCell']); ?>&entry.1698693764=<?php $this->_($this->data['email1']); ?>&entry.595703741=<?php $this->_($pipelinesData['companyName']) ?>: <?php $this->_($pipelinesData['title']) ?>" target="_blank">
                                 (En2)
                             </a>
+                            */ ?>
                         </td>
 <?php endif; ?>
                     </tr>
