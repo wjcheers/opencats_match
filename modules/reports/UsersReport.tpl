@@ -17,9 +17,12 @@
         <br />
         <table class="sortable" width="1225">
             <tr>
-                <th align="left" nowrap="nowrap">Created</th>
-                <th align="left" nowrap="nowrap">Modified</th>
-                <th align="left" nowrap="nowrap">Submitted</th>
+                <th align="left" nowrap="nowrap">Created Candidate</th>
+                <th align="left" nowrap="nowrap">Modified Candidate</th>
+                <th align="left" nowrap="nowrap">Submitted Candidate</th>
+                <th align="left" nowrap="nowrap">Activity Count</th>
+                <th align="left" nowrap="nowrap">Created Company</th>
+                <th align="left" nowrap="nowrap">Created Contact</th>
             </tr>
 
             <?php foreach ($UserData['reportRS'] as $rowNumber => $reportData): ?>
@@ -27,6 +30,9 @@
                     <td valign="top" align="left"><?php $this->_($reportData['createdCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['modifiedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['submittedCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($reportData['activityCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($reportData['companyCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($reportData['contactCount']) ?>&nbsp;</td>
                 </tr>
             <?php endforeach; ?>
         </table>

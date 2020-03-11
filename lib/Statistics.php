@@ -739,10 +739,81 @@ class Statistics
         );
 
         $c = $this->_db->getAllAssoc($sql);
+        
+        
+        $criterion = $this->makePeriodCriterion(
+            'activity.date_modified', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS activityCount
+            FROM
+                activity
+            WHERE
+                activity.entered_by = %s
+            %s
+            AND
+                activity.site_id = %s",
+            $userID,
+            $criterion,
+            $this->_siteID
+        );
+
+        $activity_count = $this->_db->getAllAssoc($sql);
+        
+        
+        $criterion = $this->makePeriodCriterion(
+            'contact.date_created', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS contactCount
+            FROM
+                contact
+            WHERE
+                contact.entered_by = %s
+            %s
+            AND
+                contact.site_id = %s",
+            $userID,
+            $criterion,
+            $this->_siteID
+        );
+
+        $contact_count = $this->_db->getAllAssoc($sql);
+        
+        
+        $criterion = $this->makePeriodCriterion(
+            'company.date_created', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS companyCount
+            FROM
+                company
+            WHERE
+                company.entered_by = %s
+            %s
+            AND
+                company.site_id = %s",
+            $userID,
+            $criterion,
+            $this->_siteID
+        );
+
+        $company_count = $this->_db->getAllAssoc($sql);
+        
+        
         $z = array();
         $z[0]['createdCount'] = $a[0]['createdCount'];
         $z[0]['modifiedCount'] = $b[0]['modifiedCount'];
         $z[0]['submittedCount'] = $c[0]['submittedCount'];
+        $z[0]['activityCount'] = $activity_count[0]['activityCount'];
+        $z[0]['companyCount'] = $company_count[0]['companyCount'];
+        $z[0]['contactCount'] = $contact_count[0]['contactCount'];
         return $z;
     }
     
@@ -1395,7 +1466,7 @@ class Statistics
         {
             case TIME_PERIOD_TODAY:
                 $criteria = sprintf(
-                    'AND %s > \'1900-01-01\' AND DATE(%s) = CURDATE()',
+                    'AND %s > \'1900-01-01\' AND DATE(%s) = DATE(CURDATE())',
                     $dateField,
                     $dateField
                 );
@@ -1403,7 +1474,7 @@ class Statistics
 
             case TIME_PERIOD_YESTERDAY:
                 $criteria = sprintf(
-                    'AND %s > \'1900-01-01\' AND DATE(%s) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)',
+                    'AND %s > \'1900-01-01\' AND DATE(%s) = DATE(DATE_SUB(CURDATE(), INTERVAL 1 DAY))',
                     $dateField,
                     $dateField
                 );
@@ -1450,6 +1521,24 @@ class Statistics
                 );
                 break;
 
+            case TIME_PERIOD_THISQUARTER:
+                $criteria =sprintf(
+                    'AND %s > \'1900-01-01\' AND YEAR(%s) = YEAR(CURDATE()) AND QUARTER(%s) = QUARTER(CURDATE())',
+                    $dateField,
+                    $dateField,
+                    $dateField
+                );
+                break;
+                
+            case TIME_PERIOD_LASTQUARTER:
+                $criteria = sprintf(
+                    'AND %s > \'1900-01-01\' AND YEAR(%s) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 QUARTER)) AND QUARTER(%s) = QUARTER(DATE_SUB(CURDATE(), INTERVAL 1 QUARTER))',
+                    $dateField,
+                    $dateField,
+                    $dateField
+                );
+                break;
+                
             case TIME_PERIOD_THISYEAR:
                 $criteria = sprintf(
                     'AND %s > \'1900-01-01\' AND YEAR(%s) = YEAR(NOW())',

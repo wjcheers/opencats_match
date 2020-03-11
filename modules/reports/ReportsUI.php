@@ -115,6 +115,8 @@ class ReportsUI extends UserInterface
         $statisticsData['companiesLastWeek']  = $statistics->getCompanyCount(TIME_PERIOD_LASTWEEK);
         $statisticsData['companiesThisMonth'] = $statistics->getCompanyCount(TIME_PERIOD_THISMONTH);
         $statisticsData['companiesLastMonth'] = $statistics->getCompanyCount(TIME_PERIOD_LASTMONTH);
+        $statisticsData['companiesThisQuarter'] = $statistics->getCompanyCount(TIME_PERIOD_THISQUARTER);
+        $statisticsData['companiesLastQuarter'] = $statistics->getCompanyCount(TIME_PERIOD_LASTQUARTER);
         $statisticsData['companiesThisYear']  = $statistics->getCompanyCount(TIME_PERIOD_THISYEAR);
         $statisticsData['companiesLastYear']  = $statistics->getCompanyCount(TIME_PERIOD_LASTYEAR);
 
@@ -126,6 +128,8 @@ class ReportsUI extends UserInterface
         $statisticsData['candidatesLastWeek']  = $statistics->getCandidateCount(TIME_PERIOD_LASTWEEK);
         $statisticsData['candidatesThisMonth'] = $statistics->getCandidateCount(TIME_PERIOD_THISMONTH);
         $statisticsData['candidatesLastMonth'] = $statistics->getCandidateCount(TIME_PERIOD_LASTMONTH);
+        $statisticsData['candidatesThisQuarter'] = $statistics->getCandidateCount(TIME_PERIOD_THISQUARTER);
+        $statisticsData['candidatesLastQuarter'] = $statistics->getCandidateCount(TIME_PERIOD_LASTQUARTER);
         $statisticsData['candidatesThisYear']  = $statistics->getCandidateCount(TIME_PERIOD_THISYEAR);
         $statisticsData['candidatesLastYear']  = $statistics->getCandidateCount(TIME_PERIOD_LASTYEAR);
 
@@ -137,6 +141,8 @@ class ReportsUI extends UserInterface
         $statisticsData['submissionsLastWeek']  = $statistics->getSubmissionCount(TIME_PERIOD_LASTWEEK);
         $statisticsData['submissionsThisMonth'] = $statistics->getSubmissionCount(TIME_PERIOD_THISMONTH);
         $statisticsData['submissionsLastMonth'] = $statistics->getSubmissionCount(TIME_PERIOD_LASTMONTH);
+        $statisticsData['submissionsThisQuarter'] = $statistics->getSubmissionCount(TIME_PERIOD_THISQUARTER);
+        $statisticsData['submissionsLastQuarter'] = $statistics->getSubmissionCount(TIME_PERIOD_LASTQUARTER);
         $statisticsData['submissionsThisYear']  = $statistics->getSubmissionCount(TIME_PERIOD_THISYEAR);
         $statisticsData['submissionsLastYear']  = $statistics->getSubmissionCount(TIME_PERIOD_LASTYEAR);
 
@@ -148,6 +154,8 @@ class ReportsUI extends UserInterface
         $statisticsData['placementsLastWeek']  = $statistics->getPlacementCount(TIME_PERIOD_LASTWEEK);
         $statisticsData['placementsThisMonth'] = $statistics->getPlacementCount(TIME_PERIOD_THISMONTH);
         $statisticsData['placementsLastMonth'] = $statistics->getPlacementCount(TIME_PERIOD_LASTMONTH);
+        $statisticsData['placementsThisQuarter'] = $statistics->getPlacementCount(TIME_PERIOD_THISQUARTER);
+        $statisticsData['placementsLastQuarter'] = $statistics->getPlacementCount(TIME_PERIOD_LASTQUARTER);
         $statisticsData['placementsThisYear']  = $statistics->getPlacementCount(TIME_PERIOD_THISYEAR);
         $statisticsData['placementsLastYear']  = $statistics->getPlacementCount(TIME_PERIOD_LASTYEAR);
 
@@ -159,6 +167,8 @@ class ReportsUI extends UserInterface
         $statisticsData['contactsLastWeek']  = $statistics->getContactCount(TIME_PERIOD_LASTWEEK);
         $statisticsData['contactsThisMonth'] = $statistics->getContactCount(TIME_PERIOD_THISMONTH);
         $statisticsData['contactsLastMonth'] = $statistics->getContactCount(TIME_PERIOD_LASTMONTH);
+        $statisticsData['contactsThisQuarter'] = $statistics->getContactCount(TIME_PERIOD_THISQUARTER);
+        $statisticsData['contactsLastQuarter'] = $statistics->getContactCount(TIME_PERIOD_LASTQUARTER);
         $statisticsData['contactsThisYear']  = $statistics->getContactCount(TIME_PERIOD_THISYEAR);
         $statisticsData['contactsLastYear']  = $statistics->getContactCount(TIME_PERIOD_LASTYEAR);
 
@@ -173,6 +183,8 @@ class ReportsUI extends UserInterface
         $statisticsData['jobOrdersLastWeek']  = $statistics->getJobOrderCount(TIME_PERIOD_LASTWEEK);
         $statisticsData['jobOrdersThisMonth'] = $statistics->getJobOrderCount(TIME_PERIOD_THISMONTH);
         $statisticsData['jobOrdersLastMonth'] = $statistics->getJobOrderCount(TIME_PERIOD_LASTMONTH);
+        $statisticsData['jobOrdersThisQuarter'] = $statistics->getJobOrderCount(TIME_PERIOD_THISQUARTER);
+        $statisticsData['jobOrdersLastQuarter'] = $statistics->getJobOrderCount(TIME_PERIOD_LASTQUARTER);
         $statisticsData['jobOrdersThisYear']  = $statistics->getJobOrderCount(TIME_PERIOD_THISYEAR);
         $statisticsData['jobOrdersLastYear']  = $statistics->getJobOrderCount(TIME_PERIOD_LASTYEAR);
 
@@ -240,6 +252,16 @@ class ReportsUI extends UserInterface
                 $reportTitle = 'Last Month\'s Report';
                 break;
 
+            case 'thisQuarter':
+                $period = TIME_PERIOD_THISQUARTER;
+                $reportTitle = 'This Quarter\'s Report';
+                break;
+
+            case 'lastQuarter':
+                $period = TIME_PERIOD_LASTQUARTER;
+                $reportTitle = 'Last Quarter\'s Report';
+                break;
+                
             case 'thisYear':
                 $period = TIME_PERIOD_THISYEAR;
                 $reportTitle = 'This Year\'s Report';
@@ -320,6 +342,16 @@ class ReportsUI extends UserInterface
                 $reportTitle = 'Last Month\'s Report';
                 break;
 
+            case 'thisQuarter':
+                $period = TIME_PERIOD_THISQUARTER;
+                $reportTitle = 'This Quarter\'s Report';
+                break;
+
+            case 'lastQuarter':
+                $period = TIME_PERIOD_LASTQUARTER;
+                $reportTitle = 'Last Quarter\'s Report';
+                break;
+                
             case 'thisYear':
                 $period = TIME_PERIOD_THISYEAR;
                 $reportTitle = 'This Year\'s Report';
@@ -392,6 +424,16 @@ class ReportsUI extends UserInterface
                 $reportTitle = 'Last Month\'s Report';
                 break;
 
+            case 'thisQuarter':
+                $period = TIME_PERIOD_THISQUARTER;
+                $reportTitle = 'This Quarter\'s Report';
+                break;
+
+            case 'lastQuarter':
+                $period = TIME_PERIOD_LASTQUARTER;
+                $reportTitle = 'Last Quarter\'s Report';
+                break;
+                
             case 'thisYear':
                 $period = TIME_PERIOD_THISYEAR;
                 $reportTitle = 'This Year\'s Report';
@@ -472,6 +514,16 @@ class ReportsUI extends UserInterface
                 $reportTitle = 'Last Month\'s Report';
                 break;
 
+            case 'thisQuarter':
+                $period = TIME_PERIOD_THISQUARTER;
+                $reportTitle = 'This Quarter\'s Report';
+                break;
+
+            case 'lastQuarter':
+                $period = TIME_PERIOD_LASTQUARTER;
+                $reportTitle = 'Last Quarter\'s Report';
+                break;
+                
             case 'thisYear':
                 $period = TIME_PERIOD_THISYEAR;
                 $reportTitle = 'This Year\'s Report';
@@ -552,6 +604,16 @@ class ReportsUI extends UserInterface
                 $reportTitle = 'Last Month\'s Report';
                 break;
 
+            case 'thisQuarter':
+                $period = TIME_PERIOD_THISQUARTER;
+                $reportTitle = 'This Quarter\'s Report';
+                break;
+
+            case 'lastQuarter':
+                $period = TIME_PERIOD_LASTQUARTER;
+                $reportTitle = 'Last Quarter\'s Report';
+                break;
+                
             case 'thisYear':
                 $period = TIME_PERIOD_THISYEAR;
                 $reportTitle = 'This Year\'s Report';

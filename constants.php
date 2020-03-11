@@ -113,6 +113,8 @@ define('TIME_PERIOD_LASTYEAR',  800);
 define('TIME_PERIOD_TODATE',    900);
 
 define('TIME_PERIOD_LASTTWOWEEKS', 1000);
+define('TIME_PERIOD_THISQUARTER',  1100);
+define('TIME_PERIOD_LASTQUARTER',  1200);
 
 /* Pipeline status flag. */
 define('PIPELINE_STATUS_NOSTATUS',           0);
