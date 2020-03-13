@@ -1848,7 +1848,7 @@ class CandidatesDataGrid extends DataGrid
                                      'sortableColumn'     => 'dateCreatedSort',
                                      'pagerWidth'    => 60,
                                      'filterHaving' => 'DATE(candidate.date_created)',
-                                     'filterTypes'   => '===g=s'),
+                                     'filterTypes'   => '=~=g=s'),
 
             'Modified' =>      array('select'   => 'DATE_FORMAT(candidate.date_modified, \'%m-%d-%y\') AS dateModified',
                                      'pagerRender'      => 'return $rsData[\'dateModified\'];',
@@ -1856,7 +1856,7 @@ class CandidatesDataGrid extends DataGrid
                                      'pagerWidth'    => 60,
                                      'pagerOptional' => false,
                                      'filterHaving' => 'DATE(candidate.date_modified)',
-                                     'filterTypes'   => '===g=s'),
+                                     'filterTypes'   => '=~=g=s'),
                                      
             'Submitted' =>      array('select'   => 'DATE_FORMAT(candidate.date_submitted, \'%m-%d-%y\') AS dateSubmitted',
                                      'pagerRender'      => 'return $rsData[\'dateSubmitted\'];',
@@ -1864,7 +1864,7 @@ class CandidatesDataGrid extends DataGrid
                                      'pagerWidth'    => 60,
                                      'pagerOptional' => false,
                                      'filterHaving' => 'DATE(candidate.date_submitted)',
-                                     'filterTypes'   => '===g=s'),
+                                     'filterTypes'   => '=~=g=s'),
 
             /* This one only works when called from the saved list view.  Thats why it is not optional, filterable, or exportable.
              * FIXME:  Somehow make this defined in the associated savedListDataGrid class child.

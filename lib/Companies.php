@@ -914,14 +914,16 @@ class CompaniesDataGrid extends DataGrid
                                      'pagerRender'      => 'return $rsData[\'dateCreated\'];',
                                      'sortableColumn'     => 'dateCreatedSort',
                                      'pagerWidth'    => 60,
-                                     'filterHaving' => 'DATE_FORMAT(company.date_created, \'%m-%d-%y\')'),
+                                     'filterHaving' => 'DATE(company.date_created)',
+                                     'filterTypes'   => '=~=g=s'),
 
             'Modified' =>      array('select'   => 'DATE_FORMAT(company.date_modified, \'%m-%d-%y\') AS dateModified',
                                      'pagerRender'      => 'return $rsData[\'dateModified\'];',
                                      'sortableColumn'     => 'dateModifiedSort',
                                      'pagerWidth'    => 60,
                                      'pagerOptional' => false,
-                                     'filterHaving' => 'DATE_FORMAT(company.date_modified, \'%m-%d-%y\')'),
+                                     'filterHaving' => 'DATE(company.date_modified)',
+                                     'filterTypes'   => '=~=g=s'),
 
             'Misc Notes' =>     array('select'  => 'company.notes AS notes',
                                      'sortableColumn'    => 'notes',

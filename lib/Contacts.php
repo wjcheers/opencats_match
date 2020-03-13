@@ -970,14 +970,16 @@ class ContactsDataGrid extends DataGrid
                                      'pagerRender'      => 'return $rsData[\'dateCreated\'];',
                                      'sortableColumn'     => 'dateCreatedSort',
                                      'pagerWidth'    => 60,
-                                     'filterHaving' => 'DATE_FORMAT(contact.date_created, \'%m-%d-%y\')'),
+                                     'filterHaving' => 'DATE(contact.date_created)',
+                                     'filterTypes'   => '=~=g=s'),
 
             'Modified' =>      array('select'   => 'DATE_FORMAT(contact.date_modified, \'%m-%d-%y\') AS dateModified',
                                      'pagerRender'      => 'return $rsData[\'dateModified\'];',
                                      'sortableColumn'     => 'dateModifiedSort',
                                      'pagerWidth'    => 60,
                                      'pagerOptional' => false,
-                                     'filterHaving' => 'DATE_FORMAT(contact.date_modified, \'%m-%d-%y\')'),
+                                     'filterHaving' => 'DATE(contact.date_modified)',
+                                     'filterTypes'   => '=~=g=s'),
 
             'OwnerID' =>       array('select'    => '',
                                      'filter'    => 'contact.owner',
