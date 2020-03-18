@@ -12,21 +12,20 @@
 
     <p class="note">User Reports</p>
 
-    <?php foreach ($this->UsersRS as $rowNumber => $UserData): ?>
-        <span style="font: normal normal bold 13px/130% Arial, Tahoma, sans-serif;"><?php $this->_($UserData['ownerFullName']) ?></span>
-        <br />
-        <table class="sortable" width="1225">
-            <tr>
-                <th align="left" nowrap="nowrap">Created Candidate</th>
-                <th align="left" nowrap="nowrap">Modified Candidate</th>
-                <th align="left" nowrap="nowrap">Submitted Candidate</th>
-                <th align="left" nowrap="nowrap">Activity Count</th>
-                <th align="left" nowrap="nowrap">Created Company</th>
-                <th align="left" nowrap="nowrap">Created Contact</th>
-            </tr>
-
+    <table class="sortable" width="1225">
+        <tr>
+            <th align="left" nowrap="nowrap">User</th>
+            <th align="left" nowrap="nowrap">Created Candidate</th>
+            <th align="left" nowrap="nowrap">Modified Candidate</th>
+            <th align="left" nowrap="nowrap">Submitted Candidate</th>
+            <th align="left" nowrap="nowrap">Activity Count</th>
+            <th align="left" nowrap="nowrap">Created Company</th>
+            <th align="left" nowrap="nowrap">Created Contact</th>
+        </tr>
+        <?php foreach ($this->UsersRS as $rowNumber => $UserData): ?>
             <?php foreach ($UserData['reportRS'] as $rowNumber => $reportData): ?>
                 <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
+                    <td valign="top" align="left"><?php $this->_($UserData['ownerFullName']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['createdCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['modifiedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['submittedCount']) ?>&nbsp;</td>
@@ -35,6 +34,6 @@
                     <td valign="top" align="left"><?php $this->_($reportData['contactCount']) ?>&nbsp;</td>
                 </tr>
             <?php endforeach; ?>
-        </table>
-    <?php endforeach; ?>
+        <?php endforeach; ?>
+    </table>
 <?php TemplateUtility::printReportFooter(); ?>
