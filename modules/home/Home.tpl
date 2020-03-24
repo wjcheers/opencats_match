@@ -68,6 +68,21 @@
                 </tr>
             </table>
 
+            <table>
+                <tr>
+                    <td align="left" valign="top" style="text-align: left; width: 50%;">
+                        <div class="noteUnsizedSpan" style="width: 1220px;">My Candidates (Submitted, Interviewing, Offered in Job Orders) - Page <?php echo($this->dataGridMy->getCurrentPageHTML()); ?> (<?php echo($this->dataGridMy->getNumberOfRows()); ?> Items)</div>
+                        <?php $this->dataGridMy->draw(); ?>
+                        <div style="float:right;"><?php $this->dataGridMy->printNavigation(false); ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php $this->dataGridMy->printShowAll(); ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+
+                        <?php if (!$this->dataGridMy->getNumberOfRows()): ?>
+                        <div style="width: 1226px; height: 47px; border: 1px solid #c0c0c0; background: #E7EEFF url(images/nodata/dashboardNoCandidatesWhiteSmall.jpg);">
+                            &nbsp;
+                        </div>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            </table>
             
             <table>
                 <tr>

@@ -109,6 +109,10 @@ class HomeUI extends UserInterface
             'filterVisible' => false
         );
 
+        $dataGrid = DataGrid::get("home:MyPipelineDashboard", $dataGridProperties);
+
+        $this->_template->assign('dataGridMy', $dataGrid);
+        
         $dataGrid = DataGrid::get("home:ImportantPipelineDashboard", $dataGridProperties);
 
         $this->_template->assign('dataGrid', $dataGrid);

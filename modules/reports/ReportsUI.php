@@ -576,7 +576,6 @@ class ReportsUI extends UserInterface
             $period = '';
         }
 
-
         switch ($period)
         {
             case 'yesterday':
@@ -645,6 +644,12 @@ class ReportsUI extends UserInterface
             $UsersRS[$rowIndex]['reportRS'] = $statistics->getReportByUser(
                 $period, $UsersData['userID']
             );
+            if($period == TIME_PERIOD_TODAY)
+            {
+                $UsersRS[$rowIndex]['currentReportRS'] = $statistics->getCurrentReportByUser(
+                    $UsersData['userID']
+                );
+            }
         }
         
         if (!eval(Hooks::get('REPORTS_SHOW_USERS_REPORT'))) return;

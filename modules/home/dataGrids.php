@@ -35,6 +35,172 @@ include_once('./lib/Hooks.php');
 include_once('./lib/InfoString.php');
 include_once('./lib/Pipelines.php');
 
+
+class MyPipelineDashboard extends DataGrid
+{
+    protected $_siteID;
+
+
+    // FIXME: Fix ugly indenting - ~400 character lines = bad.
+    public function __construct($siteID, $parameters)
+    {
+        /* Pager configuration. */
+        $this->_tableWidth = 1215;
+        $this->_defaultAlphabeticalSortBy = 'lastName';
+        $this->ajaxMode = true;
+        $this->showExportColumn = false;
+        $this->showExportCheckboxes = false;
+        $this->showActionArea = true;
+        $this->showChooseColumnsBox = true;
+        $this->allowResizing = true;
+        $this->dateCriterion = '';
+        $this->globalStyle = 'font-size:11px;';
+        $this->ignoreSavedColumnLayouts = true;
+
+        $this->defaultSortBy = 'dateModifiedSort';
+        $this->defaultSortDirection = 'DESC';
+
+        $this->_defaultColumns = array(
+            array('name' => 'First Name', 'width' => 85),
+            array('name' => 'Last Name', 'width' => 75),
+            array('name' => 'Status', 'width' => 75),
+            array('name' => 'Position', 'width' => 235),
+            array('name' => 'Company', 'width' => 210),
+            array('name' => 'Modified', 'width' => 80),
+            array('name' => 'Last Notes', 'width' => 275),
+        );
+
+
+        $this->_db = DatabaseConnection::getInstance();
+        $this->_siteID = $siteID;
+        $this->_userID = $_SESSION['CATS']->getUserID();
+        $this->_assignedCriterion = "";
+        $this->_candidateIDColumn = 'company.company_id';
+
+        $this->_classColumns = array(
+
+            'First Name' =>     array('pagerRender'    => '$ret = \'<img src="images/mru/candidate.gif" height="12" alt="" />\'; if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return $ret.\'&nbsp;<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'" style="font-size:11px;" class="\'.$className.\'" title="\'.htmlspecialchars(InfoString::make(DATA_ITEM_CANDIDATE,$rsData[\'candidateID\'],$rsData[\'siteID\'])).\'">\'.htmlspecialchars($rsData[\'firstName\']).\'</a>\';',
+                                     'sortableColumn'  => 'firstName',
+                                     'pagerWidth'      => 85,
+                                     'pagerOptional'   => false,
+                                     'alphaNavigation' => true,
+                                     'filterHaving'    => 'firstName'),
+
+            'Last Name' =>      array('pagerRender'    => 'if ($rsData[\'isHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=candidates&amp;a=show&amp;candidateID=\'.$rsData[\'candidateID\'].\'"  style="font-size:11px;" class="\'.$className.\'" title="\'.htmlspecialchars(InfoString::make(DATA_ITEM_CANDIDATE,$rsData[\'candidateID\'],$rsData[\'siteID\'])).\'"> \'.htmlspecialchars($rsData[\'lastName\']).\'</a>\';',
+                                     'sortableColumn'  => 'lastName',
+                                     'pagerWidth'      => 75,
+                                     'pagerOptional'   => false,
+                                     'alphaNavigation' => true,
+                                     'filterHaving'    => 'lastName'),
+
+            'Status'    =>      array('pagerRender'    => 'return $rsData[\'status\'];',
+                                     'sortableColumn'  => 'statusSort',
+                                     'pagerWidth'      => 75,
+                                     'alphaNavigation' => true,
+                                     'filterHaving'    => 'status'),
+
+            'Position'    =>    array('pagerRender'    => 'if ($rsData[\'jobOrderIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=joborders&amp;a=show&amp;jobOrderID=\'.$rsData[\'joborderID\'].\'"  style="font-size:11px;" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'jobOrderTitle\']).\'</a>\';',
+                                     'sortableColumn'  => 'jobOrderTitle',
+                                     'pagerWidth'      => 220,
+                                     'alphaNavigation' => true,
+                                     'filterHaving'    => 'jobOrderTitle'),
+
+            'Company'    =>    array('pagerRender'    => 'if ($rsData[\'companyIsHot\'] == 1) $className =  \'jobLinkHot\'; else $className = \'jobLinkCold\'; return \'<a href="'.CATSUtility::getIndexName().'?m=companies&amp;a=show&amp;companyID=\'.$rsData[\'companyID\'].\'"  style="font-size:11px;" class="\'.$className.\'">\'.htmlspecialchars($rsData[\'companyName\']).\'</a>\';',
+                                     'sortableColumn'  => 'companyName',
+                                     'pagerWidth'      => 180,
+                                     'alphaNavigation' => true,
+                                     'filterHaving'    => 'companyName'),
+
+            'Modified' =>      array('pagerRender'     => 'return $rsData[\'dateModified\'];',
+                                     'sortableColumn'  => 'dateModifiedSort',
+                                     'pagerWidth'      => 70,
+                                     'pagerOptional'   => true,
+                                     'filterHaving'    => 'DATE_FORMAT(candidate_joborder.date_modified, \'%m-%d-%y (%%h:%%i %%p)\')'),
+
+            'Last Notes' =>      array('pagerRender'     => 'return $rsData[\'lastNotes\'];',
+                                     'sortableColumn'  => 'lastNotes',
+                                     'pagerWidth'      => 220,
+                                     'pagerOptional'   => false,
+                                     'filterHaving'    => 'lastNotes'),
+         );
+
+        parent::__construct("home:ImportantPipelineDashboard", $parameters);
+    }
+
+    /**
+     * Returns the sql statment for the pager.
+     *
+     * @return array clients data
+     */
+    public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
+    {
+        $sql = sprintf(
+            "SELECT SQL_CALC_FOUND_ROWS %s
+                candidate_joborder.candidate_joborder_id as candidateJoborderID,
+                candidate.first_name as firstName,
+                candidate.last_name as lastName,
+                candidate.candidate_id as candidateID,
+                candidate.site_id as siteID,
+                candidate.is_hot as isHot,
+                company.name as companyName,
+                company.company_id as companyID,
+                company.is_hot as companyIsHot,
+                joborder.title as jobOrderTitle,
+                joborder.is_hot as jobOrderIsHot,
+                joborder.joborder_id as joborderID,
+                user.first_name as userFirstName,
+                user.last_name as userLastName,
+                CONCAT(user.last_name, user.first_name) AS ownerSort,
+                DATE_FORMAT(candidate_joborder.date_modified, '%%m-%%d-%%y ') as dateModified,
+                candidate_joborder.date_modified as dateModifiedSort,
+                IF(candidate_joborder.status = %s, 1,
+                  IF(candidate_joborder.status = %s, 2, 3)) as statusSort,
+                candidate_joborder_status.short_description as status,
+                candidate_joborder.last_notes AS lastNotes
+            FROM
+                candidate_joborder
+            LEFT JOIN candidate ON
+                candidate.candidate_id = candidate_joborder.candidate_id
+            LEFT JOIN joborder ON
+                joborder.joborder_id = candidate_joborder.joborder_id
+            LEFT JOIN company ON
+                joborder.company_id = company.company_id
+            LEFT JOIN candidate_joborder_status ON
+                candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
+            LEFT JOIN user ON
+                candidate.owner = user.user_id
+            WHERE
+                candidate_joborder.site_id = %s
+            AND
+                (   candidate_joborder.status = %s
+                OR
+                    candidate_joborder.status = %s
+                OR
+                    candidate_joborder.status = %s
+                )
+            AND candidate.owner = %s
+            %s
+            %s
+            %s
+            %s",
+            $distinct,
+            PIPELINE_STATUS_SUBMITTED,
+            PIPELINE_STATUS_INTERVIEWING,
+            $this->_siteID,
+            PIPELINE_STATUS_SUBMITTED,
+            PIPELINE_STATUS_INTERVIEWING,
+            PIPELINE_STATUS_OFFERED,
+            $this->_userID,
+            (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
+            (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : '',
+            $orderSQL,
+            $limitSQL
+        );
+
+        return $sql;
+    }
+}
+
 class ImportantPipelineDashboard extends DataGrid
 {
     protected $_siteID;
