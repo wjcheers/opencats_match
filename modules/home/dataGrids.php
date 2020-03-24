@@ -124,7 +124,7 @@ class MyPipelineDashboard extends DataGrid
                                      'filterHaving'    => 'lastNotes'),
          );
 
-        parent::__construct("home:ImportantPipelineDashboard", $parameters);
+        parent::__construct("home:MyPipelineDashboard", $parameters);
     }
 
     /**
