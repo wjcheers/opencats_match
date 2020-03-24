@@ -19,6 +19,7 @@
             <th align="left" nowrap="nowrap">Modified Candidates</th>
             <th align="left" nowrap="nowrap">Submitted Candidates</th>
             <th align="left" nowrap="nowrap">Interviewing Candidates</th>
+            <th align="left" nowrap="nowrap">Offered Candidates</th>
             <th align="left" nowrap="nowrap">Placed Candidates</th>
             <th align="left" nowrap="nowrap">Activities Count</th>
             <th align="left" nowrap="nowrap">Created Companies</th>
@@ -32,6 +33,7 @@
                     <td valign="top" align="left"><?php $this->_($reportData['modifiedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['submittedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['interviewingCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($reportData['offeredCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['placedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['companyCount']) ?>&nbsp;</td>

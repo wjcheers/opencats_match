@@ -772,6 +772,38 @@ class Statistics
 
         $interviewing_count = $this->_db->getAllAssoc($sql);
         
+        $criterion = $this->makePeriodCriterion(
+            'candidate_joborder_status_history.date', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS offeredCount
+            FROM
+                candidate_joborder_status_history
+            LEFT JOIN candidate
+                ON candidate.candidate_id = candidate_joborder_status_history.candidate_id
+            LEFT JOIN joborder
+                ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+            LEFT JOIN user AS owner_user
+                ON owner_user.user_id = candidate.owner
+            WHERE
+                candidate_joborder_status_history.status_to = 600
+            %s
+            AND
+                candidate.site_id = %s
+            AND
+                owner_user.user_id = %s",
+            $criterion,
+            $this->_siteID,
+            $userID
+        );
+
+        $offered_count = $this->_db->getAllAssoc($sql);
+                
+        $criterion = $this->makePeriodCriterion(
+            'activity.date_modified', $period
+        );
         
         $criterion = $this->makePeriodCriterion(
             'candidate_joborder_status_history.date', $period
@@ -873,6 +905,7 @@ class Statistics
         $z[0]['modifiedCount'] = $b[0]['modifiedCount'];
         $z[0]['submittedCount'] = $c[0]['submittedCount'];
         $z[0]['interviewingCount'] = $interviewing_count[0]['interviewingCount'];
+        $z[0]['offeredCount'] = $offered_count[0]['offeredCount'];
         $z[0]['placedCount'] = $placed_count[0]['placedCount'];
         $z[0]['activityCount'] = $activity_count[0]['activityCount'];
         $z[0]['companyCount'] = $company_count[0]['companyCount'];
