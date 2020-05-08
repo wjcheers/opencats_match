@@ -471,7 +471,7 @@
                     
                     <tr>
                         <td class="tdVertical">
-                            <label id="currentPayLabel" for="currentEmployer">Current Pay:</label>
+                            <label id="currentPayLabel" for="currentPay">Current Pay:</label>
                         </td>
                         <td class="tdData">
                             <input type="text" name="currentPay" id="currentPay" value="<?php $this->_($this->data['currentPay']); ?>" class="inputbox" style="width: 150px" />
@@ -480,7 +480,7 @@
 
                     <tr>
                         <td class="tdVertical">
-                            <label id="desiredPayLabel" for="currentEmployer">Desired Pay:</label>
+                            <label id="desiredPayLabel" for="desiredPay">Desired Pay:</label>
                         </td>
                         <td class="tdData">
                             <input type="text" name="desiredPay" id="desiredPay" value="<?php $this->_($this->data['desiredPay']); ?>" class="inputbox" style="width: 150px" />
