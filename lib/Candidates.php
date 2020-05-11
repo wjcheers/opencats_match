@@ -386,7 +386,7 @@ class Candidates
             $this->_db->makeQueryString($jobTitle),
             $this->_db->makeQueryString($extraGender),
             $this->_db->makeQueryString($maritalStatus),
-            $this->_db->makeQueryString($birthYear),
+            $this->_db->makeQueryStringOrNULL($birthYear),
             $this->_db->makeQueryString($highestDegree),
             
             $this->_db->makeQueryString($major),
@@ -1930,7 +1930,7 @@ class CandidatesDataGrid extends DataGrid
                                      'sortableColumn'    => 'birthYear',
                                      'pagerWidth'   => 110,
                                      'pagerRender'     => 'return htmlspecialchars($rsData[\'birthYear\']);',
-                                     'filterTypes'   => '=~==',
+                                     'filterTypes'   => '=~===>=<',
                                      'filter'         => 'candidate.birth_year'),
                                      
             'Highest Education Degree' => array('select'  => 'candidate.highest_degree AS highestDegree',

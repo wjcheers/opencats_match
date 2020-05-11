@@ -16,6 +16,7 @@ function checkAddForm(form)
     errorMessage += checkLastName();
     errorMessage += checkCurrentPay();
     errorMessage += checkDesiredPay();
+    errorMessage += checkBirthYear();
     errorMessage += checkPhoneHome();
     errorMessage += checkPhoneCell();
     errorMessage += checkPhoneWork();
@@ -37,6 +38,7 @@ function checkEditForm(form)
     errorMessage += checkLastName();
     errorMessage += checkCurrentPay();
     errorMessage += checkDesiredPay();
+    errorMessage += checkBirthYear();
     errorMessage += checkPhoneHome();
     errorMessage += checkPhoneCell();
     errorMessage += checkPhoneWork();
@@ -210,6 +212,27 @@ function checkDesiredPay()
     if (fieldValue != '' && isNaN(fieldValue))
     {
         errorMessage = "    - Desired Pay is not a number. (Number Only)\n";
+
+        fieldLabel.style.color = '#ff0000';
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+
+function checkBirthYear()
+{
+    var errorMessage = '';
+
+    fieldValue = document.getElementById('birthYear').value;
+    fieldLabel = document.getElementById('birthYearLabel');
+    
+    if (fieldValue != '' && (isNaN(fieldValue) || fieldValue.length != 4))
+    {
+        errorMessage = "    - Birth Year is not a 4 digit number.\n";
 
         fieldLabel.style.color = '#ff0000';
     }
