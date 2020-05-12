@@ -306,7 +306,7 @@ class DatabaseSearch
 
         /* Strip excessive whitespace. */
         $string = str_replace('OOOPENPARENTH', '(', $string);
-        $string = str_replace('CCCLOSEPARENTH ', ')', $string);
+        $string = str_replace('CCCLOSEPARENTH', ')', $string);
         $string = str_replace('( ', '(', $string);
         $string = str_replace(' )', ')', $string);
         $string = str_replace(', ', ',', $string);
