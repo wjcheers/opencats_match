@@ -634,6 +634,9 @@ class CandidatesUI extends UserInterface
         $questionnaires = $questionnaire->getCandidateQuestionnaires($candidateID);
 
         $lists = $candidates->getListsForCandidate($candidateID);
+        
+        $users = new Users($this->_siteID);
+        $user = $users->get($this->_userID);
 
         $this->_template->assign('active', $this);
         $this->_template->assign('questionnaires', $questionnaires);
@@ -651,6 +654,7 @@ class CandidatesUI extends UserInterface
         $this->_template->assign('privledgedUser', $privledgedUser);
         $this->_template->assign('sessionCookie', $_SESSION['CATS']->getCookie());
         $this->_template->assign('lists', $lists);
+        $this->_template->assign('user', $user);
 
         if (!eval(Hooks::get('CANDIDATE_SHOW'))) return;
 

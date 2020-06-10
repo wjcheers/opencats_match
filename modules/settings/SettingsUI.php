@@ -156,6 +156,13 @@ class SettingsUI extends UserInterface
                 }
                 break;
 
+            case 'setGreetingMessage':
+                if ($this->isPostBack())
+                {
+                    $this->onSetGreetingMessage();
+                }
+                break;
+                
             case 'newInstallPassword':
                 if ($this->isPostBack())
                 {
@@ -494,6 +501,17 @@ class SettingsUI extends UserInterface
 
                 case 'setGmailPassword':
                     $templateFile = './modules/settings/SetGmailPassword.tpl';
+                    break;
+                    
+                case 'setGreetingMessage':                
+                    $users = new Users($this->_siteID);
+                    $data = $users->get($this->_userID);
+                    if (empty($data))
+                    {
+                        CommonErrors::fatal(COMMONERROR_BADINDEX, $this, 'No user found with selected ID.');
+                    }
+                    $templateFile = './modules/settings/SetGreetingMessage.tpl';
+                    $this->_template->assign('data', $data);
                     break;
 
                 default:
@@ -2707,6 +2725,54 @@ class SettingsUI extends UserInterface
         {
             case LOGIN_SUCCESS:
                 $error[] = 'Your password has been successfully changed. Please log in again using your new password.';
+                break;
+
+            default:
+                $error[] = 'An unknown error occurred.';
+                break;
+        }
+
+        $isDemoUser = $_SESSION['CATS']->isDemo();
+        $this->_template->assign('userID', $this->_userID);
+        $this->_template->assign('isDemoUser', $isDemoUser);
+
+        $this->_template->assign('active', $this);
+        $this->_template->assign('subActive', 'My Profile');
+        $this->_template->assign('errorMessage', join('<br />', $error));
+        $this->_template->display('./modules/settings/MyProfile.tpl');
+    }
+    
+    /*
+     * Called by handleRequest() to process setting a user's greeting message.
+     */
+    private function onSetGreetingMessage()
+    {
+        /* Bail out if the user is demo. */
+        if ($this->_realAccessLevel == ACCESS_LEVEL_DEMO)
+        {
+            $this->fatal(
+                'You are not allowed to set your gmail password.'
+            );
+        }
+
+        $greetingMessageTitle = $this->getTrimmedInput(
+            'greetingMessageTitle', $_POST
+        );
+        $greetingMessageBody = $this->getTrimmedInput(
+            'greetingMessageBody', $_POST
+        );
+        //$greetingMessageBody = nl2br($greetingMessageBody);
+
+        /* Attempt to set the user's greeting message. */
+        $users = new Users($this->_siteID);
+        $status = $users->setGreetingMessage(
+            $this->_userID, $greetingMessageTitle, $greetingMessageBody
+        );
+
+        switch ($status)
+        {
+            case LOGIN_SUCCESS:
+                $error[] = 'Your greeting message has been successfully changed.';
                 break;
 
             default:

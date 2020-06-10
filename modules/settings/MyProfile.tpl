@@ -56,6 +56,16 @@
                                     Set your Gmail password.
                                 </td>
                             </tr>
+                            <tr>
+                                <td>
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=myProfile&amp;s=setGreetingMessage">
+                                        <img src="images/bullet_black.gif" alt="" border="0" />Set Greeting Message
+                                    </a>
+                                </td>
+                                <td>
+                                    Set Greeting Message.
+                                </td>
+                            </tr>
                             <!--<tr>
                                 <td>
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=myProfile&amp;s=notificationOptions">

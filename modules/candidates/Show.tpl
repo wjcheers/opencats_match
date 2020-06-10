@@ -60,9 +60,55 @@
                             </tr>
                             
                             <tr>
-                                <td class="vertical">E-Mail:</td>
+                                <td class="vertical">E-Mail:
+                                    <?php if (($this->data['email1'] != '') || ($this->data['email2'] != "")) {
+                                    echo "&nbsp;&nbsp;&nbsp;&nbsp;";
+                                    echo "<a target=\"_blank\" href=\"mailto:";
+                                    echo $this->data['email1'] . ',' . $this->data['email2'];
+                                    echo "?subject=";
+                                    
+                                    /* Replace e-mail template variables. */
+                                    $stringsToFind = array(
+                                        '%CANDFIRSTNAME%',
+                                        '%CANDLASTNAME%',
+                                        '%CANDFULLNAME%',
+                                        '%CANDCHNAME%',
+                                        PHP_EOL
+                                    );
+                                    $replacementStrings = array(
+                                        $this->data['firstName'],
+                                        $this->data['lastName'],
+                                        $this->data['firstName'] . ' ' . $this->data['lastName'],
+                                        $this->data['chineseName'],
+                                        '%0D%0A'
+                                    );                                            
+                                    
+                                    echo str_replace($stringsToFind, $replacementStrings, $this->user['greetingMessageTitle']);
+                                    
+                                    echo "&body=";
+                                
+                                    /* Replace e-mail template variables. */
+                                    $stringsToFind = array(
+                                        '%CANDFIRSTNAME%',
+                                        '%CANDLASTNAME%',
+                                        '%CANDFULLNAME%',
+                                        '%CANDCHNAME%',
+                                        PHP_EOL
+                                    );
+                                    $replacementStrings = array(
+                                        $this->data['firstName'],
+                                        $this->data['lastName'],
+                                        $this->data['firstName'] . ' ' . $this->data['lastName'],
+                                        $this->data['chineseName'],
+                                        '%0D%0A'
+                                    );                                            
+                                        
+                                    echo str_replace($stringsToFind, $replacementStrings, $this->user['greetingMessageBody']);
+                                    echo "\">Greeting</a>";
+                                    } ?>
+                                </td>
                                 <td class="data">
-                                    <a href="mailto:<?php $this->_($this->data['email1']); ?>">
+                                    <a target="_blank" href="mailto:<?php $this->_($this->data['email1']); ?>">
                                         <?php $this->_($this->data['email1']); ?>
                                     </a>
                                 </td>
@@ -70,7 +116,7 @@
                             <tr>
                                 <td class="vertical">2nd E-Mail:</td>
                                 <td class="data">
-                                    <a href="mailto:<?php $this->_($this->data['email2']); ?>">
+                                    <a target="_blank" href="mailto:<?php $this->_($this->data['email2']); ?>">
                                         <?php $this->_($this->data['email2']); ?>
                                     </a>
                                 </td>

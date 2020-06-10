@@ -288,6 +288,8 @@ class Users
                 user.categories AS categories,
                 user.session_cookie AS sessionCookie,
                 user.can_see_eeo_info AS canSeeEEOInfo,
+                user.greeting_message_title AS greetingMessageTitle,
+                user.greeting_message_body AS greetingMessageBody,
                 DATE_FORMAT(
                     MAX(
                         IF(user_login.successful = 1, user_login.date, NULL)
@@ -791,6 +793,68 @@ class Users
             WHERE
                 user.user_id = %s",
             $this->_db->makeQueryString($newPassword),
+            $this->_db->makeQueryInteger($userID)
+        );
+        $this->_db->query($sql);
+        // FIXME: Did the above query succeed? If not, fail.
+
+        return LOGIN_SUCCESS;
+    }
+    
+    /**
+     * Set a user's greeting message to "mailto:" default message.
+     *
+     * @param integer user ID
+     * @param string greeting message title
+     * @param string greeting message body
+     * @return flag status
+     */
+    public function setGreetingMessage($userID, $greetingMessageTitle, $greetingMessageBody)
+    {
+        $sql = sprintf(
+            "SELECT
+                user.password AS password,
+                user.access_level AS accessLevel,
+                user.can_change_password AS canChangePassword
+            FROM
+                user
+            WHERE
+                user.user_id = %s",
+            $this->_db->makeQueryInteger($userID)
+        );
+        $rs = $this->_db->getAssoc($sql);
+
+        /* No results? Shouldn't happen, but it could if the user just got
+         * deleted or something.
+         */
+        if (!$rs || $this->_db->isEOF())
+        {
+            return LOGIN_INVALID_USER;
+        }
+
+        /* Is the user's account disabled? */
+        if ($rs['accessLevel'] <= ACCESS_LEVEL_DISABLED)
+        {
+            return LOGIN_DISABLED;
+        }
+
+        /* Is the user allowed to change his/her password? */
+        if ($rs['canChangePassword'] != '1')
+        {
+            return LOGIN_CANT_CHANGE_PASSWORD;
+        }
+
+        /* Change the user's password. */
+        $sql = sprintf(
+            "UPDATE
+                user
+            SET
+                greeting_message_title = %s,
+                greeting_message_body = %s
+            WHERE
+                user.user_id = %s",
+            $this->_db->makeQueryString($greetingMessageTitle),
+            $this->_db->makeQueryString($greetingMessageBody),
             $this->_db->makeQueryInteger($userID)
         );
         $this->_db->query($sql);
