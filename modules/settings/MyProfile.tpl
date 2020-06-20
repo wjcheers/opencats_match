@@ -59,11 +59,11 @@
                             <tr>
                                 <td>
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=myProfile&amp;s=setGreetingMessage">
-                                        <img src="images/bullet_black.gif" alt="" border="0" />Set Greeting Message
+                                        <img src="images/bullet_black.gif" alt="" border="0" />Set Mail Template
                                     </a>
                                 </td>
                                 <td>
-                                    Set Greeting Message.
+                                    Set mail template.
                                 </td>
                             </tr>
                             <!--<tr>

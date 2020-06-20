@@ -24,12 +24,14 @@
 
                 <br />
                 <span style="font-size: 12pt; font-weight: 900;">
-                Your e-mail has been successfully sent to the following recipients:
+                Your e-mail has been sent to the following recipients:
                 <blockquote>
                 <?php
                 echo $this->success_to;
                 ?>
                 </blockquote>
+                </span>
+                You may check your e-mail sent box to confirm the the results.
 
 
                 <?php
@@ -85,7 +87,26 @@
                 %CANDLASTNAME%  => Last Name</BR>
                 %CANDFULLNAME%  => Full Name</BR>
                 %CANDCHNAME%    => Chinese Name</p>
-
+                
+                <?php
+                $greetingMessageName = unserialize($this->user[0]['greetingMessageName']);
+                $greetingMessageTitle = unserialize($this->user[0]['greetingMessageTitle']);
+                $greetingMessageBody = unserialize($this->user[0]['greetingMessageBody']);
+                ?>
+                
+                Template:
+                <table>
+                <?php for ($i = 0; $i < 10; $i++): ?>
+                <tr>
+                <td>
+                <a href="#" class="greetingTemplate" title="<?php echo $greetingMessageTitle[$i];?>" onclick="loadMailTemplate(<?php echo $i; ?>); return false;"><?php echo $greetingMessageName[$i];?></a>
+                <span style="display: none;" id="greetingMessageTitle<?php echo $i;?>"><?php echo $greetingMessageTitle[$i];?></span>
+                <span style="display: none;" id="greetingMessageBody<?php echo $i;?>"><?php echo $greetingMessageBody[$i];?></span>
+                </td>
+                </tr>
+                <?php endfor; ?>
+                </table>
+                
             <table class="editTable" width="100%">
                 <tr>
                     <td>
@@ -97,7 +118,7 @@
                                     To
                                 </td>
                                 <td class="tdData">
-                                    <textarea class="inputbox" name="emailTo" rows="2", cols="90" tabindex="99" style="width: 600px;" readonly><?php echo($emailTo); ?></textarea>
+                                    <textarea class="inputbox" name="emailTo" rows="2", cols="90" tabindex="<?php echo($tabIndex++); ?>" style="width: 750px;" readonly><?php echo($emailTo); ?></textarea>
                                     <textarea style="display:none;" class="inputbox" name="firstTo" rows="2", cols="90" tabindex="99" style="width: 600px;" readonly><?php echo($firstTo); ?></textarea>
                                     <textarea style="display:none;" class="inputbox" name="lastTo" rows="2", cols="90" tabindex="99" style="width: 600px;" readonly><?php echo($lastTo); ?></textarea>
                                     <textarea style="display:none;" class="inputbox" name="fullTo" rows="2", cols="90" tabindex="99" style="width: 600px;" readonly><?php echo($fullTo); ?></textarea>
@@ -109,7 +130,7 @@
                                     <label id="emailSubjectLabel" for="emailSubject">Subject</label>
                                 </td>
                                 <td class="tdData">
-                                    <input id="emailSubject" tabindex="<?php echo($tabIndex++); ?>" type="text" name="emailSubject" class="inputbox" style="width: 600px;" />
+                                    <textarea id="emailSubject" class="inputbox" name="emailSubject" rows="2", cols="90" tabindex="<?php echo($tabIndex++); ?>" style="width: 750px;"></textarea>
                                 </td>
                             </tr>
                             <tr>
@@ -117,7 +138,7 @@
                                     <label id="emailBodyLabel" for="emailBody">Body</label>
                                 </td>
                                 <td class="tdData">
-                                    <textarea id="emailBody" tabindex="<?php echo($tabIndex++); ?>" name="emailBody" rows="25" cols="90" style="width: 600px;" class="mceEditor"></textarea />
+                                    <textarea id="emailBody" tabindex="<?php echo($tabIndex++); ?>" name="emailBody" rows="25" cols="90" style="width: 750px;" class="mceEditor"></textarea />
                                 </td>
                             </tr>
                             <tr>
@@ -131,7 +152,7 @@
                         </form>
 
                         <script type="text/javascript">
-                        document.emailForm.emailSubject.focus();
+                        //document.emailForm.emailSubject.focus();
                         </script>
                     </td>
                 </tr>

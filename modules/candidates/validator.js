@@ -481,3 +481,23 @@ var getElementsByAttribute = function (el, attr, value) {
     }
     return match;
 };
+
+
+function loadMailTemplate(no)
+{
+    document.getElementById('emailSubject').value = document.getElementById('greetingMessageTitle' + no).innerHTML;
+    
+    fieldValue = '';
+    emailBodyParentElement = document.getElementById('emailBody').parentElement;
+    mceEditorIframe = getElementsByAttribute(emailBodyParentElement, 'class', "mceEditorIframe");
+    if (mceEditorIframe.length > 0) {
+        innerDoc = (mceEditorIframe[0].contentDocument) ? mceEditorIframe[0].contentDocument : mceEditorIframe[0].contentWindow.document;
+        if(innerDoc) {
+            bodyElements = innerDoc.getElementsByClassName('mceContentBody');
+            fieldValue = bodyElements[0].innerHTML = document.getElementById('greetingMessageBody' + no).innerHTML;
+        }
+    }
+    fieldLabel = document.getElementById('emailBodyLabel');
+}
+
+

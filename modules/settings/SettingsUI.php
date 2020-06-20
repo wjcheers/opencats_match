@@ -510,8 +510,14 @@ class SettingsUI extends UserInterface
                     {
                         CommonErrors::fatal(COMMONERROR_BADINDEX, $this, 'No user found with selected ID.');
                     }
+                    $greetingMessageName = unserialize($data['greetingMessageName']);
+                    $greetingMessageTitle = unserialize($data['greetingMessageTitle']);
+                    $greetingMessageBody = unserialize($data['greetingMessageBody']);
+                    
+                    $this->_template->assign('greetingMessageName', $greetingMessageName);
+                    $this->_template->assign('greetingMessageTitle', $greetingMessageTitle);
+                    $this->_template->assign('greetingMessageBody', $greetingMessageBody);
                     $templateFile = './modules/settings/SetGreetingMessage.tpl';
-                    $this->_template->assign('data', $data);
                     break;
 
                 default:
@@ -2755,18 +2761,32 @@ class SettingsUI extends UserInterface
             );
         }
 
-        $greetingMessageTitle = $this->getTrimmedInput(
-            'greetingMessageTitle', $_POST
-        );
-        $greetingMessageBody = $this->getTrimmedInput(
-            'greetingMessageBody', $_POST
-        );
-        //$greetingMessageBody = nl2br($greetingMessageBody);
+        for($i = 0; $i<10; $i++)
+        {
+            $greetingMessageNameTmp = $this->getTrimmedInput(
+                'greetingMessageName' . $i, $_POST
+            );
+            $greetingMessageTitleTmp = $this->getTrimmedInput(
+                'greetingMessageTitle' . $i, $_POST
+            );
+            $greetingMessageBodyTmp = $this->getTrimmedInput(
+                'greetingMessageBody' . $i, $_POST
+            );
+            //if(!empty($greetingMessageTitleTmp) || !empty($greetingMessageBodyTmp))
+            {
+                $greetingMessageName[] = $greetingMessageNameTmp;
+                $greetingMessageTitle[] = $greetingMessageTitleTmp;
+                $greetingMessageBody[] = $greetingMessageBodyTmp;
+            }
+        }
+        $greetingMessageName = serialize($greetingMessageName);
+        $greetingMessageTitle = serialize($greetingMessageTitle);
+        $greetingMessageBody = serialize($greetingMessageBody);
 
         /* Attempt to set the user's greeting message. */
         $users = new Users($this->_siteID);
         $status = $users->setGreetingMessage(
-            $this->_userID, $greetingMessageTitle, $greetingMessageBody
+            $this->_userID, $greetingMessageName, $greetingMessageTitle, $greetingMessageBody
         );
 
         switch ($status)

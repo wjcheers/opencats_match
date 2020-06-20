@@ -214,6 +214,10 @@ class CandidatesUI extends UserInterface
                 $this->savedList();
                 break;
 
+            case 'emailCandidate':
+                $this->onEmailCandidates($_GET['candidateID']);
+                break;
+
             case 'emailCandidates':
                 $this->onEmailCandidates();
                 break;
@@ -630,6 +634,15 @@ class CandidatesUI extends UserInterface
             }
         }
 
+        if(!empty($_SESSION['CATS']->getGmailPassword()) && $_SESSION['CATS']->getGmailPassword() !== 0 && !empty($_SESSION['CATS']->getEmail()) && $_SESSION['CATS']->getEmail() !== 0)
+        {
+            $canMail = true;
+        }
+        else
+        {
+            $canMail = false;
+        }
+        
         $questionnaire = new Questionnaire($this->_siteID);
         $questionnaires = $questionnaire->getCandidateQuestionnaires($candidateID);
 
@@ -655,6 +668,7 @@ class CandidatesUI extends UserInterface
         $this->_template->assign('sessionCookie', $_SESSION['CATS']->getCookie());
         $this->_template->assign('lists', $lists);
         $this->_template->assign('user', $user);
+        $this->_template->assign('canMail', $canMail);
 
         if (!eval(Hooks::get('CANDIDATE_SHOW'))) return;
 
@@ -3522,7 +3536,7 @@ class CandidatesUI extends UserInterface
     /*
      * Sends mass emails from the datagrid
      */
-    private function onEmailCandidates()
+    private function onEmailCandidates($candidateID = -1)
     {
         if ($this->_accessLevel == ACCESS_LEVEL_DEMO)
         {
@@ -3603,9 +3617,16 @@ class CandidatesUI extends UserInterface
         }
         else
         {
-            $dataGrid = DataGrid::getFromRequest();
+            if($candidateID == -1)
+            {
+                $dataGrid = DataGrid::getFromRequest();
 
-            $candidateIDs = $dataGrid->getExportIDs();
+                $candidateIDs = $dataGrid->getExportIDs();
+            }
+            else
+            {
+                $candidateIDs = array($candidateID);
+            }
 
             /* Validate each ID */
             foreach ($candidateIDs as $index => $candidateID)
@@ -3629,10 +3650,24 @@ class CandidatesUI extends UserInterface
                 $db_str
             ));
 
+            $user = $db->getAllAssoc(sprintf(            
+                "SELECT
+                    user.user_name AS username,
+                    user.greeting_message_name AS greetingMessageName,
+                    user.greeting_message_title AS greetingMessageTitle,
+                    user.greeting_message_body AS greetingMessageBody
+                FROM
+                    user
+                WHERE
+                    user.user_id = %s",
+                $this->_userID
+            ));
+            
             //$this->_template->assign('privledgedUser', $privledgedUser);
             $this->_template->assign('active', $this);
             $this->_template->assign('success', false);
             $this->_template->assign('recipients', $rs);
+            $this->_template->assign('user', $user);
             $this->_template->display('./modules/candidates/SendEmail.tpl');
         }
     }

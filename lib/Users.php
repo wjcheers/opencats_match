@@ -288,6 +288,7 @@ class Users
                 user.categories AS categories,
                 user.session_cookie AS sessionCookie,
                 user.can_see_eeo_info AS canSeeEEOInfo,
+                user.greeting_message_name AS greetingMessageName,
                 user.greeting_message_title AS greetingMessageTitle,
                 user.greeting_message_body AS greetingMessageBody,
                 DATE_FORMAT(
@@ -809,7 +810,7 @@ class Users
      * @param string greeting message body
      * @return flag status
      */
-    public function setGreetingMessage($userID, $greetingMessageTitle, $greetingMessageBody)
+    public function setGreetingMessage($userID, $greetingMessageName, $greetingMessageTitle, $greetingMessageBody)
     {
         $sql = sprintf(
             "SELECT
@@ -849,10 +850,12 @@ class Users
             "UPDATE
                 user
             SET
+                greeting_message_name = %s,
                 greeting_message_title = %s,
                 greeting_message_body = %s
             WHERE
                 user.user_id = %s",
+            $this->_db->makeQueryString($greetingMessageName),
             $this->_db->makeQueryString($greetingMessageTitle),
             $this->_db->makeQueryString($greetingMessageBody),
             $this->_db->makeQueryInteger($userID)

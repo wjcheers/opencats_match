@@ -61,51 +61,9 @@
                             
                             <tr>
                                 <td class="vertical">E-Mail:
-                                    <?php if (($this->data['email1'] != '') || ($this->data['email2'] != "")) {
-                                    echo "&nbsp;&nbsp;&nbsp;&nbsp;";
-                                    echo "<a target=\"_blank\" href=\"mailto:";
-                                    echo $this->data['email1'] . ',' . $this->data['email2'];
-                                    echo "?subject=";
-                                    
-                                    /* Replace e-mail template variables. */
-                                    $stringsToFind = array(
-                                        '%CANDFIRSTNAME%',
-                                        '%CANDLASTNAME%',
-                                        '%CANDFULLNAME%',
-                                        '%CANDCHNAME%',
-                                        PHP_EOL
-                                    );
-                                    $replacementStrings = array(
-                                        $this->data['firstName'],
-                                        $this->data['lastName'],
-                                        $this->data['firstName'] . ' ' . $this->data['lastName'],
-                                        $this->data['chineseName'],
-                                        '%0D%0A'
-                                    );                                            
-                                    
-                                    echo str_replace($stringsToFind, $replacementStrings, $this->user['greetingMessageTitle']);
-                                    
-                                    echo "&body=";
-                                
-                                    /* Replace e-mail template variables. */
-                                    $stringsToFind = array(
-                                        '%CANDFIRSTNAME%',
-                                        '%CANDLASTNAME%',
-                                        '%CANDFULLNAME%',
-                                        '%CANDCHNAME%',
-                                        PHP_EOL
-                                    );
-                                    $replacementStrings = array(
-                                        $this->data['firstName'],
-                                        $this->data['lastName'],
-                                        $this->data['firstName'] . ' ' . $this->data['lastName'],
-                                        $this->data['chineseName'],
-                                        '%0D%0A'
-                                    );                                            
-                                        
-                                    echo str_replace($stringsToFind, $replacementStrings, $this->user['greetingMessageBody']);
-                                    echo "\">Greeting</a>";
-                                    } ?>
+                                    <?php if ((($this->data['email1'] != '') || ($this->data['email2'] != "")) && $this->canMail) : ?>
+                                        <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=emailCandidate&amp;candidateID=<?php echo($this->candidateID); ?>">Template</a>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="data">
                                     <a target="_blank" href="mailto:<?php $this->_($this->data['email1']); ?>">
