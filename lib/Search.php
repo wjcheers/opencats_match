@@ -1429,6 +1429,10 @@ class QuickSearch
         $wildCardString = str_replace('_', '%', $wildCardString);
         $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
         $wildCardString = $this->_db->makeQueryString($wildCardString);
+
+        $wildCardStringChineseNameOrg = $wildCardStringChineseName;
+        $wildCardStringChineseNameOrg = '%' . str_replace('*', '%', $wildCardStringChineseNameOrg) . '%';
+        $wildCardStringChineseNameOrg = $this->_db->makeQueryString($wildCardStringChineseNameOrg);
         if( is_simplified( $wildCardStringChineseName ) )
         {
             $wildCardStringChineseNameBig5 = $tns->c2t($wildCardStringChineseName);
@@ -1530,6 +1534,7 @@ class QuickSearch
 					'(', '')
                 OR candidate.chinese_name LIKE %s
                 OR candidate.chinese_name LIKE %s
+                OR candidate.chinese_name LIKE %s
             )
             AND
                 candidate.site_id = %s
@@ -1552,6 +1557,7 @@ class QuickSearch
             $wildCardString,
             $wildCardString,
             $wildCardString,
+            $wildCardStringChineseNameOrg,
             $wildCardStringChineseNameBig5,
             $wildCardStringChineseNameGB2312,
             $this->_siteID
