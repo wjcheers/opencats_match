@@ -219,9 +219,11 @@ class SavedLists
                 site_id = %s
             %s
             ORDER BY
+                createdBy in (%s) DESC,
                 description ASC",
             $this->_siteID,
-            $typeCriterion
+            $typeCriterion,
+            $_SESSION['CATS']->getUserID()
         );
 
         return $this->_db->getAllAssoc($sql);
