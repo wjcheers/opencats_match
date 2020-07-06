@@ -1688,7 +1688,7 @@ class CandidatesDataGrid extends DataGrid
                                      'pagerWidth'    => 17,
                                      'sizable'  => false,
                                      'filter'         => 'candidate.email1',
-                                     'filterable' => '===~'),
+                                     'filterable' => false),
 
             'P' => array('select' => 'candidate.phone_home AS p1, candidate.phone_cell AS p2, candidate.phone_work AS p3',
 
@@ -1707,7 +1707,7 @@ class CandidatesDataGrid extends DataGrid
                                      'pagerWidth'    => 17,
                                      'sizable'  => false,
                                      'filter'         => 'candidate.phone_cell',
-                                     'filterable' => '===~'),
+                                     'filterable' => false),
 
             'ID/2' =>         array( 'select'   => 'candidate.candidate_id AS candId',
                                      'pagerRender'    => 'return $rsData[\'candId\']%2;',
