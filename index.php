@@ -79,6 +79,8 @@ include_once('./lib/UserInterface.php'); /* Depends: Template, Session. */
 include_once('./lib/ModuleUtility.php'); /* Depends: UserInterface */
 include_once('./lib/TemplateUtility.php'); /* Depends: ModuleUtility, Hooks */
 
+ini_set('session.cookie_secure',1);
+ini_set('session.cookie_path','/;samesite=None;');
 
 /* Give the session a unique name to avoid conflicts and start the session. */
 @session_name(CATS_SESSION_NAME);
