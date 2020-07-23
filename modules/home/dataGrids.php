@@ -232,7 +232,8 @@ class ImportantPipelineDashboard extends DataGrid
             array('name' => 'Position', 'width' => 275),
             array('name' => 'Company', 'width' => 210),
             array('name' => 'Modified', 'width' => 80),
-            array('name' => 'Owner', 'width' => 65),
+            array('name' => 'Cnd Owner', 'width' => 65),
+            array('name' => 'Job Owner', 'width' => 65),
         );
 
 
@@ -281,12 +282,18 @@ class ImportantPipelineDashboard extends DataGrid
                                      'pagerOptional'   => true,
                                      'filterHaving'    => 'DATE_FORMAT(candidate_joborder.date_modified, \'%m-%d-%y (%%h:%%i %%p)\')'),
 
-            'Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
+            'Cnd Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
                                      'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
                                      'sortableColumn'     => 'ownerSort',
                                      'pagerWidth'    => 75,
                                      'alphaNavigation' => true,
                                      'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
+                                     
+            'Job Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'jobUserFirstName\'], $rsData[\'jobUserLastName\'], false, LAST_NAME_MAXLEN);',
+                                     'exportRender'     => 'return $rsData[\'jobUserFirstName\'] . " " .$rsData[\'jobUserLastName\'];',
+                                     'sortableColumn'     => 'jobOwnerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true),
          );
 
         parent::__construct("home:ImportantPipelineDashboard", $parameters);
@@ -316,6 +323,9 @@ class ImportantPipelineDashboard extends DataGrid
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
+                job_user.first_name as jobUserFirstName,
+                job_user.last_name as jobUserLastName,
+                CONCAT(job_user.last_name, job_user.first_name) AS jobOwnerSort,
                 DATE_FORMAT(candidate_joborder.date_modified, '%%m-%%d-%%y ') as dateModified,
                 candidate_joborder.date_modified as dateModifiedSort,
                 IF(candidate_joborder.status = %s, 1,
@@ -333,6 +343,8 @@ class ImportantPipelineDashboard extends DataGrid
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
                 candidate.owner = user.user_id
+            LEFT JOIN user AS job_user ON
+                joborder.owner = job_user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -394,7 +406,8 @@ class QualifyingPipelineDashboard extends DataGrid
             array('name' => 'Position', 'width' => 275),
             array('name' => 'Company', 'width' => 210),
             array('name' => 'Modified', 'width' => 80),
-            array('name' => 'Owner', 'width' => 65),
+            array('name' => 'Cnd Owner', 'width' => 65),
+            array('name' => 'Job Owner', 'width' => 65),
         );
 
 
@@ -443,12 +456,18 @@ class QualifyingPipelineDashboard extends DataGrid
                                      'pagerOptional'   => true,
                                      'filterHaving'    => 'DATE_FORMAT(candidate_joborder.date_modified, \'%m-%d-%y (%%h:%%i %%p)\')'),
 
-            'Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
+            'Cnd Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
                                      'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
                                      'sortableColumn'     => 'ownerSort',
                                      'pagerWidth'    => 75,
                                      'alphaNavigation' => true,
                                      'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
+                                     
+            'Job Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'jobUserFirstName\'], $rsData[\'jobUserLastName\'], false, LAST_NAME_MAXLEN);',
+                                     'exportRender'     => 'return $rsData[\'jobUserFirstName\'] . " " .$rsData[\'jobUserLastName\'];',
+                                     'sortableColumn'     => 'jobOwnerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true),
          );
 
         parent::__construct("home:QualifyingPipelineDashboard", $parameters);
@@ -479,6 +498,9 @@ class QualifyingPipelineDashboard extends DataGrid
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
+                job_user.first_name as jobUserFirstName,
+                job_user.last_name as jobUserLastName,
+                CONCAT(job_user.last_name, job_user.first_name) AS jobOwnerSort,
                 DATE_FORMAT(candidate_joborder.date_modified, '%%m-%%d-%%y ') as dateModified,
                 candidate_joborder.date_modified as dateModifiedSort,
                 IF(candidate_joborder.status = %s, 1, 2) as statusSort,
@@ -495,6 +517,8 @@ class QualifyingPipelineDashboard extends DataGrid
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
                 candidate.owner = user.user_id
+            LEFT JOIN user AS job_user ON
+                joborder.owner = job_user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -549,7 +573,8 @@ class JechoingPipelineDashboard extends DataGrid
             array('name' => 'Position', 'width' => 275),
             array('name' => 'Company', 'width' => 210),
             array('name' => 'Modified', 'width' => 80),
-            array('name' => 'Owner', 'width' => 65),
+            array('name' => 'Cnd Owner', 'width' => 65),
+            array('name' => 'Job Owner', 'width' => 65),
         );
 
 
@@ -598,12 +623,18 @@ class JechoingPipelineDashboard extends DataGrid
                                      'pagerOptional'   => true,
                                      'filterHaving'    => 'DATE_FORMAT(candidate_joborder.date_modified, \'%m-%d-%y (%%h:%%i %%p)\')'),
 
-            'Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
+            'Cnd Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
                                      'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
                                      'sortableColumn'     => 'ownerSort',
                                      'pagerWidth'    => 75,
                                      'alphaNavigation' => true,
                                      'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
+                                     
+            'Job Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'jobUserFirstName\'], $rsData[\'jobUserLastName\'], false, LAST_NAME_MAXLEN);',
+                                     'exportRender'     => 'return $rsData[\'jobUserFirstName\'] . " " .$rsData[\'jobUserLastName\'];',
+                                     'sortableColumn'     => 'jobOwnerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true),
          );
 
         parent::__construct("home:JechoingPipelineDashboard", $parameters);
@@ -634,6 +665,9 @@ class JechoingPipelineDashboard extends DataGrid
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
+                job_user.first_name as jobUserFirstName,
+                job_user.last_name as jobUserLastName,
+                CONCAT(job_user.last_name, job_user.first_name) AS jobOwnerSort,
                 DATE_FORMAT(candidate_joborder.date_modified, '%%m-%%d-%%y ') as dateModified,
                 candidate_joborder.date_modified as dateModifiedSort,
                 IF(candidate_joborder.status = %s, 1, 2) as statusSort,
@@ -650,6 +684,8 @@ class JechoingPipelineDashboard extends DataGrid
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
                 candidate.owner = user.user_id
+            LEFT JOIN user AS job_user ON
+                joborder.owner = job_user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -703,7 +739,8 @@ class VerifiedPipelineDashboard extends DataGrid
             array('name' => 'Position', 'width' => 275),
             array('name' => 'Company', 'width' => 210),
             array('name' => 'Modified', 'width' => 80),
-            array('name' => 'Owner', 'width' => 65),
+            array('name' => 'Cnd Owner', 'width' => 65),
+            array('name' => 'Job Owner', 'width' => 65),
         );
 
 
@@ -752,12 +789,18 @@ class VerifiedPipelineDashboard extends DataGrid
                                      'pagerOptional'   => true,
                                      'filterHaving'    => 'DATE_FORMAT(candidate_joborder.date_modified, \'%m-%d-%y (%%h:%%i %%p)\')'),
 
-            'Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
+            'Cnd Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
                                      'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
                                      'sortableColumn'     => 'ownerSort',
                                      'pagerWidth'    => 75,
                                      'alphaNavigation' => true,
                                      'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
+                                     
+            'Job Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'jobUserFirstName\'], $rsData[\'jobUserLastName\'], false, LAST_NAME_MAXLEN);',
+                                     'exportRender'     => 'return $rsData[\'jobUserFirstName\'] . " " .$rsData[\'jobUserLastName\'];',
+                                     'sortableColumn'     => 'jobOwnerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true),
          );
 
         parent::__construct("home:VerifiedPipelineDashboard", $parameters);
@@ -788,6 +831,9 @@ class VerifiedPipelineDashboard extends DataGrid
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
+                job_user.first_name as jobUserFirstName,
+                job_user.last_name as jobUserLastName,
+                CONCAT(job_user.last_name, job_user.first_name) AS jobOwnerSort,
                 DATE_FORMAT(candidate_joborder.date_modified, '%%m-%%d-%%y ') as dateModified,
                 candidate_joborder.date_modified as dateModifiedSort,
                 IF(candidate_joborder.status = %s, 1, 2) as statusSort,
@@ -804,6 +850,8 @@ class VerifiedPipelineDashboard extends DataGrid
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
                 candidate.owner = user.user_id
+            LEFT JOIN user AS job_user ON
+                joborder.owner = job_user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -858,7 +906,8 @@ class AwaitingPipelineDashboard extends DataGrid
             array('name' => 'Position', 'width' => 275),
             array('name' => 'Company', 'width' => 210),
             array('name' => 'Modified', 'width' => 80),
-            array('name' => 'Owner', 'width' => 65),
+            array('name' => 'Cnd Owner', 'width' => 65),
+            array('name' => 'Job Owner', 'width' => 65),
         );
 
 
@@ -907,12 +956,18 @@ class AwaitingPipelineDashboard extends DataGrid
                                      'pagerOptional'   => true,
                                      'filterHaving'    => 'DATE_FORMAT(candidate_joborder.date_modified, \'%m-%d-%y (%%h:%%i %%p)\')'),
 
-            'Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
+            'Cnd Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
                                      'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
                                      'sortableColumn'     => 'ownerSort',
                                      'pagerWidth'    => 75,
                                      'alphaNavigation' => true,
                                      'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
+                                     
+            'Job Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'jobUserFirstName\'], $rsData[\'jobUserLastName\'], false, LAST_NAME_MAXLEN);',
+                                     'exportRender'     => 'return $rsData[\'jobUserFirstName\'] . " " .$rsData[\'jobUserLastName\'];',
+                                     'sortableColumn'     => 'jobOwnerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true),
          );
 
         parent::__construct("home:AwaitingPipelineDashboard", $parameters);
@@ -943,6 +998,9 @@ class AwaitingPipelineDashboard extends DataGrid
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
+                job_user.first_name as jobUserFirstName,
+                job_user.last_name as jobUserLastName,
+                CONCAT(job_user.last_name, job_user.first_name) AS jobOwnerSort,
                 DATE_FORMAT(candidate_joborder.date_modified, '%%m-%%d-%%y ') as dateModified,
                 candidate_joborder.date_modified as dateModifiedSort,
                 IF(candidate_joborder.status = %s, 1, 2) as statusSort,
@@ -959,6 +1017,8 @@ class AwaitingPipelineDashboard extends DataGrid
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
                 candidate.owner = user.user_id
+            LEFT JOIN user AS job_user ON
+                joborder.owner = job_user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -1013,7 +1073,8 @@ class UploadedPipelineDashboard extends DataGrid
             array('name' => 'Position', 'width' => 275),
             array('name' => 'Company', 'width' => 210),
             array('name' => 'Modified', 'width' => 80),
-            array('name' => 'Owner', 'width' => 65),
+            array('name' => 'Cnd Owner', 'width' => 65),
+            array('name' => 'Job Owner', 'width' => 65),
         );
 
 
@@ -1062,12 +1123,18 @@ class UploadedPipelineDashboard extends DataGrid
                                      'pagerOptional'   => true,
                                      'filterHaving'    => 'DATE_FORMAT(candidate_joborder.date_modified, \'%m-%d-%y (%%h:%%i %%p)\')'),
 
-            'Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
+            'Cnd Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
                                      'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
                                      'sortableColumn'     => 'ownerSort',
                                      'pagerWidth'    => 75,
                                      'alphaNavigation' => true,
                                      'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
+                                     
+            'Job Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'jobUserFirstName\'], $rsData[\'jobUserLastName\'], false, LAST_NAME_MAXLEN);',
+                                     'exportRender'     => 'return $rsData[\'jobUserFirstName\'] . " " .$rsData[\'jobUserLastName\'];',
+                                     'sortableColumn'     => 'jobOwnerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true),
          );
 
         parent::__construct("home:UploadedPipelineDashboard", $parameters);
@@ -1098,6 +1165,9 @@ class UploadedPipelineDashboard extends DataGrid
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
+                job_user.first_name as jobUserFirstName,
+                job_user.last_name as jobUserLastName,
+                CONCAT(job_user.last_name, job_user.first_name) AS jobOwnerSort,
                 DATE_FORMAT(candidate_joborder.date_modified, '%%m-%%d-%%y ') as dateModified,
                 candidate_joborder.date_modified as dateModifiedSort,
                 IF(candidate_joborder.status = %s, 1, 2) as statusSort,
@@ -1114,6 +1184,8 @@ class UploadedPipelineDashboard extends DataGrid
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
                 candidate.owner = user.user_id
+            LEFT JOIN user AS job_user ON
+                joborder.owner = job_user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -1167,7 +1239,8 @@ class EverVerifiedPipelineDashboard extends DataGrid
             array('name' => 'Position', 'width' => 275),
             array('name' => 'Company', 'width' => 210),
             array('name' => 'Date', 'width' => 80),
-            array('name' => 'Owner', 'width' => 65),
+            array('name' => 'Cnd Owner', 'width' => 65),
+            array('name' => 'Job Owner', 'width' => 65),
         );
 
 
@@ -1216,12 +1289,18 @@ class EverVerifiedPipelineDashboard extends DataGrid
                                      'pagerOptional'   => true,
                                      'filterHaving'    => 'DATE_FORMAT(candidate_joborder_status_history.date, \'%m-%d-%y (%%h:%%i %%p)\')'),
 
-            'Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
+            'Cnd Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
                                      'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
                                      'sortableColumn'     => 'ownerSort',
                                      'pagerWidth'    => 75,
                                      'alphaNavigation' => true,
                                      'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
+                                     
+            'Job Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'jobUserFirstName\'], $rsData[\'jobUserLastName\'], false, LAST_NAME_MAXLEN);',
+                                     'exportRender'     => 'return $rsData[\'jobUserFirstName\'] . " " .$rsData[\'jobUserLastName\'];',
+                                     'sortableColumn'     => 'jobOwnerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true),
          );
 
         parent::__construct("home:EverVerifiedPipelineDashboard", $parameters);
@@ -1252,6 +1331,9 @@ class EverVerifiedPipelineDashboard extends DataGrid
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
+                job_user.first_name as jobUserFirstName,
+                job_user.last_name as jobUserLastName,
+                CONCAT(job_user.last_name, job_user.first_name) AS jobOwnerSort,
                 DATE_FORMAT(candidate_joborder_status_history.date, '%%m-%%d-%%y ') as date,
                 candidate_joborder_status_history.date as dateSort,
                 candidate_joborder.status as statusSort,
@@ -1273,6 +1355,8 @@ class EverVerifiedPipelineDashboard extends DataGrid
                 candidate_joborder_status_history.candidate_id = candidate_joborder.candidate_id
             LEFT JOIN user ON
                 candidate.owner = user.user_id
+            LEFT JOIN user AS job_user ON
+                joborder.owner = job_user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -1328,7 +1412,8 @@ class SubmittedPipelineDashboard extends DataGrid
             array('name' => 'Position', 'width' => 275),
             array('name' => 'Company', 'width' => 210),
             array('name' => 'Modified', 'width' => 80),
-            array('name' => 'Owner', 'width' => 65),
+            array('name' => 'Cnd Owner', 'width' => 65),
+            array('name' => 'Job Owner', 'width' => 65),
         );
 
 
@@ -1377,12 +1462,18 @@ class SubmittedPipelineDashboard extends DataGrid
                                      'pagerOptional'   => true,
                                      'filterHaving'    => 'DATE_FORMAT(candidate_joborder.date_modified, \'%m-%d-%y (%%h:%%i %%p)\')'),
 
-            'Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
+            'Cnd Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
                                      'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
                                      'sortableColumn'     => 'ownerSort',
                                      'pagerWidth'    => 75,
                                      'alphaNavigation' => true,
                                      'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
+                                     
+            'Job Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'jobUserFirstName\'], $rsData[\'jobUserLastName\'], false, LAST_NAME_MAXLEN);',
+                                     'exportRender'     => 'return $rsData[\'jobUserFirstName\'] . " " .$rsData[\'jobUserLastName\'];',
+                                     'sortableColumn'     => 'jobOwnerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true),
          );
 
         parent::__construct("home:SubmittedPipelineDashboard", $parameters);
@@ -1413,6 +1504,9 @@ class SubmittedPipelineDashboard extends DataGrid
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
+                job_user.first_name as jobUserFirstName,
+                job_user.last_name as jobUserLastName,
+                CONCAT(job_user.last_name, job_user.first_name) AS jobOwnerSort,
                 DATE_FORMAT(candidate_joborder.date_modified, '%%m-%%d-%%y ') as dateModified,
                 candidate_joborder.date_modified as dateModifiedSort,
                 IF(candidate_joborder.status = %s, 1, 2) as statusSort,
@@ -1429,6 +1523,8 @@ class SubmittedPipelineDashboard extends DataGrid
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
                 candidate.owner = user.user_id
+            LEFT JOIN user AS job_user ON
+                joborder.owner = job_user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -1482,7 +1578,8 @@ class InterviewingPipelineDashboard extends DataGrid
             array('name' => 'Position', 'width' => 275),
             array('name' => 'Company', 'width' => 210),
             array('name' => 'Modified', 'width' => 80),
-            array('name' => 'Owner', 'width' => 65),
+            array('name' => 'Cnd Owner', 'width' => 65),
+            array('name' => 'Job Owner', 'width' => 65),
         );
 
 
@@ -1531,12 +1628,18 @@ class InterviewingPipelineDashboard extends DataGrid
                                      'pagerOptional'   => true,
                                      'filterHaving'    => 'DATE_FORMAT(candidate_joborder.date_modified, \'%m-%d-%y (%%h:%%i %%p)\')'),
 
-            'Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
+            'Cnd Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
                                      'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
                                      'sortableColumn'     => 'ownerSort',
                                      'pagerWidth'    => 75,
                                      'alphaNavigation' => true,
                                      'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
+                                     
+            'Job Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'jobUserFirstName\'], $rsData[\'jobUserLastName\'], false, LAST_NAME_MAXLEN);',
+                                     'exportRender'     => 'return $rsData[\'jobUserFirstName\'] . " " .$rsData[\'jobUserLastName\'];',
+                                     'sortableColumn'     => 'jobOwnerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true),
          );
 
         parent::__construct("home:InterviewingPipelineDashboard", $parameters);
@@ -1567,6 +1670,9 @@ class InterviewingPipelineDashboard extends DataGrid
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
+                job_user.first_name as jobUserFirstName,
+                job_user.last_name as jobUserLastName,
+                CONCAT(job_user.last_name, job_user.first_name) AS jobOwnerSort,
                 DATE_FORMAT(candidate_joborder.date_modified, '%%m-%%d-%%y ') as dateModified,
                 candidate_joborder.date_modified as dateModifiedSort,
                 IF(candidate_joborder.status = %s, 1, 2) as statusSort,
@@ -1583,6 +1689,8 @@ class InterviewingPipelineDashboard extends DataGrid
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
                 candidate.owner = user.user_id
+            LEFT JOIN user AS job_user ON
+                joborder.owner = job_user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
@@ -1636,7 +1744,8 @@ class OfferedPipelineDashboard extends DataGrid
             array('name' => 'Position', 'width' => 275),
             array('name' => 'Company', 'width' => 210),
             array('name' => 'Modified', 'width' => 80),
-            array('name' => 'Owner', 'width' => 65),
+            array('name' => 'Cnd Owner', 'width' => 65),
+            array('name' => 'Job Owner', 'width' => 65),
         );
 
 
@@ -1685,12 +1794,18 @@ class OfferedPipelineDashboard extends DataGrid
                                      'pagerOptional'   => true,
                                      'filterHaving'    => 'DATE_FORMAT(candidate_joborder.date_modified, \'%m-%d-%y (%%h:%%i %%p)\')'),
 
-            'Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
+            'Cnd Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'userFirstName\'], $rsData[\'userLastName\'], false, LAST_NAME_MAXLEN);',
                                      'exportRender'     => 'return $rsData[\'userFirstName\'] . " " .$rsData[\'userLastName\'];',
                                      'sortableColumn'     => 'ownerSort',
                                      'pagerWidth'    => 75,
                                      'alphaNavigation' => true,
                                      'filter'         => 'CONCAT(owner_user.first_name, owner_user.last_name)'),
+                                     
+            'Job Owner' =>         array('pagerRender'      => 'return StringUtility::makeInitialName($rsData[\'jobUserFirstName\'], $rsData[\'jobUserLastName\'], false, LAST_NAME_MAXLEN);',
+                                     'exportRender'     => 'return $rsData[\'jobUserFirstName\'] . " " .$rsData[\'jobUserLastName\'];',
+                                     'sortableColumn'     => 'jobOwnerSort',
+                                     'pagerWidth'    => 75,
+                                     'alphaNavigation' => true),
          );
 
         parent::__construct("home:OfferedPipelineDashboard", $parameters);
@@ -1721,6 +1836,9 @@ class OfferedPipelineDashboard extends DataGrid
                 user.first_name as userFirstName,
                 user.last_name as userLastName,
                 CONCAT(user.last_name, user.first_name) AS ownerSort,
+                job_user.first_name as jobUserFirstName,
+                job_user.last_name as jobUserLastName,
+                CONCAT(job_user.last_name, job_user.first_name) AS jobOwnerSort,
                 DATE_FORMAT(candidate_joborder.date_modified, '%%m-%%d-%%y ') as dateModified,
                 candidate_joborder.date_modified as dateModifiedSort,
                 IF(candidate_joborder.status = %s, 1, 2) as statusSort,
@@ -1737,6 +1855,8 @@ class OfferedPipelineDashboard extends DataGrid
                 candidate_joborder.status = candidate_joborder_status.candidate_joborder_status_id
             LEFT JOIN user ON
                 candidate.owner = user.user_id
+            LEFT JOIN user AS job_user ON
+                joborder.owner = job_user.user_id
             WHERE
                 candidate_joborder.site_id = %s
             AND
