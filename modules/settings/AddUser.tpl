@@ -1,5 +1,5 @@
 <?php /* $Id: AddUser.tpl 3810 2007-12-05 19:13:25Z brian $ */ ?>
-<?php TemplateUtility::printHeader('Settings', array('modules/settings/validator.js', 'js/sorttable.js')); ?>
+<?php TemplateUtility::printHeader('Settings', array('modules/settings/validator.js', 'js/sorttable.js', 'modules/settings/Settings.js')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
 <?php TemplateUtility::printTabs($this->active, $this->subActive); ?>
 <div id="main">
@@ -111,6 +111,25 @@
                                     </td>
                                 </tr>
 
+                                <tr>
+                                    <td class="tdVertical">
+                                        <label id="notesLabel" for="notes">Permissions:</label>
+                                    </td>
+                                    <td class="tdData">
+                                        <input type="hidden" id="permission" name="permission" style='display: none;' value="0"></input>
+                                        <input type="hidden" id="permissionCount" style='display: none;' value="<?php echo count($this->permissions);?>"></input>
+                                        <?php foreach ($this->permissions as $permission): ?>
+                                            <?php $checkBoxID = 'permission' . $permission['permissionID']; ?>
+
+                                            <input type="checkbox" name="<?php echo $checkBoxID; ?>" id="<?php echo $checkBoxID; ?>" value="<?php echo $permission['permissionID']; ?>" title="<?php echo $permission['longDescription']; ?>" />
+                                            <label for="<?php echo $checkBoxID; ?>" title="<?php echo $permission['longDescription']; ?>">
+                                                <?php echo $permission['shortDescription']; ?>
+                                            </label>
+                                            <br />
+                                        <?php endforeach; ?>
+                                    </td>
+                                </tr>
+
                                 <?php if (count($this->categories) > 0): ?>
                                     <tr>
                                         <td class="tdVertical">
@@ -193,7 +212,7 @@
                     </tr>
                 </table>
 
-                <input type="submit" class="button" name="submit" id="submit" value="Add User" />&nbsp;
+                <input type="submit" class="button" name="submit" id="submit" value="Add User" onclick="updatePermissions();"/>&nbsp;
                 <input type="reset"  class="button" name="reset"  id="reset"  value="Reset" onclick="document.getElementById('userAccessStatus').innerHTML='Delete - All lower access, plus the ability to delete information on the system.'" />&nbsp;
                 <input type="button" class="button" name="back"   id="back"   value="Cancel" onclick="javascript:goToURL('<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=manageUsers');" />
             </form>

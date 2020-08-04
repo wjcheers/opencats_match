@@ -62,6 +62,21 @@
                                 <td class="data"><?php $this->_($this->data['accessLevelLongDescription']); ?></td>
                             </tr>
                             
+                            <tr>
+                                <td class="vertical">Permissions:</td>
+                                <td class="data">
+                                    <?php foreach ($this->permissions as $permission): ?>
+                                        <?php $checkBoxID = 'permission' . $permission['permissionID']; ?>
+
+                                        <input type="checkbox" name="permission" id="<?php echo $checkBoxID; ?>" value="<?php echo $permission['permissionID']; ?>" title="<?php echo $permission['longDescription']; ?>"<?php if ($this->data['permission'] & $permission['permissionID']): ?> checked="checked" <?php endif; ?> disabled="disabled"  />
+                                        <label for="<?php echo $checkBoxID; ?>" title="<?php echo $permission['longDescription']; ?>">
+                                            <?php echo $permission['shortDescription']; ?>
+                                        </label>
+                                        <br />
+                                    <?php endforeach; ?>
+                                </td>
+                            </tr>
+                            
                             <?php if($this->EEOSettingsRS['enabled'] == 1): ?> <tr>
                                 <td class="vertical">Can See EEO Info:</td>
                                     <td class="data">                                       

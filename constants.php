@@ -79,6 +79,13 @@ define('ACCESS_LEVEL_SA',       400);
 define('ACCESS_LEVEL_MULTI_SA', 450);
 define('ACCESS_LEVEL_ROOT',     500);
 
+/* Access permission flags. */
+define('PERMISSION_NONE',               0);
+define('PERMISSION_JOBORDER_EDIT',      1 << 0);
+define('PERMISSION_2',                  1 << 1);
+define('PERMISSION_4',                  1 << 2);
+define('PERMISSION_8',                  1 << 3);
+
 /* Calendar constants. */
 define('CALENDAR_DAY_SUNDAY',   1);
 define('CALENDAR_DAY_MONDAY',   2);

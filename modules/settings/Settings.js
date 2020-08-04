@@ -150,3 +150,20 @@ function testEmailSettings(sessionCookie)
     document.getElementById('testButtonSpanActive').style.display='';
 }
 
+
+function updatePermissions()
+{
+    var permissions = 0;
+    var i;
+    var shift = 0;
+    for (i = 0; i < document.getElementById('permissionCount').value; i++)
+    {
+        shift = 1 << i;
+        if(document.getElementById('permission' + shift.toString()).checked == true) 
+        {
+            permissions += parseInt(document.getElementById('permission' + shift.toString()).value);
+        }
+    }
+    document.getElementById('permission').value = permissions;
+}
+

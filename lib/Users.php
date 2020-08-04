@@ -77,7 +77,7 @@ class Users
      * @return new user ID, or -1 on failure.
      */
     public function add($lastName, $firstName, $email, $username, $password,
-        $accessLevel, $eeoIsVisible = false)
+        $accessLevel, $eeoIsVisible = false, $permission)
     {
         $sql = sprintf(
             "INSERT INTO user (
@@ -90,7 +90,8 @@ class Users
                 first_name,
                 last_name,
                 site_id,
-                can_see_eeo_info
+                can_see_eeo_info,
+                permission
             )
             VALUES (
                 %s,
@@ -98,6 +99,7 @@ class Users
                 %s,
                 1,
                 0,
+                %s,
                 %s,
                 %s,
                 %s,
@@ -111,7 +113,8 @@ class Users
             $this->_db->makeQueryString($firstName),
             $this->_db->makeQueryString($lastName),
             $this->_siteID,
-            ($eeoIsVisible ? 1 : 0)
+            ($eeoIsVisible ? 1 : 0),
+            $this->_db->makeQueryInteger($permission)
         );
 
         $queryResult = $this->_db->query($sql);
@@ -135,7 +138,7 @@ class Users
      * @return boolean True if successful; false otherwise.
      */
     public function update($userID, $lastName, $firstName, $email,
-                           $username, $accessLevel = -1, $eeoIsVisible = false)
+                           $username, $accessLevel = -1, $eeoIsVisible = false, $permission = -1)
     {
         /* If an access level was specified, make sure the access level is
          * updated by the query.
@@ -152,6 +155,21 @@ class Users
             $accessLevelSQL = '';
         }
 
+        /* If an access level was specified, make sure the access level is
+         * updated by the query.
+         */
+        if ($permission != -1)
+        {
+            $permissionSQL = sprintf(
+                ", permission = %s",
+                $this->_db->makeQueryInteger($permission)
+            );
+        }
+        else
+        {
+            $permissionSQL = '';
+        }
+
         $sql = sprintf(
             "UPDATE
                 user
@@ -161,6 +179,7 @@ class Users
                 email            = %s,
                 user_name        = %s,
                 can_see_eeo_info = %s
+                %s
                 %s
             WHERE
                 user_id = %s
@@ -172,6 +191,7 @@ class Users
             $this->_db->makeQueryString($username),
             ($eeoIsVisible ? 1 : 0),
             $accessLevelSQL,
+            $permissionSQL,
             $this->_db->makeQueryInteger($userID),
             $this->_siteID
         );
@@ -270,6 +290,7 @@ class Users
                 user.access_level AS accessLevel,
                 access_level.short_description AS accessLevelDescription,
                 access_level.long_description AS accessLevelLongDescription,
+                user.permission AS permission,
                 user.first_name AS firstName,
                 user.last_name AS lastName,
                 CONCAT(
@@ -335,6 +356,7 @@ class Users
                 user.access_level AS accessLevel,
                 access_level.short_description AS accessLevelDescription,
                 access_level.long_description AS accessLevelLongDescription,
+                user.permission AS permission,
                 user.first_name AS firstName,
                 user.last_name AS lastName,
                 CONCAT(
@@ -469,6 +491,7 @@ class Users
                 user.password AS password,
                 user.access_level AS accessLevel,
                 access_level.short_description AS accessLevelDescription,
+                user.permission AS permission,
                 user.first_name AS firstName,
                 user.last_name AS lastName,
                 user.email AS email,
@@ -563,6 +586,28 @@ class Users
 
         return $this->_db->getAllAssoc($sql);
     }
+
+    /**
+     * Returns a record set of permission
+     *
+     * @return array access levels data
+     */
+    public function getPermissions()
+    {
+        $sql = sprintf(
+            "SELECT
+                permission.permission_id AS permissionID,
+                permission.short_description AS shortDescription,
+                permission.long_description AS longDescription
+            FROM
+                permission
+            ORDER BY
+                permission.permission_id ASC"
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+    
 
     /**
      * Returns $limit most recent attempted logins for the specified user ID.

@@ -1,5 +1,5 @@
 <?php /* $Id: EditUser.tpl 2881 2007-08-14 07:47:26Z brian $ */ ?>
-<?php TemplateUtility::printHeader('Settings', array('modules/settings/validator.js', 'js/sorttable.js')); ?>
+<?php TemplateUtility::printHeader('Settings', array('modules/settings/validator.js', 'js/sorttable.js', 'modules/settings/settings.js')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
 <?php TemplateUtility::printTabs($this->active, $this->subActive); ?>
     <div id="main">
@@ -96,6 +96,25 @@
                         </td>
                     </tr>
 
+                    <tr>
+                        <td class="tdVertical">
+                            <label id="notesLabel" for="notes">Permissions:</label>
+                        </td>
+                        <td class="tdData">
+                            <input type="hidden" id="permission" name="permission" style='display: none;' value="0"></input>
+                            <input type="hidden" id="permissionCount" style='display: none;' value="<?php echo count($this->permissions);?>"></input>
+                            <?php foreach ($this->permissions as $permission): ?>
+                                <?php $checkBoxID = 'permission' . $permission['permissionID']; ?>
+
+                                <input type="checkbox" name="<?php echo $checkBoxID; ?>" id="<?php echo $checkBoxID; ?>" value="<?php echo $permission['permissionID']; ?>" title="<?php echo $permission['longDescription']; ?>"<?php if ($this->data['permission'] & $permission['permissionID']): ?> checked="checked"<?php endif; ?> />
+                                <label for="<?php echo $checkBoxID; ?>" title="<?php echo $permission['longDescription']; ?>">
+                                    <?php echo $permission['shortDescription']; ?>
+                                </label>
+                                <br />
+                            <?php endforeach; ?>
+                        </td>
+                    </tr>
+
                     <?php if (count($this->categories) > 0): ?>
                         <tr>
                             <td class="tdVertical">
@@ -164,7 +183,7 @@
                     </tr>
 
                 </table>
-                <input type="submit" class="button" name="submit" id="submit" value="Save" />&nbsp;
+                <input type="submit" class="button" name="submit" id="submit" value="Save" onclick="updatePermissions();"/>&nbsp;
                 <input type="reset"  class="button" name="reset"  id="reset"  value="Reset" onclick="document.getElementById('userAccessStatus').innerHTML='<?php $this->_($this->data['accessLevelLongDescription']); ?>'" />&nbsp;
                 <input type="button" class="button" name="back"   id="back"   value="Cancel" onclick="javascript:goToURL('<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=showUser&amp;userID=<?php $this->_($this->data['userID']); ?>');" />
             </form>

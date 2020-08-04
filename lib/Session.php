@@ -43,6 +43,7 @@ class CATSSession
     private $_userLoginID = -1;
     private $_accessLevel = -1;
     private $_realAccessLevel = -1;
+    private $_permission = 0;
     private $_isLoggedIn = false;
     private $_isDemo = false;
     private $_isASP = false;
@@ -409,6 +410,12 @@ class CATSSession
     }
 
     // FIXME: Document me!
+    public function getPermission()
+    {
+        return $this->_permission;
+    }
+    
+    // FIXME: Document me!
     public function canSeeEEOInfo()
     {
         return $this->_canSeeEEOInfo;
@@ -423,6 +430,11 @@ class CATSSession
         {
             $this->_accessLevel = $accessLevel;
         }
+    }
+
+    public function setPermission($permission)
+    {
+        $this->_permission = $permission;
     }
 
     /**
@@ -672,6 +684,7 @@ class CATSSession
                 user.first_name AS firstName,
                 user.last_name AS lastName,
                 user.access_level AS accessLevel,
+                user.permission AS permission,
                 user.site_id AS userSiteID,
                 user.is_demo AS isDemoUser,
                 user.email AS email,
@@ -799,6 +812,7 @@ class CATSSession
                 $this->_userLicenses           = $rs['userLicenses'];
                 $this->_accessLevel            = $rs['accessLevel'];
                 $this->_realAccessLevel        = $rs['accessLevel'];
+                $this->_permission             = $rs['permission'];
                 $this->_categories             = explode(',', $rs['categories']);
                 $this->_isASP                  = ($rs['companyID'] != 0 ? true : false);
                 $this->_isHrMode               = ($rs['isHrMode'] != 0 ? true : false);
@@ -934,6 +948,7 @@ class CATSSession
                 user.first_name AS firstName,
                 user.last_name AS lastName,
                 user.access_level AS accessLevel,
+                user.permission AS permission,
                 user.site_id AS userSiteID,
                 user.is_demo AS isDemoUser,
                 user.email AS email,
@@ -970,6 +985,7 @@ class CATSSession
         $this->_unixName        = $rs['unixName'];
         $this->_accessLevel     = $rs['accessLevel'];
         $this->_realAccessLevel = $rs['accessLevel'];
+        $this->_permission      = $rs['permission'];
         $this->_categories      = array();
         $this->_isASP           = ($rs['companyID'] != 0 ? true : false);
         $this->_siteCompanyID   = ($rs['companyID'] != 0 ? $rs['companyID'] : -1);

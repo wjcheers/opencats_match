@@ -24,6 +24,7 @@
                         <th align="left" nowrap="nowrap">Last Name</th>
                         <th align="left">Username</th>
                         <th align="left" nowrap="nowrap">Access Level</th>
+                        <th align="left" nowrap="nowrap">Permission</th>
                         <th align="left" nowrap="nowrap">Last Success</th>
                         <th align="left" nowrap="nowrap">Last Fail</th>
                     </tr>
@@ -44,6 +45,7 @@
                             </td>
                             <td valign="top" align="left"><?php $this->_($data['username']); ?></td>
                             <td valign="top" align="left"><?php $this->_($data['accessLevelDescription']); ?></td>
+                            <td valign="top" align="left"><?php $this->_($data['permission']); ?></td>
                             <td valign="top" align="left"><?php $this->_($data['successfulDate']); ?></td>
                             <td valign="top" align="left"><?php $this->_($data['unsuccessfulDate']); ?></td>
                         </tr>

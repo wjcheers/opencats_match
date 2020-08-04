@@ -48,6 +48,7 @@ class UserInterface
     protected $_userID = -1;
     protected $_siteID = -1;
     protected $_accessLevel = -1;
+    protected $_permission = 0;
     protected $_authenticationRequired = true;
     protected $_hooks = array();
     protected $_schema = array();
@@ -67,6 +68,8 @@ class UserInterface
 
             /* Get the current user's access level. */
             $this->_accessLevel = $_SESSION['CATS']->getAccessLevel();
+            $this->_permission = $_SESSION['CATS']->getPermission();
+            
 
             /* All templates have an access level if we have a session. */
             $this->_template->assign('accessLevel', $this->_accessLevel);
