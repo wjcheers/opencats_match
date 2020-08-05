@@ -2361,7 +2361,7 @@ class DataGrid
 
                     if (isset($this->_parameters['filterAlpha']) && $this->_parameters['filterAlpha'] == chr($i))
                     {
-                        echo $link, '&nbsp;<span style="font-weight:bold;">', chr($i), '</span></a>';
+                        echo $link, '&nbsp;<span style="font-weight:bold;color:#ff0000;">', chr($i), '</span></a>';
                     }
                     else
                     {
@@ -2380,7 +2380,7 @@ class DataGrid
 
                     if (isset($this->_parameters['filterAlpha']) && $this->_parameters['filterAlpha'] == chr($i))
                     {
-                        echo $link, '&nbsp;<span style="font-weight:bold;">', chr($i), '</span></a>';
+                        echo $link, '&nbsp;<span style="font-weight:bold;color:#ff0000;">', chr($i), '</span></a>';
                     }
                     else
                     {
@@ -2401,7 +2401,7 @@ class DataGrid
 
             if (!isset($this->_parameters['filterAlpha']))
             {
-                echo $link . '&nbsp;&nbsp;<span style="font-weight:bold;">ALL</span></a>';
+                echo $link . '&nbsp;&nbsp;<span style="font-weight:bold;color:#ff0000;">ALL</span></a>';
             }
             else
             {
