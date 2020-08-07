@@ -227,6 +227,13 @@
                             <label id="ownerLabel" for="owner">Owner:</label>
                         </td>
                         <td class="tdData">
+                            <?php if (!($_SESSION['CATS']->getPermission() & PERMISSION_JOBORDER_EDIT)): ?>
+                                <?php foreach ($this->usersRS as $rowNumber => $usersData): ?>
+                                    <?php if ($this->data['owner'] == $usersData['userID']): ?>
+                                        <input type="hidden" name="owner" value="<?php $this->_($usersData['userID']) ?>"/>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            <?php endif;?>
                             <select tabindex="7" id="owner" name="owner" class="inputbox" style="width: 150px;" <?php if (!$this->emailTemplateDisabled): ?>onchange="document.getElementById('divOwnershipChange').style.display=''; <?php if ($this->canEmail): ?>document.getElementById('checkboxOwnershipChange').checked=true;<?php endif; ?>"<?php endif; ?> <?php if (!($_SESSION['CATS']->getPermission() & PERMISSION_JOBORDER_EDIT)): ?>disabled="disabled"<?php endif;?>>
                                 <option value="-1">None</option>
 
