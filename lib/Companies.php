@@ -755,8 +755,20 @@ class Companies
      */
     public function updateModified($companyID)
     {
-        // currently, call by ActivityEntries.php when adding an activity
-        return true;
+        $sql = sprintf(
+            "UPDATE
+                company
+            SET
+                date_modified = NOW()
+            WHERE
+                company_id = %s
+            AND
+                site_id = %s",
+            $this->_db->makeQueryInteger($companyID),
+            $this->_siteID
+        );
+
+        return (boolean) $this->_db->query($sql);
     }
     
     /**
