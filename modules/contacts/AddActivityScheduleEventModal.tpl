@@ -138,6 +138,8 @@
                                                 <option value="60">1 hour early</option>
                                                 <option value="120">2 hours early</option>
                                                 <option value="1440">1 day early</option>
+                                                <option value="2880">2 days early</option>
+                                                <option value="4320">3 days early</option>
                                             </select>
                                         </div>
                                     </div>                               
