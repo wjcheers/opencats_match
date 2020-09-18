@@ -3152,7 +3152,9 @@ class CandidatesUI extends UserInterface
                     //FIXME: Make subject configurable.
                     $mailer = new Mailer($this->_siteID);
                     $mailerStatus = $mailer->sendToMany(
-                        array(array($pipelineUsers['candidateOwnerEmail'], ''), array($pipelineUsers['jobOrderRecruiterEmail'], '')),
+                        array(/*consultants do not want this notification
+                              array($pipelineUsers['candidateOwnerEmail'], ''), */
+                              array($pipelineUsers['jobOrderRecruiterEmail'], '')),
                         'CATS Notification: Personal Agreement Missed - ' . $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName']
                         . ' (' . $pipelineUsers['candidateOwnerFirstName'] . ' ' . $pipelineUsers['candidateOwnerLastName'] . ')',
                         $email,
