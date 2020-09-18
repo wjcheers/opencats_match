@@ -242,7 +242,17 @@
                             <tr>
                                 <td class="vertical">Desired Pay:</td>
                                 <?php if(!empty($this->data['desiredPay'])): ?>
-                                <td class="data"><?php echo(number_format($this->data['desiredPay'])); ?></td>
+                                <td class="data"
+                                    <?php
+                                        if((!empty($this->data['currentPay'])) && 
+                                           ($this->data['desiredPay'] > ($this->data['currentPay'] * 1.2)))
+                                           {
+                                            echo "style='color:#ff0000;'";
+                                           }
+                                    ?>
+                                >
+                                    <?php echo(number_format($this->data['desiredPay'])); ?>
+                                </td>
                                 <?php else: ?>
                                 <td class="data"></td>
                                 <?php endif; ?>
