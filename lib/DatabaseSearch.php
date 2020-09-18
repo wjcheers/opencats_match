@@ -357,9 +357,16 @@ class DatabaseSearch
         $string = urldecode($string);
 
         /* Word searches. */
+        /* ".NET", "C#" are not searched with [[:<:]] [[:>:]]
         $string = preg_replace(
             "/word\[\(\'([^\)]+)\'\)\]full/",
             '(' . $tableField . ' REGEXP \'[[:<:]]\\1[[:>:]]\')',
+            $string
+        );
+        */
+        $string = preg_replace(
+            "/word\[\(\'([^\)]+)\'\)\]full/",
+            '(' . $tableField . ' REGEXP \'\\1\')',
             $string
         );
 
