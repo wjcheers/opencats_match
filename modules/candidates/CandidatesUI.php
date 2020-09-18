@@ -3166,7 +3166,8 @@ class CandidatesUI extends UserInterface
                 }
             }
 
-            if ($newStatusDescription == "Qualifying" && $this->isChecked('triggerCurrentDesiredPayRatio', $_POST))
+            // disable email notification.
+            if (0) //$newStatusDescription == "Qualifying" && $this->isChecked('triggerCurrentDesiredPayRatio', $_POST))
             {                
                 $pipelineUsers = $pipelines->getUser($candidateID, $regardingID);
                 
