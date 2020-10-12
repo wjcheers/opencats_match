@@ -205,7 +205,7 @@ class Candidates
             $this->_db->makeQueryString($jobTitle),
             $this->_db->makeQueryString($extraGender),
             $this->_db->makeQueryString($maritalStatus),
-            $this->_db->makeQueryString($birthYear),
+            $this->_db->makeQueryInteger($birthYear),
             $this->_db->makeQueryString($highestDegree),
             
             $this->_db->makeQueryString($major),
