@@ -970,7 +970,7 @@ class SettingsUI extends UserInterface
         }
 
         /* Bail out if the two passwords don't match. */
-        if ($password1 !== $password2)
+        if (($password1 !== $password2) && $passwordRst == 1)
         {
             CommonErrors::fatal(COMMONERROR_NOPASSWORDMATCH, $this, 'Passwords do not match.');
         }
