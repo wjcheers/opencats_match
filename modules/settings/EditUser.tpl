@@ -1,5 +1,5 @@
 <?php /* $Id: EditUser.tpl 2881 2007-08-14 07:47:26Z brian $ */ ?>
-<?php TemplateUtility::printHeader('Settings', array('modules/settings/validator.js', 'js/sorttable.js', 'modules/settings/settings.js')); ?>
+<?php TemplateUtility::printHeader('Settings', array('modules/settings/validator.js', 'js/sorttable.js', 'modules/settings/Settings.js')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
 <?php TemplateUtility::printTabs($this->active, $this->subActive); ?>
     <div id="main">
