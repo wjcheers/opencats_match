@@ -443,6 +443,7 @@
                     </td>
 
                     <td width="420" valign="top">
+                        <!--
                         <table class="statisticsTable" width="400">
                             <tr>
                                 <th align="left">To Date</th>
@@ -487,6 +488,7 @@
                                 <td align="right"><?php $this->_($this->statisticsData['totalOffers']); ?>&nbsp;&nbsp;</td>
                             </tr>
                         </table>
+                        -->
                     </td>
                 </tr>
                 <tr>
