@@ -42,7 +42,7 @@
     <?php endforeach; ?>
 </script>
 
-    <form name="changePipelineStatusForm" id="changePipelineStatusForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=<?php if ($this->isJobOrdersMode): ?>joborders<?php else: ?>candidates<?php endif; ?>&amp;a=addActivityChangeStatus<?php if ($this->onlyScheduleEvent): ?>&amp;onlyScheduleEvent=true<?php endif; ?>" method="post" onsubmit="return checkActivityForm(document.changePipelineStatusForm);" autocomplete="off">
+    <form name="changePipelineStatusForm" id="changePipelineStatusForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=<?php if ($this->isJobOrdersMode): ?>joborders<?php else: ?>candidates<?php endif; ?>&amp;a=addActivityChangeStatus<?php if ($this->onlyScheduleEvent): ?>&amp;onlyScheduleEvent=true<?php endif; ?>" method="post" onsubmit="result = checkActivityForm(document.changePipelineStatusForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Sending, please wait...';} return result;" autocomplete="off">
         <input type="hidden" name="postback" id="postback" value="postback" />
         <input type="hidden" id="candidateID" name="candidateID" value="<?php echo($this->candidateID); ?>" />
 <?php if ($this->isJobOrdersMode): ?>
