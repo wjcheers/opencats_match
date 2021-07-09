@@ -15,7 +15,7 @@
     <table class="sortable" width="1225">
         <tr>
             <th align="left" nowrap="nowrap">User</th>
-            <th align="left" nowrap="nowrap">Created Candidates</th>
+            <th align="left" nowrap="nowrap">Created (Phone/Email)</th>
             <th align="left" nowrap="nowrap">Modified Candidates</th>
             <th align="left" nowrap="nowrap">Submitted Candidates</th>
             <th align="left" nowrap="nowrap">Interviewing Candidates</th>

@@ -680,6 +680,18 @@ class Statistics
                 candidate
             WHERE
                 candidate.entered_by = %s
+            AND
+                (
+                phone_home <> '' 
+                OR
+                phone_cell <> '' 
+                OR 
+                phone_work <> '' 
+                OR 
+                email1 <> '' 
+                OR 
+                email2 <> '' 
+                )
             %s
             AND
                 candidate.site_id = %s",
