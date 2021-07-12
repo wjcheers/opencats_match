@@ -691,6 +691,14 @@ class Statistics
                 email1 <> '' 
                 OR 
                 email2 <> '' 
+                OR 
+                line <> '' 
+                OR 
+                skype <> '' 
+                OR 
+                qq <> '' 
+                OR 
+                wechat <> '' 
                 )
             %s
             AND
