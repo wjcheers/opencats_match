@@ -15,7 +15,7 @@
                 </tr>
             </table>
 
-            <form name="addContactForm" id="addContactForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;a=add&amp;v=<?php if ($this->selectedCompanyID === false) { echo('-1'); } else { echo($this->selectedCompanyID); } ?>" method="post" onsubmit="return checkAddForm(document.addContactForm);" autocomplete="off">
+            <form name="addContactForm" id="addContactForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;a=add&amp;v=<?php if ($this->selectedCompanyID === false) { echo('-1'); } else { echo($this->selectedCompanyID); } ?>" method="post" onsubmit="result = checkAddForm(document.addContactForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Sending, please wait...'; return;} return onSubmitFalse();" autocomplete="off">
                 <input type="hidden" name="postback" id="postback" value="postback" />
 
                 <table width="1225">
@@ -233,7 +233,7 @@
                         </td>
                     </tr>
                 </table>
-                <input type="submit" class="button" value="Add Contact" />&nbsp;
+                <input type="submit" class="button" id="submit" value="Add Contact" />&nbsp;
                 <input type="reset"  class="button" value="Reset" />&nbsp;
                 <input type="button" class="button" value="Back to Contacts" onclick="javascript:goToURL('<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;a=listRecent');" />
             </form>

@@ -7,7 +7,7 @@
 <script type="text/javascript">
 </script>
 
-    <form name="logActivityForm" id="logActivityForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=addActivityScheduleEvent" method="post" autocomplete="off">
+    <form name="logActivityForm" id="logActivityForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=addActivityScheduleEvent" method="post" onsubmit="document.getElementById('submit').disabled = true; document.getElementById('submit').value='Sending, please wait...';" autocomplete="off">
         <input type="hidden" name="postback" id="postback" value="postback" />
         <input type="hidden" id="companyID" name="companyID" value="<?php echo($this->companyID); ?>" />
 

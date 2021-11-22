@@ -118,6 +118,7 @@ function onSubmitEmailInSystem()
         else
         	return false ;
     }
+    return true;
 }
 
 
@@ -209,6 +210,7 @@ function onSubmitPhoneInSystem()
         else
         	return false ;
     }
+    return true;
 }
 
 
@@ -300,6 +302,7 @@ function onSubmitLinkInSystem()
         else
         	return false ;
     }
+    return true;
 }
 
 
@@ -387,5 +390,6 @@ function onSubmitSocialMediaInSystem()
         else
         	return false ;
     }
+    return true ;
 }
 

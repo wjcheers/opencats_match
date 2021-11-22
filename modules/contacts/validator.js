@@ -8,6 +8,11 @@
  * $Id: validator.js 1890 2007-02-20 05:29:38Z will $
  */
 
+function onSubmitFalse()
+{
+    return false;
+}
+
 function checkAddForm(form)
 {
     var errorMessage = '';

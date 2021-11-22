@@ -28,7 +28,7 @@
                     </tr>
                 </table>
             <?php else: ?>
-                <form name="addJobOrderForm" id="addJobOrderForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=add" method="post" onsubmit="return checkAddForm(document.addJobOrderForm);" autocomplete="off">
+                <form name="addJobOrderForm" id="addJobOrderForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=add" method="post" onsubmit="result = checkAddForm(document.addJobOrderForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Sending, please wait...'; return;} return onSubmitFalse();" autocomplete="off">
                     <input type="hidden" name="postback" id="postback" value="postback" />
 
                     <table class="editTable" width="1000">
@@ -297,7 +297,7 @@
                             <?php endif; ?>
                         </tr>
                     </table>
-                    <input type="submit" tabindex="20" class="button" name="submit" value="Add Job Order" />&nbsp;
+                    <input type="submit" tabindex="20" class="button" name="submit" id="submit" value="Add Job Order" />&nbsp;
                     <input type="reset"  tabindex="21" class="button" name="reset"  value="Reset" />&nbsp;
                     <input type="button" tabindex="22" class="button" name="back"   value="Back to Job Orders" onclick="javascript:goToURL('<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=listByView');" />
                 </form>
