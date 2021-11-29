@@ -524,7 +524,101 @@ class Statistics
 
         return $this->_db->getAllAssoc($sql);
     }
- 
+    
+    /**
+     * Returns all job orders with functions.
+     *
+     * @param flag statistics period flag
+     * @return integer candidate count
+     */
+    public function getJobOrderFunctions()
+    {
+        $sql = sprintf(
+            "SELECT
+                extra_field.value AS jobOrderFunctions
+            FROM
+                joborder
+            LEFT JOIN extra_field
+                ON extra_field.data_item_id = joborder.joborder_id
+                    AND extra_field.data_item_type = %s
+                    AND extra_field.field_name = 'Functions'
+            WHERE
+                joborder.status = 'Active'
+            AND
+                extra_field.value IS NOT NULL
+            AND
+                joborder.site_id = %s
+            GROUP BY
+                jobOrderFunctions",
+            DATA_ITEM_JOBORDER,
+            $this->_siteID
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+    
+    /**
+     * Returns all job orders for the specified functions.
+     *
+     * @param flag statistics period flag
+     * @return integer candidate count
+     */
+    public function getJobOrdersByFunction($function)
+    {
+        $sql = sprintf(
+            "SELECT
+                joborder.joborder_id AS jobOrderID,
+                joborder.title AS title,
+                joborder.company_id AS companyID,
+                joborder.openings AS openings,
+                CONCAT(
+                    owner_user.first_name, ' ', owner_user.last_name
+                ) AS ownerFullName,
+                CONCAT(
+                    recruiter_user.first_name, ' ', recruiter_user.last_name
+                ) AS recruiterFullName,
+                DATE_FORMAT(
+                    joborder.date_modified, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateModifieded,
+                extraJobOrder.value AS jobOrderFunctions,
+                company.name AS companyName,
+                extraCompany.value AS companyShortName
+            FROM
+                joborder
+            LEFT JOIN company
+                ON company.company_id = joborder.company_id
+            LEFT JOIN user AS owner_user
+                ON owner_user.user_id = joborder.owner
+            LEFT JOIN user AS recruiter_user
+                ON recruiter_user.user_id = joborder.recruiter
+            LEFT JOIN extra_field AS extraJobOrder
+                ON extraJobOrder.data_item_id = joborder.joborder_id
+                    AND extraJobOrder.data_item_type = %s
+                    AND extraJobOrder.field_name = 'Functions'
+            LEFT JOIN extra_field AS extraCompany
+                ON extraCompany.data_item_id = company.company_id
+                    AND extraCompany.data_item_type = %s
+                    AND extraCompany.field_name = 'Short Name'
+            WHERE
+                extraJobOrder.value = %s
+            AND
+                joborder.status = 'Active'
+            AND
+                joborder.site_id = %s
+            AND
+                company.site_id = %s
+            ORDER BY
+                company.name ASC",
+            DATA_ITEM_JOBORDER,
+            DATA_ITEM_COMPANY,
+            $this->_db->makeQueryString($function),
+            $this->_siteID,
+            $this->_siteID
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+    
     /**
      * Returns all job orders with offers created in the given period.
      *

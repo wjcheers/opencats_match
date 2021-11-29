@@ -68,6 +68,12 @@
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
+							<tr class="evenTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showFunctionReport&amp;period=today" target="_blank">Function Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
                         </table>
                     </td>
 

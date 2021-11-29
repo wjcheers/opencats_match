@@ -70,7 +70,11 @@ class ReportsUI extends UserInterface
             case 'showPlacementReport':
                 $this->showPlacementReport();
                 break;
-                
+
+            case 'showFunctionReport':
+                $this->showFunctionReport();
+                break;
+
             case 'showOfferReport':
                 $this->showOfferReport();
                 break;
@@ -472,6 +476,45 @@ class ReportsUI extends UserInterface
         $this->_template->assign('reportTitle', $reportTitle);
         $this->_template->assign('placementsJobOrdersRS', $placementsJobOrdersRS);
         $this->_template->display('./modules/reports/PlacedReport.tpl');
+    }
+
+    private function showFunctionReport()
+    {
+        //FIXME: getTrimmedInput
+        if (isset($_GET['period']) && !empty($_GET['period']))
+        {
+            $period = $_GET['period'];
+        }
+        else
+        {
+            $period = '';
+        }
+
+        switch ($period)
+        {
+            case 'today':
+            default:
+                $period = TIME_PERIOD_TODAY;
+                $reportTitle = 'Today\'s Report';
+                break;
+        }
+
+        $statistics = new Statistics($this->_siteID);
+        $jobOrderFunctionsRS = $statistics->getJobOrderFunctions($period);
+
+        foreach ($jobOrderFunctionsRS as $rowIndex => $jobOrderFunctionsData)
+        {
+            /* Querys inside loops are bad, but I don't think there is any avoiding this. */
+            $jobOrderFunctionsRS[$rowIndex]['jobOrdersRS'] = $statistics->getJobOrdersByFunction(
+                $jobOrderFunctionsData['jobOrderFunctions'], $this->_siteID
+            );
+        }
+
+        if (!eval(Hooks::get('REPORTS_SHOW_FUNCTIONS'))) return;
+
+        $this->_template->assign('reportTitle', $reportTitle);
+        $this->_template->assign('jobOrderFunctionsRS', $jobOrderFunctionsRS);
+        $this->_template->display('./modules/reports/FunctionReport.tpl');
     }
 
     private function showOfferReport()
