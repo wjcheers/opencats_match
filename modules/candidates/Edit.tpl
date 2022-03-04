@@ -557,7 +557,7 @@
                     </tr>
                     <tr>
                         <td class="tdVertical">
-                            <label id="qqLabel" for="qq">QQ:</label>
+                            <label id="qqLabel" for="qq">Telegram:</label>
                         </td>
                         <td class="tdData">
                             <input type="text" class="inputbox" id="qq" name="qq" value="<?php $this->_($this->data['qq']); ?>" style="width: 150px;" onchange="checkSocialMediaAlreadyInSystem('qq', this.value);" />

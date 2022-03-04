@@ -671,7 +671,7 @@
                     </tr>
                     <tr>
                         <td class="tdVertical">
-                            <label id="qqLabel" for="qq">QQ:</label>
+                            <label id="qqLabel" for="qq">Telegram:</label>
                         </td>
                         <td class="tdData">
                             <input type="text" tabindex="<?php echo($tabIndex++); ?>" name="qq" id="qq" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['qq'])) $this->_($this->preassignedFields['qq']); ?>" onchange="checkSocialMediaAlreadyInSystem('qq', this.value);" />

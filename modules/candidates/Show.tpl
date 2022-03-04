@@ -372,7 +372,7 @@
                             </tr>
                             
                             <tr>
-                                <td class="vertical">QQ:</td>
+                                <td class="vertical">Telegram:</td>
                                 <td class="data"><?php $this->_($this->data['qq']); ?></td>
                             </tr>
                             
