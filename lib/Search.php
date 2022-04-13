@@ -913,6 +913,8 @@ class SearchJobOrders
             AND
                 joborder.is_admin_hidden = 0
             AND
+                joborder.status = 'Active'
+            AND
                 joborder.site_id = %s
             ORDER BY
                 %s %s",
@@ -1006,6 +1008,109 @@ class SearchJobOrders
             %s
             AND
                 joborder.is_admin_hidden = 0
+            AND
+                joborder.status = 'Active'
+            AND
+                joborder.site_id = %s
+            AND
+                company.site_id = %s
+            ORDER BY
+                %s %s",
+            $wildCardString,
+            $activeCriterion,
+            $this->_siteID,
+            $this->_siteID,
+            $sortBy,
+            $sortDirection
+        );
+
+        if (!eval(Hooks::get('JO_SEARCH_SQL'))) return;
+        if (!eval(Hooks::get('JO_SEARCH_BY_CLIENT_NAME'))) return;
+
+        return $this->_db->getAllAssoc($sql);
+    }
+    
+    /**
+     * Returns all job orders with key skill matching $wildCardString. If
+     * activeOnly is true, only Active/OnHold/Full job orders will be shown.
+     *
+     * @param string wildcard match string
+     * @param boolean return active job orders only
+     * @return array job orders data
+     */
+    public function byKeySkill($wildCardString, $sortBy, $sortDirection, $activeOnly)
+    {
+        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
+        $wildCardString = $this->_db->makeQueryString($wildCardString);
+
+        if ($activeOnly)
+        {
+            //FIXME:  Remove session dependancy.
+            if ($_SESSION['CATS']->isFree())
+            {
+                $activeCriterion = "AND joborder.status = 'Active'";
+            }
+            else
+            {
+                $activeCriterion = "AND (joborder.status IN ('Active', 'OnHold', 'Full'))";
+            }
+        }
+        else
+        {
+            $activeCriterion = "";
+        }
+
+        $sql = sprintf(
+            "SELECT
+                company.company_id AS companyID,
+                company.name AS companyName,
+                joborder.joborder_id AS jobOrderID,
+                joborder.title AS title,
+                joborder.type AS type,
+                joborder.is_hot AS isHot,
+                joborder.duration AS duration,
+                joborder.rate_max AS maxRate,
+                joborder.salary AS salary,
+                joborder.status AS status,
+                joborder.city AS city,
+                joborder.state AS state,
+                contact.first_name AS contactFirstName,
+                contact.last_name AS contactLastName,
+                CONCAT(
+                    contact.first_name, ' ', contact.last_name
+                ) AS contactFullName,
+                recruiter_user.first_name AS recruiterFirstName,
+                recruiter_user.last_name AS recruiterLastName,
+                owner_user.first_name AS ownerFirstName,
+                owner_user.last_name AS ownerLastName,
+                DATE_FORMAT(
+                    joborder.start_date, '%%m-%%d-%%y'
+                ) AS startDate,
+                DATE_FORMAT(
+                    joborder.date_created, '%%m-%%d-%%y'
+                ) AS dateCreated,
+                DATE_FORMAT(
+                    joborder.date_modified, '%%m-%%d-%%y'
+                ) AS dateModified
+            FROM
+                company
+            LEFT JOIN joborder
+                ON company.company_id = joborder.company_id
+            LEFT JOIN user AS recruiter_user
+                ON joborder.recruiter = recruiter_user.user_id
+            LEFT JOIN user AS owner_user
+                ON joborder.owner = owner_user.user_id
+            LEFT JOIN contact
+                ON joborder.contact_id = contact.contact_id
+            LEFT JOIN extra_field
+                ON extra_field.data_item_id = joborder.joborder_id AND extra_field.data_item_type = '400' AND extra_field.field_name = 'Key Skills'
+            WHERE
+                extra_field.value like %s
+            %s
+            AND
+                joborder.is_admin_hidden = 0
+            AND
+                joborder.status = 'Active'
             AND
                 joborder.site_id = %s
             AND

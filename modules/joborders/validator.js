@@ -85,6 +85,21 @@ function checkSearchByCompanyNameForm(form)
     return true;
 }
 
+function checkSearchByKeySkillForm(form)
+{
+    var errorMessage = '';
+
+    errorMessage += checkSearchKeySkill();
+
+    if (errorMessage != '')
+    {
+        alert("Form Error:\n" + errorMessage);
+        return false;
+    }
+
+    return true;
+}
+
 function checkAttachmentForm(form)
 {
     var errorMessage = '';

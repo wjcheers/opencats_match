@@ -1877,6 +1877,11 @@ class JobOrdersUI extends UserInterface
                 $rs = $search->byCompanyName($query, $sortBy, $sortDirection, false);
                 break;
 
+            case 'searchByKeySkill':
+                $rs = $search->byKeySkill($query, $sortBy, $sortDirection, false);
+                $resultsMode = true;
+                break;
+
             default:
                 $this->listByView('Invalid search mode.');
                 return;

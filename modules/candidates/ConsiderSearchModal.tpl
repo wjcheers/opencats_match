@@ -35,12 +35,34 @@
                 <tr>
                     <td><input type="submit" class="button" id="searchByCompanyName" name="searchByCompanyName" value="Search by Company Name" /></td>
                 </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+            </form>
+
+            <form id="searchByKeySkillForm" name="searchByKeySkillForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=considerForJobSearch" method="post">
+                <input type="hidden" name="postback" id="postback" value="postback" />
+                <input type="hidden" id="mode_keyskill" name="mode" value="searchByKeySkill" />
+                <input type="hidden" id="candidateID_keyskill" name="candidateIDArrayStored" value="<?php echo($this->candidateIDArrayStored); ?>" />
+
+                <tr>
+                    <td>Search by Key Skill:&nbsp;</td>
+                    <td><input type="text" class="inputbox" id="wildCardString_keyskill" name="wildCardString" style="width:200px;" />&nbsp;*</td>
+
+                </tr>
+                <tr>
+                    <td><input type="submit" class="button" id="searchByKeySkill" name="searchByKeySkill" value="Search by Key Skill" /></td>
+                </tr>
             </form>
         </table>
 
         <?php if (empty($_POST['mode']) || $_POST['mode'] == 'searchByJobTitle'): ?>
             <script type="text/javascript">
                 document.searchByJobTitleForm.wildCardString.focus();
+            </script>
+        <?php elseif (empty($_POST['mode']) || $_POST['mode'] == 'searchByKeySkill'): ?>
+            <script type="text/javascript">
+                document.searchByKeySkillForm.wildCardString.focus();
             </script>
         <?php else: ?>
             <script type="text/javascript">

@@ -31,6 +31,7 @@
                             <select id="searchMode" name="mode" onclick="advancedSearchConsider();" class="selectBox">
                                 <option value="searchByJobTitle"<?php if ($this->mode == "searchByJobTitle"): ?> selected="selected"<?php endif; ?>>Job Title</option>
                                 <option value="searchByCompanyName"<?php if ($this->mode == "searchByCompanyName"): ?> selected="selected"<?php endif; ?>>Company Name</option>
+                                <option value="searchByKeySkill"<?php if ($this->mode == "searchByKeySkill"): ?> selected="selected"<?php endif; ?>>Key Skill</option>
                             </select>&nbsp;
                             <input type="text" class="inputbox" id="searchText" name="wildCardString" value="<?php if (!empty($this->wildCardString)) echo(urldecode($this->wildCardString)); ?>" style="width:250px" />&nbsp;*&nbsp;
                             <input type="submit" class="button" id="searchJobOrders" name="searchJobOrders" value="Search" />

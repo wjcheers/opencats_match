@@ -1459,6 +1459,11 @@ class CandidatesUI extends UserInterface
                 $resultsMode = true;
                 break;
 
+            case 'searchByKeySkill':
+                $rs = $search->byKeySkill($query, 'title', 'ASC', true);
+                $resultsMode = true;
+                break;
+
             default:
                 $rs = $search->recentlyModified('DESC', true, 8);
                 $resultsMode = false;
