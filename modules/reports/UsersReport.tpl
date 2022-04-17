@@ -15,12 +15,13 @@
     <table class="sortable" width="1225">
         <tr>
             <th align="left" nowrap="nowrap">User</th>
-            <th align="left" nowrap="nowrap">Created (Phone/Email)</th>
-            <th align="left" nowrap="nowrap">Modified Candidates</th>
-            <th align="left" nowrap="nowrap">Submitted Candidates</th>
-            <th align="left" nowrap="nowrap">Interviewing Candidates</th>
-            <th align="left" nowrap="nowrap">Offered Candidates</th>
-            <th align="left" nowrap="nowrap">Placed Candidates</th>
+            <th align="left" nowrap="nowrap">Created(Phone/Email)</th>
+            <th align="left" nowrap="nowrap">Modified CANDs</th>
+            <th align="left" nowrap="nowrap">Submitted Person</th>
+            <th align="left" nowrap="nowrap">Submitted CANDs</th>
+            <th align="left" nowrap="nowrap">Interviewing CANDs</th>
+            <th align="left" nowrap="nowrap">Offered CANDs</th>
+            <th align="left" nowrap="nowrap">Placed CANDs</th>
             <th align="left" nowrap="nowrap">Activities Count</th>
             <th align="left" nowrap="nowrap">Created Companies</th>
             <th align="left" nowrap="nowrap">Created Contacts</th>
@@ -31,6 +32,7 @@
                     <td valign="top" align="left"><?php $this->_($UserData['ownerFullName']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['createdCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['modifiedCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($reportData['personSubmittedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['submittedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['interviewingCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['offeredCount']) ?>&nbsp;</td>

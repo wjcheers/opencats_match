@@ -853,11 +853,41 @@ class Statistics
         );
 
         $c = $this->_db->getAllAssoc($sql);
-                
+
         $criterion = $this->makePeriodCriterion(
             'candidate_joborder_status_history.date', $period
         );
-                $criterion = $this->makePeriodCriterion(
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS personSubmittedCount
+            FROM (
+                SELECT
+                    COUNT(*)
+                FROM
+                    candidate_joborder_status_history
+                LEFT JOIN candidate
+                    ON candidate.candidate_id = candidate_joborder_status_history.candidate_id
+                LEFT JOIN user AS owner_user
+                    ON owner_user.user_id = candidate.owner
+                WHERE
+                    candidate_joborder_status_history.status_to = 400
+                %s
+                AND
+                    candidate.site_id = %s
+                AND
+                    owner_user.user_id = %s
+                GROUP BY
+                    candidate_joborder_status_history.candidate_id
+            ) AS countByCandidates",
+            $criterion,
+            $this->_siteID,
+            $userID
+        );
+
+        $personSubmittedCount = $this->_db->getAllAssoc($sql);
+
+        $criterion = $this->makePeriodCriterion(
             'candidate_joborder_status_history.date', $period
         );
 
@@ -1017,6 +1047,7 @@ class Statistics
         $z = array();
         $z[0]['createdCount'] = $a[0]['createdCount'];
         $z[0]['modifiedCount'] = $b[0]['modifiedCount'];
+        $z[0]['personSubmittedCount'] = $personSubmittedCount[0]['personSubmittedCount'];
         $z[0]['submittedCount'] = $c[0]['submittedCount'];
         $z[0]['interviewingCount'] = $interviewing_count[0]['interviewingCount'];
         $z[0]['offeredCount'] = $offered_count[0]['offeredCount'];
