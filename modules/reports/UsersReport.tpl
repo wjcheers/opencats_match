@@ -23,13 +23,19 @@
             <th align="left" nowrap="nowrap">Offered CANDs</th>
             <th align="left" nowrap="nowrap">Placed CANDs</th>
             <th align="left" nowrap="nowrap">Activities Count</th>
+            <!--
             <th align="left" nowrap="nowrap">Created Companies</th>
             <th align="left" nowrap="nowrap">Created Contacts</th>
+            -->
         </tr>
         <?php foreach ($this->UsersRS as $rowNumber => $UserData): ?>
             <?php foreach ($UserData['reportRS'] as $rowNumber => $reportData): ?>
                 <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
-                    <td valign="top" align="left"><?php $this->_($UserData['ownerFullName']) ?>&nbsp;</td>
+                    <td valign="top" align="left">
+                        <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReportByUser&amp;period=<?php $this->_($this->period) ?>&amp;userID=<?php $this->_($UserData['userID']) ?>">
+                            <?php $this->_($UserData['ownerFullName']) ?>
+                        </a>
+                    </td>
                     <td valign="top" align="left"><?php $this->_($reportData['createdCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['modifiedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['personSubmittedCount']) ?>&nbsp;</td>
@@ -38,13 +44,15 @@
                     <td valign="top" align="left"><?php $this->_($reportData['offeredCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['placedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityCount']) ?>&nbsp;</td>
+                    <!--
                     <td valign="top" align="left"><?php $this->_($reportData['companyCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['contactCount']) ?>&nbsp;</td>
+                    -->
                 </tr>
             <?php endforeach; ?>
         <?php endforeach; ?>
     </table>
-    
+
     <?php if($this->reportTitle == 'Today\'s Report'): ?>
     <p class="note">Current Pipeline Status</p>
 

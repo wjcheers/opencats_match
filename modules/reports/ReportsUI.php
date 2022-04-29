@@ -67,12 +67,12 @@ class ReportsUI extends UserInterface
                 $this->showSubmissionReport();
                 break;
 
-            case 'showPlacementReport':
-                $this->showPlacementReport();
-                break;
-
             case 'showFunctionReport':
                 $this->showFunctionReport();
+                break;
+
+            case 'showPlacementReport':
+                $this->showPlacementReport();
                 break;
 
             case 'showOfferReport':
@@ -81,6 +81,10 @@ class ReportsUI extends UserInterface
 
             case 'showUserReport':
                 $this->showUserReport();
+                break;
+
+            case 'showUserReportByUser':
+                $this->showUserReportByUser();
                 break;
 
             case 'showSubmitReport':
@@ -305,6 +309,7 @@ class ReportsUI extends UserInterface
         $this->_template->assign('submissionJobOrdersRS', $submissionJobOrdersRS);
         $this->_template->display('./modules/reports/SubmissionReport.tpl');
     }
+
 
     private function showSubmitReport()
     {
@@ -612,14 +617,15 @@ class ReportsUI extends UserInterface
         //FIXME: getTrimmedInput
         if (isset($_GET['period']) && !empty($_GET['period']))
         {
-            $period = $_GET['period'];
+            $periodString = $_GET['period'];
         }
         else
         {
-            $period = '';
+            $periodString = '';
         }
+        $period = '';
 
-        switch ($period)
+        switch ($periodString)
         {
             case 'yesterday':
                 $period = TIME_PERIOD_YESTERDAY;
@@ -698,8 +704,148 @@ class ReportsUI extends UserInterface
         if (!eval(Hooks::get('REPORTS_SHOW_USERS_REPORT'))) return;
 
         $this->_template->assign('reportTitle', $reportTitle);
+        $this->_template->assign('period', $periodString);
         $this->_template->assign('UsersRS', $UsersRS);
         $this->_template->display('./modules/reports/UsersReport.tpl');
+    }
+
+    private function showUserReportByUser()
+    {
+        //FIXME: getTrimmedInput
+        if (isset($_GET['period']) && !empty($_GET['period']))
+        {
+            $periodString = $_GET['period'];
+        }
+        else
+        {
+            $periodString = '';
+        }
+        $period = '';
+        
+        //FIXME: getTrimmedInput
+        if (isset($_GET['userID']) && !empty($_GET['userID']))
+        {
+            $userID = $_GET['userID'];
+        }
+        else
+        {
+            $userID = '';
+        }
+        
+        $subdaystart = 0;
+        $subdayend = 0;
+        $byday = 0;
+        $reportTitle = '';
+        switch ($periodString)
+        {
+            case 'yesterday':
+                $byday = 1;
+                $subdaystart = -1; // php weekday 0-6, sql week 1-7
+                $subdayend = $subdaystart;
+                $period = TIME_PERIOD_YESTERDAY;
+                $reportTitle = 'Yesterday\'s Report';
+                break;
+
+            case 'thisWeek':
+                $byday = 1;
+                $subdaystart = -date('w');
+                $subdayend = 0; // php weekday 0-6, sql week 1-7
+                $period = TIME_PERIOD_THISWEEK;
+                $reportTitle = 'This Week\'s Report';
+                break;
+
+            case 'lastWeek':
+                $byday = 1;
+                $subdaystart = -6-1-date('w'); // php weekday 0-6, sql week 1-7
+                $subdayend = -date('w')-1;
+                $period = TIME_PERIOD_LASTWEEK;
+                $reportTitle = 'Last Week\'s Report';
+                break;
+
+            case 'thisMonth':
+                $period = TIME_PERIOD_THISMONTH;
+                $reportTitle = 'This Month\'s Report';
+                break;
+
+            case 'lastMonth':
+                $period = TIME_PERIOD_LASTMONTH;
+                $reportTitle = 'Last Month\'s Report';
+                break;
+
+            case 'thisQuarter':
+                $period = TIME_PERIOD_THISQUARTER;
+                $reportTitle = 'This Quarter\'s Report';
+                break;
+
+            case 'lastQuarter':
+                $period = TIME_PERIOD_LASTQUARTER;
+                $reportTitle = 'Last Quarter\'s Report';
+                break;
+                
+            case 'thisYear':
+                $period = TIME_PERIOD_THISYEAR;
+                $reportTitle = 'This Year\'s Report';
+                break;
+
+            case 'lastYear':
+                $period = TIME_PERIOD_LASTYEAR;
+                $reportTitle = 'Last Year\'s Report';
+                break;
+
+            case 'toDate':
+                $period = TIME_PERIOD_TODATE;
+                $reportTitle = 'To Date Report';
+                break;
+            case 'today':
+            default:
+                $byday = 1;
+                $subdaystart = 0; // php weekday 0-6, sql week 1-7
+                $subdayend = 0;
+                $period = TIME_PERIOD_TODAY;
+                $reportTitle = 'Today\'s Report';
+                break;
+        }
+
+        $UserDateRS = '';
+        $statistics = new Statistics($this->_siteID);
+        //$UsersRS = $statistics->getReportUsers($period);
+
+        //foreach ($UserDateRS as $rowIndex => $UsersData)
+        if($byday)
+        {
+            $daycount = 0;
+            $dayofweekstring = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
+            for(;($daycount + $subdaystart) <= $subdayend;$daycount++)
+            {
+                $date = date('Y-m-d', strtotime(($subdaystart+$daycount).' days'));
+                $weekday = date('w', strtotime(($subdaystart+$daycount).' days'));
+                $UserDateRS[$daycount]['date'] = $date . ' (' . $dayofweekstring[$weekday] . ')';
+
+                /* Querys inside loops are bad, but I don't think there is any avoiding this. */
+                $UserDateRS[$daycount]['reportRS'] = $statistics->getReportByUser(
+                    $period, $userID, $subdaystart+$daycount
+                );
+            }
+        }
+        else
+        {
+            $UserDateRS[0]['date'] = $reportTitle;
+
+            /* Querys inside loops are bad, but I don't think there is any avoiding this. */
+            $UserDateRS[0]['reportRS'] = $statistics->getReportByUser(
+                $period, $userID
+            );
+        }
+        
+        $submitRS = $statistics->getSubmitReport($period, $userID);
+        
+        if (!eval(Hooks::get('REPORTS_SHOW_USERS_REPORT_BY_USER'))) return;
+
+        $this->_template->assign('reportTitle', $reportTitle);
+        $this->_template->assign('period', $periodString);
+        $this->_template->assign('UserDateRS', $UserDateRS);
+        $this->_template->assign('submitRS', $submitRS);
+        $this->_template->display('./modules/reports/UsersReportByUser.tpl');
     }
 
     private function customizeJobOrderReport()

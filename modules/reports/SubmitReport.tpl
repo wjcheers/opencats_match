@@ -19,8 +19,7 @@
                 <th align="left" nowrap="nowrap">Candidate Owner</th>
                 <th align="left" nowrap="nowrap">JobOrder</th>
                 <th align="left" nowrap="nowrap">Company</th>
-                <th align="left" nowrap="nowrap">JobOrder Date Submitted</th>
-                <th align="left" nowrap="nowrap">Candiate Date Modified</th>
+                <th align="left" nowrap="nowrap">Date</th>
             </tr>
 
             <?php foreach ($this->submitRS as $rowNumber => $submitData): ?>
@@ -37,8 +36,7 @@
                     <td valign="top" align="left"><?php $this->_($submitData['ownerFullName']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($submitData['jobOrderTitle']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($submitData['companyName']) ?>&nbsp;</td>
-                    <td valign="top" align="left"><?php $this->_($submitData['dateSubmitted']) ?>&nbsp;</td>
-                    <td valign="top" align="left"><?php $this->_($submitData['dateModified']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($submitData['date']) ?>&nbsp;</td>
                 </tr>
             <?php endforeach; ?>
         </table>

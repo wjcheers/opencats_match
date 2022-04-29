@@ -41,6 +41,10 @@ ACTIVITY_CONFIRM     = 900;
 ACTIVITY_DRIFTING    = 1000;
 ACTIVITY_IM_LINKEDIN = 1100;
 ACTIVITY_INTERVIEW   = 1200;
+ACTIVITY_CALL_COLD   = 1300;
+ACTIVITY_NOTE        = 1400;
+ACTIVITY_IM_LINE     = 1500;
+ACTIVITY_IM          = 1600;
 
 ARRANGE_TEXT = "Arrange: \nDate: 9/9/2020\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
 CONFIRM_TEXT = "Confirm: \nDate: 9/9/2020\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
@@ -111,6 +115,26 @@ function Activity_fillTypeSelect(selectList, selectedText)
     optionElements[11] = document.createElement('option');
     optionElements[11].value = ACTIVITY_INTERVIEW;
     optionElements[11].appendChild(document.createTextNode('Interview'));
+    
+    /* Call (Cold) option. */
+    optionElements[12] = document.createElement('option');
+    optionElements[12].value = ACTIVITY_CALL_COLD;
+    optionElements[12].appendChild(document.createTextNode('Call (Cold)'));
+    
+    /* Note option. */
+    optionElements[13] = document.createElement('option');
+    optionElements[13].value = ACTIVITY_NOTE;
+    optionElements[13].appendChild(document.createTextNode('Note'));
+    
+    /* IM Line option. */
+    optionElements[14] = document.createElement('option');
+    optionElements[14].value = ACTIVITY_IM_LINE;
+    optionElements[14].appendChild(document.createTextNode('IM (Line)'));
+    
+    /* IM option. */
+    optionElements[15] = document.createElement('option');
+    optionElements[15].value = ACTIVITY_IM;
+    optionElements[15].appendChild(document.createTextNode('IM'));
     
     /* Select the correct option. */
     if (selectedText)

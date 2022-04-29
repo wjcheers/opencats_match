@@ -362,28 +362,44 @@ class Statistics
      * @param flag statistics period flag
      * @return integer candidate count
      */
-    public function getSubmitReport($period)
+    public function getSubmitReport($period, $userID = null)
     {
         $criterion = $this->makePeriodCriterion(
             'candidate_joborder_status_history.date', $period
         );
+
+        $criterionUserID = '';
+        if($userID && $userID != '')
+        {
+            $criterionUserID = sprintf("AND candidate.owner = %s", $userID);
+        }
 
         $sql = sprintf(
             "SELECT
                 candidate.candidate_id AS candidateID,
                 candidate.first_name AS firstName,
                 candidate.last_name AS lastName,
+                CONCAT(
+                    candidate.first_name, ' ', candidate.last_name
+                ) AS candidateFullName,
                 candidate.chinese_name AS chineseName,
-                candidate.date_modified AS dateModified,
+                candidate.linkedin AS linkedin,
+                candidate.key_skills AS keySkills,
+                candidate.is_resume AS isResume,
                 joborder.joborder_id AS jobOrderID,
                 joborder.title AS jobOrderTitle,
+                joborder_function.value AS jobOrderFunctions,
+                candidate_joborder.last_notes AS lastNotes,
+                company.company_id AS companyID,
                 company.name AS companyName,
+                company_shortname.value AS companyShortName,
                 CONCAT(
                     owner_user.first_name, ' ', owner_user.last_name
                 ) AS ownerFullName,
                 DATE_FORMAT(
                     candidate_joborder_status_history.date, '%%m-%%d-%%y (%%h:%%i %%p)'
-                ) AS dateSubmitted
+                ) AS date,
+                candidate_joborder_status.short_description as status
             FROM
                 candidate_joborder_status_history
             LEFT JOIN candidate
@@ -394,8 +410,30 @@ class Statistics
                 ON company.company_id = joborder.company_id
             LEFT JOIN user AS owner_user
                 ON owner_user.user_id = candidate.owner
+            LEFT JOIN extra_field AS joborder_function
+                ON joborder_function.data_item_id = joborder.joborder_id
+                    AND joborder_function.data_item_type = %s
+                    AND joborder_function.field_name = 'Functions'
+            LEFT JOIN extra_field AS company_shortname
+                ON company_shortname.data_item_id = company.company_id
+                    AND company_shortname.data_item_type = %s
+                    AND company_shortname.field_name = 'Short Name'
+            LEFT JOIN candidate_joborder_status ON
+                candidate_joborder_status.candidate_joborder_status_id = candidate_joborder_status_history.status_to
+            LEFT JOIN candidate_joborder
+                ON candidate_joborder.candidate_id = candidate.candidate_id
+                    AND candidate_joborder.joborder_id = joborder.joborder_id
             WHERE
-                candidate_joborder_status_history.status_to = 400
+                (
+                    candidate_joborder_status_history.status_to = %s
+                OR
+                    candidate_joborder_status_history.status_to = %s
+                OR
+                    candidate_joborder_status_history.status_to = %s
+                OR
+                    candidate_joborder_status_history.status_to = %s
+                )
+            %s
             %s
             AND
                 candidate.site_id = %s
@@ -404,10 +442,18 @@ class Statistics
             AND
                 company.site_id = %s
             ORDER BY
+                candidate_joborder_status_history.status_to ASC,
                 candidate.date_modified ASC,
                 candidate.last_name ASC,
                 candidate.first_name ASC",
+            DATA_ITEM_JOBORDER,
+            DATA_ITEM_COMPANY,
+            PIPELINE_STATUS_SUBMITTED,
+            PIPELINE_STATUS_INTERVIEWING,
+            PIPELINE_STATUS_OFFERED,
+            PIPELINE_STATUS_CLIENTDECLINED,
             $criterion,
+            $criterionUserID,
             $this->_siteID,
             $this->_siteID,
             $this->_siteID
@@ -415,6 +461,7 @@ class Statistics
 
         return $this->_db->getAllAssoc($sql);
     }
+
 
     /**
      * Returns all job orders with placements created in the given period.
@@ -761,10 +808,30 @@ class Statistics
      * @param flag statistics period flag
      * @return integer candidate count
      */
-    public function getReportByUser($period, $userID)
+    public function getReportByUser($period, $userID, $subday = null)
     {
+        $sql = sprintf(
+            "SELECT
+                user.user_id AS userID,
+                CONCAT(
+                    user.first_name, ' ', user.last_name
+                ) AS ownerFullName
+            FROM
+                user
+            WHERE
+                user.access_level > 0
+            AND
+                user.user_id = %s
+            AND
+                user.site_id = %s",
+            $userID,
+            $this->_siteID
+        );
+
+        $user = $this->_db->getAllAssoc($sql);
+        
         $criterion = $this->makePeriodCriterion(
-            'candidate.date_created', $period
+            'candidate.date_created', $period, $subday
         );
 
         $sql = sprintf(
@@ -805,7 +872,7 @@ class Statistics
         $a = $this->_db->getAllAssoc($sql);
         
         $criterion = $this->makePeriodCriterion(
-            'candidate.date_modified', $period
+            'candidate.date_modified', $period, $subday
         );
 
         $sql = sprintf(
@@ -826,7 +893,7 @@ class Statistics
         $b = $this->_db->getAllAssoc($sql);
 
         $criterion = $this->makePeriodCriterion(
-            'candidate_joborder_status_history.date', $period
+            'candidate_joborder_status_history.date', $period, $subday
         );
 
         $sql = sprintf(
@@ -855,7 +922,7 @@ class Statistics
         $c = $this->_db->getAllAssoc($sql);
 
         $criterion = $this->makePeriodCriterion(
-            'candidate_joborder_status_history.date', $period
+            'candidate_joborder_status_history.date', $period, $subday
         );
 
         $sql = sprintf(
@@ -888,7 +955,7 @@ class Statistics
         $personSubmittedCount = $this->_db->getAllAssoc($sql);
 
         $criterion = $this->makePeriodCriterion(
-            'candidate_joborder_status_history.date', $period
+            'candidate_joborder_status_history.date', $period, $subday
         );
 
         $sql = sprintf(
@@ -917,7 +984,7 @@ class Statistics
         $interviewing_count = $this->_db->getAllAssoc($sql);
         
         $criterion = $this->makePeriodCriterion(
-            'candidate_joborder_status_history.date', $period
+            'candidate_joborder_status_history.date', $period, $subday
         );
 
         $sql = sprintf(
@@ -944,13 +1011,9 @@ class Statistics
         );
 
         $offered_count = $this->_db->getAllAssoc($sql);
-                
-        $criterion = $this->makePeriodCriterion(
-            'activity.date_modified', $period
-        );
         
         $criterion = $this->makePeriodCriterion(
-            'candidate_joborder_status_history.date', $period
+            'candidate_joborder_status_history.date', $period, $subday
         );
 
         $sql = sprintf(
@@ -977,9 +1040,98 @@ class Statistics
         );
 
         $placed_count = $this->_db->getAllAssoc($sql);
-                
+
         $criterion = $this->makePeriodCriterion(
-            'activity.date_modified', $period
+            'activity.date_modified', $period, $subday
+        );
+
+        // define('ACTIVITY_CALL_COLD',  1300);
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS activityColdCall
+            FROM
+                activity
+            WHERE
+                activity.entered_by = %s
+            %s
+            AND
+                activity.type = '1300'
+            AND
+                activity.site_id = %s",
+            $userID,
+            $criterion,
+            $this->_siteID
+        );
+
+        $activity_cold_call = $this->_db->getAllAssoc($sql);
+
+        $criterion = $this->makePeriodCriterion(
+            'activity.date_modified', $period, $subday
+        );
+
+        // define('ACTIVITY_CALL_TALKED', 500);
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS activityTalked
+            FROM
+                activity
+            WHERE
+                activity.entered_by = %s
+            %s
+            AND
+                activity.type = '500'
+            AND
+                activity.site_id = %s",
+            $userID,
+            $criterion,
+            $this->_siteID
+        );
+
+        $activity_talked = $this->_db->getAllAssoc($sql);
+
+        $criterion = $this->makePeriodCriterion(
+            'activity.date_modified', $period, $subday
+        );
+
+        /*
+        define('ACTIVITY_EMAIL',       200);
+        define('ACTIVITY_MEETING',     300);
+        define('ACTIVITY_OTHER',       400);
+        define('ACTIVITY_CALL_LVM',    600);
+        define('ACTIVITY_CALL_MISSED', 700);
+        define('ACTIVITY_IM_LINKEDIN',1100);
+        define('ACTIVITY_IM_LINE',    1500);
+        define('ACTIVITY_IM',         1600);
+        */
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS activityContact
+            FROM
+                activity
+            WHERE
+                activity.entered_by = %s
+            %s
+            AND
+                (activity.type = '200'
+                OR activity.type = '300'
+                OR activity.type = '400'
+                OR activity.type = '600'
+                OR activity.type = '700'
+                OR activity.type = '1100'
+                OR activity.type = '1500'
+                OR activity.type = '1600'
+                )
+            AND
+                activity.site_id = %s",
+            $userID,
+            $criterion,
+            $this->_siteID
+        );
+
+        $activity_contact = $this->_db->getAllAssoc($sql);
+
+        $criterion = $this->makePeriodCriterion(
+            'activity.date_modified', $period, $subday
         );
 
         $sql = sprintf(
@@ -999,11 +1151,11 @@ class Statistics
 
         $activity_count = $this->_db->getAllAssoc($sql);
         
-        
         $criterion = $this->makePeriodCriterion(
-            'contact.date_created', $period
+            'contact.date_created', $period, $subday
         );
 
+        /*
         $sql = sprintf(
             "SELECT
                 COUNT(*) AS contactCount
@@ -1021,9 +1173,8 @@ class Statistics
 
         $contact_count = $this->_db->getAllAssoc($sql);
         
-        
         $criterion = $this->makePeriodCriterion(
-            'company.date_created', $period
+            'company.date_created', $period, $subday
         );
 
         $sql = sprintf(
@@ -1042,9 +1193,12 @@ class Statistics
         );
 
         $company_count = $this->_db->getAllAssoc($sql);
+        */
         
         
         $z = array();
+        $z[0]['userID'] = $userID;
+        $z[0]['ownerFullName'] = $user[0]['ownerFullName'];
         $z[0]['createdCount'] = $a[0]['createdCount'];
         $z[0]['modifiedCount'] = $b[0]['modifiedCount'];
         $z[0]['personSubmittedCount'] = $personSubmittedCount[0]['personSubmittedCount'];
@@ -1052,9 +1206,14 @@ class Statistics
         $z[0]['interviewingCount'] = $interviewing_count[0]['interviewingCount'];
         $z[0]['offeredCount'] = $offered_count[0]['offeredCount'];
         $z[0]['placedCount'] = $placed_count[0]['placedCount'];
+        $z[0]['activityColdCall'] = $activity_cold_call[0]['activityColdCall'];
+        $z[0]['activityTalked'] = $activity_talked[0]['activityTalked'];
+        $z[0]['activityContact'] = $activity_contact[0]['activityContact'];
         $z[0]['activityCount'] = $activity_count[0]['activityCount'];
+        /*
         $z[0]['companyCount'] = $company_count[0]['companyCount'];
         $z[0]['contactCount'] = $contact_count[0]['contactCount'];
+        */
         return $z;
     }
     
@@ -1781,7 +1940,7 @@ class Statistics
 
 
     // FIXME: Document me.
-    private function makePeriodCriterion($dateField, $period)
+    private function makePeriodCriterion($dateField, $period, $subday = null)
     {
         /* Note: we add a bogus "AND date > '1900-01-01'" condition to the
          * WHERE clause to force MySQL to use an index containing the date
@@ -1886,6 +2045,16 @@ class Statistics
             default:
                 return sprintf('AND %s > \'1900-01-01\'', $dateField);
                 break;
+        }
+        
+        if($subday && $subday != '')
+        {
+            $criteria = sprintf(
+                '%s AND DATE(%s) = DATE(DATE_ADD(CURDATE(),  INTERVAL %s day))',
+                $criteria,
+                $dateField,
+                $subday
+            );
         }
 
         if ($this->_timeZoneOffset != 0)

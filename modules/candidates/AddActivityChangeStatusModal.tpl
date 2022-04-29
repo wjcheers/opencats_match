@@ -129,7 +129,8 @@
                     <div id="activityNoteDiv" style="margin-top: 4px;">
                         <span id="addActivitySpanA">Activity Type</span><br />
                         <select id="activityTypeID" name="activityTypeID" class="inputbox" style="width: 150px; margin-bottom: 4px;" onclick="AS_onActivityChange('addActivity', 'activityTypeID', 'activityNote', 'addActivitySpanA', 'addActivitySpanB');">
-                            <option selected="selected" value="<?php echo(ACTIVITY_CALL); ?>">Call</option>
+                            <option selected="selected" value="<?php echo(ACTIVITY_NOTE); ?>">Note</option>
+                            <option value="<?php echo(ACTIVITY_CALL_COLD); ?>">Call (Cold)</option>
                             <option value="<?php echo(ACTIVITY_CALL_TALKED); ?>">Call (Talked)</option>
                             <option value="<?php echo(ACTIVITY_CALL_LVM); ?>">Call (LVM)</option>
                             <option value="<?php echo(ACTIVITY_CALL_MISSED); ?>">Call (Missed)</option>
@@ -140,6 +141,8 @@
                             <option value="<?php echo(ACTIVITY_CONFIRM); ?>">Confirm</option>
                             <option value="<?php echo(ACTIVITY_DRIFTING); ?>">Drifting</option>
                             <option value="<?php echo(ACTIVITY_IM_LINKEDIN); ?>">IM (Linkedin)</option>
+                            <option value="<?php echo(ACTIVITY_IM_LINE); ?>">IM (Line)</option>
+                            <option value="<?php echo(ACTIVITY_IM); ?>">IM</option>
                             <option value="<?php echo(ACTIVITY_INTERVIEW); ?>">Interview</option>
                         </select><br />
                                                 

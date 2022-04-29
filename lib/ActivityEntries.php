@@ -42,6 +42,10 @@ define('ACTIVITY_CONFIRM',     900);
 define('ACTIVITY_DRIFTING',   1000);
 define('ACTIVITY_IM_LINKEDIN',1100);
 define('ACTIVITY_INTERVIEW',  1200);
+define('ACTIVITY_CALL_COLD',  1300);
+define('ACTIVITY_NOTE',       1400);
+define('ACTIVITY_IM_LINE',    1500);
+define('ACTIVITY_IM',         1600);
 
 /**
  * Candidates library.
