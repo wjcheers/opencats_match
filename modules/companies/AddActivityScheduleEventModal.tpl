@@ -36,6 +36,7 @@
                             <option value="<?php echo(ACTIVITY_IM_LINKEDIN); ?>">IM (Linkedin)</option>
                             <option value="<?php echo(ACTIVITY_IM_LINE); ?>">IM (Line)</option>
                             <option value="<?php echo(ACTIVITY_IM); ?>">IM</option>
+                            <option value="<?php echo(ACTIVITY_REPORT); ?>">Report</option>
                             <option <?php if($this->activityType == 'Interview') echo 'selected="selected"'; ?> value="<?php echo(ACTIVITY_INTERVIEW); ?>">Interview</option>
                         </select><br />
                         <span id="addActivitySpanB">Activity Notes</span><br />

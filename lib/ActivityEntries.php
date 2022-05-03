@@ -46,6 +46,7 @@ define('ACTIVITY_CALL_COLD',  1300);
 define('ACTIVITY_NOTE',       1400);
 define('ACTIVITY_IM_LINE',    1500);
 define('ACTIVITY_IM',         1600);
+define('ACTIVITY_REPORT',     1700);
 
 /**
  * Candidates library.
