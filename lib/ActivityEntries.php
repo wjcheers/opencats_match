@@ -68,6 +68,10 @@ include_once('./lib/Companies.php');
  */
 include_once('./lib/JobOrders.php');
 
+/**
+ * Job Orders library.
+ */
+include_once('./lib/Statistics.php');
 
 /**
  *  Activity Entries Library
@@ -630,8 +634,17 @@ class ActivityEntries
      * @param flag Data Item type flag.
      * @return resultset Activity entries data.
      */
-    public function getAllRegardingByDataItem($dataItemID = NULL, $dataItemType = NULL, $jobOrderID = NULL, $companyID = NULL, $activityType = NULL)
+    public function getAllRegardingByDataItem($dataItemID = NULL, $dataItemType = NULL, $jobOrderID = NULL, $companyID = NULL, $activityType = NULL, $period = NULL, $userID = NULL)
     {
+        $criterion = '';
+        if($period != NULL)
+        {
+            $statistics = new Statistics($this->_siteID);
+            $criterion = $statistics->makePeriodCriterion(
+                'activity.date_modified', $period
+            );
+        }
+
         $select = '';
         $join = '';
         
@@ -646,8 +659,8 @@ class ActivityEntries
             $dataItemTypeCondition = 'AND activity.data_item_type = ' . $dataItemType;
             if($dataItemType == DATA_ITEM_CANDIDATE)
             {
-                $select .= ",CONCAT(candidate.first_name, ' ', candidate.last_name) AS candidateFullName";
-                $join .= 'LEFT JOIN candidate ON candidate.candidate_id = activity.data_item_id';
+                //$select .= ",CONCAT(candidate.first_name, ' ', candidate.last_name) AS candidateFullName";
+                //$join .= 'LEFT JOIN candidate ON candidate.candidate_id = activity.data_item_id';
             }
         }
         $jobOrderCondition = '';
@@ -665,15 +678,25 @@ class ActivityEntries
         {
             $activityCondition = 'AND activity_type.short_description ' . $activityType;
         }
+        $userCondition = '';
+        if($userID != NULL)
+        {
+            $userCondition = 'AND activity.entered_by = ' . $userID;
+        }
+        
         $sql = sprintf(
             "SELECT
                 activity.activity_id AS activityID,
                 activity.data_item_id AS dataItemID,
+                activity.data_item_type AS dataItemType,
                 activity.joborder_id AS jobOrderID,
                 activity.notes AS notes,
                 DATE_FORMAT(
                     activity.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
                 ) AS dateCreated,
+                DATE_FORMAT(
+                    activity.date_modified, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateModified,
                 activity.date_created AS dateCreatedSort,
                 activity.type AS type,
                 activity_type.short_description AS typeDescription,
@@ -681,11 +704,25 @@ class ActivityEntries
                 entered_by_user.first_name AS enteredByFirstName,
                 entered_by_user.last_name AS enteredByLastName,
                 IF(
-                    ISNULL(joborder.title),
-                    'General',
-                    CONCAT(joborder.title, ' (', company.name, ')')
+                    NOT ISNULL(joborder.title) AND (activity.data_item_type = %s),
+                    CONCAT(joborder.title, ' (', company.name, ')'),
+                    IF(
+                        activity.data_item_type = %s,
+                        CONCAT(candidate.first_name, ' ', candidate.last_name),
+                        IF(
+                            NOT ISNULL(company.name) AND (activity.data_item_type = %s),  
+                            company.name,                      
+                            IF(
+                                NOT ISNULL(CONCAT(contact.first_name, contact.last_name)) AND (activity.data_item_type = %s),
+                                CONCAT(contact.first_name, ' ', contact.last_name),
+                                'General'
+                            )
+                        )
+                    )
                 ) AS regarding,
                 joborder.title AS regardingJobTitle,
+                CONCAT(candidate.first_name, ' ', candidate.last_name) AS candidateFullName,
+                CONCAT(contact.first_name, ' ', contact.last_name) AS regardingContactName,
                 company.name AS regardingCompanyName
                 %s
             FROM
@@ -696,8 +733,13 @@ class ActivityEntries
                 ON activity.type = activity_type.activity_type_id
             LEFT JOIN joborder
                 ON activity.joborder_id = joborder.joborder_id
+            LEFT JOIN candidate
+                ON candidate.candidate_id = activity.data_item_id AND activity.data_item_type = %s
             LEFT JOIN company
-                ON joborder.company_id = company.company_id
+                ON (joborder.company_id = company.company_id AND activity.data_item_type = %s) OR
+                   (company.company_id = activity.data_item_id AND activity.data_item_type = %s)
+            LEFT JOIN contact
+                ON contact.contact_id = activity.data_item_id AND activity.data_item_type = %s
             %s
             WHERE
                 activity.site_id = %s
@@ -706,16 +748,28 @@ class ActivityEntries
             %s
             %s
             %s
+            %s
+            %s
             ORDER BY
                 dateCreatedSort ASC",
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
             $select,
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
             $join,
             $this->_siteID,
             $dataItemCondition,
             $dataItemTypeCondition,
             $jobOrderCondition,
             $companyCondition,
-            $activityCondition
+            $activityCondition,
+            $userCondition,
+            $criterion
         );
 
         return $this->_db->getAllAssoc($sql);

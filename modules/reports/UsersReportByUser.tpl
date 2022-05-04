@@ -1,6 +1,7 @@
 <?php /* $Id: PlacedReportByUser.tpl 2336 2007-04-14 22:01:51Z will $ */ ?>
-<?php TemplateUtility::printHeader($this->reportTitle); ?>
+<?php TemplateUtility::printHeader($this->reportTitle, array( 'js/activity.js', 'js/attachment.js')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
+    
     <table>
         <tr>
             <td width="3%">
@@ -10,18 +11,8 @@
         </tr>
     </table>
 
+
     <p class="note">User Report by Date</p>
-    <p>
-    Cold Call: Activities with type: Cold Call<br/>
-    Talked: Activities with type: Talked<br/>
-    Contact: Activities with type: Email, Meeting, Other, Call (LVM), Call (Missed), IM<br/>
-    Created: Created Candidates with Email/Phone/IM<br/>
-    Submitted Person: Submitted Candidates<br/>
-    Submitted: Submitted Pipelines<br/>
-    Interviewing: Interviewing Pipelines<br/>
-    Offered: Offered Pipelines<br/>
-    Placed: Placed Pipelines
-    </p>
 
     <table class="sortable" width="1225">
         <tr>
@@ -65,9 +56,12 @@
             <?php endforeach; ?>
         <?php endforeach; ?>
     </table>
+       
+    <br clear="all" />
+    <br />
     
     <p class="note">Pipelines</p>
-
+    
     <table class="sortable" width="1225">
         <tr>
             <th align="left" nowrap="nowrap">#</th>
@@ -131,4 +125,74 @@
         <?php endforeach; ?>
     </table>
     
+    <br clear="all" />
+    <br />
+    
+    <p class="note">Report Activity</p>
+    
+    <table id="activityTable" class="sortable" width="1225">
+        <tr>
+            <th align="left" width="125">Created</th>
+            <th align="left" width="125">Modified</th>
+            <th align="left" width="90">Type</th>
+            <th align="left" width="90">Entered</th>
+            <th align="left" width="250">Regarding</th>
+            <th align="left">Notes</th>
+        </tr>
+
+        <?php foreach ($this->activityRS as $rowNumber => $activityData): ?>
+            <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
+                <td align="left" valign="top" id="activityDate<?php echo($activityData['activityID']); ?>"><?php $this->_($activityData['dateCreated']) ?></td>
+                <td align="left" valign="top" id="activityDate<?php echo($activityData['activityID']); ?>"><?php $this->_($activityData['dateModified']) ?></td>
+                <td align="left" valign="top" id="activityType<?php echo($activityData['activityID']); ?>"><?php $this->_($activityData['typeDescription']) ?></td>
+                <td align="left" valign="top"><?php $this->_($activityData['enteredByAbbrName']) ?></td>
+                <td align="left" valign="top" id="activityRegarding<?php echo($activityData['activityID']); ?>">                
+                    <?php if ($activityData['dataItemType'] == 100): ?>
+                        <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;candidateID=<?php echo($activityData['dataItemID']); ?>&amp;a=show"><?php $this->_($activityData['regarding']) ?></a>
+                    <?php elseif ($activityData['dataItemType'] == 200): ?>
+                        <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;companyID=<?php echo($activityData['dataItemID']); ?>&amp;a=show"><?php $this->_($activityData['regarding']) ?></a>
+                    <?php elseif ($activityData['dataItemType'] == 300): ?>
+                        <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;contactID=<?php echo($activityData['dataItemID']); ?>&amp;a=show"><?php $this->_($activityData['regarding']) ?></a>
+                    <?php else: ?>
+                        <?php $this->_($activityData['regarding']) ?></a>
+                    <?php endif; ?>                    
+                </td>
+                <td align="left" valign="top" id="activityNotes<?php echo($activityData['activityID']); ?>"><?php echo(nl2br($activityData['notes'])); ?></td>
+                <!--
+                <td align="center" >
+                    <?php if ($this->accessLevel >= ACCESS_LEVEL_EDIT): ?>
+                        <a href="#" id="editActivity<?php echo($activityData['activityID']); ?>" onclick="Activity_editEntry(<?php echo($activityData['activityID']); ?>, <?php echo($activityData['dataItemID']); ?>, <?php echo($activityData['dataItemType']); ?>, '<?php echo($this->sessionCookie); ?>'); return false;">
+                            <img src="images/actions/edit.gif" width="16" height="16" alt="" class="absmiddle" border="0" title="Edit"/>
+                        </a>
+                    <?php endif; ?>
+                    <?php if ($this->accessLevel >= ACCESS_LEVEL_DELETE): ?>
+                        <a href="#" id="deleteActivity<?php echo($activityData['activityID']); ?>" onclick="Activity_deleteEntry(<?php echo($activityData['activityID']); ?>, '<?php echo($this->sessionCookie); ?>'); return false;">
+                            <img src="images/actions/delete.gif" width="16" height="16" alt="" class="absmiddle" border="0" title="Delete"/>
+                        </a>
+                    <?php endif; ?>
+                </td>
+                -->
+            </tr>
+        <?php endforeach; ?>
+    </table>
+    
+    <br clear="all" />
+    <br />
+    
+    <p class="note">Description</p>
+    
+    <p>
+    Cold Call: Activities with type: Cold Call<br/>
+    Talked: Activities with type: Talked<br/>
+    Contact: Activities with type: Email, Meeting, Other, Call (LVM), Call (Missed), IM<br/>
+    Created: Created Candidates with Email/Phone/IM<br/>
+    Submitted Person: Submitted Candidates<br/>
+    Submitted: Submitted Pipelines<br/>
+    Interviewing: Interviewing Pipelines<br/>
+    Offered: Offered Pipelines<br/>
+    Placed: Placed Pipelines
+    </p>
+    
+    
+    <div id="bottomShadow"></div>
 <?php TemplateUtility::printReportFooter(); ?>

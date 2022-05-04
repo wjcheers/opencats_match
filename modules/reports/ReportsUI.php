@@ -30,6 +30,7 @@
 include_once('./lib/Statistics.php');
 include_once('./lib/DateUtility.php');
 include_once('./lib/Candidates.php');
+include_once('./lib/ActivityEntries.php');
 include_once('./lib/CommonErrors.php');
 
 class ReportsUI extends UserInterface
@@ -808,16 +809,14 @@ class ReportsUI extends UserInterface
 
         $UserDateRS = '';
         $statistics = new Statistics($this->_siteID);
-        //$UsersRS = $statistics->getReportUsers($period);
-
-        //foreach ($UserDateRS as $rowIndex => $UsersData)
+        
         if($byday)
         {
             $daycount = 0;
             $dayofweekstring = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
             for(;($daycount + $subdaystart) <= $subdayend;$daycount++)
             {
-                $date = date('Y-m-d', strtotime(($subdaystart+$daycount).' days'));
+                $date = date('m-d-y', strtotime(($subdaystart+$daycount).' days'));
                 $weekday = date('w', strtotime(($subdaystart+$daycount).' days'));
                 $UserDateRS[$daycount]['date'] = $date . ' (' . $dayofweekstring[$weekday] . ')';
 
@@ -838,13 +837,43 @@ class ReportsUI extends UserInterface
         }
         
         $submitRS = $statistics->getSubmitReport($period, $userID);
+
+
+        $activityEntries = new ActivityEntries($this->_siteID);
+        $activityRS = $activityEntries->getAllRegardingByDataItem(NULL, NULL, NULL, NULL, "= 'Report'", $period, $userID);
+        if (!empty($activityRS))
+        {
+            foreach ($activityRS as $rowIndex => $row)
+            {
+                if (empty($activityRS[$rowIndex]['notes']))
+                {
+                    $activityRS[$rowIndex]['notes'] = '(No Notes)';
+                }
+
+                if (empty($activityRS[$rowIndex]['regarding']))
+                {
+                    $activityRS[$rowIndex]['regarding'] = 'General';
+                }
+
+                $activityRS[$rowIndex]['enteredByAbbrName'] = StringUtility::makeInitialName(
+                    $activityRS[$rowIndex]['enteredByFirstName'],
+                    $activityRS[$rowIndex]['enteredByLastName'],
+                    false,
+                    LAST_NAME_MAXLEN
+                );
+            }
+        }
+        
         
         if (!eval(Hooks::get('REPORTS_SHOW_USERS_REPORT_BY_USER'))) return;
 
+        $this->_template->assign('active', $this);
         $this->_template->assign('reportTitle', $reportTitle);
         $this->_template->assign('period', $periodString);
+        $this->_template->assign('activityRS', $activityRS);
         $this->_template->assign('UserDateRS', $UserDateRS);
         $this->_template->assign('submitRS', $submitRS);
+        $this->_template->assign('sessionCookie', $_SESSION['CATS']->getCookie());
         $this->_template->display('./modules/reports/UsersReportByUser.tpl');
     }
 

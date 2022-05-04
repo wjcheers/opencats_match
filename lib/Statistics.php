@@ -1940,7 +1940,7 @@ class Statistics
 
 
     // FIXME: Document me.
-    private function makePeriodCriterion($dateField, $period, $subday = null)
+    public function makePeriodCriterion($dateField, $period, $subday = null)
     {
         /* Note: we add a bogus "AND date > '1900-01-01'" condition to the
          * WHERE clause to force MySQL to use an index containing the date
