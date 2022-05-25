@@ -41,7 +41,7 @@
                         <span id="addActivitySpanA">Activity Type</span><br />
                         <select id="activityTypeID" name="activityTypeID" class="inputbox" style="width: 150px; margin-bottom: 4px;">
                             <option selected="selected" value="<?php echo(ACTIVITY_NOTE); ?>">Note</option>
-                            <option value="<?php echo(ACTIVITY_CALL_COLD); ?>">Call (Cold)</option>
+                            <option value="<?php echo(ACTIVITY_CALL_FIRST); ?>">Call (First)</option>
                             <option value="<?php echo(ACTIVITY_CALL_TALKED); ?>">Call (Talked)</option>
                             <option value="<?php echo(ACTIVITY_CALL_LVM); ?>">Call (LVM)</option>
                             <option value="<?php echo(ACTIVITY_CALL_MISSED); ?>">Call (Missed)</option>

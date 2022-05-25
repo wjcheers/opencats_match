@@ -840,7 +840,7 @@ class ReportsUI extends UserInterface
 
 
         $activityEntries = new ActivityEntries($this->_siteID);
-        $activityRS = $activityEntries->getAllRegardingByDataItem(NULL, NULL, NULL, NULL, "= 'Report'", $period, $userID);
+        $activityRS = $activityEntries->getAllForReportByUser($period, $userID);
         if (!empty($activityRS))
         {
             foreach ($activityRS as $rowIndex => $row)

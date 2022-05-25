@@ -32,9 +32,18 @@
             <?php foreach ($UserData['reportRS'] as $rowNumber => $reportData): ?>
                 <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
                     <td valign="top" align="left">
-                        <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReportByUser&amp;period=<?php $this->_($this->period) ?>&amp;userID=<?php $this->_($UserData['userID']) ?>">
+                        <?php if(($this->period == 'today') ||
+                                 ($this->period == 'yesterday') ||
+                                 ($this->period == 'thisWeek') ||
+                                 ($this->period == 'lastWeek') ||
+                                 ($this->period == 'thisMonth') ||
+                                 ($this->period == 'lastMonth')): ?>
+                            <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReportByUser&amp;period=<?php $this->_($this->period) ?>&amp;userID=<?php $this->_($UserData['userID']) ?>">
+                                <?php $this->_($UserData['ownerFullName']) ?>
+                            </a>
+                        <?php else: ?>
                             <?php $this->_($UserData['ownerFullName']) ?>
-                        </a>
+                        <?php endif; ?>
                     </td>
                     <td valign="top" align="left"><?php $this->_($reportData['createdCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['modifiedCount']) ?>&nbsp;</td>

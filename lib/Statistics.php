@@ -1045,10 +1045,10 @@ class Statistics
             'activity.date_modified', $period, $subday
         );
 
-        // define('ACTIVITY_CALL_COLD',  1300);
+        // define('ACTIVITY_CALL_FIRST',  1300);
         $sql = sprintf(
             "SELECT
-                COUNT(*) AS activityColdCall
+                COUNT(*) AS activityFirstCall
             FROM
                 activity
             WHERE
@@ -1063,7 +1063,7 @@ class Statistics
             $this->_siteID
         );
 
-        $activity_cold_call = $this->_db->getAllAssoc($sql);
+        $activity_first_call = $this->_db->getAllAssoc($sql);
 
         $criterion = $this->makePeriodCriterion(
             'activity.date_modified', $period, $subday
@@ -1096,7 +1096,6 @@ class Statistics
         /*
         define('ACTIVITY_EMAIL',       200);
         define('ACTIVITY_MEETING',     300);
-        define('ACTIVITY_OTHER',       400);
         define('ACTIVITY_CALL_LVM',    600);
         define('ACTIVITY_CALL_MISSED', 700);
         define('ACTIVITY_IM_LINKEDIN',1100);
@@ -1114,7 +1113,6 @@ class Statistics
             AND
                 (activity.type = '200'
                 OR activity.type = '300'
-                OR activity.type = '400'
                 OR activity.type = '600'
                 OR activity.type = '700'
                 OR activity.type = '1100'
@@ -1206,7 +1204,7 @@ class Statistics
         $z[0]['interviewingCount'] = $interviewing_count[0]['interviewingCount'];
         $z[0]['offeredCount'] = $offered_count[0]['offeredCount'];
         $z[0]['placedCount'] = $placed_count[0]['placedCount'];
-        $z[0]['activityColdCall'] = $activity_cold_call[0]['activityColdCall'];
+        $z[0]['activityFirstCall'] = $activity_first_call[0]['activityFirstCall'];
         $z[0]['activityTalked'] = $activity_talked[0]['activityTalked'];
         $z[0]['activityContact'] = $activity_contact[0]['activityContact'];
         $z[0]['activityCount'] = $activity_count[0]['activityCount'];

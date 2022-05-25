@@ -41,7 +41,7 @@ ACTIVITY_CONFIRM     = 900;
 ACTIVITY_DRIFTING    = 1000;
 ACTIVITY_IM_LINKEDIN = 1100;
 ACTIVITY_INTERVIEW   = 1200;
-ACTIVITY_CALL_COLD   = 1300;
+ACTIVITY_CALL_FIRST  = 1300;
 ACTIVITY_NOTE        = 1400;
 ACTIVITY_IM_LINE     = 1500;
 ACTIVITY_IM          = 1600;
@@ -117,10 +117,10 @@ function Activity_fillTypeSelect(selectList, selectedText)
     optionElements[11].value = ACTIVITY_INTERVIEW;
     optionElements[11].appendChild(document.createTextNode('Interview'));
     
-    /* Call (Cold) option. */
+    /* Call (First) option. */
     optionElements[12] = document.createElement('option');
-    optionElements[12].value = ACTIVITY_CALL_COLD;
-    optionElements[12].appendChild(document.createTextNode('Call (Cold)'));
+    optionElements[12].value = ACTIVITY_CALL_FIRST;
+    optionElements[12].appendChild(document.createTextNode('Call (First)'));
     
     /* Note option. */
     optionElements[13] = document.createElement('option');
@@ -193,7 +193,7 @@ function Activity_fillTypeSelect(selectList, selectedText)
         {
             optionElements[11].setAttribute('selected', 'selected');
         }
-        else if (selectedText == 'Call (Cold)')
+        else if (selectedText == 'Call (First)')
         {
             optionElements[12].setAttribute('selected', 'selected');
         }

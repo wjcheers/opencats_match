@@ -18,7 +18,7 @@
         <tr>
             <th align="left" nowrap="nowrap">Date</th>
             <th align="left" nowrap="nowrap">Owner</th>
-            <th align="left" nowrap="nowrap">Cold Call</th>
+            <th align="left" nowrap="nowrap">First Call</th>
             <th align="left" nowrap="nowrap">Talked</th>
             <th align="left" nowrap="nowrap">Contact</th>
             <th align="left" nowrap="nowrap">Activities</th>
@@ -38,7 +38,7 @@
                 <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
                     <td valign="top" align="left"><?php $this->_($UserData['date']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['ownerFullName']) ?>&nbsp;</td>
-                    <td valign="top" align="left"><?php $this->_($reportData['activityColdCall']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($reportData['activityFirstCall']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityTalked']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityContact']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityCount']) ?>&nbsp;</td>
@@ -182,9 +182,9 @@
     <p class="note">Description</p>
     
     <p>
-    Cold Call: Activities with type: Cold Call<br/>
+    First Call: Activities with type: First Call<br/>
     Talked: Activities with type: Talked<br/>
-    Contact: Activities with type: Email, Meeting, Other, Call (LVM), Call (Missed), IM<br/>
+    Contact: Activities with type: Email, Meeting, Call (LVM), Call (Missed), IM<br/>
     Created: Created Candidates with Email/Phone/IM<br/>
     Submitted Person: Submitted Candidates<br/>
     Submitted: Submitted Pipelines<br/>

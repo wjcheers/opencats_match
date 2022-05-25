@@ -42,7 +42,7 @@ define('ACTIVITY_CONFIRM',     900);
 define('ACTIVITY_DRIFTING',   1000);
 define('ACTIVITY_IM_LINKEDIN',1100);
 define('ACTIVITY_INTERVIEW',  1200);
-define('ACTIVITY_CALL_COLD',  1300);
+define('ACTIVITY_CALL_FIRST', 1300);
 define('ACTIVITY_NOTE',       1400);
 define('ACTIVITY_IM_LINE',    1500);
 define('ACTIVITY_IM',         1600);
@@ -775,6 +775,117 @@ class ActivityEntries
         return $this->_db->getAllAssoc($sql);
     }
     
+    /**
+     * Returns all activity entries for report
+     *
+     * @param integer Data Item ID.
+     * @param flag Data Item type flag.
+     * @return resultset Activity entries data.
+     */
+    public function getAllForReportByUser($period = NULL, $userID = NULL)
+    {
+        $criterion = '';
+        if($period != NULL)
+        {
+            $statistics = new Statistics($this->_siteID);
+            $criterion = $statistics->makePeriodCriterion(
+                'activity.date_modified', $period
+            );
+        }
+
+        $activityCondition = "AND (activity_type.short_description = 'Report' OR 
+            activity_type.short_description = 'Call (Talked)' OR 
+            activity_type.short_description = 'Call (First)' OR 
+            activity_type.short_description = 'Call (Missed)' OR 
+            activity_type.short_description = 'Call (LVM)' OR 
+            activity_type.short_description = 'Email' OR 
+            activity_type.short_description = 'Meeting')";
+            
+        $userCondition = '';
+        if($userID != NULL)
+        {
+            $userCondition = 'AND activity.entered_by = ' . $userID;
+        }
+        
+        $sql = sprintf(
+            "SELECT
+                activity.activity_id AS activityID,
+                activity.data_item_id AS dataItemID,
+                activity.data_item_type AS dataItemType,
+                activity.joborder_id AS jobOrderID,
+                activity.notes AS notes,
+                DATE_FORMAT(
+                    activity.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateCreated,
+                DATE_FORMAT(
+                    activity.date_modified, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateModified,
+                activity.date_created AS dateCreatedSort,
+                activity.type AS type,
+                activity_type.short_description AS typeDescription,
+                activity.date_created AS dateCreatedSort,
+                entered_by_user.first_name AS enteredByFirstName,
+                entered_by_user.last_name AS enteredByLastName,
+                IF(
+                    NOT ISNULL(joborder.title) AND (activity.data_item_type = %s),
+                    CONCAT(candidate.first_name, ' ', candidate.last_name, ' (', joborder.title, ' - ', company.name, ')'),
+                    IF(
+                        activity.data_item_type = %s,
+                        CONCAT(candidate.first_name, ' ', candidate.last_name),
+                        IF(
+                            NOT ISNULL(company.name) AND (activity.data_item_type = %s),  
+                            company.name,
+                            IF(
+                                NOT ISNULL(CONCAT(contact.first_name, contact.last_name)) AND (activity.data_item_type = %s),
+                                CONCAT(contact.first_name, ' ', contact.last_name),
+                                'General'
+                            )
+                        )
+                    )
+                ) AS regarding,
+                joborder.title AS regardingJobTitle,
+                CONCAT(candidate.first_name, ' ', candidate.last_name) AS candidateFullName,
+                CONCAT(contact.first_name, ' ', contact.last_name) AS regardingContactName,
+                company.name AS regardingCompanyName
+            FROM
+                activity
+            LEFT JOIN user AS entered_by_user
+                ON activity.entered_by = entered_by_user.user_id
+            LEFT JOIN activity_type
+                ON activity.type = activity_type.activity_type_id
+            LEFT JOIN joborder
+                ON activity.joborder_id = joborder.joborder_id
+            LEFT JOIN candidate
+                ON candidate.candidate_id = activity.data_item_id AND activity.data_item_type = %s
+            LEFT JOIN company
+                ON (joborder.company_id = company.company_id AND activity.data_item_type = %s) OR
+                   (company.company_id = activity.data_item_id AND activity.data_item_type = %s)
+            LEFT JOIN contact
+                ON contact.contact_id = activity.data_item_id AND activity.data_item_type = %s
+            WHERE
+                activity.site_id = %s
+            %s
+            %s
+            %s
+            ORDER BY
+                regarding ASC",
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
+            $this->_siteID,
+            $activityCondition,
+            $userCondition,
+            $criterion
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+
     /**
      * Returns all activity types and their descriptions.
      *
