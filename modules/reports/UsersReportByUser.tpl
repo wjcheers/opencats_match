@@ -60,7 +60,7 @@
     <br clear="all" />
     <br />
     
-    <p class="note">Pipelines</p>
+    <p class="note">Pipelines (Submitted, Interviewing, Offered, Client Declined)</p>
     
     <table class="sortable" width="1225">
         <tr>
@@ -128,7 +128,7 @@
     <br clear="all" />
     <br />
     
-    <p class="note">Report Activity</p>
+    <p class="note">Report Activity (Call, E-Mail, Meeting, IM)</p>
     
     <table id="activityTable" class="sortable" width="1225">
         <tr>

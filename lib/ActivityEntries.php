@@ -799,7 +799,10 @@ class ActivityEntries
             activity_type.short_description = 'Call (Missed)' OR 
             activity_type.short_description = 'Call (LVM)' OR 
             activity_type.short_description = 'Email' OR 
-            activity_type.short_description = 'Meeting')";
+            activity_type.short_description = 'Meeting' OR 
+            activity_type.short_description = 'IM (Linkedin)' OR 
+            activity_type.short_description = 'IM (Line)' OR 
+            activity_type.short_description = 'IM')";
             
         $userCondition = '';
         if($userID != NULL)
