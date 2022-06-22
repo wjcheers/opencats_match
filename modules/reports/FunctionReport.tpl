@@ -15,9 +15,13 @@
         <span style="font: normal normal bold 13px/130% Arial, Tahoma, sans-serif;"><?php $this->_($jobOrderFunctionsData['jobOrderFunctions']) ?></span>
             <?php
                 $companyID = 0;
+                $count = 0;
                 foreach ($jobOrderFunctionsData['jobOrdersRS'] as $rowNumber => $jobOrdersData):
                 if($companyID == $jobOrdersData['companyID'])
                     continue;
+                if($count != 0)
+                    echo("<span> | </span>");
+                $count++;
                 $companyID = $jobOrdersData['companyID'];?>
                 <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=show&amp;companyID=<?php $this->_($jobOrdersData['companyID']) ?>" target="_blank"><?php $jobOrdersData['companyShortName'] ? $this->_($jobOrdersData['companyShortName']) : $this->_($jobOrdersData['companyName']) ?></a>
             <?php endforeach; ?>
