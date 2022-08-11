@@ -161,6 +161,7 @@ CREATE TABLE `candidate` (
   `is_submitted` int(1) default NULL,
   `is_attachment` int(1) default NULL,
   `is_interviewed` int(1) default NULL,
+  `is_offered` int(1) default NULL,
   `chinese_name` varchar(64) default NULL,
   `job_title` varchar(256) default NULL,
   `extra_gender` varchar(32) default NULL,
