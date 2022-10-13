@@ -1093,9 +1093,32 @@ class Statistics
             'activity.date_modified', $period, $subday
         );
 
+        // define('ACTIVITY_MEETING', 300);
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS activityMeeting
+            FROM
+                activity
+            WHERE
+                activity.entered_by = %s
+            %s
+            AND
+                activity.type = '300'
+            AND
+                activity.site_id = %s",
+            $userID,
+            $criterion,
+            $this->_siteID
+        );
+
+        $activity_meeting = $this->_db->getAllAssoc($sql);
+
+        $criterion = $this->makePeriodCriterion(
+            'activity.date_modified', $period, $subday
+        );
+
         /*
         define('ACTIVITY_EMAIL',       200);
-        define('ACTIVITY_MEETING',     300);
         define('ACTIVITY_CALL_LVM',    600);
         define('ACTIVITY_CALL_MISSED', 700);
         define('ACTIVITY_IM_LINKEDIN',1100);
@@ -1112,7 +1135,6 @@ class Statistics
             %s
             AND
                 (activity.type = '200'
-                OR activity.type = '300'
                 OR activity.type = '600'
                 OR activity.type = '700'
                 OR activity.type = '1100'
@@ -1206,6 +1228,7 @@ class Statistics
         $z[0]['placedCount'] = $placed_count[0]['placedCount'];
         $z[0]['activityFirstCall'] = $activity_first_call[0]['activityFirstCall'];
         $z[0]['activityTalked'] = $activity_talked[0]['activityTalked'];
+        $z[0]['activityMeeting'] = $activity_meeting[0]['activityMeeting'];
         $z[0]['activityContact'] = $activity_contact[0]['activityContact'];
         $z[0]['activityCount'] = $activity_count[0]['activityCount'];
         /*

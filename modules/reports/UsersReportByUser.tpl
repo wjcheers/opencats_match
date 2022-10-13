@@ -20,6 +20,7 @@
             <th align="left" nowrap="nowrap">Owner</th>
             <th align="left" nowrap="nowrap">First Call</th>
             <th align="left" nowrap="nowrap">Talked</th>
+            <th align="left" nowrap="nowrap">Meeting</th>
             <th align="left" nowrap="nowrap">Contact</th>
             <th align="left" nowrap="nowrap">Activities</th>
             <th align="left" nowrap="nowrap">Created</th>
@@ -40,6 +41,7 @@
                     <td valign="top" align="left"><?php $this->_($reportData['ownerFullName']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityFirstCall']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityTalked']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($reportData['activityMeeting']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityContact']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['createdCount']) ?>&nbsp;</td>
@@ -184,6 +186,7 @@
     <p>
     First Call: Activities with type: First Call<br/>
     Talked: Activities with type: Talked<br/>
+    Meeting: Activities with type: Meeting, include face to face meeting and video meeting<br/>
     Contact: Activities with type: Email, Meeting, Call (LVM), Call (Missed), IM<br/>
     Created: Created Candidates with Email/Phone/IM<br/>
     Submitted Person: Submitted Candidates<br/>
