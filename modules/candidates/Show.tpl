@@ -177,7 +177,7 @@
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>                         
                                     <td class="data">
                                         <?php if(substr($this->extraFieldRS[$i]['display'], 0, 4) == 'http'): ?>
-                                            <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
+                                            <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank" style="word-break: break-all;"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
                                         <?php else: ?>
                                         <?php echo($this->extraFieldRS[$i]['display']); ?>
                                         <?php endif; ?>
@@ -335,7 +335,7 @@
                                 <td class="vertical">Link1:</td>
                                 <td class="data">
                                     <?php if (!empty($this->data['link1'])): ?>
-                                        <a href="<?php $this->_($this->data['link1']); ?>" target="_blank"><?php $this->_($this->data['link1']); ?></a>
+                                        <a href="<?php $this->_($this->data['link1']); ?>" target="_blank" style="word-break: break-all;"><?php $this->_($this->data['link1']); ?></a>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -343,7 +343,7 @@
                                 <td class="vertical">Link2:</td>
                                 <td class="data">
                                     <?php if (!empty($this->data['link2'])): ?>
-                                        <a href="<?php $this->_($this->data['link2']); ?>" target="_blank"><?php $this->_($this->data['link2']); ?></a>
+                                        <a href="<?php $this->_($this->data['link2']); ?>" target="_blank" style="word-break: break-all;"><?php $this->_($this->data['link2']); ?></a>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -351,7 +351,7 @@
                                 <td class="vertical">Link3:</td>
                                 <td class="data">
                                     <?php if (!empty($this->data['link3'])): ?>
-                                        <a href="<?php $this->_($this->data['link3']); ?>" target="_blank"><?php $this->_($this->data['link3']); ?></a>
+                                        <a href="<?php $this->_($this->data['link3']); ?>" target="_blank" style="word-break: break-all;"><?php $this->_($this->data['link3']); ?></a>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -381,7 +381,7 @@
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>
                                     <td class="data">
                                         <?php if(substr($this->extraFieldRS[$i]['display'], 0, 4) == 'http'): ?>
-                                            <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
+                                            <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank" style="word-break: break-all;"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
                                         <?php else: ?>
                                         <?php echo($this->extraFieldRS[$i]['display']); ?>
                                         <?php endif; ?>
