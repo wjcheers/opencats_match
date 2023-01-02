@@ -53,10 +53,6 @@
                     <td valign="top" align="left"><?php $this->_($reportData['offeredCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['placedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityCount']) ?>&nbsp;</td>
-                    <!--
-                    <td valign="top" align="left"><?php $this->_($reportData['companyCount']) ?>&nbsp;</td>
-                    <td valign="top" align="left"><?php $this->_($reportData['contactCount']) ?>&nbsp;</td>
-                    -->
                 </tr>
             <?php endforeach; ?>
         <?php endforeach; ?>
