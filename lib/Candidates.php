@@ -966,6 +966,12 @@ class Candidates
                 OR candidate.twitter like %s
                 OR candidate.cakeresume like %s
                 OR candidate.cakeresume like %s
+                OR candidate.cakeresume like %s
+                OR candidate.cakeresume like %s
+                OR candidate.cakeresume like %s
+                OR candidate.cakeresume like %s
+                OR candidate.cakeresume like %s
+                OR candidate.cakeresume like %s
                 OR candidate.link1 like %s
                 OR candidate.link1 like %s
                 OR candidate.link2 like %s
@@ -989,6 +995,18 @@ class Candidates
             $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
             $encLink4Query,
             $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
+            str_replace(array('cakeresume.com/me/', 'cakeresume.com/search/', 'cakeresume.com/', 'cakeresume.com/resumes/resumes/'), 'cakeresume.com/resumes/', $encLink4Query),
+            $this->_db->makeQueryString('%' . trim(urlDecode(
+                str_replace(array('cakeresume.com/me/', 'cakeresume.com/search/', 'cakeresume.com/', 'cakeresume.com/resumes/resumes/'), 'cakeresume.com/resumes/', $link)
+            )) . '%'),
+            str_replace(array('cakeresume.com/me/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/search/search/'), 'cakeresume.com/search/', $encLink4Query),
+            $this->_db->makeQueryString('%' . trim(urlDecode(
+                str_replace(array('cakeresume.com/me/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/search/search/'), 'cakeresume.com/search/', $link)
+            )) . '%'),
+            str_replace(array('cakeresume.com/search/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/me/me/'), 'cakeresume.com/me/', $encLink4Query),
+            $this->_db->makeQueryString('%' . trim(urlDecode(
+                str_replace(array('cakeresume.com/search/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/me/me/'), 'cakeresume.com/me/', $link)
+            )) . '%'),
             $encLink4Query,
             $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
             $encLink4Query,
@@ -1072,7 +1090,16 @@ class Candidates
                 if (!empty($field['cakeresume']))
                 {
                     $parsedUrl = parse_url(urlDecode(rtrim($field['cakeresume'], '/')));
-                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && !empty(rtrim($parsedUrl['path'], '/')) &&  strpos($link, rtrim($parsedUrl['path'], '/')) !== false) {
+                    // remove the ending '/portfolios'
+                    $parsedUrl['path'] = rtrim($parsedUrl['path'], '/portfolios');
+                    // remove /resumes/, /me/, /search/
+                    $parsedUrl['path'] = str_replace('/search/', '', $parsedUrl['path']);
+                    $parsedUrl['path'] = str_replace('/me/', '', $parsedUrl['path']);
+                    $parsedUrl['path'] = str_replace('/resumes/', '', $parsedUrl['path']);
+
+                    //return 'ilii: ' . $parsedUrl['path'] . ' link: ' . $link;
+                    if (!empty($parsedUrl) && !empty($parsedUrl['path']) && !empty(rtrim($parsedUrl['path'], '/')) &&
+                        (stripos($link, rtrim($parsedUrl['path'], '/')) !== false)) {
                         return $field['candidateID'];                
                     }
                 }
