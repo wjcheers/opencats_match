@@ -74,6 +74,12 @@
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
+							<tr class="oddTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompaniesReport&amp;period=today" target="_blank">Companies Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
                         </table>
                     </td>
 

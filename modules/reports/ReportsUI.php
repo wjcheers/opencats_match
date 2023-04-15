@@ -72,6 +72,10 @@ class ReportsUI extends UserInterface
                 $this->showFunctionReport();
                 break;
 
+            case 'showCompaniesReport':
+                $this->showCompaniesReport();
+                break;
+
             case 'showPlacementReport':
                 $this->showPlacementReport();
                 break;
@@ -521,6 +525,37 @@ class ReportsUI extends UserInterface
         $this->_template->assign('reportTitle', $reportTitle);
         $this->_template->assign('jobOrderFunctionsRS', $jobOrderFunctionsRS);
         $this->_template->display('./modules/reports/FunctionReport.tpl');
+    }
+
+    private function showCompaniesReport()
+    {
+        //FIXME: getTrimmedInput
+        if (isset($_GET['period']) && !empty($_GET['period']))
+        {
+            $period = $_GET['period'];
+        }
+        else
+        {
+            $period = '';
+        }
+
+        switch ($period)
+        {
+            case 'today':
+            default:
+                $period = TIME_PERIOD_TODAY;
+                $reportTitle = 'Today\'s Report';
+                break;
+        }
+
+        $statistics = new Statistics($this->_siteID);
+        $companiesRS = $statistics->getCompanies($period);
+
+        if (!eval(Hooks::get('REPORTS_SHOW_COMPANY'))) return;
+
+        $this->_template->assign('reportTitle', $reportTitle);
+        $this->_template->assign('companiesRS', $companiesRS);
+        $this->_template->display('./modules/reports/CompaniesReport.tpl');
     }
 
     private function showOfferReport()

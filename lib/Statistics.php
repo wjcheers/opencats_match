@@ -665,7 +665,60 @@ class Statistics
 
         return $this->_db->getAllAssoc($sql);
     }
-    
+
+
+    /**
+     * Returns all companies.
+     *
+     * @return integer candidate count
+     */
+    public function getCompanies()
+    {
+        $sql = sprintf(
+            "SELECT
+                company.company_id AS companyID,
+                extraStatus.value AS companyStatus,
+                CONCAT(
+                    owner_user.first_name, ' ', owner_user.last_name
+                ) AS ownerFullName,
+                DATE_FORMAT(
+                    company.date_modified, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateModifieded,
+                company.name AS companyName,
+                extraShortName.value AS companyShortName,
+                extraNotes.value AS companyUpdatedNotes
+            FROM
+                company
+            LEFT JOIN user AS owner_user
+                ON owner_user.user_id = company.owner
+            LEFT JOIN extra_field AS extraNotes
+                ON extraNotes.data_item_id = company.company_id
+                    AND extraNotes.data_item_type = %s
+                    AND extraNotes.field_name = 'Updated Notes'
+            LEFT JOIN extra_field AS extraStatus
+                ON extraStatus.data_item_id = company.company_id
+                    AND extraStatus.data_item_type = %s
+                    AND extraStatus.field_name = 'Status'
+            LEFT JOIN extra_field AS extraShortName
+                ON extraShortName.data_item_id = company.company_id
+                    AND extraShortName.data_item_type = %s
+                    AND extraShortName.field_name = 'Short Name'
+            WHERE
+                extraStatus.value = 'Active'
+            AND
+                company.site_id = %s
+            ORDER BY
+                owner_user.user_name ASC",
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_COMPANY,
+            $this->_siteID
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+
+
     /**
      * Returns all job orders with offers created in the given period.
      *
