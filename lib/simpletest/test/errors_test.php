@@ -45,7 +45,7 @@
         var $_old;
         
         function setUp() {
-            $this->_old = error_reporting(E_ALL);
+            $this->_old = error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
             set_error_handler('simpleTestErrorHandler');
         }
         
@@ -69,7 +69,7 @@
         var $_old;
         
         function setUp() {
-            $this->_old = error_reporting(E_ALL);
+            $this->_old = error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
         }
         
         function tearDown() {
@@ -77,25 +77,25 @@
         }
         
         function testDefaultWhenAllReported() {
-            error_reporting(E_ALL);
+            error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
             trigger_error('Ouch!');
             $this->assertError('Ouch!');
         }
         
         function testNoticeWhenReported() {
-            error_reporting(E_ALL);
+            error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
             trigger_error('Ouch!', E_USER_NOTICE);
             $this->assertError('Ouch!');
         }
         
         function testWarningWhenReported() {
-            error_reporting(E_ALL);
+            error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
             trigger_error('Ouch!', E_USER_WARNING);
             $this->assertError('Ouch!');
         }
         
         function testErrorWhenReported() {
-            error_reporting(E_ALL);
+            error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
             trigger_error('Ouch!', E_USER_ERROR);
             $this->assertError('Ouch!');
         }
@@ -119,19 +119,19 @@
         }
         
         function testNoticeSuppressedWhenReported() {
-            error_reporting(E_ALL);
+            error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
             @trigger_error('Ouch!', E_USER_NOTICE);
             $this->assertNoErrors();
         }
         
         function testWarningSuppressedWhenReported() {
-            error_reporting(E_ALL);
+            error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
             @trigger_error('Ouch!', E_USER_WARNING);
             $this->assertNoErrors();
         }
         
         function testErrorSuppressedWhenReported() {
-            error_reporting(E_ALL);
+            error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
             @trigger_error('Ouch!', E_USER_ERROR);
             $this->assertNoErrors();
         }
