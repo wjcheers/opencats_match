@@ -24,7 +24,7 @@
             <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
                 <td valign="top" align="left" width="255px">
                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=show&amp;companyID=<?php echo($companyData['companyID']) ?>" target="_blank">
-                        <?php echo $companyData['companyShortName'] ? $this->_($companyData['companyShortName']) : $this->_($companyData['companyName']); ?>
+                        <?php $this->_($companyData['companyName']) ?>
                     </a>
                     &nbsp;
                 </td>                
