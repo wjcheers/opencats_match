@@ -857,7 +857,7 @@ class ReportsUI extends UserInterface
 
                 /* Querys inside loops are bad, but I don't think there is any avoiding this. */
                 $UserDateRS[$daycount]['reportRS'] = $statistics->getReportByUser(
-                    $period, $userID, $subdaystart+$daycount
+                    $period, $userID, (string)($subdaystart+$daycount)
                 );
             }
         }

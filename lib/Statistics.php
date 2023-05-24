@@ -2121,7 +2121,7 @@ class Statistics
                 break;
         }
         
-        if($subday && $subday != '')
+        if(!is_null($subday) && $subday != '')
         {
             $criteria = sprintf(
                 '%s AND DATE(%s) = DATE(DATE_ADD(CURDATE(),  INTERVAL %s day))',
