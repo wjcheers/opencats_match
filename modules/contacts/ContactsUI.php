@@ -150,6 +150,14 @@ class ContactsUI extends UserInterface
                 $this->downloadVCard();
                 break;
 
+            case 'emailContact':
+                $this->onEmailContacts($_GET['contactID']);
+                break;
+
+            case 'emailContacts':
+                $this->onEmailContacts();
+                break;
+
             /* Main contacts page. */
             case 'listByView':
             default:
@@ -430,6 +438,15 @@ class ContactsUI extends UserInterface
             $privledgedUser = true;
         }
 
+        if(!empty($_SESSION['CATS']->getGmailPassword()) && $_SESSION['CATS']->getGmailPassword() !== 0 && !empty($_SESSION['CATS']->getEmail()) && $_SESSION['CATS']->getEmail() !== 0)
+        {
+            $canMail = true;
+        }
+        else
+        {
+            $canMail = false;
+        }
+
         $this->_template->assign('active', $this);
         $this->_template->assign('data', $data);
         $this->_template->assign('isShortNotes', $isShortNotes);
@@ -440,6 +457,7 @@ class ContactsUI extends UserInterface
         $this->_template->assign('contactID', $contactID);
         $this->_template->assign('privledgedUser', $privledgedUser);
         $this->_template->assign('sessionCookie', $_SESSION['CATS']->getCookie());
+        $this->_template->assign('canMail', $canMail);
 
         if (!eval(Hooks::get('CONTACTS_SHOW'))) return;
 
@@ -1270,6 +1288,149 @@ class ContactsUI extends UserInterface
         if (!eval(Hooks::get('CONTACTS_GET_VCARD'))) return;
 
         $vCard->printVCardWithHeaders();
+    }
+
+
+    /*
+     * Sends mass emails from the datagrid
+     */
+    private function onEmailContacts($contactID = -1)
+    {
+        if ($this->_accessLevel == ACCESS_LEVEL_DEMO)
+        {
+            CommonErrors::fatal(COMMONERROR_PERMISSION, $this, 'Sorry, but demo accounts are not allowed to send e-mails.');
+        }
+
+        if (isset($_POST['postback']))
+        {
+            $emailTo = $_POST['emailTo'];
+            $firstTo = $_POST['firstTo'];
+            $lastTo = $_POST['lastTo'];
+            $fullTo = $_POST['fullTo'];
+            $emailSubject = $_POST['emailSubject'];
+            $emailBody = $_POST['emailBody'];
+
+            $tmpDestination = explode(', ', $emailTo);
+            $firstDestination = explode(', ', $firstTo);
+            $lastDestination = explode(', ', $lastTo);
+            $fullDestination = explode(', ', $fullTo);
+            
+            if(!empty($_SESSION['CATS']->getGmailPassword()) && $_SESSION['CATS']->getGmailPassword() !== 0 && !empty($_SESSION['CATS']->getEmail()) && $_SESSION['CATS']->getEmail() !== 0)
+            {
+                $mailer = new Mailer(CATS_ADMIN_SITE, -1, $_SESSION['CATS']->getEmail(), $_SESSION['CATS']->getGmailPassword());
+            }
+            else
+            {
+                $mailer = new Mailer(CATS_ADMIN_SITE);
+            }
+            
+            $stringsToFind = array(
+                '%CONTACTFIRSTNAME%',
+                '%CONTACTLASTNAME%',
+                '%CONTACTFULLNAME%'
+            );
+
+            $i = 0;
+            $mailerStatus = 1;
+            foreach($tmpDestination as $emailDest)
+            {
+                $destination = array($emailDest, $emailDest);
+                
+                $replacementStrings = array(
+                    $firstDestination[$i],
+                    $lastDestination[$i],
+                    $fullDestination[$i]
+                );
+                $emailSubjectReplaced = str_replace(
+                    $stringsToFind,
+                    $replacementStrings,
+                    $emailSubject
+                );
+                $emailBodyReplaced = str_replace(
+                    $stringsToFind,
+                    $replacementStrings,
+                    $emailBody
+                );
+                
+                // FIXME: Use sendToOne()?
+                $mailerStatus = $mailer->send(
+                    array($_SESSION['CATS']->getEmail(), $_SESSION['CATS']->getEmail()),
+                    array($destination),
+                    $emailSubjectReplaced,
+                    $emailBodyReplaced,
+                    true,
+                    true
+                );
+                $i++;
+            }
+
+
+            $this->_template->assign('active', $this);
+            $this->_template->assign('success', true);
+            $this->_template->assign('success_to', $emailTo);
+            if($mailerStatus == 0) {
+                $this->_template->assign('message', $mailer->getError());
+            }
+            else {
+                $this->_template->assign('message', 'Success');
+            }
+            $this->_template->display('./modules/contacts/SendEmail.tpl');
+        }
+        else
+        {
+            if($contactID == -1)
+            {
+                $dataGrid = DataGrid::getFromRequest();
+
+                $contactIDs = $dataGrid->getExportIDs();
+            }
+            else
+            {
+                $contactIDs = array($contactID);
+            }
+
+            /* Validate each ID */
+            foreach ($contactIDs as $index => $contactID)
+            {
+                if (!$this->isRequiredIDValid($index, $contactIDs))
+                {
+                    CommonErrors::fatalModal(COMMONERROR_BADINDEX, $this, 'Invalid contact ID.');
+                    return;
+                }
+            }
+
+            $db_str = implode(", ", $contactIDs);
+
+            $db = DatabaseConnection::getInstance();
+
+            $rs = $db->getAllAssoc(sprintf(
+                "SELECT contact_id, first_name AS firstName, last_name AS lastName, CONCAT(first_name, ' ', last_name) AS contactFullName, 
+                email1, email2 "
+                . 'FROM contact '
+                . 'WHERE contact_id IN (%s)',
+                $db_str
+            ));
+
+            $user = $db->getAllAssoc(sprintf(            
+                "SELECT
+                    user.user_name AS username,
+                    user.greeting_message_name AS greetingMessageName,
+                    user.greeting_message_title AS greetingMessageTitle,
+                    user.greeting_message_body AS greetingMessageBody
+                FROM
+                    user
+                WHERE
+                    user.user_id = %s",
+                $this->_userID
+            ));
+            
+            //$this->_template->assign('privledgedUser', $privledgedUser);
+            $this->_template->assign('active', $this);
+            $this->_template->assign('success', false);
+            $this->_template->assign('recipients', $rs);
+            $this->_template->assign('user', $user);
+            $this->_template->display('./modules/contacts/SendEmail.tpl');
+        }
     }
 
 

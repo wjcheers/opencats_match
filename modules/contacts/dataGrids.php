@@ -81,6 +81,14 @@ class ContactsListByViewDataGrid extends ContactsDataGrid
         $html .= $this->getInnerActionAreaItemPopup('Add To List', CATSUtility::getIndexName().'?m=lists&amp;a=addToListFromDatagridModal&amp;dataItemType='.DATA_ITEM_CONTACT, 750, 550);
         //$html .= $this->getInnerActionAreaItem('Export', CATSUtility::getIndexName().'?m=export&amp;a=exportByDataGrid');
 
+        if(MAIL_MAILER != 0)
+        {
+            if(!empty($_SESSION['CATS']->getGmailPassword()) && $_SESSION['CATS']->getGmailPassword() !== 0 && !empty($_SESSION['CATS']->getEmail()) && $_SESSION['CATS']->getEmail() !== 0)
+            {
+                $html .= $this->getInnerActionAreaItem('Send E-Mail', CATSUtility::getIndexName().'?m=contacts&amp;a=emailContacts');
+            }
+        }
+
         $html .= parent::getInnerActionArea();
 
         return $html;
@@ -134,6 +142,14 @@ class contactSavedListByViewDataGrid extends ContactsDataGrid
 
         $html .= $this->getInnerActionAreaItem('Remove From This List', CATSUtility::getIndexName().'?m=lists&amp;a=removeFromListDatagrid&amp;dataItemType='.DATA_ITEM_CONTACT.'&amp;savedListID='.$this->getMiscArgument(), false);
         //$html .= $this->getInnerActionAreaItem('Export', CATSUtility::getIndexName().'?m=export&amp;a=exportByDataGrid');
+
+        if(MAIL_MAILER != 0)
+        {
+            if(!empty($_SESSION['CATS']->getGmailPassword()) && $_SESSION['CATS']->getGmailPassword() !== 0 && !empty($_SESSION['CATS']->getEmail()) && $_SESSION['CATS']->getEmail() !== 0)
+            {
+                $html .= $this->getInnerActionAreaItem('Send E-Mail', CATSUtility::getIndexName().'?m=contacts&amp;a=emailContacts');
+            }
+        }
 
         $html .= parent::getInnerActionArea();
 

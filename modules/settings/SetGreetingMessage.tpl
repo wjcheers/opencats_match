@@ -17,10 +17,15 @@
 
             <p class="note">Set Mail Template</p>
 
+            <p>Candidate:</p>
             <p>%CANDFIRSTNAME% => First Name</BR>
             %CANDLASTNAME%  => Last Name</BR>
             %CANDFULLNAME%  => Full Name</BR>
             %CANDCHNAME%    => Chinese Name</p>
+            <p>Contact:</p>
+            <p>%CONTACTFIRSTNAME% => First Name</BR>
+            %CONTACTLASTNAME%  => Last Name</BR>
+            %CONTACTFULLNAME%  => Full Name</p>
             
             <form name="setGreetingMessageForm" id="setGreetingMessageForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=setGreetingMessage" method="post">
                 <input type="hidden" name="postback" id="postback" value="postback" />

@@ -199,3 +199,117 @@ function checkSearchCompanyName()
 
     return errorMessage;
 }
+
+function checkEmailForm(form)
+{
+    var errorMessage = '';
+
+    errorMessage += checkEmailSubject();
+    errorMessage += checkEmailBody();
+
+    if (errorMessage != '')
+    {
+        alert("Form Error:\n" + errorMessage);
+        return false;
+    }
+
+    return true;
+}
+
+
+function checkEmailSubject()
+{
+    var errorMessage = '';
+
+    fieldValue = document.getElementById('emailSubject').value;
+    fieldLabel = document.getElementById('emailSubjectLabel');
+
+    if (fieldValue == '')
+    {
+        errorMessage = "    - You must enter a subject for your e-mail.\n";
+
+        fieldLabel.style.color = '#ff0000';
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+
+function checkEmailBody()
+{
+    var errorMessage = '';
+
+    fieldValue = '';
+    emailBodyParentElement = document.getElementById('emailBody').parentElement;
+    mceEditorIframe = getElementsByAttribute(emailBodyParentElement, 'class', "mceEditorIframe");
+    if (mceEditorIframe.length > 0) {
+        innerDoc = (mceEditorIframe[0].contentDocument) ? mceEditorIframe[0].contentDocument : mceEditorIframe[0].contentWindow.document;
+        if(innerDoc) {
+            bodyElements = innerDoc.getElementsByClassName('mceContentBody');
+            if (bodyElements.length > 0) {
+                fieldValue = bodyElements[0].innerHTML;
+            }
+        }
+    }
+    fieldLabel = document.getElementById('emailBodyLabel');
+
+    if (fieldValue == '')
+    {
+        errorMessage = "    - You must enter a body for your e-mail.\n";
+
+        fieldLabel.style.color = '#ff0000';
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+
+var getElementsByAttribute = function (el, attr, value) {
+    var match = [];
+
+    /* Get the droids we're looking for*/
+    var elements = el.getElementsByTagName("*");
+
+    /* Loop through all elements */
+    for (var ii = 0, ln = elements.length; ii < ln; ii++) {
+
+        if (elements[ii].hasAttribute(attr)) {
+
+            /* If a value was passed, make sure it matches the element's */
+            if (value) {
+
+                if (elements[ii].getAttribute(attr) === value) {
+                    match.push(elements[ii]);
+                }
+            } else {
+                /* Else, simply push it */
+                match.push(elements[ii]);
+            }
+        }
+    }
+    return match;
+};
+
+function loadMailTemplate(no)
+{
+    document.getElementById('emailSubject').value = document.getElementById('greetingMessageTitle' + no).innerHTML;
+    
+    fieldValue = '';
+    emailBodyParentElement = document.getElementById('emailBody').parentElement;
+    mceEditorIframe = getElementsByAttribute(emailBodyParentElement, 'class', "mceEditorIframe");
+    if (mceEditorIframe.length > 0) {
+        innerDoc = (mceEditorIframe[0].contentDocument) ? mceEditorIframe[0].contentDocument : mceEditorIframe[0].contentWindow.document;
+        if(innerDoc) {
+            bodyElements = innerDoc.getElementsByClassName('mceContentBody');
+            fieldValue = bodyElements[0].innerHTML = document.getElementById('greetingMessageBody' + no).innerHTML;
+        }
+    }
+    fieldLabel = document.getElementById('emailBodyLabel');
+}
+

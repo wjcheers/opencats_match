@@ -115,7 +115,11 @@
                             </tr>
 
                             <tr>
-                                <td class="vertical">E-Mail:</td>
+                                <td class="vertical">E-Mail:
+                                    <?php if ((($this->data['email1'] != '') || ($this->data['email2'] != "")) && $this->canMail) : ?>
+                                        <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;a=emailContact&amp;contactID=<?php echo($this->contactID); ?>">Template</a>
+                                    <?php endif; ?>
+                                </td>
                                 <td class="data">
                                     <a href="mailto:<?php $this->_($this->data['email1']); ?>"><?php $this->_($this->data['email1']); ?></a>
                                 </td>
