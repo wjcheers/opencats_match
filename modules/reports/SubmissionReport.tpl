@@ -17,10 +17,10 @@
         <br />
         <table class="sortable" width="1225">
             <tr>
-                <th align="left" nowrap="nowrap">First Name</th>
-                <th align="left" nowrap="nowrap">Last Name</th>
-                <th align="left" nowrap="nowrap">Candidate Owner</th>
-                <th align="left" nowrap="nowrap">Date Submitted</th>
+                <th align="left" nowrap="nowrap" width="25%">First Name</th>
+                <th align="left" nowrap="nowrap" width="25%">Last Name</th>
+                <th align="left" nowrap="nowrap" width="25%">Candidate Owner</th>
+                <th align="left" nowrap="nowrap" width="25%">Date Submitted</th>
             </tr>
 
             <?php foreach ($submissionJobOrdersData['submissionsRS'] as $rowNumber => $submissionsData): ?>

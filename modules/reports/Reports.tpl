@@ -41,40 +41,46 @@
                             </tr>
                             <tr class="oddTableRow">
                                 <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPipelineReport&amp;period=today" target="_blank">New Pipelines</a>
+                                </td>
+                                <td align="right"><?php $this->_($this->statisticsData['pipelinesToday']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmissionReport&amp;period=today" target="_blank">New Submissions</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['submissionsToday']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=today" target="_blank">New Placements</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['placementsToday']); ?>&nbsp;&nbsp;</td>
                             </tr>
-                            <tr class="oddTableRow">
+                            <tr class="evenTableRow">
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsToday']); ?>&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=today" target="_blank">Submit Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="oddTableRow">
+							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=today" target="_blank">User Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showFunctionReport&amp;period=today" target="_blank">Function Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="oddTableRow">
+							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompaniesReport&amp;period=today" target="_blank">Companies Reports</a>
                                 </td>
@@ -105,28 +111,34 @@
                             </tr>
                             <tr class="oddTableRow">
                                 <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPipelineReport&amp;period=yesterday" target="_blank">New Pipelines</a>
+                                </td>
+                                <td align="right"><?php $this->_($this->statisticsData['pipelinesYesterday']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmissionReport&amp;period=yesterday" target="_blank">New Submissions</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['submissionsYesterday']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=yesterday" target="_blank">New Placements</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['placementsYesterday']); ?>&nbsp;&nbsp;</td>
                             </tr>
-                            <tr class="oddTableRow">
+                            <tr class="evenTableRow">
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsYesterday']); ?>&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=yesterday" target="_blank">Submit Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="oddTableRow">
+							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=yesterday" target="_blank">User Reports</a>
                                 </td>
@@ -157,28 +169,34 @@
                             </tr>
                             <tr class="oddTableRow">
                                 <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPipelineReport&amp;period=thisWeek" target="_blank">New Pipelines</a>
+                                </td>
+                                <td align="right"><?php $this->_($this->statisticsData['pipelinesThisWeek']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmissionReport&amp;period=thisWeek" target="_blank">New Submissions</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['submissionsThisWeek']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=thisWeek" target="_blank">New Placements</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['placementsThisWeek']); ?>&nbsp;&nbsp;</td>
                             </tr>
-                            <tr class="oddTableRow">
+                            <tr class="evenTableRow">
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsThisWeek']); ?>&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=thisWeek" target="_blank">Submit Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="oddTableRow">
+							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=thisWeek" target="_blank">User Reports</a>
                                 </td>
@@ -211,29 +229,35 @@
                             </tr>
                             <tr class="oddTableRow">
                                 <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPipelineReport&amp;period=lastWeek" target="_blank">New Pipelines</a>
+                                </td>
+                                <td align="right"><?php $this->_($this->statisticsData['pipelinesLastWeek']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmissionReport&amp;period=lastWeek" target="_blank">New Submissions</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['submissionsLastWeek']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=lastWeek" target="_blank">New Placements</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['placementsLastWeek']); ?>&nbsp;&nbsp;</td>
                             </tr>
-                            <tr class="oddTableRow">
+                            <tr class="evenTableRow">
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsLastWeek']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=lastWeek" target="_blank">Submit Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="oddTableRow">
+							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=lastWeek" target="_blank">User Reports</a>
                                 </td>
@@ -264,28 +288,34 @@
                             </tr>
                             <tr class="oddTableRow">
                                 <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPipelineReport&amp;period=thisMonth" target="_blank">New Pipelines</a>
+                                </td>
+                                <td align="right"><?php $this->_($this->statisticsData['pipelinesThisMonth']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmissionReport&amp;period=thisMonth" target="_blank">New Submissions</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['submissionsThisMonth']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=thisMonth" target="_blank">New Placements</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['placementsThisMonth']); ?>&nbsp;&nbsp;</td>
                             </tr>
-                            <tr class="oddTableRow">
+                            <tr class="evenTableRow">
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsThisMonth']); ?>&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=thisMonth" target="_blank">Submit Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="oddTableRow">
+							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=thisMonth" target="_blank">User Reports</a>
                                 </td>
@@ -316,28 +346,34 @@
                             </tr>
                             <tr class="oddTableRow">
                                 <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPipelineReport&amp;period=lastMonth" target="_blank">New Pipelines</a>
+                                </td>
+                                <td align="right"><?php $this->_($this->statisticsData['pipelinesLastMonth']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmissionReport&amp;period=lastMonth" target="_blank">New Submissions</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['submissionsLastMonth']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=lastMonth" target="_blank">New Placements</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['placementsLastMonth']); ?>&nbsp;&nbsp;</td>
                             </tr>
-                            <tr class="oddTableRow">
+                            <tr class="evenTableRow">
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsLastMonth']); ?>&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=lastMonth" target="_blank">Submit Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="oddTableRow">
+							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=lastMonth" target="_blank">User Reports</a>
                                 </td>
@@ -370,29 +406,35 @@
                             </tr>
                             <tr class="oddTableRow">
                                 <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPipelineReport&amp;period=thisYear" target="_blank">New Pipelines</a>
+                                </td>
+                                <td align="right"><?php $this->_($this->statisticsData['pipelinesThisYear']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmissionReport&amp;period=thisYear" target="_blank">New Submissions</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['submissionsThisYear']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=thisYear" target="_blank">New Placements</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['placementsThisYear']); ?>&nbsp;&nbsp;</td>
                             </tr>
-                            <tr class="oddTableRow">
+                            <tr class="evenTableRow">
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsThisYear']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=thisYear" target="_blank">Submit Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="oddTableRow">
+							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=thisYear" target="_blank">User Reports</a>
                                 </td>
@@ -423,29 +465,35 @@
                             </tr>
                             <tr class="oddTableRow">
                                 <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPipelineReport&amp;period=lastYear" target="_blank">New Pipelines</a>
+                                </td>
+                                <td align="right"><?php $this->_($this->statisticsData['pipelinesLastYear']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmissionReport&amp;period=lastYear" target="_blank">New Submissions</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['submissionsLastYear']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=lastYear" target="_blank">New Placements</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['placementsLastYear']); ?>&nbsp;&nbsp;</td>
                             </tr>
-                            <tr class="oddTableRow">
+                            <tr class="evenTableRow">
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsLastYear']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=lastYear" target="_blank">Submit Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="oddTableRow">
+							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=lastYear" target="_blank">User Reports</a>
                                 </td>
@@ -527,29 +575,35 @@
                             </tr>
                             <tr class="oddTableRow">
                                 <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPipelineReport&amp;period=thisQuarter" target="_blank">New Pipelines</a>
+                                </td>
+                                <td align="right"><?php $this->_($this->statisticsData['pipelinesThisQuarter']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmissionReport&amp;period=thisQuarter" target="_blank">New Submissions</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['submissionsThisQuarter']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=thisQuarter" target="_blank">New Placements</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['placementsThisQuarter']); ?>&nbsp;&nbsp;</td>
                             </tr>
-                            <tr class="oddTableRow">
+                            <tr class="evenTableRow">
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsThisQuarter']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=thisQuarter" target="_blank">Submit Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="oddTableRow">
+							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=thisQuarter" target="_blank">User Reports</a>
                                 </td>
@@ -580,29 +634,35 @@
                             </tr>
                             <tr class="oddTableRow">
                                 <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPipelineReport&amp;period=lastQuarter" target="_blank">New Pipelines</a>
+                                </td>
+                                <td align="right"><?php $this->_($this->statisticsData['pipelinesLastQuarter']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmissionReport&amp;period=lastQuarter" target="_blank">New Submissions</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['submissionsLastQuarter']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showPlacementReport&amp;period=lastQuarter" target="_blank">New Placements</a>
                                 </td>
                                 <td align="right"><?php $this->_($this->statisticsData['placementsLastQuarter']); ?>&nbsp;&nbsp;</td>
                             </tr>
-                            <tr class="oddTableRow">
+                            <tr class="evenTableRow">
                                 <td align="left">New Contacts</td>
                                 <td align="right"><?php $this->_($this->statisticsData['contactsLastQuarter']); ?>&nbsp;&nbsp;</td>
                             </tr>
 
-							<tr class="evenTableRow">
+							<tr class="oddTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showSubmitReport&amp;period=lastQuarter" target="_blank">Submit Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
-							<tr class="oddTableRow">
+							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=lastQuarter" target="_blank">User Reports</a>
                                 </td>

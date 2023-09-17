@@ -16,10 +16,11 @@
                 <th align="left" nowrap="nowrap">First Name</th>
                 <th align="left" nowrap="nowrap">Last Name</th>
                 <th align="left" nowrap="nowrap">Chinese Name</th>
+                <th align="left" nowrap="nowrap">Date</th>
+                <th align="left" nowrap="nowrap">Status</th>
                 <th align="left" nowrap="nowrap">Candidate Owner</th>
                 <th align="left" nowrap="nowrap">JobOrder</th>
                 <th align="left" nowrap="nowrap">Company</th>
-                <th align="left" nowrap="nowrap">Date</th>
             </tr>
 
             <?php foreach ($this->submitRS as $rowNumber => $submitData): ?>
@@ -33,10 +34,11 @@
                     <td valign="top" align="left">
                         <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID=<?php $this->_($submitData['candidateID']) ?>" target="_blank"><?php $this->_($submitData['chineseName']) ?></a>
                     &nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($submitData['date']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($submitData['status']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($submitData['ownerFullName']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($submitData['jobOrderTitle']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($submitData['companyName']) ?>&nbsp;</td>
-                    <td valign="top" align="left"><?php $this->_($submitData['date']) ?>&nbsp;</td>
                 </tr>
             <?php endforeach; ?>
         </table>

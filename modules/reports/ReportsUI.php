@@ -64,6 +64,10 @@ class ReportsUI extends UserInterface
                 $this->generateJobOrderReportPDF();
                 break;
 
+            case 'showPipelineReport':
+                $this->showPipelineReport();
+                break;
+
             case 'showSubmissionReport':
                 $this->showSubmissionReport();
                 break;
@@ -146,6 +150,19 @@ class ReportsUI extends UserInterface
         $statisticsData['candidatesThisYear']  = $statistics->getCandidateCount(TIME_PERIOD_THISYEAR);
         $statisticsData['candidatesLastYear']  = $statistics->getCandidateCount(TIME_PERIOD_LASTYEAR);
 
+        /* Get pipeline statistics. */
+        $statisticsData['totalPipelines']     = $statistics->getPipelineCount(TIME_PERIOD_TODATE);
+        $statisticsData['pipelinesToday']     = $statistics->getPipelineCount(TIME_PERIOD_TODAY);
+        $statisticsData['pipelinesYesterday'] = $statistics->getPipelineCount(TIME_PERIOD_YESTERDAY);
+        $statisticsData['pipelinesThisWeek']  = $statistics->getPipelineCount(TIME_PERIOD_THISWEEK);
+        $statisticsData['pipelinesLastWeek']  = $statistics->getPipelineCount(TIME_PERIOD_LASTWEEK);
+        $statisticsData['pipelinesThisMonth'] = $statistics->getPipelineCount(TIME_PERIOD_THISMONTH);
+        $statisticsData['pipelinesLastMonth'] = $statistics->getPipelineCount(TIME_PERIOD_LASTMONTH);
+        $statisticsData['pipelinesThisQuarter'] = $statistics->getPipelineCount(TIME_PERIOD_THISQUARTER);
+        $statisticsData['pipelinesLastQuarter'] = $statistics->getPipelineCount(TIME_PERIOD_LASTQUARTER);
+        $statisticsData['pipelinesThisYear']  = $statistics->getPipelineCount(TIME_PERIOD_THISYEAR);
+        $statisticsData['pipelinesLastYear']  = $statistics->getPipelineCount(TIME_PERIOD_LASTYEAR);
+
         /* Get submission statistics. */
         $statisticsData['totalSubmissions']     = $statistics->getSubmissionCount(TIME_PERIOD_TODATE);
         $statisticsData['submissionsToday']     = $statistics->getSubmissionCount(TIME_PERIOD_TODAY);
@@ -223,6 +240,96 @@ class ReportsUI extends UserInterface
 
         $this->_template->assign('active', $this);
         $this->_template->display('./modules/reports/GraphView.tpl');
+    }
+
+    private function showPipelineReport()
+    {
+        //FIXME: getTrimmedInput
+        if (isset($_GET['period']) && !empty($_GET['period']))
+        {
+            $period = $_GET['period'];
+        }
+        else
+        {
+            $period = '';
+        }
+
+
+        switch ($period)
+        {
+            case 'yesterday':
+                $period = TIME_PERIOD_YESTERDAY;
+                $reportTitle = 'Yesterday\'s Report';
+                break;
+
+            case 'thisWeek':
+                $period = TIME_PERIOD_THISWEEK;
+                $reportTitle = 'This Week\'s Report';
+                break;
+
+            case 'lastWeek':
+                $period = TIME_PERIOD_LASTWEEK;
+                $reportTitle = 'Last Week\'s Report';
+                break;
+
+            case 'thisMonth':
+                $period = TIME_PERIOD_THISMONTH;
+                $reportTitle = 'This Month\'s Report';
+                break;
+
+            case 'lastMonth':
+                $period = TIME_PERIOD_LASTMONTH;
+                $reportTitle = 'Last Month\'s Report';
+                break;
+
+            case 'thisQuarter':
+                $period = TIME_PERIOD_THISQUARTER;
+                $reportTitle = 'This Quarter\'s Report';
+                break;
+
+            case 'lastQuarter':
+                $period = TIME_PERIOD_LASTQUARTER;
+                $reportTitle = 'Last Quarter\'s Report';
+                break;
+                
+            case 'thisYear':
+                $period = TIME_PERIOD_THISYEAR;
+                $reportTitle = 'This Year\'s Report';
+                break;
+
+            case 'lastYear':
+                $period = TIME_PERIOD_LASTYEAR;
+                $reportTitle = 'Last Year\'s Report';
+                break;
+
+            case 'toDate':
+                $period = TIME_PERIOD_TODATE;
+                $reportTitle = 'To Date Report';
+                break;
+
+            case 'today':
+            default:
+                $period = TIME_PERIOD_TODAY;
+                $reportTitle = 'Today\'s Report';
+                break;
+        }
+
+        $statistics = new Statistics($this->_siteID);
+        $pipelineJobOrdersRS = $statistics->getPipelineJobOrders($period);
+
+        foreach ($pipelineJobOrdersRS as $rowIndex => $pipelineJobOrdersData)
+        {
+            /* Querys inside loops are bad, but I don't think there is any avoiding this. */
+            $pipelineJobOrdersRS[$rowIndex]['pipelinesRS'] = $statistics->getPipelinesByJobOrder(
+                $period, $pipelineJobOrdersData['jobOrderID'], $this->_siteID
+            );
+        }
+
+        if (!eval(Hooks::get('REPORTS_SHOW_SUBMISSION'))) return;
+
+        $this->_template->assign('reportTitle', $reportTitle);
+        $this->_template->assign('pipelineJobOrdersRS', $pipelineJobOrdersRS);
+        $this->_template->display('./modules/reports/PipelineReport.tpl');
     }
 
     private function showSubmissionReport()

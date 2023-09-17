@@ -246,6 +246,140 @@ class Statistics
         return $rs['joborder_count'];
     }
 
+
+    /**
+     * Returns the total number of pipeline created in the given period.
+     *
+     * @param flag statistics period flag
+     * @return integer pipeline count
+     */
+    public function getPipelineCount($period)
+    {
+        $criterion = $this->makePeriodCriterion('date_created', $period);
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS pipeline_count
+            FROM
+                candidate_joborder
+            WHERE
+                site_id = %s
+            %s",
+            $this->_siteID,
+            $criterion
+        );
+        $rs = $this->_db->getAssoc($sql);
+
+        return $rs['pipeline_count'];
+    }
+
+
+    /**
+     * Returns all pipelines in the given period.
+     *
+     * @param flag statistics period flag
+     * @return integer candidate count
+     */
+    public function getPipelineJobOrders($period)
+    {
+        $criterion = $this->makePeriodCriterion(
+            'candidate_joborder.date_created', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                joborder.joborder_id AS jobOrderID,
+                joborder.title AS title,
+                joborder.company_id AS companyID,
+                COUNT(*) AS addedCount,
+                CONCAT(
+                    owner_user.first_name, ' ', owner_user.last_name
+                ) AS ownerFullName,
+                company.name AS companyName
+            FROM
+                candidate_joborder
+            LEFT JOIN joborder
+                ON candidate_joborder.joborder_id = joborder.joborder_id
+            LEFT JOIN company
+                ON company.company_id = joborder.company_id
+            LEFT JOIN user AS owner_user
+                ON owner_user.user_id = joborder.owner
+            WHERE
+                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
+                %s
+            AND
+                joborder.site_id = %s
+            GROUP BY
+                jobOrderID
+            ORDER BY
+                company.name ASC",
+            $criterion,
+            $this->_siteID
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+
+    /**
+     * Returns all added for the specified job order new pipelines in the
+     * given period.
+     *
+     * @param flag statistics period flag
+     * @return integer candidate count
+     */
+    public function getPipelinesByJobOrder($period, $jobOrderID)
+    {
+        $criterion = $this->makePeriodCriterion(
+            'candidate_joborder.date_created', $period
+        );
+
+        $sql = sprintf(
+            "SELECT
+                candidate.candidate_id AS candidateID,
+                candidate.first_name AS firstName,
+                candidate.last_name AS lastName,
+                joborder.joborder_id AS jobOrderID,
+                joborder.title AS title,
+                joborder.company_id AS companyID,
+                CONCAT(
+                    owner_user.first_name, ' ', owner_user.last_name
+                ) AS ownerFullName,
+                DATE_FORMAT(
+                    candidate_joborder.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateCreated
+            FROM
+                candidate_joborder
+            LEFT JOIN candidate
+                ON candidate.candidate_id = candidate_joborder.candidate_id
+            LEFT JOIN joborder
+                ON joborder.joborder_id = candidate_joborder.joborder_id
+            LEFT JOIN company
+                ON company.company_id = joborder.company_id
+            LEFT JOIN user AS owner_user
+                ON owner_user.user_id = candidate.owner
+            WHERE
+                candidate_joborder.joborder_id = %s
+            %s
+            AND
+                candidate.site_id = %s
+            AND
+                joborder.site_id = %s
+            AND
+                company.site_id = %s
+            ORDER BY
+                candidate.last_name ASC,
+                candidate.first_name ASC",
+            $jobOrderID,
+            $criterion,
+            $this->_siteID,
+            $this->_siteID,
+            $this->_siteID
+        );
+
+        return $this->_db->getAllAssoc($sql);
+    }
+
+
     /**
      * Returns all job orders with submissions created in the given period.
      *
@@ -286,7 +420,9 @@ class Statistics
             GROUP BY
                 jobOrderID
             HAVING
-                submittedCount > 0",
+                submittedCount > 0
+            ORDER BY
+                company.name ASC",
             $criterion,
             $this->_siteID
         );
@@ -442,10 +578,12 @@ class Statistics
             AND
                 company.site_id = %s
             ORDER BY
-                candidate_joborder_status_history.status_to ASC,
-                candidate.date_modified ASC,
+                company.name ASC,
+                joborder.title ASC,
+                candidate.first_name ASC,
                 candidate.last_name ASC,
-                candidate.first_name ASC",
+                candidate_joborder_status_history.date ASC,
+                owner_user.first_name ASC",
             DATA_ITEM_JOBORDER,
             DATA_ITEM_COMPANY,
             PIPELINE_STATUS_SUBMITTED,
