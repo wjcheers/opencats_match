@@ -259,7 +259,7 @@ class Statistics
 
         $sql = sprintf(
             "SELECT
-                COUNT(*) AS pipeline_count
+                COUNT(*) AS pipelineCount
             FROM
                 candidate_joborder
             WHERE
@@ -270,7 +270,7 @@ class Statistics
         );
         $rs = $this->_db->getAssoc($sql);
 
-        return $rs['pipeline_count'];
+        return $rs['pipelineCount'];
     }
 
 
@@ -808,9 +808,10 @@ class Statistics
     /**
      * Returns all companies.
      *
-     * @return integer candidate count
+     * @param flag statistics period flag
+     * @return integer companies data
      */
-    public function getCompanies()
+    public function getReportCompanies($period)
     {
         $sql = sprintf(
             "SELECT
@@ -820,9 +821,10 @@ class Statistics
                     owner_user.first_name, ' ', owner_user.last_name
                 ) AS ownerFullName,
                 DATE_FORMAT(
-                    company.date_modified, '%%m-%%d-%%y (%%h:%%i %%p)'
+                    company.date_modified, '%%m-%%d-%%y'
                 ) AS dateModifieded,
                 company.name AS companyName,
+                company.is_hot AS isHot,
                 extraShortName.value AS companyShortName,
                 extraNotes.value AS companyUpdatedNotes
             FROM
@@ -846,7 +848,8 @@ class Statistics
             AND
                 company.site_id = %s
             ORDER BY
-                owner_user.user_name ASC",
+                owner_user.user_name ASC,
+                company.name ASC",
             DATA_ITEM_COMPANY,
             DATA_ITEM_COMPANY,
             DATA_ITEM_COMPANY,
@@ -854,6 +857,103 @@ class Statistics
         );
 
         return $this->_db->getAllAssoc($sql);
+    }
+
+
+    /**
+     * Returns all companies.
+     *
+     * @return integer candidate count
+     */
+    public function getReportByCompany($period, $companyID)
+    {
+        $criterion = $this->makePeriodCriterion('candidate_joborder.date_created', $period);
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS pipelineCount
+            FROM
+                candidate_joborder
+            LEFT JOIN joborder
+                ON joborder.joborder_id = candidate_joborder.joborder_id
+            LEFT JOIN company
+                ON company.company_id = joborder.company_id
+            WHERE
+                company.site_id = %s
+            AND
+                company.company_id = %s
+                %s",
+            $this->_siteID,
+            $companyID,
+            $criterion
+        );
+
+        $pipeline_count = $this->_db->getAllAssoc($sql);
+
+
+        $criterion = $this->makePeriodCriterion('date', $period);
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS submissionCount
+            FROM
+                candidate_joborder_status_history
+            LEFT JOIN joborder
+                ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+            LEFT JOIN company
+                ON company.company_id = joborder.company_id
+            WHERE
+                status_to = 400
+            AND
+                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
+            AND
+                company.site_id = %s
+            AND
+                company.company_id = %s
+            %s",
+            $this->_siteID,
+            $companyID,
+            $criterion
+        );
+
+        $submission_count = $this->_db->getAllAssoc($sql);
+
+
+        $criterion = $this->makePeriodCriterion('date', $period);
+
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS interviewingCount
+            FROM
+                candidate_joborder_status_history
+            LEFT JOIN candidate
+                ON candidate.candidate_id = candidate_joborder_status_history.candidate_id
+            LEFT JOIN joborder
+                ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+            LEFT JOIN user AS owner_user
+                ON owner_user.user_id = candidate.owner
+            LEFT JOIN company
+                ON company.company_id = joborder.company_id
+            WHERE
+                candidate_joborder_status_history.status_to = 500
+            AND
+                company.site_id = %s
+            AND
+                company.company_id = %s
+            %s",
+            $companyID,
+            $this->_siteID,
+            $criterion
+        );
+
+        $interviewing_count = $this->_db->getAllAssoc($sql);
+
+        $z = array();
+        $z[0]['companyID'] = $companyID;
+        $z[0]['pipelineCount'] = $pipeline_count[0]['pipelineCount'];
+        $z[0]['submissionCount'] = $submission_count[0]['submissionCount'];
+        $z[0]['interviewingCount'] = $interviewing_count[0]['interviewingCount'];
+        return $z;        
     }
 
 

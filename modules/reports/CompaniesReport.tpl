@@ -15,24 +15,42 @@
     <table class="sortable" width="1225">
         <tr>
             <th align="left" nowrap="nowrap">Company Name</th>
-            <th align="left" nowrap="nowrap">Updated Notes</th>
             <th align="left" nowrap="nowrap">User</th>
             <th align="left" nowrap="nowrap">Modified</th>
-            <th align="left" nowrap="nowrap">Status</th>
+            <th align="left" nowrap="nowrap">NewPipe</th>
+            <th align="left" nowrap="nowrap">Submit</th>
+            <th align="left" nowrap="nowrap">Interview</th>
+            <th align="left" nowrap="nowrap">Updated Notes</th>
+            <!--th align="left" nowrap="nowrap">Status</th-->
         </tr>
         <?php foreach ($this->companiesRS as $rowNumber => $companyData): ?>
-            <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
-                <td valign="top" align="left" width="255px">
-                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=show&amp;companyID=<?php echo($companyData['companyID']) ?>" target="_blank">
-                        <?php $this->_($companyData['companyName']) ?>
-                    </a>
-                    &nbsp;
-                </td>                
-                <td valign="top" align="left"><?php $this->_($companyData['companyUpdatedNotes']) ?>&nbsp;</td>
-                <td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['ownerFullName']) ?>&nbsp;</td>
-                <td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['dateModifieded']) ?>&nbsp;</td>
-                <td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['companyStatus']) ?>&nbsp;</td>
-            </tr>
+            <?php foreach ($companyData['reportRS'] as $rowNumber => $reportData): ?>
+                <tr class="<?php TemplateUtility::printAlternatingRowClass($rowNumber); ?>">
+                    <td valign="top" align="left" width="255px">
+                        <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=show&amp;companyID=<?php echo($companyData['companyID']) ?>" target="_blank">
+                            <?php
+                                if (($companyData['isHot']) == '1') {
+                                    echo('<span style="font-weight:bold;color:#ff0000;">');
+                                }
+                            ?>
+                            <?php $this->_($companyData['companyName']) ?>
+                            <?php
+                                if (($companyData['isHot']) == '1') {    
+                                    echo('</span>');
+                                }
+                            ?>
+                        </a>
+                        &nbsp;
+                    </td>
+                    <td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['ownerFullName']) ?>&nbsp;</td>
+                    <td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['dateModifieded']) ?>&nbsp;</td>
+                    <td valign="top" align="left" nowrap="nowrap"><?php $this->_($reportData['pipelineCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left" nowrap="nowrap"><?php $this->_($reportData['submissionCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left" nowrap="nowrap"><?php $this->_($reportData['interviewingCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($companyData['companyUpdatedNotes']) ?>&nbsp;</td>
+                    <!--td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['companyStatus']) ?>&nbsp;</td-->
+                </tr>
+            <?php endforeach; ?>
         <?php endforeach; ?>
     </table>
 

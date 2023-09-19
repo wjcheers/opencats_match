@@ -76,13 +76,13 @@
                             </tr>
 							<tr class="oddTableRow">
                                 <td align="left">
-                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showFunctionReport&amp;period=today" target="_blank">Function Reports</a>
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompanyReport&amp;period=today" target="_blank">Company Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
 							<tr class="evenTableRow">
                                 <td align="left">
-                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompaniesReport&amp;period=today" target="_blank">Companies Reports</a>
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showFunctionReport&amp;period=today" target="_blank">Function Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
@@ -144,6 +144,12 @@
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
+							<tr class="oddTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompanyReport&amp;period=yesterday" target="_blank">Company Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
                         </table>
                     </td>
 
@@ -199,6 +205,12 @@
 							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=thisWeek" target="_blank">User Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
+							<tr class="oddTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompanyReport&amp;period=thisWeek" target="_blank">Company Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
@@ -263,6 +275,12 @@
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
+							<tr class="oddTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompanyReport&amp;period=lastWeek" target="_blank">Company Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
                         </table>
                     </td>
 
@@ -321,6 +339,12 @@
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
+							<tr class="oddTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompanyReport&amp;period=thisMonth" target="_blank">Company Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
                         </table>
                     </td>
 
@@ -376,6 +400,12 @@
 							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=lastMonth" target="_blank">User Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
+							<tr class="oddTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompanyReport&amp;period=lastMonth" target="_blank">Company Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
@@ -440,6 +470,12 @@
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
+							<tr class="oddTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompanyReport&amp;period=thisYear" target="_blank">Company Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
                         </table>
                     </td>
 
@@ -496,6 +532,12 @@
 							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=lastYear" target="_blank">User Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
+							<tr class="oddTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompanyReport&amp;period=lastYear" target="_blank">Company Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
@@ -609,6 +651,12 @@
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
+							<tr class="oddTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompanyReport&amp;period=thisQuarter" target="_blank">Company Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
                         </table>
                     </td>
 
@@ -665,6 +713,12 @@
 							<tr class="evenTableRow">
                                 <td align="left">
                                     <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showUserReport&amp;period=lastQuarter" target="_blank">User Reports</a>
+                                </td>
+                                <td align="right">☆&nbsp;&nbsp;</td>
+                            </tr>
+							<tr class="oddTableRow">
+                                <td align="left">
+                                    <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showCompanyReport&amp;period=lastQuarter" target="_blank">Company Reports</a>
                                 </td>
                                 <td align="right">☆&nbsp;&nbsp;</td>
                             </tr>
