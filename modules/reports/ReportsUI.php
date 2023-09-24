@@ -705,25 +705,40 @@ class ReportsUI extends UserInterface
                 break;
         }
 
+        $dataGridProperties = DataGrid::getRecentParamaters("reports:ReportCompanies");
 
+        /* If this is the first time we visited the datagrid this session, the recent paramaters will
+         * be empty.  Fill in some default values. */
+        if ($dataGridProperties == array())
+        {
+            $dataGridProperties = array('rangeStart'    => 0,
+                                        'maxResults'    => 15,
+                                        'filterVisible' => false);
+        }
+        // TODO: period in parameter is not the correct method to pass it.
+        $dataGridProperties['period'] = $period;
+
+        $dataGrid = DataGrid::get("reports:ReportCompanies", $dataGridProperties);
+
+        $this->_template->assign('active', $this);
+        $this->_template->assign('dataGrid', $dataGrid);
+        $this->_template->assign('userID', $_SESSION['CATS']->getUserID());
+        $this->_template->assign('errMessage', '');
+
+        if (!eval(Hooks::get('REPORT_COMPANIES_LIST_BY_VIEW'))) return;
+
+        $this->_template->display('./modules/reports/ReportCompanies.tpl');
+
+        /* Original Report Style
         $statistics = new Statistics($this->_siteID);
         $companiesRS = $statistics->getReportCompanies($period);
 
         foreach ($companiesRS as $rowIndex => $CompaniesData)
         {
-            /* Querys inside loops are bad, but I don't think there is any avoiding this. */
+            // Querys inside loops are bad, but I don't think there is any avoiding this.
             $companiesRS[$rowIndex]['reportRS'] = $statistics->getReportByCompany(
                 $period, $CompaniesData['companyID']
-            );
-            
-            /*
-            if($period == TIME_PERIOD_TODAY)
-            {
-                $companiesRS[$rowIndex]['currentReportRS'] = $statistics->getCurrentReportByCompany(
-                    $CompaniesData['companyID']
-                );
-            }
-            */
+            );            
         }
         
         if (!eval(Hooks::get('REPORTS_SHOW_COMPANY'))) return;
@@ -732,7 +747,7 @@ class ReportsUI extends UserInterface
         $this->_template->assign('period', $periodString);
         $this->_template->assign('companiesRS', $companiesRS);
         $this->_template->display('./modules/reports/CompaniesReport.tpl');
-
+        */
     }
 
     private function showOfferReport()

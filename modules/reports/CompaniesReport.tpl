@@ -44,9 +44,9 @@
                     </td>
                     <td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['ownerFullName']) ?>&nbsp;</td>
                     <td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['dateModifieded']) ?>&nbsp;</td>
-                    <td valign="top" align="left" nowrap="nowrap"><?php $this->_($reportData['pipelineCount']) ?>&nbsp;</td>
-                    <td valign="top" align="left" nowrap="nowrap"><?php $this->_($reportData['submissionCount']) ?>&nbsp;</td>
-                    <td valign="top" align="left" nowrap="nowrap"><?php $this->_($reportData['interviewingCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['pipelineCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['submissionCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['interviewingCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($companyData['companyUpdatedNotes']) ?>&nbsp;</td>
                     <!--td valign="top" align="left" nowrap="nowrap"><?php $this->_($companyData['companyStatus']) ?>&nbsp;</td-->
                 </tr>

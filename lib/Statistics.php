@@ -813,6 +813,9 @@ class Statistics
      */
     public function getReportCompanies($period)
     {
+        $criterionPipeline = $this->makePeriodCriterion('candidate_joborder.date_created', $period);
+        $criterion = $this->makePeriodCriterion('date', $period);
+
         $sql = sprintf(
             "SELECT
                 company.company_id AS companyID,
@@ -826,7 +829,56 @@ class Statistics
                 company.name AS companyName,
                 company.is_hot AS isHot,
                 extraShortName.value AS companyShortName,
-                extraNotes.value AS companyUpdatedNotes
+                extraNotes.value AS companyUpdatedNotes,
+                (SELECT
+                        COUNT(*)
+                    FROM
+                        candidate_joborder
+                    LEFT JOIN joborder
+                        ON joborder.joborder_id = candidate_joborder.joborder_id
+                    LEFT JOIN company AS companyPipeline
+                        ON companyPipeline.company_id = joborder.company_id
+                    WHERE
+                        companyPipeline.site_id = %s
+                    AND
+                        companyPipeline.company_id = company.company_id
+                        %s) AS pipelineCount,
+                (SELECT
+                        COUNT(*) 
+                    FROM
+                        candidate_joborder_status_history
+                    LEFT JOIN joborder
+                        ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+                    LEFT JOIN company AS companyPipeline
+                        ON companyPipeline.company_id = joborder.company_id
+                    WHERE
+                        status_to = 400
+                    AND
+                        joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
+                    AND
+                        companyPipeline.site_id = %s
+                    AND
+                        companyPipeline.company_id = company.company_id
+                    %s) AS submissionCount,
+                (SELECT
+                        COUNT(*)
+                    FROM
+                        candidate_joborder_status_history
+                    LEFT JOIN candidate
+                        ON candidate.candidate_id = candidate_joborder_status_history.candidate_id
+                    LEFT JOIN joborder
+                        ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+                    LEFT JOIN user AS owner_user
+                        ON owner_user.user_id = candidate.owner
+                    LEFT JOIN company AS companyPipeline
+                        ON companyPipeline.company_id = joborder.company_id
+                    WHERE
+                        candidate_joborder_status_history.status_to = 500
+                    AND
+                        companyPipeline.site_id = %s
+                    AND
+                        companyPipeline.company_id = company.company_id
+                    %s) AS interviewingCount
             FROM
                 company
             LEFT JOIN user AS owner_user
@@ -849,7 +901,16 @@ class Statistics
                 company.site_id = %s
             ORDER BY
                 owner_user.user_name ASC,
+                pipelineCount DESC,
+                submissionCount DESC,
+                interviewingCount DESC,
                 company.name ASC",
+            $this->_siteID,
+            $criterionPipeline,
+            $this->_siteID,
+            $criterion,
+            $this->_siteID,
+            $criterion,
             DATA_ITEM_COMPANY,
             DATA_ITEM_COMPANY,
             DATA_ITEM_COMPANY,
