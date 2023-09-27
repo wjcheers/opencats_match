@@ -65,10 +65,10 @@ class ReportCompanies extends DataGrid
             array('name' => 'Name', 'width' => 255),
             array('name' => 'Owner', 'width' => 65),
             array('name' => 'Modified', 'width' => 60),
+            array('name' => 'OpenJobs', 'width' => 100),
             array('name' => 'Pipelines', 'width' => 100),
             array('name' => 'Submissions', 'width' => 100),
             array('name' => 'Interviews', 'width' => 100),
-            array('name' => 'Updated Notes', 'width' => 235),
         );
 
 
@@ -107,6 +107,12 @@ class ReportCompanies extends DataGrid
                                      'filterHaving' => 'DATE(company.date_modified)',
                                      'filterTypes'   => '=~=g=s'),
 
+            'OpenJobs' =>      array('pagerRender'     => 'return $rsData[\'openCount\'];',
+                                     'sortableColumn'  => 'openCount',
+                                     'pagerWidth'      => 100,
+                                     'pagerOptional'   => false,
+                                     'filterHaving'    => 'openCount',
+                                     'filterTypes'     => '===>=<'),
 
             'Pipelines' =>      array('pagerRender'     => 'return $rsData[\'pipelineCount\'];',
                                      'sortableColumn'  => 'pipelineCount',
@@ -128,12 +134,6 @@ class ReportCompanies extends DataGrid
                                      'pagerOptional'   => false,
                                      'filterHaving'    => 'interviewingCount',
                                      'filterTypes'     => '===>=<'),
-
-            'Updated Notes' =>      array('pagerRender'     => 'return $rsData[\'companyUpdatedNotes\'];',
-                                     'sortableColumn'  => 'companyUpdatedNotes',
-                                     'pagerWidth'      => 220,
-                                     'pagerOptional'   => false,
-                                     'filterHaving'    => 'companyUpdatedNotes'),
 
             'OwnerID' =>       array('select'    => '',
                                      'filter'    => 'company.owner',
@@ -171,7 +171,6 @@ class ReportCompanies extends DataGrid
                 company.is_hot AS isHot,
                 company.date_modified AS dateModifiedSort,
                 extraShortName.value AS companyShortName,
-                extraNotes.value AS companyUpdatedNotes,
                 (SELECT
                         COUNT(*)
                     FROM
@@ -220,15 +219,21 @@ class ReportCompanies extends DataGrid
                         companyPipeline.site_id = %s
                     AND
                         companyPipeline.company_id = company.company_id
-                    %s) AS interviewingCount
+                    %s) AS interviewingCount,
+                (SELECT
+                        COUNT(*)
+                    FROM joborder
+                    WHERE
+                        site_id = %s
+                    AND
+                        status = 'Active'
+                    AND
+                        company_id = company.company_id
+                ) AS openCount
             FROM
                 company
             LEFT JOIN user AS owner_user
                 ON owner_user.user_id = company.owner
-            LEFT JOIN extra_field AS extraNotes
-                ON extraNotes.data_item_id = company.company_id
-                    AND extraNotes.data_item_type = %s
-                    AND extraNotes.field_name = 'Updated Notes'
             LEFT JOIN extra_field AS extraStatus
                 ON extraStatus.data_item_id = company.company_id
                     AND extraStatus.data_item_type = %s
@@ -238,10 +243,12 @@ class ReportCompanies extends DataGrid
                     AND extraShortName.data_item_type = %s
                     AND extraShortName.field_name = 'Short Name'
             WHERE
-                extraStatus.value = 'Active'
-            AND
                 company.site_id = %s
             %s
+            GROUP BY
+                companyID
+            HAVING
+                openCount > 0
             %s
             %s
             %s",
@@ -253,7 +260,7 @@ class ReportCompanies extends DataGrid
             $criterion,
             $this->_siteID,
             $criterion,
-            DATA_ITEM_COMPANY,
+            $this->_siteID,
             DATA_ITEM_COMPANY,
             DATA_ITEM_COMPANY,
             $this->_siteID,

@@ -1,5 +1,5 @@
 <?php /* $Id: Companies.tpl 3460 2007-11-07 03:50:34Z brian $ */ ?>
-<?php TemplateUtility::printHeader('Companies', array('js/highlightrows.js', 'js/export.js', 'js/dataGrid.js')); ?>
+<?php TemplateUtility::printHeader($this->reportTitle, array('js/highlightrows.js', 'js/export.js', 'js/dataGrid.js')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
 <?php TemplateUtility::printTabs($this->active); ?>
     <style type="text/css">
@@ -15,7 +15,7 @@
                     <td width="3%">
                         <img src="images/companies.gif" width="24" height="24" border="0" alt="Companies" style="margin-top: 3px;" />&nbsp;
                     </td>
-                    <td><h2>Reports: Companies</h2></td>
+                    <td><h2><?php $this->_($this->reportTitle); ?></h2></td>
                     <td align="right">
                         <form name="companiesViewSelectorForm" id="companiesViewSelectorForm" action="<?php echo(CATSUtility::getIndexName()); ?>" method="get">
                             <input type="hidden" name="m" value="companies" />

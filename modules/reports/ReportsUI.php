@@ -720,6 +720,7 @@ class ReportsUI extends UserInterface
 
         $dataGrid = DataGrid::get("reports:ReportCompanies", $dataGridProperties);
 
+        $this->_template->assign('reportTitle', $reportTitle);
         $this->_template->assign('active', $this);
         $this->_template->assign('dataGrid', $dataGrid);
         $this->_template->assign('userID', $_SESSION['CATS']->getUserID());
