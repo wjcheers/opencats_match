@@ -510,9 +510,14 @@ class SettingsUI extends UserInterface
                     {
                         CommonErrors::fatal(COMMONERROR_BADINDEX, $this, 'No user found with selected ID.');
                     }
+                    /*
                     $greetingMessageName = unserialize($data['greetingMessageName']);
                     $greetingMessageTitle = unserialize($data['greetingMessageTitle']);
                     $greetingMessageBody = unserialize($data['greetingMessageBody']);
+                    */
+                    $greetingMessageName = json_decode($data['greetingMessageName']);
+                    $greetingMessageTitle = json_decode($data['greetingMessageTitle']);
+                    $greetingMessageBody = json_decode($data['greetingMessageBody']);
                     
                     $this->_template->assign('greetingMessageName', $greetingMessageName);
                     $this->_template->assign('greetingMessageTitle', $greetingMessageTitle);
@@ -2789,9 +2794,14 @@ class SettingsUI extends UserInterface
                 $greetingMessageBody[] = $greetingMessageBodyTmp;
             }
         }
+        /*
         $greetingMessageName = serialize($greetingMessageName);
         $greetingMessageTitle = serialize($greetingMessageTitle);
         $greetingMessageBody = serialize($greetingMessageBody);
+        */
+        $greetingMessageName = json_encode($greetingMessageName);
+        $greetingMessageTitle = json_encode($greetingMessageTitle);
+        $greetingMessageBody = json_encode($greetingMessageBody);
 
         /* Attempt to set the user's greeting message. */
         $users = new Users($this->_siteID);

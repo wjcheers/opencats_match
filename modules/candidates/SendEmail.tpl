@@ -89,9 +89,14 @@
                 %CANDCHNAME%    => Chinese Name</p>
                 
                 <?php
+                /*
                 $greetingMessageName = unserialize($this->user[0]['greetingMessageName']);
                 $greetingMessageTitle = unserialize($this->user[0]['greetingMessageTitle']);
                 $greetingMessageBody = unserialize($this->user[0]['greetingMessageBody']);
+                */
+                $greetingMessageName = json_decode($this->user[0]['greetingMessageName']);
+                $greetingMessageTitle = json_decode($this->user[0]['greetingMessageTitle']);
+                $greetingMessageBody = json_decode($this->user[0]['greetingMessageBody']);
                 ?>
                 
                 Template:
