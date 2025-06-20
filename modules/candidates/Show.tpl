@@ -175,7 +175,7 @@
                             <?php for ($i = 0; $i < intval(count($this->extraFieldRS)/2); $i++): ?>
                                 <tr>
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>                         
-                                    <td class="data">
+                                    <td class="data" data-<?php echo str_replace(' ', '-', strtolower($this->extraFieldRS[$i]['fieldName'])); ?>>
                                         <?php if(substr($this->extraFieldRS[$i]['display'], 0, 4) == 'http'): ?>
                                             <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank" style="word-break: break-all;"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
                                         <?php else: ?>
@@ -379,7 +379,7 @@
                             <?php for ($i = (intval(count($this->extraFieldRS))/2); $i < (count($this->extraFieldRS)); $i++): ?>
                                 <tr>
                                     <td class="vertical"><?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:</td>
-                                    <td class="data">
+                                    <td class="data" data-<?php echo str_replace(' ', '-', strtolower($this->extraFieldRS[$i]['fieldName'])); ?>>
                                         <?php if(substr($this->extraFieldRS[$i]['display'], 0, 4) == 'http'): ?>
                                             <a href="<?php echo($this->extraFieldRS[$i]['display']); ?>" target="_blank" style="word-break: break-all;"><?php echo($this->extraFieldRS[$i]['display']); ?></a>
                                         <?php else: ?>
