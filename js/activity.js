@@ -721,6 +721,14 @@ function AS_onRegardingChange(statusesArray, jobOrdersArray, regardingSelectID,
     document.getElementById('triggerValidGender').checked = false;
     document.getElementById('triggerValidNationalitySpan').style.display = 'none';
     document.getElementById('triggerValidNationality').checked = false;
+    /*
+    document.getElementById('triggerValidSenioritySpan').style.display = 'none';
+    document.getElementById('triggerValidSeniority').checked = false;
+    document.getElementById('triggerValidCareerSummarySpan').style.display = 'none';
+    document.getElementById('triggerValidCareerSummary').checked = false;
+    document.getElementById('triggerValidSkillSummarySpan').style.display = 'none';
+    document.getElementById('triggerValidSkillsummary').checked = false;
+    */
     
     if (regardingID != '-1')
     {
@@ -802,6 +810,14 @@ function AS_onStatusChange(statusesArray, jobOrdersArray, regardingSelectID,
     document.getElementById('triggerValidGender').checked = false;
     document.getElementById('triggerValidNationalitySpan').style.display = 'none';
     document.getElementById('triggerValidNationality').checked = false;
+    /*
+    document.getElementById('triggerValidSenioritySpan').style.display = 'none';
+    document.getElementById('triggerValidSeniority').checked = false;
+    document.getElementById('triggerValidCareerSummarySpan').style.display = 'none';
+    document.getElementById('triggerValidCareerSummary').checked = false;
+    document.getElementById('triggerValidSkillSummarySpan').style.display = 'none';
+    document.getElementById('triggerValidSkillsummary').checked = false;
+    */
     
     if(statusSelectList[statusSelectList.selectedIndex].text == 'Qualifying')
     {

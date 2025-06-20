@@ -21,6 +21,11 @@ function checkActivityForm(form)
     errorMessage += checkValidEmail();
     errorMessage += checkValidGender();
     errorMessage += checkValidNationality();
+    /*
+    errorMessage += checkValidSeniority();
+    errorMessage += checkValidCareerSummary();
+    errorMessage += checkValidSkillSummary();
+    */
 
     if (errorMessage != '')
     {
@@ -323,6 +328,111 @@ function checkValidNationality()
     return errorMessage;
 }
 
+/*
+function checkValidSeniority()
+{
+    var errorMessage = '';
+    fieldLabel = document.getElementById('triggerValidSenioritySpan');
+    
+    
+    var seniority = fieldLabel.getAttribute('data-seniority');
+    var seniorityCount = fieldLabel.getAttribute('data-seniority-count');
+    seniorityCount ++;
+    fieldLabel.setAttribute('data-seniority-count', seniorityCount);
+
+    if((!seniority || seniority == '')
+        && document.getElementById('changeStatus').checked == true
+        && document.changePipelineStatusForm.statusID.options[document.changePipelineStatusForm.statusID.selectedIndex].text == "Qualifying")
+    {
+        if(seniorityCount >= 3)
+        {
+            document.getElementById('triggerValidSenioritySpan').style.display = 'inline';
+        }
+        if(document.getElementById('triggerValidSeniority').checked == false)
+        {
+            errorMessage  = "    - Did you fill the candidate's Seniority?\n\n";
+
+            fieldLabel.style.color = '#ff0000';        
+        }
+        else
+        {
+            fieldLabel.style.color = '#000';
+        }
+    }
+
+    return errorMessage;
+}
+
+
+function checkValidCareerSummary()
+{
+    var errorMessage = '';
+    fieldLabel = document.getElementById('triggerValidCareerSummarySpan');
+    
+    
+    var careerSummary = fieldLabel.getAttribute('data-career-summary');
+    var careerSummaryCount = fieldLabel.getAttribute('data-career-summary-count');
+    careerSummaryCount ++;
+    fieldLabel.setAttribute('data-career-summary-count', careerSummaryCount);
+
+    if((!careerSummary || careerSummary == '')
+        && document.getElementById('changeStatus').checked == true
+        && document.changePipelineStatusForm.statusID.options[document.changePipelineStatusForm.statusID.selectedIndex].text == "Qualifying")
+    {
+        if(careerSummaryCount >= 3)
+        {
+            document.getElementById('triggerValidCareerSummarySpan').style.display = 'inline';
+        }
+        if(document.getElementById('triggerValidCareerSummary').checked == false)
+        {
+            errorMessage  = "    - Did you fill the candidate's Career Summary?\n\n";
+
+            fieldLabel.style.color = '#ff0000';        
+        }
+        else
+        {
+            fieldLabel.style.color = '#000';
+        }
+    }
+
+    return errorMessage;
+}
+
+
+function checkValidSkillSummary()
+{
+    var errorMessage = '';
+    fieldLabel = document.getElementById('triggerValidSkillSummarySpan');
+    
+    
+    var skillSummary = fieldLabel.getAttribute('data-skill-summary');
+    var skillSummaryCount = fieldLabel.getAttribute('data-skill-summary-count');
+    skillSummaryCount ++;
+    fieldLabel.setAttribute('data-skill-summary-count', skillSummaryCount);
+
+    if((!skillSummary || skillSummary == '')
+        && document.getElementById('changeStatus').checked == true
+        && document.changePipelineStatusForm.statusID.options[document.changePipelineStatusForm.statusID.selectedIndex].text == "Qualifying")
+    {
+        if(skillSummaryCount >= 3)
+        {
+            document.getElementById('triggerValidSkillSummarySpan').style.display = 'inline';
+        }
+        if(document.getElementById('triggerValidSkillSummary').checked == false)
+        {
+            errorMessage  = "    - Did you fill the candidate's Skill Summary?\n\n";
+
+            fieldLabel.style.color = '#ff0000';        
+        }
+        else
+        {
+            fieldLabel.style.color = '#000';
+        }
+    }
+
+    return errorMessage;
+}
+*/
 
 function checkQualifyingNotes()
 {
