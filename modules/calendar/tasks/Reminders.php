@@ -65,7 +65,7 @@ class Reminders extends Task
 
         foreach ($dueEvents as $index => $data)
         {
-            $emailSubject = 'CATS Event Reminder: ' . $data['title'];
+            $emailSubject = 'CATS: ' . $data['title'];
 
             $emailContents = $GLOBALS['eventReminderEmail'];
             

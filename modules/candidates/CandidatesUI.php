@@ -3249,6 +3249,66 @@ class CandidatesUI extends UserInterface
                 }
             }
             
+            if ($newStatusDescription == "Submitted")
+            {                
+                if (empty($pipelineUsers))
+                {
+                    $pipelineUsers = $pipelines->getUser($candidateID, $regardingID);
+                    if (!empty($pipelineUsers))
+                    {
+                        $pipelineUsers = $pipelineUsers[0];
+                    }
+                }
+
+                        
+                if(!empty($pipelineUsers) &&
+                   !empty($pipelineUsers['jobOrderRecruiterEmail']) &&
+                   !empty($pipelineUsers['candidateOwnerEmail']) &&
+                   $pipelineUsers['jobOrderRecruiterEmail'] != '' &&
+                   $pipelineUsers['candidateOwnerEmail'] != '')
+                {
+                    $description = '請關心你的投遞人選，並與他/她保持聯繫！';
+
+                    $nodifyDays = [3, 7, 14, 21];
+                    $calendar = new Calendar($this->_siteID);
+                    foreach($nodifyDays as $days)
+                    {
+                        /* Create MySQL date string w/ 24hr time (YYYY-MM-DD HH:MM:SS). */
+                        $date = date('Y-m-d H:i:s', strtotime("+" . $days . " day", time()));
+                        $title = $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'] . '投遞' . $days . '天';
+                        
+                        $eventID = $calendar->addEvent(
+                            600, $date, $description, 0, $this->_userID,
+                            $candidateID, DATA_ITEM_CANDIDATE, -1, $title,
+                            15, 1, $pipelineUsers['candidateOwnerEmail'] . ',' . $pipelineUsers['jobOrderRecruiterEmail'], 15,
+                            false, $_SESSION['CATS']->getTimeZoneOffset()
+                        );
+                        if ($eventID <= 0)
+                        {
+                            $this->fatalModal(
+                                'Failed to add calendar event.', $moduleDirectory
+                            );
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if($oldStatusDescription == "Submitted") 
+                {
+                    $calendar = new Calendar($this->_siteID);
+                    $events = $calendar->getUpcomingEventsByDataItem(DATA_ITEM_CANDIDATE, $candidateID);
+                    foreach ($events as $event) 
+                    {
+                        if ($event['description'] == '請關心你的投遞人選，並與他/她保持聯繫！')
+                        {
+                            $calendar->deleteEvent($event['eventID']);
+                        }
+                    }
+                }
+
+            }
+
             if ($newStatusDescription == "Placed")
             {                
                 if (empty($pipelineUsers))
@@ -3267,18 +3327,19 @@ class CandidatesUI extends UserInterface
                    $pipelineUsers['jobOrderRecruiterEmail'] != '' &&
                    $pipelineUsers['candidateOwnerEmail'] != '')
                 {
-                    $description = 'Please care about your candidate. Keep in touch with him/her!';
+                    $description = '請關心你的到職人選，並與他/她保持聯繫！';
 
                     $nodifyDays = [7, 14, 21, 28, 42, 56, 84];
+                    $calendar = new Calendar($this->_siteID);
                     foreach($nodifyDays as $days)
                     {
                         /* Create MySQL date string w/ 24hr time (YYYY-MM-DD HH:MM:SS). */
                         $date = date('Y-m-d H:i:s', strtotime("+" . $days . " day", time()));
+                        $title = $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'] . '到職' . $days . '天';
                         
-                        $calendar = new Calendar($this->_siteID);
                         $eventID = $calendar->addEvent(
                             600, $date, $description, 0, $this->_userID,
-                            $candidateID, DATA_ITEM_CANDIDATE, -1, 'Placed for ' . $days . ' days',
+                            $candidateID, DATA_ITEM_CANDIDATE, -1, $title,
                             15, 1, $pipelineUsers['candidateOwnerEmail'] . ',' . $pipelineUsers['jobOrderRecruiterEmail'], 15,
                             false, $_SESSION['CATS']->getTimeZoneOffset()
                         );

@@ -210,19 +210,18 @@ define('MAIL_SMTP_PASS', "def");
 
 /* Event reminder E-Mail Template. */
 $GLOBALS['eventReminderEmail'] = <<<EOF
-%FULLNAME%,
+%FULLNAME%，
 
-This is a reminder from the CATS Applicant Tracking System about an
-upcoming event.
+提醒您即將到來的活動。
 
-'%EVENTNAME%'
-Is scheduled to occur %DUETIME%.
+『%EVENTNAME%』
+預定於 %DUETIME% 發生。
 
-Description:
+說明：
 %NOTES%
 
 --
-CATS Applicant Tracking System
+CATS
 EOF;
 
 /* Enable replication slave mode? This is probably only useful for the CATS
