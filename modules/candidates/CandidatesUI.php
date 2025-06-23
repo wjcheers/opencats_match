@@ -3275,7 +3275,7 @@ class CandidatesUI extends UserInterface
                     {
                         /* Create MySQL date string w/ 24hr time (YYYY-MM-DD HH:MM:SS). */
                         $date = date('Y-m-d H:i:s', strtotime("+" . $days . " day", time()));
-                        $title = $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'] . '投遞' . $days . '天';
+                        $title = $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'] . ' 已投遞 ' . $days . ' 天';
                         
                         $eventID = $calendar->addEvent(
                             600, $date, $description, 0, $this->_userID,
@@ -3335,7 +3335,7 @@ class CandidatesUI extends UserInterface
                     {
                         /* Create MySQL date string w/ 24hr time (YYYY-MM-DD HH:MM:SS). */
                         $date = date('Y-m-d H:i:s', strtotime("+" . $days . " day", time()));
-                        $title = $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'] . '到職' . $days . '天';
+                        $title = $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'] . ' 已到職' . $days . ' 天';
                         
                         $eventID = $calendar->addEvent(
                             600, $date, $description, 0, $this->_userID,
