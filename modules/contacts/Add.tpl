@@ -15,7 +15,7 @@
                 </tr>
             </table>
 
-            <form name="addContactForm" id="addContactForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;a=add&amp;v=<?php if ($this->selectedCompanyID === false) { echo('-1'); } else { echo($this->selectedCompanyID); } ?>" method="post" onsubmit="result = checkAddForm(document.addContactForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Sending, please wait...'; return;} return onSubmitFalse();" autocomplete="off">
+            <form name="addContactForm" id="addContactForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;a=add&amp;v=<?php if ($this->selectedCompanyID === false) { echo('-1'); } else { echo($this->selectedCompanyID); } ?>" method="post" onsubmit="result = checkAddContactForm(document.addContactForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Adding, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" name="postback" id="postback" value="postback" />
 
                 <table width="1225">

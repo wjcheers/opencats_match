@@ -20,7 +20,7 @@
             <table class="searchTable" id="searchTable ">
                 <tr>
                     <td>
-                        <form name="searchForm" id="searchForm" action="<?php echo(CATSUtility::getIndexName()); ?>" method="get" autocomplete="off">
+                        <form name="searchForm" id="searchForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;a=search" method="post" onsubmit="result = checkSearchForm(document.searchForm); if(result) {document.getElementById('searchContacts').disabled = true; document.getElementById('searchContacts').value='Searching, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                             <input type="hidden" name="m" id="moduleName" value="contacts" />
                             <input type="hidden" name="a" id="moduleAction" value="search" />
                             <input type="hidden" name="getback" id="getback" value="getback" />

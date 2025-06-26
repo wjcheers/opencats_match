@@ -15,7 +15,7 @@
                 </tr>
             </table>
 
-            <form name="editContactForm" id="editContactForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;a=edit" method="post" onsubmit="return checkEditForm(document.editContactForm);" autocomplete="off">
+            <form name="editContactForm" id="editContactForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;a=edit" method="post" onsubmit="result = checkEditContactForm(document.editContactForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Saving, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" name="postback" id="postback" value="postback" />
                 <input type="hidden" name="contactID" id="contactID" value="<?php echo($this->contactID); ?>" />
 

@@ -32,7 +32,7 @@
                 </tr>
             </table>
 
-            <form name="editCandidateForm" id="editCandidateForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=edit" method="post" onsubmit="return (checkEditForm(document.editCandidateForm) && onSubmitEmailInSystem() && onSubmitPhoneInSystem() && onSubmitLinkInSystem());" autocomplete="off">
+            <form name="editCandidateForm" id="editCandidateForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=edit" method="post" onsubmit="result = checkEditCandidateForm(document.editCandidateForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Saving, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" name="postback" id="postback" value="postback" />
                 <input type="hidden" id="candidateID" name="candidateID" value="<?php $this->_($this->data['candidateID']); ?>" />
 

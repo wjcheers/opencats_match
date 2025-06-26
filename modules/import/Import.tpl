@@ -87,7 +87,7 @@
 
             <p class="note" id="importHide2">Import Data</p>
 
-            <form name="importDataForm" id="importDataForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=import&amp;a=import&amp;#step2" enctype="multipart/form-data" method="post" autocomplete="off" <?php if (isset($this->contactsUploadNotice) && $this->contactsUploadNotice): ?> onsubmit="return checkField(<?php echo(count($this->theFields)); ?>, 'company_id', 'You must have 1 field set as Company.') && showLoading();"<?php else: ?> onsubmit="return showLoading();"<?php endif; ?>>
+            <form name="importForm" id="importForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=import&amp;a=import" method="post" onsubmit="result = checkImportForm(document.importForm); if(result) {document.getElementById('importHide7').disabled = true; document.getElementById('importHide7').value='Importing, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" name="postback" id="postback" value="postback" />
                 <input type="hidden" id="fileName" name="fileName" value="<?php echo($this->fileName); ?>" />
                 <input type="hidden" id="dataContaining" name="dataContaining" value="<?php echo($this->dataContaining) ?>" />

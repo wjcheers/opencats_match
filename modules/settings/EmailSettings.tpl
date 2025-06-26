@@ -20,7 +20,7 @@
             <table>
                 <tr>
                     <td>
-                        <form name="emailSettingsForm" id="emailSettingsForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=emailSettings" method="post">
+                        <form name="emailSettingsForm" id="emailSettingsForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=emailSettings" method="post" onsubmit="result = checkEmailSettingsForm(document.emailSettingsForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Saving, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                             <input type="hidden" name="postback" value="postback" />
                             <input type="hidden" name="configured" value="1" />
 

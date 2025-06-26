@@ -114,7 +114,7 @@
             <table class="editTable" width="100%">
                 <tr>
                     <td>
-                        <form name="emailForm" id="emailForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;a=emailContacts" method="post" onsubmit="return checkEmailForm(document.emailForm);" autocomplete="off" enctype="multipart/form-data">
+                        <form name="emailForm" id="emailForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=contacts&amp;a=emailContacts" method="post" onsubmit="result = checkEmailForm(document.emailForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Sending, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                         <input type="hidden" name="postback" id="postback" value="postback" />
                         <table>
                             <tr>
@@ -146,7 +146,7 @@
                             </tr>
                             <tr>
                                 <td align="right" valign="top" colspan="2">
-                                    <input type="submit" tabindex="<?php echo($tabIndex++); ?>" class="button" value="Send E-Mail" />&nbsp;
+                                    <input type="submit" tabindex="<?php echo($tabIndex++); ?>" class="button" id="submit" value="Send E-Mail" />&nbsp;
                                     <input type="reset"  tabindex="<?php echo($tabIndex++); ?>" class="button" value="Reset" />&nbsp;
                                 </td>
                             </tr>

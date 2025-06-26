@@ -17,7 +17,7 @@
 
             <p class="note">Change Password</p>
 
-            <form name="changePasswordForm" id="changePasswordForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=changePassword" method="post" onsubmit="return checkChangePasswordForm(document.changePasswordForm);">
+            <form name="changePasswordForm" id="changePasswordForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=changePassword" method="post" onsubmit="result = checkChangePasswordForm(document.changePasswordForm); if(result) {document.getElementById('changePassword').disabled = true; document.getElementById('changePassword').value='Changing, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" name="postback" id="postback" value="postback" />
 
                 <?php if ($this->isDemoUser): ?>

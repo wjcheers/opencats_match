@@ -17,7 +17,7 @@
 
             <p class="note">Generate a report on Equal Employment Opportunity Statistics.</p>
 
-            <form name="jobOrderReportForm" id="jobOrderReportForm" action="<?php echo(CATSUtility::getIndexName()); ?>" method="get">
+            <form name="eeoReportForm" id="eeoReportForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=eeoReport" method="post" onsubmit="result = checkEEOReportForm(document.eeoReportForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Generating, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" name="m" value="reports">
                 <input type="hidden" name="a" value="generateEEOReportPreview">
                 
@@ -47,7 +47,7 @@
                                     </td>
                                 </tr>
                             </table>
-                            <input type="submit" class="button" name="submit" value="Preview Report" />&nbsp;
+                            <input type="submit" class="button" name="submit" id="submit" value="Preview Report" />&nbsp;
                         </td>
                         
                         <?php if (isset($this->EEOReportStatistics)): ?>
@@ -156,7 +156,7 @@
             </form>
 
             <script type="text/javascript">
-                document.jobOrderReportForm.siteName.focus();
+                document.eeoReportForm.siteName.focus();
             </script>
         </div>
     </div>

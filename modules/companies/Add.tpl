@@ -15,7 +15,7 @@
                 </tr>
             </table>
 
-            <form name="addCompanyForm" id="addCompanyForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=add" method="post" onsubmit="result = checkAddForm(document.addCompanyForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Sending, please wait...'; return;} return onSubmitFalse();" autocomplete="off">
+            <form name="addCompanyForm" id="addCompanyForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=companies&amp;a=add" method="post" onsubmit="result = checkAddCompanyForm(document.addCompanyForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Adding, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" name="postback" id="postback" value="postback" />
 
                 <p class="noteUnsized">Basic Information</p>

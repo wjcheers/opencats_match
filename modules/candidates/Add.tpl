@@ -45,7 +45,7 @@
                 <?php $URI = CATSUtility::getIndexName() . '?m=candidates&amp;a=add'; ?>
             <?php endif; ?>
 
-            <form name="addCandidateForm" id="addCandidateForm" enctype="multipart/form-data" action="<?php echo($URI); ?>" method="post" onsubmit="result = (checkAddForm(document.addCandidateForm) && onSubmitEmailInSystem() && onSubmitPhoneInSystem() && onSubmitLinkInSystem()); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Sending, please wait...'; return;} return onSubmitFalse();" autocomplete="off" enctype="multipart/form-data">
+            <form name="addCandidateForm" id="addCandidateForm" enctype="multipart/form-data" action="<?php echo($URI); ?>" method="post" onsubmit="result = (checkAddForm(document.addCandidateForm) && onSubmitEmailInSystem() && onSubmitPhoneInSystem() && onSubmitLinkInSystem()); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Sending, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                 <?php if ($this->isModal): ?>
                     <input type="hidden" name="jobOrderID" id="jobOrderID" value="<?php echo($this->jobOrderID); ?>" />
                 <?php endif; ?>

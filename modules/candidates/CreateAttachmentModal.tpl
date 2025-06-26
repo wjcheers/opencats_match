@@ -2,7 +2,7 @@
 <?php TemplateUtility::printModalHeader('Candidates', array('modules/candidates/validator.js'), 'Create Candidate Attachment'); ?>
 
     <?php if (!$this->isFinishedMode): ?>
-        <form name="createAttachmentForm" id="createAttachmentForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=createAttachment" enctype="multipart/form-data" method="post" onsubmit="return checkCreateAttachmentForm(document.createAttachmentForm);">
+        <form name="createAttachmentForm" id="createAttachmentForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=createAttachment" method="post" onsubmit="result = checkCreateAttachmentForm(document.createAttachmentForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Creating, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
             <input type="hidden" name="postback" id="postback" value="postback" />
             <input type="hidden" id="candidateID" name="candidateID" value="<?php echo($this->candidateID); ?>" />
 

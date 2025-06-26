@@ -17,7 +17,7 @@
 
             <p class="note">Generate a job order report.</p>
 
-            <form name="jobOrderReportForm" id="jobOrderReportForm" action="<?php echo(CATSUtility::getIndexName()); ?>" method="get">
+            <form name="jobOrderReportForm" id="jobOrderReportForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=jobOrderReport" method="post" onsubmit="result = checkJobOrderReportForm(document.jobOrderReportForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Generating, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" name="m" value="reports">
                 <input type="hidden" name="a" value="generateJobOrderReportPDF">
 
@@ -252,7 +252,7 @@
                     </tr>
                 </table>
 
-                <input type="submit" class="button" name="submit" value="Generate Report" />&nbsp;
+                <input type="submit" class="button" name="submit" id="submit" value="Generate Report" />&nbsp;
                 <input type="reset"  class="button" name="reset"  value="Reset" />&nbsp;
                 
                 <!-- IE PDF Hack -->

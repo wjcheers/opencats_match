@@ -2,7 +2,7 @@
 <?php TemplateUtility::printModalHeader('Job Order', array('modules/joborders/validator.js'), 'Create Job Order Attachment'); ?>
 
     <?php if (!$this->isFinishedMode): ?>
-        <form name="createAttachmentForm" id="createAttachmentForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=createAttachment" enctype="multipart/form-data" method="post" onsubmit="return checkAttachmentForm(document.createAttachmentForm);">
+        <form name="createAttachmentForm" id="createAttachmentForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=createAttachment" method="post" onsubmit="result = checkCreateAttachmentForm(document.createAttachmentForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Creating, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
             <input type="hidden" name="postback" id="postback" value="postback" />
             <input type="hidden" id="jobOrderID" name="jobOrderID" value="<?php echo($this->jobOrderID); ?>" />
 

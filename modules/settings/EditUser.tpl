@@ -20,7 +20,7 @@
                 <span style="float: right;"><a href='<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=manageUsers'>Back to User Management</a></span>&nbsp;
             </p>
 
-            <form name="editUserForm" id="editUserForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=editUser" method="post" onsubmit="return checkEditUserForm(document.editUserForm);" autocomplete="off">
+            <form name="editUserForm" id="editUserForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=settings&amp;a=editUser" method="post" onsubmit="result = checkEditUserForm(document.editUserForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Saving, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" name="postback" id="postback" value="postback" />
                 <input type="hidden" id="userID" name="userID" value="<?php $this->_($this->data['userID']); ?>" />
 

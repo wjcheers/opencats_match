@@ -43,7 +43,7 @@
                                 </td>
                                 <td id="addEventTD" style="display:none;">
                                     <p class="noteUnsized">Add Event</p>
-                                    <form name="addEventForm" id="addEventForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=calendar&amp;a=addEvent" method="post" onsubmit="return checkAddForm(document.addEventForm);" autocomplete="off">
+                                    <form name="addEventForm" id="addEventForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=calendar&amp;a=addEvent" method="post" onsubmit="result = checkAddEventForm(document.addEventForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Adding, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                                         <input type="hidden" name="postback" id="postbackA" value="postback" />
 
                                         <table class="editTableMini" width="235">
@@ -185,13 +185,13 @@
 
                                         </table>
                                         <div style="text-align: center;">
-                                            <input type="submit" class="button" name="submit" value="Add Event" />
+                                            <input type="submit" class="button" name="submit" id="submit" value="Add Event" />
                                         </div>
                                     </form>
                                 </td>
                                 <td style="display:none" id="editEventTD">
                                     <p class="noteUnsized">Edit Event</p>
-                                    <form name="editEventForm" id="editEventForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=calendar&amp;a=editEvent" method="post" onsubmit="return checkEditForm(document.editEventForm);" autocomplete="off">
+                                    <form name="editEventForm" id="editEventForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=calendar&amp;a=editEvent" method="post" onsubmit="result = checkEditEventForm(document.editEventForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Saving, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                                         <input type="hidden" name="postback" id="postbackB" value="postback" />
                                         <input type="hidden" name="eventID" id="eventIDEdit" />
                                         <input type="hidden" name="dataItemType" id="dataItemTypeEdit" />
@@ -337,7 +337,7 @@
 
                                         </table>
                                         <div style="text-align: center;">
-                                            <input type="submit" class="button" name="submit" value="Save" />
+                                            <input type="submit" class="button" name="submit" id="submit" value="Save" />
                                             <?php if ($this->accessLevel >= ACCESS_LEVEL_DELETE): ?>
                                                 <input type="button" class="button" name="delete" value="Delete" onclick="confirmDeleteEntry();" />
                                             <?php endif; ?>

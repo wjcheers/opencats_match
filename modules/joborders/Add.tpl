@@ -28,7 +28,7 @@
                     </tr>
                 </table>
             <?php else: ?>
-                <form name="addJobOrderForm" id="addJobOrderForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=add" method="post" onsubmit="result = checkAddForm(document.addJobOrderForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Sending, please wait...'; return;} return onSubmitFalse();" autocomplete="off">
+                <form name="addJobOrderForm" id="addJobOrderForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=add" method="post" onsubmit="result = checkAddJobOrderForm(document.addJobOrderForm); if(result) {document.getElementById('submit').disabled = true; document.getElementById('submit').value='Adding, please wait...';} return result;" autocomplete="off" enctype="multipart/form-data">
                     <input type="hidden" name="postback" id="postback" value="postback" />
 
                     <table class="editTable" width="1000">
