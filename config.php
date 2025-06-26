@@ -215,7 +215,7 @@ $GLOBALS['eventReminderEmail'] = <<<EOF
 提醒您即將到來的活動。
 
 『%EVENTNAME%』
-預定於 %DUETIME% 發生。
+預定於 %DUETIME% 開始。
 
 說明：
 %NOTES%
