@@ -3295,7 +3295,7 @@ class CandidatesUI extends UserInterface
                             $reminderEmails .= ',' . $pipelineUsers['jobOrderRecruiterEmail'];
                         }
                         $eventID = $calendar->addEvent(
-                            600, $date, $description, 0, $this->_userID,
+                            100, $date, $description, 0, $this->_userID,
                             $candidateID, DATA_ITEM_CANDIDATE, -1, $title,
                             15, 1, $reminderEmails, 15,
                             false, $_SESSION['CATS']->getTimeZoneOffset()
@@ -3359,7 +3359,7 @@ class CandidatesUI extends UserInterface
                             $reminderEmails .= ',' . $pipelineUsers['jobOrderRecruiterEmail'];
                         }
                         $eventID = $calendar->addEvent(
-                            600, $date, $description, 0, $this->_userID,
+                            100, $date, $description, 0, $this->_userID,
                             $candidateID, DATA_ITEM_CANDIDATE, -1, $title,
                             15, 1, $reminderEmails, 15,
                             false, $_SESSION['CATS']->getTimeZoneOffset()

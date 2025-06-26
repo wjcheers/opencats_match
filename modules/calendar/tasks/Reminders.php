@@ -125,31 +125,38 @@ class Reminders extends Task
     {
         if ($reminderTime < 1)
         {
-            $string = 'immediately';
+            //$string = 'immediately';
+            $string = '立即';
         }
         else if ($reminderTime == 1)
         {
-            $string = 'in 1 minute';
+            //$string = 'in 1 minute';
+            $string = '1分鐘';
         }
         else if ($reminderTime < 60)
         {
-            $string = 'in ' . $reminderTime . ' minutes';
+            //$string = 'in ' . $reminderTime . ' minutes';
+            $string = $reminderTime . '分鐘';
         }
         else if ($reminderTime == 60)
         {
-            $string = 'in 1 hour';
+            //$string = 'in 1 hour';
+            $string = '1小時';
         }
         else if ($reminderTime < 1440)
         {
-            $string = 'in ' . (($reminderTime * 1.0) / 60) . ' hours';
+            //$string = 'in ' . (($reminderTime * 1.0) / 60) . ' hours';
+            $string = (($reminderTime * 1.0) / 60) . '小時';
         }
         else if ($reminderTime == 1440)
         {
-            $string = 'in 1 day';
+            //$string = 'in 1 day';
+            $string = '1天';
         }
         else
         {
-            $string = 'in ' . (($reminderTime * 1.0) / 1440) . ' days';
+            //$string = 'in ' . (($reminderTime * 1.0) / 1440) . ' days';
+            $string = (($reminderTime * 1.0) / 1440) . '天';
         }
 
     	return $string;
