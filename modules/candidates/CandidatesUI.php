@@ -3373,6 +3373,21 @@ class CandidatesUI extends UserInterface
                     }
                 }
             }
+            else
+            {
+                if($oldStatusDescription == "Placed") 
+                {
+                    $calendar = new Calendar($this->_siteID);
+                    $events = $calendar->getUpcomingEventsByDataItem(DATA_ITEM_CANDIDATE, $candidateID);
+                    foreach ($events as $event) 
+                    {
+                        if ($event['description'] == '請關心你的到職人選，並與他/她保持聯繫！')
+                        {
+                            $calendar->deleteEvent($event['eventID']);
+                        }
+                    }
+                }
+            }
 
             if ($statusChanged && $this->isChecked('triggerEmail', $_POST))
             {
