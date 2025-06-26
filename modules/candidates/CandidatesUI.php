@@ -1230,6 +1230,19 @@ class CandidatesUI extends UserInterface
                 );
 
                 $email = $statusChangeTemplate;
+
+                if (!empty($emailAddress))
+                {
+                    /* Send e-mail notification. */
+                    //FIXME: Make subject configurable.
+                    $mailer = new Mailer($this->_siteID);
+                    $mailerStatus = $mailer->sendToOne(
+                        array($emailAddress, ''),
+                        'CATS: 人選負責人變更 (' . $ownerDetails['fullName'] . ') - ' . $candidateDetails['firstName'] . ' ' . $candidateDetails['lastName'],
+                        $email,
+                        true
+                    );
+                }
             }
             else
             {
@@ -3160,7 +3173,7 @@ class CandidatesUI extends UserInterface
                         array(/*consultants do not want this notification
                               array($pipelineUsers['candidateOwnerEmail'], ''), */
                               array($pipelineUsers['jobOrderRecruiterEmail'], '')),
-                        'CATS Notification: Personal Agreement Missed - ' . $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName']
+                        'CATS: 缺少個資同意書 - ' . $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName']
                         . ' (' . $pipelineUsers['candidateOwnerFirstName'] . ' ' . $pipelineUsers['candidateOwnerLastName'] . ')',
                         $email,
                         true);
@@ -3277,10 +3290,14 @@ class CandidatesUI extends UserInterface
                         $date = date('Y-m-d H:i:s', strtotime("+" . $days . " day", time()));
                         $title = $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'] . ' 已投遞 ' . $days . ' 天';
                         
+                        $reminderEmails = $pipelineUsers['candidateOwnerEmail'];
+                        if ($pipelineUsers['candidateOwnerEmail'] != $pipelineUsers['jobOrderRecruiterEmail']) {
+                            $reminderEmails .= ',' . $pipelineUsers['jobOrderRecruiterEmail'];
+                        }
                         $eventID = $calendar->addEvent(
                             600, $date, $description, 0, $this->_userID,
                             $candidateID, DATA_ITEM_CANDIDATE, -1, $title,
-                            15, 1, $pipelineUsers['candidateOwnerEmail'] . ',' . $pipelineUsers['jobOrderRecruiterEmail'], 15,
+                            15, 1, $reminderEmails, 15,
                             false, $_SESSION['CATS']->getTimeZoneOffset()
                         );
                         if ($eventID <= 0)
@@ -3337,10 +3354,14 @@ class CandidatesUI extends UserInterface
                         $date = date('Y-m-d H:i:s', strtotime("+" . $days . " day", time()));
                         $title = $pipelineUsers['candidateFirstName'] . ' ' . $pipelineUsers['candidateLastName'] . ' 已到職' . $days . ' 天';
                         
+                        $reminderEmails = $pipelineUsers['candidateOwnerEmail'];
+                        if ($pipelineUsers['candidateOwnerEmail'] != $pipelineUsers['jobOrderRecruiterEmail']) {
+                            $reminderEmails .= ',' . $pipelineUsers['jobOrderRecruiterEmail'];
+                        }
                         $eventID = $calendar->addEvent(
                             600, $date, $description, 0, $this->_userID,
                             $candidateID, DATA_ITEM_CANDIDATE, -1, $title,
-                            15, 1, $pipelineUsers['candidateOwnerEmail'] . ',' . $pipelineUsers['jobOrderRecruiterEmail'], 15,
+                            15, 1, $reminderEmails, 15,
                             false, $_SESSION['CATS']->getTimeZoneOffset()
                         );
                         if ($eventID <= 0)

@@ -340,19 +340,6 @@ class JobOrders
             return false;
         }
 
-        if (!empty($emailAddress))
-        {
-            /* Send e-mail notification. */
-            //FIXME: Make subject configurable.
-            $mailer = new Mailer($this->_siteID);
-            $mailerStatus = $mailer->sendToOne(
-                array($emailAddress, ''),
-                'CATS Notification: Job Order Ownership Change',
-                $email,
-                true
-            );
-        }
-
         return true;
     }
 

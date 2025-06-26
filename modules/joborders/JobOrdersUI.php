@@ -825,13 +825,16 @@ class JobOrdersUI extends UserInterface
 					/* Send e-mail notification. */
 					//FIXME: Make subject configurable.
 					$mailer = new Mailer($this->_siteID);
+
 					$mailerStatus = $mailer->sendToOne(
 						array($emailAddress, ''),
-						'CATS Notification: Job Order Added', $statusChangeTemplate, true);
+                        'CATS: 職缺新增 - ' . $title . ' (' . $companyName . ')',
+                        $statusChangeTemplate, true);
                         
 					$mailerStatus = $mailer->sendToOne(
 						array('cats@example.com', ''),
-						'CATS Notification: Job Order Added', $statusChangeTemplate, true);
+                        'CATS(Admin): 職缺新增 - ' . $title . ' (' . $companyName . ')',
+                        $statusChangeTemplate, true);
                 }
             }
         }
@@ -1131,6 +1134,19 @@ class JobOrdersUI extends UserInterface
                 );
 
                 $email = $statusChangeTemplate;
+
+                if (!empty($emailAddress))
+                {
+                    /* Send e-mail notification. */
+                    //FIXME: Make subject configurable.
+                    $mailer = new Mailer($this->_siteID);
+                    $mailerStatus = $mailer->sendToOne(
+                        array($emailAddress, ''),
+                        'CATS: 職缺負責人變更 (' . $ownerDetails['fullName'] . ') - ' . $jobOrderDetails['title'] . ' (' . $jobOrderDetails['companyName'] . ')',
+                        $email,
+                        true
+                    );
+                }
             }
             else
             {
@@ -1194,7 +1210,7 @@ class JobOrdersUI extends UserInterface
             $mailer = new Mailer($this->_siteID);
             $mailerStatus = $mailer->sendToOne(
                 array('cats@example.com', ''),
-                'CATS: Job Order Modified - ' . $jobOrderDetails['title'] . ' (' . $jobOrderDetails['companyName'] . ')',
+                'CATS(Admin): 職缺變更(' . $_POST['status'] . ') - ' . $jobOrderDetails['title'] . ' (' . $jobOrderDetails['companyName'] . ')',
                 $statusChangeTemplateJecho, true);
         }
 		
@@ -1258,7 +1274,8 @@ class JobOrdersUI extends UserInterface
 					$mailer = new Mailer($this->_siteID);
 					$mailerStatus = $mailer->sendToOne(
 						array($emailAddressOwner, ''),
-						'CATS Notification: Job Order Modified', $statusChangeTemplateOwner, true);
+                        'CATS: 職缺變更(' . $_POST['status'] . ') - ' . $jobOrderDetails['title'] . ' (' . $jobOrderDetails['companyName'] . ')',
+                        $statusChangeTemplateOwner, true);
 				}
 			}
         }
