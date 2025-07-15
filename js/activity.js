@@ -47,8 +47,8 @@ ACTIVITY_IM_LINE     = 1500;
 ACTIVITY_IM          = 1600;
 ACTIVITY_REPORT      = 1700;
 
-ARRANGE_TEXT = "Arrange: \nDate: 9/9/2020\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
-CONFIRM_TEXT = "Confirm: \nDate: 9/9/2020\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
+ARRANGE_TEXT = "Arrange: \nDate: 9/9/2025\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
+CONFIRM_TEXT = "Confirm: \nDate: 9/9/2025\nTime: 7:30am (UTC+8)\nVenue: Phone: / Skype: / On site\nNote: he is on biz travel, hence phone interview is much preferred.\n";
 INTERVIEW_TEXT = "Interview: \n1.興趣程度(和前一次面試或投履歷時相比)\n2.面試感想\n  A.對面試官、環境(文化)評價\n  B.和自己技能的相符程度、可發揮空間\n  C.對工作內容的興趣程度\n3.其他(可以參考上方面試回饋範例)\n";
 QUALIFYING_TEXT = "1.必不能安排的時間\n2.其他面試及Offer\n3.預期到職日\n4.申請動機\n5.聯繫方式\n\n";
 DECLINE_TEXT = "拒絕原因：\n\n";
@@ -973,8 +973,14 @@ function AS_onChangeStatusChangeGenerateEmail(emailText, emailTextOrigional,
 
 //FIXME: Document me.
 function AS_onChangeStatusChange(changeStatusCheckboxID, statusSelectID,
-    changeStatusSpanBID)
+    changeStatusSpanBID, addActivityCheckboxID, activityTypeSelectID,
+    activityNoteID, spanAID, spanBID)
 {
+    var addActivityCheckbox = document.getElementById(addActivityCheckboxID);
+    var activityTypeSelect = document.getElementById(activityTypeSelectID);
+    var activityNote = document.getElementById(activityNoteID);
+    var spanA = document.getElementById(spanAID);
+    var spanB = document.getElementById(spanBID);
     var changeStatusCheckbox = document.getElementById(changeStatusCheckboxID);
     var statusSelect = document.getElementById(statusSelectID);
     var changeStatusSpanB = document.getElementById(changeStatusSpanBID);
@@ -983,11 +989,19 @@ function AS_onChangeStatusChange(changeStatusCheckboxID, statusSelectID,
     {
         statusSelect.disabled = false;
         changeStatusSpanB.style.color = '#000';
+
+        addActivityCheckbox.checked = true;
+        activityTypeSelect.disabled = false;
+        activityNote.disabled = false;
+        spanA.style.color = '#000';
+        spanB.style.color = '#000';
+
     }
     else
     {
         statusSelect.disabled = true;
         changeStatusSpanB.style.color = '#aaa';
+
     }
 }
 
@@ -1010,13 +1024,23 @@ function AS_onSendEmailChange(triggersEmailCheckboxID, sendEmailRowID, visibleRo
 
 //FIXME: Document me.
 function AS_onAddActivityChange(addActivityCheckboxID, activityTypeSelectID,
-    activityNoteID, spanAID, spanBID)
+    activityNoteID, spanAID, spanBID, changeStatusCheckboxID = null, event = null)
 {
     var addActivityCheckbox = document.getElementById(addActivityCheckboxID);
     var activityTypeSelect = document.getElementById(activityTypeSelectID);
     var activityNote = document.getElementById(activityNoteID);
     var spanA = document.getElementById(spanAID);
     var spanB = document.getElementById(spanBID);
+
+    if (changeStatusCheckboxID != null)
+    {
+        var changeStatusCheckbox = document.getElementById(changeStatusCheckboxID);
+        if (changeStatusCheckbox.checked)
+        {
+            if (event) event.preventDefault();
+            return; // do nothing
+        }
+    }
 
     if (addActivityCheckbox.checked)
     {

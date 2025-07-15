@@ -78,7 +78,7 @@
                     <label id="statusIDLabel" for="statusID">Status:</label>
                 </td>
                 <td class="tdData">
-                    <input type="checkbox" name="changeStatus" id="changeStatus" style="margin-left: 0px" onclick="AS_onChangeStatusChange('changeStatus', 'statusID', 'changeStatusSpanB');"<?php if ($this->selectedJobOrderID == -1 || $this->onlyScheduleEvent): ?> disabled<?php endif; ?> />
+                    <input type="checkbox" name="changeStatus" id="changeStatus" style="margin-left: 0px" onclick="AS_onChangeStatusChange('changeStatus', 'statusID', 'changeStatusSpanB', 'addActivity', 'activityTypeID', 'activityNote', 'addActivitySpanA', 'addActivitySpanB');"<?php if ($this->selectedJobOrderID == -1 || $this->onlyScheduleEvent): ?> disabled<?php endif; ?> />
                     <span id="changeStatusSpanA"<?php if ($this->selectedJobOrderID == -1): ?> style="color: #aaaaaa;"<?php endif;?>>Change Status</span><br />
 
                     <div id="changeStatusDiv" style="margin-top: 4px;">
@@ -105,11 +105,11 @@
                         <span id="triggerValidEmailSpan" style="display: none;" data-email-count=0 data-email=<?php echo($this->email1) ?> ><br><input type="checkbox" name="triggerValidEmail" id="triggerValidEmail" /><b>Prepare Email later.</b></span>
                         <span id="triggerValidGenderSpan" style="display: none;" data-gender-count=0 data-gender=<?php echo($this->gender) ?> ><br><input type="checkbox" name="triggerValidGender" id="triggerValidGender" /><b>Prepare Gender later.</b></span>
                         <span id="triggerValidNationalitySpan" style="display: none;" data-nationality-count=0 data-nationality=<?php echo($this->nationality) ?> ><br><input type="checkbox" name="triggerValidNationality" id="triggerValidNationality" /><b>Prepare Nationality later.</b></span>
-                        <!--
+                        <?php if (FALSE): ?>
                         <span id="triggerValidSenioritySpan" style="display: none;" data-seniority-count=0 data-seniority=<?php echo($this->seniority) ?> ><br><input type="checkbox" name="triggerValidSeniority" id="triggerValidSeniority" /><b>Prepare Seniority later.</b></span>
                         <span id="triggerValidCareerSummarySpan" style="display: none;" data-career-summary-count=0 data-career-summary=<?php echo($this->careerSummary) ?> ><br><input type="checkbox" name="triggerValidCareerSummary" id="triggerCareerSummary" /><b>Prepare Career Summary later.</b></span>
                         <span id="triggerValidSkillSummarySpan" style="display: none;" data-skill-summary-count=0 data-skill-summary=<?php echo($this->skillSummary) ?> ><br><input type="checkbox" name="triggerValidSkillSummary" id="triggerSkillSummary" /><b>Prepare Skill Summary later.</b></span>
-                        -->
+                        <?php endif; ?>
                     </div>
                 </td>
             </tr>
@@ -130,7 +130,7 @@
                     <label id="addActivityLabel" for="addActivity">Activity:</label>
                 </td>
                 <td class="tdData">
-                    <input type="checkbox" name="addActivity" id="addActivity" style="margin-left: 0px;"<?php if (!$this->onlyScheduleEvent): ?> checked="checked"<?php endif; ?> onclick="AS_onAddActivityChange('addActivity', 'activityTypeID', 'activityNote', 'addActivitySpanA', 'addActivitySpanB');" />Log an Activity<br />
+                    <input type="checkbox" name="addActivity" id="addActivity" style="margin-left: 0px;"<?php if (!$this->onlyScheduleEvent): ?> checked="checked"<?php endif; ?> onclick="AS_onAddActivityChange('addActivity', 'activityTypeID', 'activityNote', 'addActivitySpanA', 'addActivitySpanB', 'changeStatus', event);" />Log an Activity<br />
                     <div id="activityNoteDiv" style="margin-top: 4px;">
                         <span id="addActivitySpanA">Activity Type</span><br />
                         <select id="activityTypeID" name="activityTypeID" class="inputbox" style="width: 150px; margin-bottom: 4px;" onclick="AS_onActivityChange('addActivity', 'activityTypeID', 'activityNote', 'addActivitySpanA', 'addActivitySpanB');">
