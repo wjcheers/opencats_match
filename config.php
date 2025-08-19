@@ -220,6 +220,8 @@ $GLOBALS['eventReminderEmail'] = <<<EOF
 說明：
 %NOTES%
 
+https://www.catsone.com/index.php?m=calendar
+
 --
 CATS
 EOF;
