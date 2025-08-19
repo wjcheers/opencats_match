@@ -210,7 +210,6 @@ define('MAIL_SMTP_PASS', "def");
 
 /* Event reminder E-Mail Template. */
 $GLOBALS['eventReminderEmail'] = <<<EOF
-%FULLNAME%，
 
 提醒您即將到來的活動。
 
