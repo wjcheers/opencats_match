@@ -726,6 +726,81 @@
                     </td>
 
                 </tr>
+                <tr>
+                    <td colspan="3" width="1260" valign="top">
+                        <table class="statisticsTable" width="1240" style="margin-top: 20px;">
+                            <tr>
+                                <th align="left" colspan="2">自訂月份範圍報告</th>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <form method="get" action="<?php echo(CATSUtility::getIndexName()); ?>">
+                                        <input type="hidden" name="m" value="reports" />
+                                        <input type="hidden" name="a" value="showCustomRangeReport" />
+                                        <table border="0" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td align="right" style="padding-right: 10px;">開始月份：</td>
+                                                <td>
+                                                    <select name="customStartYear" style="width: 80px;">
+                                                        <?php
+                                                        $currentYear = date('Y');
+                                                        $currentMonth = date('m');
+                                                        for ($year = $currentYear - 5; $year <= $currentYear + 1; $year++)
+                                                        {
+                                                            $selected = (isset($this->customStartYear) && $this->customStartYear == $year) ? 'selected' : ((!isset($this->customStartYear) && $year == $currentYear) ? 'selected' : '');
+                                                            echo '<option value="' . $year . '" ' . $selected . '>' . $year . '</option>';
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                    <select name="customStartMonth" style="width: 80px; margin-left: 5px;">
+                                                        <?php
+                                                        for ($month = 1; $month <= 12; $month++)
+                                                        {
+                                                            $monthStr = sprintf('%02d', $month);
+                                                            $selected = (isset($this->customStartMonth) && $this->customStartMonth == $monthStr) ? 'selected' : ((!isset($this->customStartMonth) && $monthStr == $currentMonth) ? 'selected' : '');
+                                                            echo '<option value="' . $monthStr . '" ' . $selected . '>' . $monthStr . '</option>';
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </td>
+                                                <td align="right" style="padding-left: 20px; padding-right: 10px;">結束月份：</td>
+                                                <td>
+                                                    <select name="customEndYear" style="width: 80px;">
+                                                        <?php
+                                                        for ($year = $currentYear - 5; $year <= $currentYear + 1; $year++)
+                                                        {
+                                                            $selected = (isset($this->customEndYear) && $this->customEndYear == $year) ? 'selected' : ((!isset($this->customEndYear) && $year == $currentYear) ? 'selected' : '');
+                                                            echo '<option value="' . $year . '" ' . $selected . '>' . $year . '</option>';
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                    <select name="customEndMonth" style="width: 80px; margin-left: 5px;">
+                                                        <?php
+                                                        for ($month = 1; $month <= 12; $month++)
+                                                        {
+                                                            $monthStr = sprintf('%02d', $month);
+                                                            $selected = (isset($this->customEndMonth) && $this->customEndMonth == $monthStr) ? 'selected' : ((!isset($this->customEndMonth) && $monthStr == $currentMonth) ? 'selected' : '');
+                                                            echo '<option value="' . $monthStr . '" ' . $selected . '>' . $monthStr . '</option>';
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </td>
+                                                <td style="padding-left: 20px;">
+                                                    <input type="submit" value="查詢" class="button" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="padding-top: 10px; color: #666; font-size: 12px;">
+                                    選擇月份範圍後點擊「查詢」按鈕查看報告
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>

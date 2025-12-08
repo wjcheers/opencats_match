@@ -2439,6 +2439,51 @@ class Statistics
 
         return $criteria;
     }
+
+    /**
+     * Creates a date range criterion for custom date ranges.
+     *
+     * @param string dateField The date field to filter on
+     * @param string startDate Start date in YYYY-MM-DD format
+     * @param string endDate End date in YYYY-MM-DD format
+     * @return string SQL criterion
+     */
+    public function makeDateRangeCriterion($dateField, $startDate, $endDate)
+    {
+        // Validate dates
+        if (empty($startDate) || empty($endDate))
+        {
+            return sprintf('AND %s > \'1900-01-01\'', $dateField);
+        }
+
+        // Ensure dates are in correct format
+        $startDate = date('Y-m-d', strtotime($startDate));
+        $endDate = date('Y-m-d', strtotime($endDate));
+
+        // Swap dates if start is after end
+        if (strtotime($startDate) > strtotime($endDate))
+        {
+            $temp = $startDate;
+            $startDate = $endDate;
+            $endDate = $temp;
+        }
+
+        $criteria = sprintf(
+            'AND %s > \'1900-01-01\' AND DATE(%s) >= \'%s\' AND DATE(%s) <= \'%s\'',
+            $dateField,
+            $dateField,
+            $startDate,
+            $dateField,
+            $endDate
+        );
+
+        if ($this->_timeZoneOffset != 0)
+        {
+            $criteria = str_replace($dateField, 'DATE_ADD(' . $dateField . ', INTERVAL ' . $this->_timeZoneOffset . ' HOUR)', $criteria);
+        }
+
+        return $criteria;
+    }
 }
 
 ?>
