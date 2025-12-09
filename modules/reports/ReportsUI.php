@@ -236,6 +236,7 @@ class ReportsUI extends UserInterface
         $customEndMonth = $this->getTrimmedInput('customEndMonth', $_GET);
         $customStartYear = $this->getTrimmedInput('customStartYear', $_GET);
         $customEndYear = $this->getTrimmedInput('customEndYear', $_GET);
+        $userID = $this->getTrimmedInput('userID', $_GET);
         
         // Validate input
         if (empty($customStartMonth) || empty($customEndMonth) || empty($customStartYear) || empty($customEndYear))
@@ -247,13 +248,46 @@ class ReportsUI extends UserInterface
         
         $statistics = new Statistics($this->_siteID);
         
+        // Get users list
+        $usersRS = $statistics->getReportUsers(TIME_PERIOD_TODATE);
+        
+        // Check if start date is after end date, swap months if needed
+        $startTimestamp = strtotime(sprintf('%04d-%02d-01', $customStartYear, $customStartMonth));
+        $endTimestamp = strtotime(sprintf('%04d-%02d-01', $customEndYear, $customEndMonth));
+        
+        if ($startTimestamp > $endTimestamp)
+        {
+            // Swap months
+            $tempYear = $customStartYear;
+            $tempMonth = $customStartMonth;
+            $customStartYear = $customEndYear;
+            $customStartMonth = $customEndMonth;
+            $customEndYear = $tempYear;
+            $customEndMonth = $tempMonth;
+        }
+        
         // Calculate start and end dates (first day of start month to last day of end month)
         $startDate = sprintf('%04d-%02d-01', $customStartYear, $customStartMonth);
         $endDate = date('Y-m-t', strtotime(sprintf('%04d-%02d-01', $customEndYear, $customEndMonth)));
         
         // Get statistics for custom date range
-        $customStatisticsData = $this->getCustomDateRangeStatistics($statistics, $startDate, $endDate);
+        $customStatisticsData = $this->getCustomDateRangeStatistics($statistics, $startDate, $endDate, $userID);
         $customStatisticsData['dateRange'] = sprintf('%04d年%02d月 至 %04d年%02d月', $customStartYear, $customStartMonth, $customEndYear, $customEndMonth);
+        
+        // Get selected user name
+        $selectedUserName = '全部使用者';
+        if (!empty($userID))
+        {
+            foreach ($usersRS as $user)
+            {
+                if ($user['userID'] == $userID)
+                {
+                    $selectedUserName = $user['ownerFullName'];
+                    break;
+                }
+            }
+        }
+        $customStatisticsData['selectedUserName'] = $selectedUserName;
 
         if (!eval(Hooks::get('REPORTS_SHOW_CUSTOM_RANGE'))) return;
 
@@ -263,90 +297,195 @@ class ReportsUI extends UserInterface
         $this->_template->assign('customEndMonth', $customEndMonth);
         $this->_template->assign('customStartYear', $customStartYear);
         $this->_template->assign('customEndYear', $customEndYear);
+        $this->_template->assign('userID', $userID);
+        $this->_template->assign('usersRS', $usersRS);
         $this->_template->display('./modules/reports/CustomRangeReport.tpl');
     }
 
     /**
      * Get statistics for custom date range
      */
-    private function getCustomDateRangeStatistics($statistics, $startDate, $endDate)
+    private function getCustomDateRangeStatistics($statistics, $startDate, $endDate, $userID = null)
     {
         $data = array();
         $db = DatabaseConnection::getInstance();
         
+        // Build user criterion if userID is specified
+        $userCriterion = '';
+        if (!empty($userID) && $userID != '')
+        {
+            $userCriterion = sprintf("AND candidate.owner = %s", $db->makeQueryInteger($userID));
+        }
+        
         // Get company statistics
         $criterion = $statistics->makeDateRangeCriterion('date_created', $startDate, $endDate);
-        $sql = sprintf(
-            "SELECT COUNT(*) AS count FROM company WHERE site_id = %s %s",
-            $this->_siteID,
-            $criterion
-        );
+        if (!empty($userID) && $userID != '')
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM company WHERE site_id = %s AND entered_by = %s %s",
+                $this->_siteID,
+                $db->makeQueryInteger($userID),
+                $criterion
+            );
+        }
+        else
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM company WHERE site_id = %s %s",
+                $this->_siteID,
+                $criterion
+            );
+        }
         $rs = $db->getAssoc($sql);
         $data['companies'] = $rs['count'];
         
         // Get candidate statistics
         $criterion = $statistics->makeDateRangeCriterion('date_created', $startDate, $endDate);
-        $sql = sprintf(
-            "SELECT COUNT(*) AS count FROM candidate WHERE site_id = %s %s",
-            $this->_siteID,
-            $criterion
-        );
+        if (!empty($userID) && $userID != '')
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM candidate WHERE site_id = %s AND entered_by = %s %s",
+                $this->_siteID,
+                $db->makeQueryInteger($userID),
+                $criterion
+            );
+        }
+        else
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM candidate WHERE site_id = %s %s",
+                $this->_siteID,
+                $criterion
+            );
+        }
         $rs = $db->getAssoc($sql);
         $data['candidates'] = $rs['count'];
         
         // Get job order statistics
         $criterion = $statistics->makeDateRangeCriterion('date_created', $startDate, $endDate);
-        $sql = sprintf(
-            "SELECT COUNT(*) AS count FROM joborder WHERE site_id = %s %s",
-            $this->_siteID,
-            $criterion
-        );
+        if (!empty($userID) && $userID != '')
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM joborder WHERE site_id = %s AND entered_by = %s %s",
+                $this->_siteID,
+                $db->makeQueryInteger($userID),
+                $criterion
+            );
+        }
+        else
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM joborder WHERE site_id = %s %s",
+                $this->_siteID,
+                $criterion
+            );
+        }
         $rs = $db->getAssoc($sql);
         $data['jobOrders'] = $rs['count'];
         
         // Get pipeline statistics
-        $criterion = $statistics->makeDateRangeCriterion('date_created', $startDate, $endDate);
-        $sql = sprintf(
-            "SELECT COUNT(*) AS count FROM candidate_joborder WHERE site_id = %s %s",
-            $this->_siteID,
-            $criterion
-        );
+        $criterion = $statistics->makeDateRangeCriterion('candidate_joborder.date_created', $startDate, $endDate);
+        if (!empty($userID) && $userID != '')
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM candidate_joborder 
+                 LEFT JOIN candidate ON candidate.candidate_id = candidate_joborder.candidate_id
+                 WHERE candidate_joborder.site_id = %s AND candidate.owner = %s %s",
+                $this->_siteID,
+                $db->makeQueryInteger($userID),
+                $criterion
+            );
+        }
+        else
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM candidate_joborder WHERE candidate_joborder.site_id = %s %s",
+                $this->_siteID,
+                $criterion
+            );
+        }
         $rs = $db->getAssoc($sql);
         $data['pipelines'] = $rs['count'];
         
         // Get submission statistics
-        $criterion = $statistics->makeDateRangeCriterion('date', $startDate, $endDate);
-        $sql = sprintf(
-            "SELECT COUNT(*) AS count FROM candidate_joborder_status_history 
-             LEFT JOIN joborder ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
-             WHERE status_to = 400 AND joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
-             AND candidate_joborder_status_history.site_id = %s %s",
-            $this->_siteID,
-            $criterion
-        );
+        $criterion = $statistics->makeDateRangeCriterion('candidate_joborder_status_history.date', $startDate, $endDate);
+        if (!empty($userID) && $userID != '')
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM candidate_joborder_status_history 
+                 LEFT JOIN joborder ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+                 LEFT JOIN candidate ON candidate.candidate_id = candidate_joborder_status_history.candidate_id
+                 WHERE status_to = 400
+                 AND candidate_joborder_status_history.site_id = %s
+                 AND candidate.owner = %s %s",
+                $this->_siteID,
+                $db->makeQueryInteger($userID),
+                $criterion
+            );
+        }
+        else
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM candidate_joborder_status_history 
+                 LEFT JOIN joborder ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+                 WHERE status_to = 400
+                 AND candidate_joborder_status_history.site_id = %s %s",
+                $this->_siteID,
+                $criterion
+            );
+        }
         $rs = $db->getAssoc($sql);
         $data['submissions'] = $rs['count'];
         
         // Get placement statistics
-        $criterion = $statistics->makeDateRangeCriterion('date', $startDate, $endDate);
-        $sql = sprintf(
-            "SELECT COUNT(*) AS count FROM candidate_joborder_status_history 
-             LEFT JOIN joborder ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
-             WHERE status_to = 800 AND joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
-             AND candidate_joborder_status_history.site_id = %s %s",
-            $this->_siteID,
-            $criterion
-        );
+        $criterion = $statistics->makeDateRangeCriterion('candidate_joborder_status_history.date', $startDate, $endDate);
+        if (!empty($userID) && $userID != '')
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM candidate_joborder_status_history 
+                 LEFT JOIN joborder ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+                 LEFT JOIN candidate ON candidate.candidate_id = candidate_joborder_status_history.candidate_id
+                 WHERE status_to = 800
+                 AND candidate_joborder_status_history.site_id = %s
+                 AND candidate.owner = %s %s",
+                $this->_siteID,
+                $db->makeQueryInteger($userID),
+                $criterion
+            );
+        }
+        else
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM candidate_joborder_status_history 
+                 LEFT JOIN joborder ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
+                 WHERE status_to = 800
+                 AND candidate_joborder_status_history.site_id = %s %s",
+                $this->_siteID,
+                $criterion
+            );
+        }
         $rs = $db->getAssoc($sql);
         $data['placements'] = $rs['count'];
         
         // Get contact statistics
         $criterion = $statistics->makeDateRangeCriterion('date_created', $startDate, $endDate);
-        $sql = sprintf(
-            "SELECT COUNT(*) AS count FROM contact WHERE site_id = %s %s",
-            $this->_siteID,
-            $criterion
-        );
+        if (!empty($userID) && $userID != '')
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM contact WHERE site_id = %s AND entered_by = %s %s",
+                $this->_siteID,
+                $db->makeQueryInteger($userID),
+                $criterion
+            );
+        }
+        else
+        {
+            $sql = sprintf(
+                "SELECT COUNT(*) AS count FROM contact WHERE site_id = %s %s",
+                $this->_siteID,
+                $criterion
+            );
+        }
         $rs = $db->getAssoc($sql);
         $data['contacts'] = $rs['count'];
         

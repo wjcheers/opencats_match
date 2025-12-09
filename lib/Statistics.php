@@ -100,8 +100,6 @@ class Statistics
             WHERE
                 status_to = 400
             AND
-                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
-            AND
                 candidate_joborder_status_history.site_id = %s
             %s",
             $this->_siteID,
@@ -305,16 +303,14 @@ class Statistics
             LEFT JOIN user AS owner_user
                 ON owner_user.user_id = joborder.owner
             WHERE
-                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
-                %s
-            AND
                 joborder.site_id = %s
+            %s
             GROUP BY
                 jobOrderID
             ORDER BY
                 company.name ASC",
-            $criterion,
-            $this->_siteID
+            $this->_siteID,
+            $criterion
         );
 
         return $this->_db->getAllAssoc($sql);
@@ -414,8 +410,6 @@ class Statistics
             LEFT JOIN user AS owner_user
                 ON owner_user.user_id = joborder.owner
             WHERE
-                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
-            AND
                 joborder.site_id = %s
             GROUP BY
                 jobOrderID
@@ -635,8 +629,6 @@ class Statistics
             LEFT JOIN user AS owner_user
                 ON owner_user.user_id = joborder.owner
             WHERE
-                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
-            AND
                 joborder.site_id = %s
             GROUP BY
                 jobOrderID
@@ -854,8 +846,6 @@ class Statistics
                     WHERE
                         status_to = 400
                     AND
-                        joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
-                    AND
                         companyPipeline.site_id = %s
                     AND
                         companyPipeline.company_id = company.company_id
@@ -966,8 +956,6 @@ class Statistics
             WHERE
                 status_to = 400
             AND
-                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
-            AND
                 company.site_id = %s
             AND
                 company.company_id = %s
@@ -1052,8 +1040,6 @@ class Statistics
             LEFT JOIN user AS owner_user
                 ON owner_user.user_id = joborder.owner
             WHERE
-                joborder.status IN ('Active', 'OnHold', 'Full', 'Closed')
-            AND
                 joborder.site_id = %s
             GROUP BY
                 jobOrderID

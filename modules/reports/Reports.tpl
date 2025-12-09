@@ -745,19 +745,21 @@
                                                         <?php
                                                         $currentYear = date('Y');
                                                         $currentMonth = date('m');
+                                                        $startYear = (isset($this->customStartYear) && !empty($this->customStartYear)) ? $this->customStartYear : $currentYear;
                                                         for ($year = $currentYear - 5; $year <= $currentYear + 1; $year++)
                                                         {
-                                                            $selected = (isset($this->customStartYear) && $this->customStartYear == $year) ? 'selected' : ((!isset($this->customStartYear) && $year == $currentYear) ? 'selected' : '');
+                                                            $selected = ($startYear == $year) ? 'selected' : '';
                                                             echo '<option value="' . $year . '" ' . $selected . '>' . $year . '</option>';
                                                         }
                                                         ?>
                                                     </select>
                                                     <select name="customStartMonth" style="width: 80px; margin-left: 5px;">
                                                         <?php
+                                                        $startMonth = (isset($this->customStartMonth) && !empty($this->customStartMonth)) ? $this->customStartMonth : $currentMonth;
                                                         for ($month = 1; $month <= 12; $month++)
                                                         {
                                                             $monthStr = sprintf('%02d', $month);
-                                                            $selected = (isset($this->customStartMonth) && $this->customStartMonth == $monthStr) ? 'selected' : ((!isset($this->customStartMonth) && $monthStr == $currentMonth) ? 'selected' : '');
+                                                            $selected = ($startMonth == $monthStr) ? 'selected' : '';
                                                             echo '<option value="' . $monthStr . '" ' . $selected . '>' . $monthStr . '</option>';
                                                         }
                                                         ?>
@@ -767,19 +769,21 @@
                                                 <td>
                                                     <select name="customEndYear" style="width: 80px;">
                                                         <?php
+                                                        $endYear = (isset($this->customEndYear) && !empty($this->customEndYear)) ? $this->customEndYear : $currentYear;
                                                         for ($year = $currentYear - 5; $year <= $currentYear + 1; $year++)
                                                         {
-                                                            $selected = (isset($this->customEndYear) && $this->customEndYear == $year) ? 'selected' : ((!isset($this->customEndYear) && $year == $currentYear) ? 'selected' : '');
+                                                            $selected = ($endYear == $year) ? 'selected' : '';
                                                             echo '<option value="' . $year . '" ' . $selected . '>' . $year . '</option>';
                                                         }
                                                         ?>
                                                     </select>
                                                     <select name="customEndMonth" style="width: 80px; margin-left: 5px;">
                                                         <?php
+                                                        $endMonth = (isset($this->customEndMonth) && !empty($this->customEndMonth)) ? $this->customEndMonth : $currentMonth;
                                                         for ($month = 1; $month <= 12; $month++)
                                                         {
                                                             $monthStr = sprintf('%02d', $month);
-                                                            $selected = (isset($this->customEndMonth) && $this->customEndMonth == $monthStr) ? 'selected' : ((!isset($this->customEndMonth) && $monthStr == $currentMonth) ? 'selected' : '');
+                                                            $selected = ($endMonth == $monthStr) ? 'selected' : '';
                                                             echo '<option value="' . $monthStr . '" ' . $selected . '>' . $monthStr . '</option>';
                                                         }
                                                         ?>
