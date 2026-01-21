@@ -793,7 +793,7 @@ class ActivityEntries
             );
         }
 
-        $activityCondition = "AND (activity_type.short_description = 'Report' OR 
+        $activityCondition = "AND ((activity_type.short_description = 'Report' OR 
             activity_type.short_description = 'Call (Talked)' OR 
             activity_type.short_description = 'Call (First)' OR 
             activity_type.short_description = 'Call (Missed)' OR 
@@ -802,7 +802,8 @@ class ActivityEntries
             activity_type.short_description = 'Meeting' OR 
             activity_type.short_description = 'IM (Linkedin)' OR 
             activity_type.short_description = 'IM (Line)' OR 
-            activity_type.short_description = 'IM')";
+            activity_type.short_description = 'IM') OR 
+            activity.data_item_type = " . DATA_ITEM_COMPANY . ")";
             
         $userCondition = '';
         if($userID != NULL)

@@ -22,7 +22,8 @@
             <th align="left" nowrap="nowrap">Interviewing CANDs</th>
             <th align="left" nowrap="nowrap">Offered CANDs</th>
             <th align="left" nowrap="nowrap">Placed CANDs</th>
-            <th align="left" nowrap="nowrap">Activities Count</th>
+            <th align="left" nowrap="nowrap">Activities</th>
+            <th align="left" nowrap="nowrap">Activities(by Comp)</th>
             <!--
             <th align="left" nowrap="nowrap">Created Companies</th>
             <th align="left" nowrap="nowrap">Created Contacts</th>
@@ -53,6 +54,7 @@
                     <td valign="top" align="left"><?php $this->_($reportData['offeredCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['placedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($reportData['activityCompanyCount']) ?>&nbsp;</td>
                 </tr>
             <?php endforeach; ?>
         <?php endforeach; ?>

@@ -23,6 +23,7 @@
             <th align="left" nowrap="nowrap">Meeting</th>
             <th align="left" nowrap="nowrap">Contact</th>
             <th align="left" nowrap="nowrap">Activities</th>
+            <th align="left" nowrap="nowrap">Activities(by Comp)</th>
             <th align="left" nowrap="nowrap">Created</th>
             <th align="left" nowrap="nowrap">Submitted Person</th>
             <th align="left" nowrap="nowrap">Submitted</th>
@@ -44,6 +45,7 @@
                     <td valign="top" align="left"><?php $this->_($reportData['activityMeeting']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityContact']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['activityCount']) ?>&nbsp;</td>
+                    <td valign="top" align="left"><?php $this->_($reportData['activityCompanyCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['createdCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['personSubmittedCount']) ?>&nbsp;</td>
                     <td valign="top" align="left"><?php $this->_($reportData['submittedCount']) ?>&nbsp;</td>
@@ -130,7 +132,7 @@
     <br clear="all" />
     <br />
     
-    <p class="note">Report Activity (Call, E-Mail, Meeting, IM)</p>
+    <p class="note">Report Activity (Call, E-Mail, Meeting, IM, Company)</p>
     
     <table id="activityTable" class="sortable" width="1225">
         <tr>

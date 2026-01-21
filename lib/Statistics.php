@@ -1509,11 +1509,31 @@ class Statistics
 
         $activity_count = $this->_db->getAllAssoc($sql);
         
+        $sql = sprintf(
+            "SELECT
+                COUNT(DISTINCT activity.data_item_id) AS activityCompanyCount
+            FROM
+                activity
+            WHERE
+                activity.entered_by = %s
+            %s
+            AND
+                activity.data_item_type = %s
+            AND
+                activity.site_id = %s",
+            $userID,
+            $criterion,
+            DATA_ITEM_COMPANY,
+            $this->_siteID
+        );
+
+        $activity_company_count = $this->_db->getAllAssoc($sql);
+
+        /*
         $criterion = $this->makePeriodCriterion(
             'contact.date_created', $period, $subday
         );
 
-        /*
         $sql = sprintf(
             "SELECT
                 COUNT(*) AS contactCount
@@ -1569,6 +1589,7 @@ class Statistics
         $z[0]['activityMeeting'] = $activity_meeting[0]['activityMeeting'];
         $z[0]['activityContact'] = $activity_contact[0]['activityContact'];
         $z[0]['activityCount'] = $activity_count[0]['activityCount'];
+        $z[0]['activityCompanyCount'] = $activity_company_count[0]['activityCompanyCount'];
         /*
         $z[0]['companyCount'] = $company_count[0]['companyCount'];
         $z[0]['contactCount'] = $contact_count[0]['contactCount'];
