@@ -112,7 +112,7 @@
                             <label id="salaryLabel" for="salary">Salary:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="14" class="inputbox" id="salary" name="salary" value="<?php $this->_($this->data['salary']); ?>" style="width: 150px;" />
+                            <input type="text" tabindex="14" class="inputbox" id="salary" name="salary" value="<?php $this->_($this->data['salary']); ?>" style="width: 150px;" />&nbsp;*
                         </td>
                     </tr>
 
@@ -310,7 +310,7 @@
                     <?php for ($i = 0; $i < count($this->extraFieldRS); $i++): ?>
                         <tr>
                             <td class="tdVertical" id="extraFieldTd<?php echo($i); ?>">
-                                <label id="extraFieldLbl<?php echo($i); ?>">
+                                <label id="extraFieldLbl<?php echo($i); ?>" data-field-name="<?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>">
                                     <?php $this->_($this->extraFieldRS[$i]['fieldName']); ?>:
                                 </label>
                             </td>
@@ -328,6 +328,25 @@
                             <textarea tabindex="20" class="mceEditor" name="description" id="description" rows="45" style="width: 800px;"><?php $this->_($this->data['description']); ?></textarea>
                         </td>
                     </tr>
+                    <script type="text/javascript">
+                        (function(){
+                            var labels=document.querySelectorAll('[id^=extraFieldLbl]');
+                            for(var i=0;i<labels.length;i++){
+                                var t=labels[i].getAttribute('data-field-name')||'';
+                                if(t==='Functions'||t==='Short Name'){
+                                    var fieldContainer=document.getElementById('extraFieldData'+i);
+                                    if(!fieldContainer){
+                                        continue;
+                                    }
+                                    var field=fieldContainer.querySelector('input, select, textarea');
+                                    if(!field){
+                                        continue;
+                                    }
+                                    field.parentNode.insertBefore(document.createTextNode('\u00a0*'), field.nextSibling);
+                                }
+                            }
+                        })();
+                    </script>
 
                     <tr>
                         <td class="tdVertical">

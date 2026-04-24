@@ -737,9 +737,23 @@ class JobOrdersUI extends UserInterface
         $notes       = $this->getTrimmedInput('notes', $_POST);
 
         /* Bail out if any of the required fields are empty. */
-        if (empty($title) || empty($type) || empty($city) || empty($state))
+        if (empty($title) || empty($type) || empty($city) || empty($state) || empty($salary))
         {
             CommonErrors::fatal(COMMONERROR_MISSINGFIELDS, $this, 'Required fields are missing.');
+        }
+
+        // Require Extra Fields: Functions and Short Name
+        $jobOrdersTmp = new JobOrders($this->_siteID);
+        $settingsEF = $jobOrdersTmp->extraFields->getSettings();
+        foreach ($settingsEF as $efIndex => $ef) {
+            $name = trim($ef['fieldName']);
+            if ($name === 'Functions' || $name === 'Short Name') {
+                $key = 'extraField' . $efIndex;
+                $val = $this->getTrimmedInput($key, $_POST);
+                if (empty($val)) {
+                    CommonErrors::fatal(COMMONERROR_MISSINGFIELDS, $this, $name . ' is required.');
+                }
+            }
         }
 
         if (!eval(Hooks::get('JO_ON_ADD'))) return;
@@ -1294,9 +1308,22 @@ class JobOrdersUI extends UserInterface
         $notes       = $this->getTrimmedInput('notes', $_POST);
 
         /* Bail out if any of the required fields are empty. */
-        if (empty($title) || empty($type) || empty($city) || empty($state))
+        if (empty($title) || empty($type) || empty($city) || empty($state) || empty($salary))
         {
             CommonErrors::fatal(COMMONERROR_MISSINGFIELDS, $this, 'Required fields are missing.');
+        }
+
+        // Require Extra Fields: Functions and Short Name on edit
+        $settingsEF = $jobOrders->extraFields->getSettings();
+        foreach ($settingsEF as $efIndex => $ef) {
+            $name = trim($ef['fieldName']);
+            if ($name === 'Functions' || $name === 'Short Name') {
+                $key = 'extraField' . $efIndex;
+                $val = $this->getTrimmedInput($key, $_POST);
+                if (empty($val)) {
+                    CommonErrors::fatal(COMMONERROR_MISSINGFIELDS, $this, $name . ' is required.');
+                }
+            }
         }
 
         if (!eval(Hooks::get('JO_ON_EDIT_PRE'))) return;

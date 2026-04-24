@@ -23,6 +23,9 @@ function checkAddForm(form)
     errorMessage += checkCity();
     errorMessage += checkState();
     errorMessage += checkOpenings();
+    errorMessage += checkSalary();
+    errorMessage += checkExtraFieldRequired('Functions');
+    errorMessage += checkExtraFieldRequired('Short Name');
 
     if (errorMessage != '')
     {
@@ -45,6 +48,9 @@ function checkEditForm(form)
     errorMessage += checkOpenings();
     errorMessage += checkOpeningsAvailable();
     errorMessage += checkOwner();
+    errorMessage += checkSalary();
+    errorMessage += checkExtraFieldRequired('Functions');
+    errorMessage += checkExtraFieldRequired('Short Name');
 
     if (errorMessage != '')
     {
@@ -357,5 +363,48 @@ function checkFilename()
     return errorMessage;
 }
 
+function checkSalary()
+{
+    var errorMessage = '';
+
+    var fieldValue = document.getElementById('salary').value;
+    var fieldLabel = document.getElementById('salaryLabel');
+    if (fieldValue == '')
+    {
+        errorMessage = "    - You must enter a salary.\n";
+
+        fieldLabel.style.color = '#ff0000';
+    }
+    else
+    {
+        fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+
+function checkExtraFieldRequired(labelText)
+{
+    var labels = document.querySelectorAll('[id^=extraFieldLbl]');
+    for (var i = 0; i < labels.length; i++) {
+        var lbl = labels[i];
+        var fieldName = lbl.getAttribute('data-field-name') || '';
+        if (fieldName && fieldName.trim().toLowerCase() === labelText.trim().toLowerCase()) {
+            var index = lbl.id.replace('extraFieldLbl', '');
+            var input = document.getElementById('extraField' + index);
+            if (input) {
+                var value = (input.value || '').trim();
+                if (value === '') {
+                    lbl.style.color = '#ff0000';
+                    return "    - You must enter " + labelText + ".\n";
+                } else {
+                    lbl.style.color = '#000';
+                    return '';
+                }
+            }
+        }
+    }
+    return '';
+}
 
 
