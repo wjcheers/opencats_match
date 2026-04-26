@@ -121,6 +121,14 @@ class ReportsUI extends UserInterface
                 $this->showAIUsageReport();
                 break;
 
+            case 'showAIDataReport':
+                $this->showAIDataReport();
+                break;
+
+            case 'handleAISuggestion':
+                $this->handleAISuggestion();
+                break;
+
             case 'reports':
             default:
                 $this->reports();
@@ -180,11 +188,640 @@ class ReportsUI extends UserInterface
         $this->_template->display('./modules/reports/AIUsageReport.tpl');
     }
 
+    private function showAIDataReport()
+    {
+        $dictionarySummary = $this->getAIDataDictionarySummary();
+        $jobTitleStats = $this->getAIParseResultGroupedStats(
+            'job_title_canonical_key',
+            'job_title_raw',
+            'job_title_confidence'
+        );
+        $functionStats = $this->getAIParseResultGroupedStats(
+            'function_canonical_key',
+            'function_raw',
+            'function_confidence'
+        );
+        $jobLevelStats = $this->getAIParseResultGroupedStats(
+            'job_level',
+            'job_level',
+            'job_level_confidence'
+        );
+        $recentSuggestions = $this->getAIRecentSuggestions();
+        $recentResults = $this->getAIRecentParseResults();
+        $message = $this->getTrimmedInput('message', $_GET);
+
+        if (!eval(Hooks::get('REPORTS_SHOW_AI_DATA'))) return;
+
+        $this->_template->assign('active', $this);
+        $this->_template->assign('message', $message);
+        $this->_template->assign('dictionarySummary', $dictionarySummary);
+        $this->_template->assign('jobTitleStats', $jobTitleStats);
+        $this->_template->assign('functionStats', $functionStats);
+        $this->_template->assign('jobLevelStats', $jobLevelStats);
+        $this->_template->assign('recentSuggestions', $recentSuggestions);
+        $this->_template->assign('recentResults', $recentResults);
+        $this->_template->display('./modules/reports/AIDataReport.tpl');
+    }
+
+    private function handleAISuggestion()
+    {
+        if (!$this->canViewAllAIUsageReport())
+        {
+            CommonErrors::fatal(COMMONERROR_PERMISSION, $this, 'Only site administrators can manage AI suggestions.');
+            return;
+        }
+
+        $suggestionID = (int) $this->getTrimmedInput('suggestionID', $_POST);
+        $operation = $this->getTrimmedInput('operation', $_POST);
+        $manualCanonicalKey = $this->getTrimmedInput('canonicalKey', $_POST);
+        $manualNameEN = $this->getTrimmedInput('nameEN', $_POST);
+        $manualNameZH = $this->getTrimmedInput('nameZH', $_POST);
+        if ($suggestionID <= 0)
+        {
+            CATSUtility::transferRelativeURI('m=reports&a=showAIDataReport&message=missing_suggestion');
+            return;
+        }
+
+        if ($operation == 'ignore')
+        {
+            $this->updateAISuggestionStatus($suggestionID, 'ignored');
+            CATSUtility::transferRelativeURI('m=reports&a=showAIDataReport&message=ignored');
+            return;
+        }
+
+        $suggestion = $this->getAISuggestionByID($suggestionID);
+        if (empty($suggestion))
+        {
+            CATSUtility::transferRelativeURI('m=reports&a=showAIDataReport&message=missing_suggestion');
+            return;
+        }
+
+        if ($operation == 'accept_alias')
+        {
+            if ($this->acceptAISuggestionAsAlias($suggestion, $manualCanonicalKey, $manualNameEN, $manualNameZH))
+            {
+                $this->updateAISuggestionStatus($suggestionID, 'accepted');
+                CATSUtility::transferRelativeURI('m=reports&a=showAIDataReport&message=accepted');
+                return;
+            }
+        }
+        else if ($operation == 'create_dictionary')
+        {
+            if ($this->createAIKeywordDictionaryEntry($suggestion, $manualCanonicalKey, $manualNameEN, $manualNameZH))
+            {
+                $this->updateAISuggestionStatus($suggestionID, 'created');
+                CATSUtility::transferRelativeURI('m=reports&a=showAIDataReport&message=created');
+                return;
+            }
+        }
+
+        CATSUtility::transferRelativeURI('m=reports&a=showAIDataReport&message=unsupported');
+    }
+
     private function aiParseTablesExist()
     {
         $db = DatabaseConnection::getInstance();
         $logTable = $db->getAssoc("SHOW TABLES LIKE 'ai_resume_parse_log'");
         return !empty($logTable);
+    }
+
+    private function tableExists($tableName)
+    {
+        $db = DatabaseConnection::getInstance();
+        $rs = $db->getAssoc('SHOW TABLES LIKE ' . $db->makeQueryString($tableName));
+        return !empty($rs);
+    }
+
+    private function getAISuggestionByID($suggestionID)
+    {
+        if (!$this->tableExists('ai_parse_suggestion'))
+        {
+            return array();
+        }
+
+        $db = DatabaseConnection::getInstance();
+        return $db->getAssoc(sprintf(
+            "SELECT
+                id,
+                site_id AS siteID,
+                suggestion_type AS suggestionType,
+                raw_value AS rawValue,
+                suggested_canonical_key AS suggestedCanonicalKey,
+                suggested_name_en AS suggestedNameEN,
+                suggested_name_zh AS suggestedNameZH,
+                status
+            FROM
+                ai_parse_suggestion
+            WHERE
+                id = %s
+            AND
+                site_id = %s",
+            $db->makeQueryInteger($suggestionID),
+            $db->makeQueryInteger($this->_siteID)
+        ));
+    }
+
+    private function updateAISuggestionStatus($suggestionID, $status)
+    {
+        if (!$this->tableExists('ai_parse_suggestion'))
+        {
+            return false;
+        }
+
+        $db = DatabaseConnection::getInstance();
+        return $db->query(sprintf(
+            "UPDATE ai_parse_suggestion
+            SET
+                status = %s,
+                updated_at = NOW()
+            WHERE
+                id = %s
+            AND
+                site_id = %s",
+            $db->makeQueryString($status),
+            $db->makeQueryInteger($suggestionID),
+            $db->makeQueryInteger($this->_siteID)
+        ));
+    }
+
+    private function acceptAISuggestionAsAlias($suggestion, $manualCanonicalKey = '', $manualNameEN = '', $manualNameZH = '')
+    {
+        $tableInfo = $this->getAISuggestionTableInfo($suggestion['suggestionType']);
+        if (empty($tableInfo))
+        {
+            return false;
+        }
+
+        $canonicalSource = trim($manualCanonicalKey) != ''
+            ? $manualCanonicalKey
+            : $suggestion['suggestedCanonicalKey'];
+        if (trim($canonicalSource) == '')
+        {
+            $canonicalSource = trim($suggestion['suggestedNameEN']) != ''
+                ? $suggestion['suggestedNameEN']
+                : $suggestion['rawValue'];
+        }
+        $canonicalKey = $this->makeAICanonicalKey($canonicalSource);
+        if ($canonicalKey == 'unknown')
+        {
+            $canonicalKey = 'suggestion_' . (int) $suggestion['id'];
+        }
+
+        $dictionaryID = $this->getOrCreateAIDictionaryID(
+            $tableInfo,
+            $canonicalKey,
+            trim($manualNameEN) != '' ? $manualNameEN : $suggestion['suggestedNameEN'],
+            trim($manualNameZH) != '' ? $manualNameZH : $suggestion['suggestedNameZH'],
+            $suggestion['rawValue'],
+            $this->getManualAISuggestionOverride($manualNameEN, $suggestion['suggestedNameEN']),
+            $this->getManualAISuggestionOverride($manualNameZH, $suggestion['suggestedNameZH'])
+        );
+        if ($dictionaryID <= 0)
+        {
+            return false;
+        }
+
+        return $this->insertAIAliasIfMissing(
+            $tableInfo,
+            $dictionaryID,
+            $suggestion['rawValue']
+        );
+    }
+
+    private function createAIKeywordDictionaryEntry($suggestion, $manualCanonicalKey = '', $manualNameEN = '', $manualNameZH = '')
+    {
+        $tableInfo = $this->getAISuggestionTableInfo($suggestion['suggestionType']);
+        if (empty($tableInfo))
+        {
+            return false;
+        }
+
+        $canonicalSource = trim($manualCanonicalKey) != ''
+            ? $manualCanonicalKey
+            : $suggestion['suggestedCanonicalKey'];
+        if (trim($canonicalSource) == '')
+        {
+            $canonicalSource = trim($suggestion['suggestedNameEN']) != ''
+                ? $suggestion['suggestedNameEN']
+                : $suggestion['rawValue'];
+        }
+        $canonicalKey = $this->makeAICanonicalKey($canonicalSource);
+        if ($canonicalKey == 'unknown')
+        {
+            $canonicalKey = 'suggestion_' . (int) $suggestion['id'];
+        }
+        $dictionaryID = $this->getOrCreateAIDictionaryID(
+            $tableInfo,
+            $canonicalKey,
+            trim($manualNameEN) != '' ? $manualNameEN : $suggestion['rawValue'],
+            trim($manualNameZH) != '' ? $manualNameZH : $suggestion['suggestedNameZH'],
+            $suggestion['rawValue'],
+            $this->getManualAISuggestionOverride($manualNameEN, $suggestion['suggestedNameEN']),
+            $this->getManualAISuggestionOverride($manualNameZH, $suggestion['suggestedNameZH'])
+        );
+        if ($dictionaryID <= 0)
+        {
+            return false;
+        }
+
+        return $this->insertAIAliasIfMissing(
+            $tableInfo,
+            $dictionaryID,
+            $suggestion['rawValue']
+        );
+    }
+
+    private function getAISuggestionTableInfo($suggestionType)
+    {
+        switch ($suggestionType)
+        {
+            case 'job_title':
+            case 'title':
+                return array(
+                    'dictionary' => 'ai_job_title_dictionary',
+                    'alias' => 'ai_job_title_alias'
+                );
+
+            case 'function':
+                return array(
+                    'dictionary' => 'ai_function_dictionary',
+                    'alias' => 'ai_function_alias'
+                );
+
+            case 'skill':
+                return array(
+                    'dictionary' => 'ai_skill_dictionary',
+                    'alias' => 'ai_skill_alias'
+                );
+
+            default:
+                return array();
+        }
+    }
+
+    private function getManualAISuggestionOverride($manualValue, $suggestedValue)
+    {
+        $manualValue = trim($manualValue);
+        return ($manualValue != '' && $manualValue != trim($suggestedValue)) ? $manualValue : '';
+    }
+
+    private function getOrCreateAIDictionaryID(
+        $tableInfo,
+        $canonicalKey,
+        $nameEN,
+        $nameZH,
+        $fallbackName,
+        $updateExistingNameEN = '',
+        $updateExistingNameZH = ''
+    )
+    {
+        if (!$this->tableExists($tableInfo['dictionary']))
+        {
+            return 0;
+        }
+
+        $db = DatabaseConnection::getInstance();
+        $existing = $db->getAssoc(sprintf(
+            "SELECT id FROM %s WHERE canonical_key = %s LIMIT 1",
+            $tableInfo['dictionary'],
+            $db->makeQueryString($canonicalKey)
+        ));
+        if (!empty($existing['id']))
+        {
+            $this->updateAIDictionaryNameIfNeeded(
+                $tableInfo['dictionary'],
+                (int) $existing['id'],
+                $updateExistingNameEN,
+                $updateExistingNameZH
+            );
+            return (int) $existing['id'];
+        }
+
+        $nameEN = trim($nameEN) != '' ? trim($nameEN) : trim($fallbackName);
+        $nameZH = trim($nameZH) != '' ? trim($nameZH) : '';
+
+        $extraColumns = '';
+        $extraValues = '';
+        if ($tableInfo['dictionary'] == 'ai_skill_dictionary')
+        {
+            $extraColumns = ', is_key_skill, priority';
+            $extraValues = ', 1, 100';
+        }
+
+        $db->query(sprintf(
+            "INSERT INTO %s (
+                canonical_key,
+                name_en,
+                name_zh,
+                is_active,
+                created_at,
+                updated_at
+                %s
+            ) VALUES (
+                %s,
+                %s,
+                %s,
+                1,
+                NOW(),
+                NOW()
+                %s
+            )",
+            $tableInfo['dictionary'],
+            $extraColumns,
+            $db->makeQueryString($canonicalKey),
+            $db->makeQueryString($nameEN),
+            $db->makeQueryString($nameZH),
+            $extraValues
+        ));
+
+        return (int) $db->getLastInsertID();
+    }
+
+    private function updateAIDictionaryNameIfNeeded($dictionaryTable, $dictionaryID, $nameEN, $nameZH)
+    {
+        $nameEN = trim($nameEN);
+        $nameZH = trim($nameZH);
+        if ($dictionaryID <= 0 || ($nameEN == '' && $nameZH == ''))
+        {
+            return false;
+        }
+
+        $sets = array();
+        $db = DatabaseConnection::getInstance();
+        if ($nameEN != '')
+        {
+            $sets[] = 'name_en = ' . $db->makeQueryString($nameEN);
+        }
+        if ($nameZH != '')
+        {
+            $sets[] = 'name_zh = ' . $db->makeQueryString($nameZH);
+        }
+        $sets[] = 'updated_at = NOW()';
+
+        return $db->query(sprintf(
+            "UPDATE %s
+            SET
+                %s
+            WHERE
+                id = %s",
+            $dictionaryTable,
+            implode(",\n                ", $sets),
+            $db->makeQueryInteger($dictionaryID)
+        ));
+    }
+
+    private function insertAIAliasIfMissing($tableInfo, $dictionaryID, $aliasValue)
+    {
+        if (!$this->tableExists($tableInfo['alias']))
+        {
+            return false;
+        }
+
+        $aliasValue = trim($aliasValue);
+        if ($aliasValue == '')
+        {
+            return false;
+        }
+
+        $db = DatabaseConnection::getInstance();
+        $normalizedValue = $this->normalizeAIKeywordValue($aliasValue);
+        $existing = $db->getAssoc(sprintf(
+            "SELECT id FROM %s
+            WHERE dictionary_id = %s
+            AND normalized_value = %s
+            LIMIT 1",
+            $tableInfo['alias'],
+            $db->makeQueryInteger($dictionaryID),
+            $db->makeQueryString($normalizedValue)
+        ));
+        if (!empty($existing['id']))
+        {
+            return true;
+        }
+
+        return $db->query(sprintf(
+            "INSERT INTO %s (
+                dictionary_id,
+                alias_value,
+                alias_lang,
+                normalized_value,
+                created_at
+            ) VALUES (
+                %s,
+                %s,
+                %s,
+                %s,
+                NOW()
+            )",
+            $tableInfo['alias'],
+            $db->makeQueryInteger($dictionaryID),
+            $db->makeQueryString($aliasValue),
+            $db->makeQueryString($this->detectAIKeywordLanguage($aliasValue)),
+            $db->makeQueryString($normalizedValue)
+        ));
+    }
+
+    private function makeAICanonicalKey($value)
+    {
+        $value = $this->normalizeAIKeywordValue($value);
+        $value = preg_replace('/[^a-z0-9]+/', '_', $value);
+        $value = trim($value, '_');
+
+        return $value != '' ? substr($value, 0, 100) : 'unknown';
+    }
+
+    private function normalizeAIKeywordValue($value)
+    {
+        $value = strtolower(trim($value));
+        $value = preg_replace('/\s+/', ' ', $value);
+        return $value;
+    }
+
+    private function detectAIKeywordLanguage($value)
+    {
+        return preg_match('/[^\x00-\x7F]/', $value) ? 'zh' : 'en';
+    }
+
+    private function getAIDataDictionarySummary()
+    {
+        $tables = array(
+            array('label' => 'Job Title Dictionary', 'table' => 'ai_job_title_dictionary'),
+            array('label' => 'Job Title Aliases', 'table' => 'ai_job_title_alias'),
+            array('label' => 'Function Dictionary', 'table' => 'ai_function_dictionary'),
+            array('label' => 'Function Aliases', 'table' => 'ai_function_alias'),
+            array('label' => 'Skill Dictionary', 'table' => 'ai_skill_dictionary'),
+            array('label' => 'Skill Aliases', 'table' => 'ai_skill_alias'),
+            array('label' => 'Parse Logs', 'table' => 'ai_resume_parse_log', 'site_scoped' => true),
+            array('label' => 'Parse Results', 'table' => 'ai_resume_parse_result', 'result_scoped' => true),
+            array('label' => 'Pending Suggestions', 'table' => 'ai_parse_suggestion', 'where' => "status = 'pending'", 'site_scoped' => true)
+        );
+
+        $db = DatabaseConnection::getInstance();
+        $summary = array();
+        foreach ($tables as $table)
+        {
+            $count = null;
+            if ($this->tableExists($table['table']))
+            {
+                if (!empty($table['result_scoped']) && $this->tableExists('ai_resume_parse_log'))
+                {
+                    $rs = $db->getAssoc(sprintf(
+                        "SELECT COUNT(*) AS recordCount
+                        FROM ai_resume_parse_result
+                        INNER JOIN ai_resume_parse_log
+                            ON ai_resume_parse_result.parse_log_id = ai_resume_parse_log.id
+                        WHERE ai_resume_parse_log.site_id = %s",
+                        $db->makeQueryInteger($this->_siteID)
+                    ));
+                }
+                else
+                {
+                    $criteria = array();
+                    if (!empty($table['site_scoped']))
+                    {
+                        $criteria[] = 'site_id = ' . $db->makeQueryInteger($this->_siteID);
+                    }
+                    if (isset($table['where']))
+                    {
+                        $criteria[] = $table['where'];
+                    }
+                    $whereSQL = !empty($criteria) ? ' WHERE ' . implode(' AND ', $criteria) : '';
+                    $rs = $db->getAssoc(sprintf(
+                        'SELECT COUNT(*) AS recordCount FROM %s%s',
+                        $table['table'],
+                        $whereSQL
+                    ));
+                }
+                $count = isset($rs['recordCount']) ? (int) $rs['recordCount'] : 0;
+            }
+
+            $summary[] = array(
+                'label' => $table['label'],
+                'table' => $table['table'],
+                'count' => $count
+            );
+        }
+
+        return $summary;
+    }
+
+    private function getAIParseResultGroupedStats($canonicalColumn, $rawColumn, $confidenceColumn)
+    {
+        if (!$this->tableExists('ai_resume_parse_result') ||
+            !$this->tableExists('ai_resume_parse_log'))
+        {
+            return array();
+        }
+
+        $allowedColumns = array(
+            'job_title_canonical_key',
+            'job_title_raw',
+            'job_title_confidence',
+            'function_canonical_key',
+            'function_raw',
+            'function_confidence',
+            'job_level',
+            'job_level_confidence'
+        );
+        if (!in_array($canonicalColumn, $allowedColumns) ||
+            !in_array($rawColumn, $allowedColumns) ||
+            !in_array($confidenceColumn, $allowedColumns))
+        {
+            return array();
+        }
+
+        $db = DatabaseConnection::getInstance();
+        return $db->getAllAssoc(sprintf(
+            "SELECT
+                IF(%s != '', %s, '(Unmapped)') AS canonicalValue,
+                MAX(%s) AS sampleRawValue,
+                COUNT(*) AS recordCount,
+                AVG(%s) AS averageConfidence
+            FROM
+                ai_resume_parse_result
+            INNER JOIN ai_resume_parse_log
+                ON ai_resume_parse_result.parse_log_id = ai_resume_parse_log.id
+            WHERE
+                ai_resume_parse_log.site_id = %s
+            GROUP BY
+                canonicalValue
+            ORDER BY
+                recordCount DESC,
+                canonicalValue ASC
+            LIMIT 30",
+            $canonicalColumn,
+            $canonicalColumn,
+            $rawColumn,
+            $confidenceColumn,
+            $db->makeQueryInteger($this->_siteID)
+        ));
+    }
+
+    private function getAIRecentSuggestions()
+    {
+        if (!$this->tableExists('ai_parse_suggestion'))
+        {
+            return array();
+        }
+
+        $db = DatabaseConnection::getInstance();
+        return $db->getAllAssoc(sprintf(
+            "SELECT
+                id AS suggestionID,
+                suggestion_type AS suggestionType,
+                raw_value AS rawValue,
+                suggested_canonical_key AS suggestedCanonicalKey,
+                suggested_name_en AS suggestedNameEN,
+                suggested_name_zh AS suggestedNameZH,
+                confidence_score AS confidenceScore,
+                status,
+                DATE_FORMAT(created_at, '%%m-%%d-%%y %%h:%%i %%p') AS createdAt
+            FROM
+                ai_parse_suggestion
+            WHERE
+                site_id = %s
+            ORDER BY
+                created_at DESC
+            LIMIT 50",
+            $db->makeQueryInteger($this->_siteID)
+        ));
+    }
+
+    private function getAIRecentParseResults()
+    {
+        if (!$this->tableExists('ai_resume_parse_result') ||
+            !$this->tableExists('ai_resume_parse_log'))
+        {
+            return array();
+        }
+
+        $db = DatabaseConnection::getInstance();
+        return $db->getAllAssoc(sprintf(
+            "SELECT
+                ai_resume_parse_log.id AS parseLogID,
+                ai_resume_parse_log.original_filename AS originalFilename,
+                ai_resume_parse_log.status AS status,
+                ai_resume_parse_log.saved_candidate_id AS savedCandidateID,
+                DATE_FORMAT(ai_resume_parse_log.created_at, '%%m-%%d-%%y %%h:%%i %%p') AS createdAt,
+                ai_resume_parse_result.chinese_name AS chineseName,
+                ai_resume_parse_result.first_name AS firstName,
+                ai_resume_parse_result.last_name AS lastName,
+                ai_resume_parse_result.email AS email,
+                ai_resume_parse_result.phone AS phone,
+                ai_resume_parse_result.job_title_raw AS jobTitleRaw,
+                ai_resume_parse_result.function_raw AS functionRaw,
+                ai_resume_parse_result.job_level AS jobLevel
+            FROM
+                ai_resume_parse_result
+            INNER JOIN ai_resume_parse_log
+                ON ai_resume_parse_result.parse_log_id = ai_resume_parse_log.id
+            WHERE
+                ai_resume_parse_log.site_id = %s
+            ORDER BY
+                ai_resume_parse_log.created_at DESC
+            LIMIT 100",
+            $db->makeQueryInteger($this->_siteID)
+        ));
     }
 
     private function getAIParseDashboardStatistics($userID)

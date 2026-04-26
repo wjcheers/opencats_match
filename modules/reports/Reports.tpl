@@ -817,6 +817,10 @@
                                 <th align="left">AI Resume Usage</th>
                                 <th align="right">&nbsp;&nbsp;</th>
                             </tr>
+                            <tr class="oddTableRow">
+                                <td align="left"><a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showAIDataReport" target="_blank">AI Data Overview</a></td>
+                                <td align="right">&nbsp;&nbsp;</td>
+                            </tr>
                             <tr class="evenTableRow">
                                 <td align="left"><a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showAIUsageReport&amp;period=today" target="_blank">Today</a></td>
                                 <td align="right"><?php $this->_($this->aiParseDashboardData['today']); ?>&nbsp;&nbsp;</td>
