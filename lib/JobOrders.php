@@ -1398,37 +1398,14 @@ class JobOrdersDataGrid extends DataGrid
      */
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
-        // FIXME: Factor out Session dependency.
-        if ($_SESSION['CATS']->isLoggedIn() && $_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_MULTI_SA)
-        {
-            $adminHiddenCriterion = 'AND joborder.is_admin_hidden = 0';
-        }
-        else
-        {
-            $adminHiddenCriterion = '';
-        }
-
-        if ($this->getMiscArgument() != 0)
-        {
-            $savedListID = (int) $this->getMiscArgument();
-            $joinSQL  .= ' INNER JOIN saved_list_entry
-                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_JOBORDER.'
-                                    AND saved_list_entry.data_item_id = joborder.joborder_id
-                                    AND saved_list_entry.site_id = '.$this->_siteID.'
-                                    AND saved_list_entry.saved_list_id = '.$savedListID;
-        }
-        else
-        {
-            $joinSQL  .= ' LEFT JOIN saved_list_entry
-                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_JOBORDER.'
-                                    AND saved_list_entry.data_item_id = joborder.joborder_id
-                                    AND saved_list_entry.site_id = '.$this->_siteID;
-        }
+        $adminHiddenCriterion = $this->getAdministrativeHiddenCriterion();
+        $savedListJoinData = $this->getSavedListJoinData($joinSQL);
+        $joinSQL = $savedListJoinData['joinSQL'];
 
         if (!eval(Hooks::get('JOBORDER_DATAGRID_GETSQL'))) return;
 
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 joborder.joborder_id AS jobOrderID,
                 joborder.joborder_id AS exportID,
                 joborder.date_modified AS dateModifiedSort,
@@ -1454,7 +1431,7 @@ class JobOrdersDataGrid extends DataGrid
             %s
             %s
             %s",
-            $distinct,
+            ($this->useFoundRows() ? 'SQL_CALC_FOUND_ROWS ' : '') . $distinct,
             $selectSQL,
             DATA_ITEM_JOBORDER,
             $joinSQL,
@@ -1468,6 +1445,99 @@ class JobOrdersDataGrid extends DataGrid
         );
 
         return $sql;
+    }
+
+    protected function useFoundRows()
+    {
+        return false;
+    }
+
+    protected function getCountSQL($joinSQL, $whereSQL, $havingSQL)
+    {
+        $savedListJoinData = $this->getSavedListJoinData($joinSQL);
+        $joinSQL = $savedListJoinData['joinSQL'];
+
+        return sprintf(
+            "SELECT
+                COUNT(*) AS rowCount
+            FROM
+            (
+                SELECT
+                    joborder.joborder_id
+                FROM
+                    joborder
+                LEFT JOIN company
+                    ON joborder.company_id = company.company_id
+                LEFT JOIN contact
+                    ON joborder.contact_id = contact.contact_id
+                LEFT JOIN attachment
+                    ON joborder.joborder_id = attachment.data_item_id
+                    AND attachment.data_item_type = %s
+                %s
+                WHERE
+                    joborder.site_id = %s
+                %s
+                %s
+                %s
+                GROUP BY joborder.joborder_id
+                %s
+            ) AS joborderCountQuery",
+            DATA_ITEM_JOBORDER,
+            $joinSQL,
+            $this->_siteID,
+            $this->getAdministrativeHiddenCriterion(),
+            (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
+            $this->_assignedCriterion,
+            (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : ''
+        );
+    }
+
+    private function hasVisibleColumn($columnName)
+    {
+        foreach ($this->_currentColumns as $data)
+        {
+            if (isset($data['name']) && $data['name'] == $columnName)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getAdministrativeHiddenCriterion()
+    {
+        if ($_SESSION['CATS']->isLoggedIn() &&
+            $_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_MULTI_SA)
+        {
+            return 'AND joborder.is_admin_hidden = 0';
+        }
+
+        return '';
+    }
+
+    private function getSavedListJoinData($joinSQL)
+    {
+        if ($this->getMiscArgument() != 0)
+        {
+            $savedListID = (int) $this->getMiscArgument();
+            $joinSQL  .= ' INNER JOIN saved_list_entry
+                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_JOBORDER.'
+                                    AND saved_list_entry.data_item_id = joborder.joborder_id
+                                    AND saved_list_entry.site_id = '.$this->_siteID.'
+                                    AND saved_list_entry.saved_list_id = '.$savedListID;
+        }
+        else if ($this->hasVisibleColumn('Added To List'))
+        {
+            $joinSQL  .= ' LEFT JOIN saved_list_entry
+                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_JOBORDER.'
+                                    AND saved_list_entry.data_item_id = joborder.joborder_id
+                                    AND saved_list_entry.site_id = '.$this->_siteID;
+        }
+
+        return array(
+            'joinSQL' => $joinSQL
+        );
     }
 }
 

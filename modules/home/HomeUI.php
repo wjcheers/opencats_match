@@ -97,8 +97,6 @@ class HomeUI extends UserInterface
         
         $calendar = new Calendar($this->_siteID);
         $upcomingEventsHTML = $calendar->getUpcomingEventsHTML(7, UPCOMING_FOR_DASHBOARD);
-        
-        $calendar = new Calendar($this->_siteID);
         $upcomingEventsFupHTML = $calendar->getUpcomingEventsHTML(7, UPCOMING_FOR_DASHBOARD_FUP);        
 
         /* Important cand datagrid */
@@ -159,7 +157,7 @@ class HomeUI extends UserInterface
 
         $dataGridProperties = array(
             'rangeStart'    => 0,
-            'maxResults'    => 15,
+            'maxResults'    => 6,
             'filterVisible' => false
         );
 

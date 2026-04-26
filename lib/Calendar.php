@@ -640,134 +640,15 @@ class Calendar
      */
     public function getUpcomingEventsHTML($limit, $flag = UPCOMING_FOR_CALENDAR)
     {
-        switch ($flag)
-        {
-            case UPCOMING_FOR_CALENDAR:
-                $HTML = '<div class="noteUnsizedSpan">My Upcoming Events / Calls</div>';
-                $style = '';
-                $criteria = '';
-                break;
+        $eventConfig = $this->getUpcomingEventsHTMLConfig($flag);
+        $HTML = $eventConfig['headerHTML'];
+        $style = $eventConfig['style'];
 
-            case UPCOMING_FOR_DASHBOARD:
-                $HTML = '<div class="noteUnsizedSpan" style="width:100%;">My Upcoming Events</div>';
-                $style = 'font-size:11px;';
-                $criteria = 'AND NOT TYPE = 100';
-                break;
-
-            case UPCOMING_FOR_DASHBOARD_FUP:
-                $HTML = '<div class="noteUnsizedSpan">My Upcoming Calls</div>';
-                $style = 'font-size:11px;';
-                $criteria = 'AND TYPE = 100';
-                break;
-        }
-
-        /* Get today's events. */
-        $sql = sprintf(
-            "SELECT
-                calendar_event.calendar_event_id AS eventID,
-                calendar_event.title AS title,
-                calendar_event.description AS description,
-                calendar_event.public AS public,
-                calendar_event.all_day AS allDay,
-                DATE_FORMAT(
-                    calendar_event.date, '%%d'
-                ) AS day,
-                DATE_FORMAT(
-                    calendar_event.date, '%%m'
-                ) AS month,
-                DATE_FORMAT(
-                    calendar_event.date, '%%y'
-                ) AS year,
-                DATE_FORMAT(
-                    calendar_event.date, '%%m-%%d-%%y'
-                ) AS date,
-                DATE_FORMAT(
-                    calendar_event.date, '%%h:%%i %%p'
-                ) AS time,
-                calendar_event.date AS dateSort,
-                entered_by_user.user_id AS userID,
-                entered_by_user.first_name AS enteredByFirstName,
-                entered_by_user.last_name AS enteredByLastName
-            FROM
-                calendar_event
-            LEFT JOIN user AS entered_by_user
-                ON calendar_event.entered_by = entered_by_user.user_id
-            WHERE
-                TO_DAYS(NOW()) = TO_DAYS(calendar_event.date)
-            AND
-                calendar_event.site_id = %s
-            AND
-            (
-                %s
-                OR calendar_event.entered_by = %s
-            )
-            %s
-            ORDER BY
-                dateSort ASC",
-            $this->_siteID,
-            ($flag == UPCOMING_FOR_CALENDAR ? 'calendar_event.public = 1' : 'false'),
-            $this->_userID,
-            $criteria
-        );
-        $todayRS = $this->_db->getAllAssoc($sql);
-
-        /* Get events after today. */
-        $sql = sprintf(
-            "SELECT
-                calendar_event.calendar_event_id AS eventID,
-                calendar_event.title AS title,
-                calendar_event.description AS description,
-                calendar_event.public AS public,
-                calendar_event.all_day AS allDay,
-                DATE_FORMAT(
-                    calendar_event.date, '%%d'
-                ) AS day,
-                DATE_FORMAT(
-                    calendar_event.date, '%%m'
-                ) AS month,
-                DATE_FORMAT(
-                    calendar_event.date, '%%y'
-                ) AS year,
-                DATE_FORMAT(
-                    calendar_event.date, '%%m-%%d-%%y'
-                ) AS date,
-                DATE_FORMAT(
-                    calendar_event.date, '%%h:%%i %%p'
-                ) AS time,
-                calendar_event.date AS dateSort,
-                entered_by_user.user_id AS userID,
-                entered_by_user.first_name AS enteredByFirstName,
-                entered_by_user.last_name AS enteredByLastName
-            FROM
-                calendar_event
-            LEFT JOIN user AS entered_by_user
-                ON calendar_event.entered_by = entered_by_user.user_id
-            WHERE
-                DATE(calendar_event.date) > CURDATE()
-            AND
-                TO_DAYS(NOW()) != TO_DAYS(calendar_event.date)
-            AND
-                calendar_event.site_id = %s
-            AND
-            (
-                calendar_event.public = 1
-                OR calendar_event.entered_by = %s
-            )
-            %s
-            ORDER BY
-                dateSort ASC
-            LIMIT
-                0, %s",
-            $this->_siteID,
-            $this->_userID,
-            $criteria,
-            $limit
-        );
-        $futureRS = $this->_db->getAllAssoc($sql);
+        $eventsRS = $this->getUpcomingEventsRows($limit, $flag);
 
         $indexName = CATSUtility::getIndexName();
 
-        foreach ($todayRS as $rowIndex => $row)
+        foreach ($eventsRS as $rowIndex => $row)
         {
             if ($row['allDay'] == '1')
             {
@@ -798,39 +679,135 @@ class Calendar
             );
         }
 
-        foreach ($futureRS as $rowIndex => $row)
+        return $HTML;
+    }
+
+    private function getUpcomingEventsHTMLConfig($flag)
+    {
+        switch ($flag)
         {
-            if ($row['allDay'] == '1')
-            {
-                $time = 'All Day';
-            }
-            else
-            {
-                $time = $row['time'];
-            }
+            case UPCOMING_FOR_CALENDAR:
+                return array(
+                    'headerHTML' => '<div class="noteUnsizedSpan">My Upcoming Events / Calls</div>',
+                    'style'      => ''
+                );
 
-            $formatString = ''
-                . '<span title="%s" style="%s">%s %s: <a href="%s?m=calendar'
-                . '&amp;view=DAYVIEW&amp;month=%s&amp;year=20%s&amp;day=%s'
-                . '&amp;showEvent=%s" style="%s">%s</a></span><br />';
+            case UPCOMING_FOR_DASHBOARD:
+                return array(
+                    'headerHTML' => '<div class="noteUnsizedSpan" style="width:100%;">My Upcoming Events</div>',
+                    'style'      => 'font-size:11px;'
+                );
 
-            $HTML .= sprintf(
-                $formatString,
-                htmlspecialchars($row['description']),
-                $style,
-                $row['date'],
-                $time,
-                $indexName,
-                $row['month'],
-                $row['year'],
-                $row['day'],
-                $row['eventID'],
-                $style,
-                htmlspecialchars($row['title'])
+            case UPCOMING_FOR_DASHBOARD_FUP:
+            default:
+                return array(
+                    'headerHTML' => '<div class="noteUnsizedSpan">My Upcoming Calls</div>',
+                    'style'      => 'font-size:11px;'
+                );
+        }
+    }
+
+    private function getUpcomingEventsCriteria($flag)
+    {
+        switch ($flag)
+        {
+            case UPCOMING_FOR_DASHBOARD:
+                return 'AND calendar_event.type != ' . CALENDAR_EVENT_CALL;
+
+            case UPCOMING_FOR_DASHBOARD_FUP:
+                return 'AND calendar_event.type = ' . CALENDAR_EVENT_CALL;
+
+            case UPCOMING_FOR_CALENDAR:
+            default:
+                return '';
+        }
+    }
+
+    private function getUpcomingEventsVisibilitySQL($flag, $includePublic)
+    {
+        if ($flag == UPCOMING_FOR_CALENDAR || $includePublic)
+        {
+            return sprintf(
+                '(calendar_event.public = 1 OR calendar_event.entered_by = %s)',
+                $this->_userID
             );
         }
 
-        return $HTML;
+        return sprintf(
+            '(calendar_event.entered_by = %s)',
+            $this->_userID
+        );
+    }
+
+    private function getUpcomingEventsRows($limit, $flag)
+    {
+        $criteria = $this->getUpcomingEventsCriteria($flag);
+        $todayVisibilitySQL = $this->getUpcomingEventsVisibilitySQL($flag, false);
+        $futureVisibilitySQL = $this->getUpcomingEventsVisibilitySQL($flag, true);
+
+        $baseSelectSQL = "
+                calendar_event.calendar_event_id AS eventID,
+                calendar_event.title AS title,
+                calendar_event.description AS description,
+                calendar_event.public AS public,
+                calendar_event.all_day AS allDay,
+                DATE_FORMAT(
+                    calendar_event.date, '%%d'
+                ) AS day,
+                DATE_FORMAT(
+                    calendar_event.date, '%%m'
+                ) AS month,
+                DATE_FORMAT(
+                    calendar_event.date, '%%y'
+                ) AS year,
+                DATE_FORMAT(
+                    calendar_event.date, '%%m-%%d-%%y'
+                ) AS date,
+                DATE_FORMAT(
+                    calendar_event.date, '%%h:%%i %%p'
+                ) AS time,
+                calendar_event.date AS dateSort,
+                entered_by_user.user_id AS userID,
+                entered_by_user.first_name AS enteredByFirstName,
+                entered_by_user.last_name AS enteredByLastName";
+
+        $baseFromSQL = "
+            FROM
+                calendar_event
+            LEFT JOIN user AS entered_by_user
+                ON calendar_event.entered_by = entered_by_user.user_id
+            WHERE
+                calendar_event.site_id = %s
+            AND
+                %s
+            %s";
+
+        $sql = sprintf(
+            "(SELECT
+                %s
+            %s
+            AND
+                DATE(calendar_event.date) = CURDATE())
+            UNION ALL
+            (SELECT
+                %s
+            %s
+            AND
+                DATE(calendar_event.date) > CURDATE()
+            ORDER BY
+                dateSort ASC
+            LIMIT
+                0, %s)
+            ORDER BY
+                dateSort ASC",
+            $baseSelectSQL,
+            sprintf($baseFromSQL, $this->_siteID, $todayVisibilitySQL, $criteria),
+            $baseSelectSQL,
+            sprintf($baseFromSQL, $this->_siteID, $futureVisibilitySQL, $criteria),
+            $limit
+        );
+
+        return $this->_db->getAllAssoc($sql);
     }
 
     /**

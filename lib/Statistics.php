@@ -271,6 +271,389 @@ class Statistics
         return $rs['pipelineCount'];
     }
 
+    /**
+     * Returns all dashboard count groups for the Reports landing page.
+     *
+     * @return array statistics data keyed for Reports.tpl
+     */
+    public function getReportsDashboardStatistics()
+    {
+        $statisticsData = array();
+
+        $statisticsData = array_merge(
+            $statisticsData,
+            $this->getCountsByPeriods('company', 'date_created', 'companies')
+        );
+        $statisticsData = array_merge(
+            $statisticsData,
+            $this->getCountsByPeriods('candidate', 'date_created', 'candidates')
+        );
+        $statisticsData = array_merge(
+            $statisticsData,
+            $this->getCountsByPeriods('candidate_joborder', 'date_created', 'pipelines')
+        );
+        $statisticsData = array_merge(
+            $statisticsData,
+            $this->getCountsByPeriods('contact', 'date_created', 'contacts')
+        );
+        $statisticsData = array_merge(
+            $statisticsData,
+            $this->getCountsByPeriods('joborder', 'date_created', 'jobOrders')
+        );
+        $statisticsData = array_merge(
+            $statisticsData,
+            $this->getStatusHistoryCountsByPeriods()
+        );
+
+        return $statisticsData;
+    }
+
+    /**
+     * Returns dashboard counts for a custom date range, optionally filtered by user.
+     *
+     * @param string start date in Y-m-d
+     * @param string end date in Y-m-d
+     * @param integer|null user ID
+     * @return array
+     */
+    public function getDateRangeDashboardStatistics($startDate, $endDate,
+        $userID = null)
+    {
+        $statisticsData = array();
+
+        $statisticsData = array_merge(
+            $statisticsData,
+            $this->getCountsByDateRange(
+                'company',
+                'date_created',
+                'companies',
+                (!empty($userID) ? 'entered_by' : ''),
+                $userID,
+                $startDate,
+                $endDate
+            )
+        );
+        $statisticsData = array_merge(
+            $statisticsData,
+            $this->getCountsByDateRange(
+                'candidate',
+                'date_created',
+                'candidates',
+                (!empty($userID) ? 'entered_by' : ''),
+                $userID,
+                $startDate,
+                $endDate
+            )
+        );
+        $statisticsData = array_merge(
+            $statisticsData,
+            $this->getCountsByDateRange(
+                'joborder',
+                'date_created',
+                'jobOrders',
+                (!empty($userID) ? 'entered_by' : ''),
+                $userID,
+                $startDate,
+                $endDate
+            )
+        );
+        $statisticsData = array_merge(
+            $statisticsData,
+            $this->getCountsByDateRange(
+                'contact',
+                'date_created',
+                'contacts',
+                (!empty($userID) ? 'entered_by' : ''),
+                $userID,
+                $startDate,
+                $endDate
+            )
+        );
+
+        $statisticsData['pipelines'] = $this->getDateRangeCount(
+            'candidate_joborder',
+            'candidate_joborder.date_created',
+            $startDate,
+            $endDate,
+            (!empty($userID) ? 'LEFT JOIN candidate ON candidate.candidate_id = candidate_joborder.candidate_id' : ''),
+            (!empty($userID) ? sprintf('AND candidate.owner = %s', $this->_db->makeQueryInteger($userID)) : '')
+        );
+
+        $statusCounts = $this->getDateRangeStatusHistoryCounts(
+            $startDate,
+            $endDate,
+            $userID
+        );
+        $statisticsData['submissions'] = $statusCounts['submissions'];
+        $statisticsData['placements'] = $statusCounts['placements'];
+
+        return $statisticsData;
+    }
+
+    /**
+     * Returns counts for the reports dashboard periods in one query.
+     *
+     * @param string table name
+     * @param string date field
+     * @param string key prefix used in template data
+     * @return array count data
+     */
+    private function getCountsByPeriods($tableName, $dateField, $keyPrefix)
+    {
+        $periodMap = $this->getReportsDashboardPeriodMap();
+        $selectParts = array();
+
+        foreach ($periodMap as $periodKey => $periodFlag)
+        {
+            $conditionSQL = $this->getPeriodConditionSQL($dateField, $periodFlag);
+            $selectParts[] = sprintf(
+                "COALESCE(SUM(IF(%s, 1, 0)), 0) AS %s",
+                $conditionSQL,
+                $this->getReportsDashboardCountKey($keyPrefix, $periodKey)
+            );
+        }
+
+        $sql = sprintf(
+            "SELECT
+                %s
+            FROM
+                %s
+            WHERE
+                site_id = %s",
+            implode(",\n                ", $selectParts),
+            $tableName,
+            $this->_siteID
+        );
+
+        $rs = $this->_db->getAssoc($sql);
+
+        return (!empty($rs) ? $rs : array());
+    }
+
+    /**
+     * Returns one custom-range count keyed by prefix.
+     *
+     * @param string table name
+     * @param string date field
+     * @param string key prefix
+     * @param string optional user field name
+     * @param integer|null user ID
+     * @param string start date
+     * @param string end date
+     * @return array
+     */
+    private function getCountsByDateRange($tableName, $dateField, $keyPrefix,
+        $userField, $userID, $startDate, $endDate)
+    {
+        $key = lcfirst($keyPrefix);
+
+        return array(
+            $key => $this->getDateRangeCount(
+                $tableName,
+                $dateField,
+                $startDate,
+                $endDate,
+                '',
+                (!empty($userField) && !empty($userID)
+                    ? sprintf('AND %s = %s', $userField, $this->_db->makeQueryInteger($userID))
+                    : '')
+            )
+        );
+    }
+
+    /**
+     * Returns a single date-range count query result.
+     *
+     * @param string table name
+     * @param string date field
+     * @param string start date
+     * @param string end date
+     * @param string join SQL
+     * @param string extra where SQL
+     * @return integer
+     */
+    private function getDateRangeCount($tableName, $dateField, $startDate,
+        $endDate, $joinSQL, $extraWhereSQL)
+    {
+        $criterion = $this->makeDateRangeCriterion($dateField, $startDate, $endDate);
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS count
+            FROM
+                %s
+            %s
+            WHERE
+                %s.site_id = %s
+            %s
+            %s",
+            $tableName,
+            $joinSQL,
+            $tableName,
+            $this->_siteID,
+            $extraWhereSQL,
+            $criterion
+        );
+        $rs = $this->_db->getAssoc($sql);
+
+        return (!empty($rs['count']) ? (int) $rs['count'] : 0);
+    }
+
+    /**
+     * Returns submission and placement counts for a date range.
+     *
+     * @param string start date
+     * @param string end date
+     * @param integer|null user ID
+     * @return array
+     */
+    private function getDateRangeStatusHistoryCounts($startDate, $endDate, $userID)
+    {
+        $criterion = $this->makeDateRangeCriterion(
+            'candidate_joborder_status_history.date',
+            $startDate,
+            $endDate
+        );
+        $joinCandidateSQL = '';
+        $userCriterion = '';
+
+        if (!empty($userID))
+        {
+            $joinCandidateSQL = 'LEFT JOIN candidate
+                ON candidate.candidate_id = candidate_joborder_status_history.candidate_id';
+            $userCriterion = sprintf(
+                'AND candidate.owner = %s',
+                $this->_db->makeQueryInteger($userID)
+            );
+        }
+
+        $sql = sprintf(
+            "SELECT
+                COALESCE(SUM(IF(status_to = 400, 1, 0)), 0) AS submissions,
+                COALESCE(SUM(IF(status_to = 800, 1, 0)), 0) AS placements
+            FROM
+                candidate_joborder_status_history
+            %s
+            WHERE
+                candidate_joborder_status_history.site_id = %s
+            %s
+            %s",
+            $joinCandidateSQL,
+            $this->_siteID,
+            $userCriterion,
+            $criterion
+        );
+        $rs = $this->_db->getAssoc($sql);
+
+        return array(
+            'submissions' => (!empty($rs['submissions']) ? (int) $rs['submissions'] : 0),
+            'placements' => (!empty($rs['placements']) ? (int) $rs['placements'] : 0)
+        );
+    }
+
+    /**
+     * Returns submissions, placements, and offers dashboard counts in one query.
+     *
+     * @return array count data
+     */
+    private function getStatusHistoryCountsByPeriods()
+    {
+        $periodMap = $this->getReportsDashboardPeriodMap();
+        $selectParts = array();
+
+        foreach ($periodMap as $periodKey => $periodFlag)
+        {
+            $conditionSQL = $this->getPeriodConditionSQL('date', $periodFlag);
+            $selectParts[] = sprintf(
+                "COALESCE(SUM(IF(status_to = 400 AND %s, 1, 0)), 0) AS %s",
+                $conditionSQL,
+                $this->getReportsDashboardCountKey('submissions', $periodKey)
+            );
+            $selectParts[] = sprintf(
+                "COALESCE(SUM(IF(status_to = 800 AND %s, 1, 0)), 0) AS %s",
+                $conditionSQL,
+                $this->getReportsDashboardCountKey('placements', $periodKey)
+            );
+        }
+
+        $selectParts[] = sprintf(
+            "COALESCE(SUM(IF(status_to = 600 AND %s, 1, 0)), 0) AS totalOffers",
+            $this->getPeriodConditionSQL('date', TIME_PERIOD_TODATE)
+        );
+
+        $sql = sprintf(
+            "SELECT
+                %s
+            FROM
+                candidate_joborder_status_history
+            WHERE
+                site_id = %s",
+            implode(",\n                ", $selectParts),
+            $this->_siteID
+        );
+
+        $rs = $this->_db->getAssoc($sql);
+
+        return (!empty($rs) ? $rs : array());
+    }
+
+    /**
+     * Returns the Reports landing page period suffix map.
+     *
+     * @return array suffix => period constant
+     */
+    private function getReportsDashboardPeriodMap()
+    {
+        return array(
+            'Total' => TIME_PERIOD_TODATE,
+            'Today' => TIME_PERIOD_TODAY,
+            'Yesterday' => TIME_PERIOD_YESTERDAY,
+            'ThisWeek' => TIME_PERIOD_THISWEEK,
+            'LastWeek' => TIME_PERIOD_LASTWEEK,
+            'ThisMonth' => TIME_PERIOD_THISMONTH,
+            'LastMonth' => TIME_PERIOD_LASTMONTH,
+            'ThisQuarter' => TIME_PERIOD_THISQUARTER,
+            'LastQuarter' => TIME_PERIOD_LASTQUARTER,
+            'ThisYear' => TIME_PERIOD_THISYEAR,
+            'LastYear' => TIME_PERIOD_LASTYEAR
+        );
+    }
+
+    /**
+     * Returns the template key name for a dashboard count.
+     *
+     * @param string key prefix
+     * @param string period key
+     * @return string
+     */
+    private function getReportsDashboardCountKey($keyPrefix, $periodKey)
+    {
+        if ($periodKey == 'Total')
+        {
+            return 'total' . ucfirst($keyPrefix);
+        }
+
+        return $keyPrefix . $periodKey;
+    }
+
+    /**
+     * Returns a SQL boolean expression for a reports period.
+     *
+     * @param string date field
+     * @param integer period constant
+     * @return string SQL condition
+     */
+    private function getPeriodConditionSQL($dateField, $period)
+    {
+        $criterion = trim($this->makePeriodCriterion($dateField, $period));
+
+        if (stripos($criterion, 'AND ') === 0)
+        {
+            $criterion = substr($criterion, 4);
+        }
+
+        return $criterion;
+    }
+
 
     /**
      * Returns all pipelines in the given period.

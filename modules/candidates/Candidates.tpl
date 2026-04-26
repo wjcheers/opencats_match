@@ -11,8 +11,8 @@
     <div id="main">
         <?php TemplateUtility::printQuickSearch(); ?>
 
-        <div id="contents"<?php echo !$this->totalCandidates ? ' style="background-color: #E6EEFF; padding: 0px;"' : ''; ?>>
-            <?php if ($this->totalCandidates): ?>
+        <div id="contents"<?php echo !$this->hasCandidates ? ' style="background-color: #E6EEFF; padding: 0px;"' : ''; ?>>
+            <?php if ($this->hasCandidates): ?>
             <table width="100%">
                 <tr>
                     <td width="3%">
@@ -116,11 +116,6 @@
                             <td style="padding-right: 20px;">
                                 <a href="<?php echo CATSUtility::getIndexName(); ?>?m=candidates&amp;a=add">
                                 <div class="addCandidateButton">&nbsp;</div>
-                                </a>
-                            </td>
-                            <td>
-                                <a href="<?php echo CATSUtility::getIndexName(); ?>?m=import&amp;a=massImport">
-                                <div class="addMassImportButton">&nbsp;</div>
                                 </a>
                             </td>
                         </tr>

@@ -641,6 +641,41 @@
             </form>
 
             <script type="text/javascript">
+                function adjustCandidateSummaryFields(formId)
+                {
+                    var form = document.getElementById(formId);
+                    if (!form)
+                    {
+                        return;
+                    }
+
+                    var labels = form.querySelectorAll('td.tdVertical label');
+                    for (var i = 0; i < labels.length; i++)
+                    {
+                        var labelText = labels[i].textContent.replace(/\s+/g, ' ').replace(/:\s*$/, '').trim();
+                        if (labelText !== 'Career Summary' && labelText !== 'Skill Summary')
+                        {
+                            continue;
+                        }
+
+                        var row = labels[i].closest('tr');
+                        if (!row)
+                        {
+                            continue;
+                        }
+
+                        var textarea = row.querySelector('textarea');
+                        if (!textarea)
+                        {
+                            continue;
+                        }
+
+                        textarea.style.width = '700px';
+                        textarea.rows = Math.max(parseInt(textarea.rows, 10) || 0, 8);
+                    }
+                }
+
+                adjustCandidateSummaryFields('editCandidateForm');
                 document.editCandidateForm.firstName.focus();
             </script>
         </div>

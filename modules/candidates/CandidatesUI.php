@@ -47,6 +47,7 @@ include_once('./lib/CommonErrors.php');
 include_once('./lib/License.php');
 include_once('./lib/ParseUtility.php');
 include_once('./lib/Questionnaire.php');
+include_once('./lib/AIResumeParser.php');
 
 class CandidatesUI extends UserInterface
 {
@@ -209,6 +210,14 @@ class CandidatesUI extends UserInterface
                 $this->onDeleteAttachment();
                 break;
 
+            case 'generateJechoReport':
+                $this->onGenerateJechoReport();
+                break;
+
+            case 'removeDocumentTempFile':
+                $this->removeDocumentTempFile();
+                break;
+
             /* Hot List Page */
             case 'savedLists':
                 $this->savedList();
@@ -296,7 +305,7 @@ class CandidatesUI extends UserInterface
         $dataGrid = DataGrid::get("candidates:candidatesListByViewDataGrid", $dataGridProperties);
 
         $candidates = new Candidates($this->_siteID);
-        $this->_template->assign('totalCandidates', $candidates->getCount());
+        $this->_template->assign('hasCandidates', $candidates->hasAny());
 
         $this->_template->assign('active', $this);
         $this->_template->assign('dataGrid', $dataGrid);
@@ -476,6 +485,16 @@ class CandidatesUI extends UserInterface
         $attachmentsRS = $attachments->getAll(
             DATA_ITEM_CANDIDATE, $candidateID
         );
+        $attachmentFileNames = ResultSetUtility::getColumnValues(
+            $attachmentsRS,
+            'originalFilename'
+        );
+        $candidateName = trim($data['firstName'] . ' ' . $data['lastName']);
+        if ($candidateName == '')
+        {
+            $candidateName = 'Candidate';
+        }
+        $parser = new AIResumeParser();
 
         foreach ($attachmentsRS as $rowNumber => $attachmentsData)
         {
@@ -498,7 +517,7 @@ class CandidatesUI extends UserInterface
             if ($attachmentsRS[$rowNumber]['hasText'])
             {
                 $attachmentsRS[$rowNumber]['previewLink'] = sprintf(
-                    '<a href="#" onclick="window.open(\'%s?m=candidates&amp;a=viewResume&amp;attachmentID=%s\', \'viewResume\', \'scrollbars=1,width=800,height=760\')"><img width="15" height="15" style="border: none;" src="images/search.gif" alt="(Preview)" /></a>',
+                    '<a href="#" onclick="window.open(\'%s?m=candidates&amp;a=viewResume&amp;attachmentID=%s\', \'viewResume\', \'scrollbars=1,resizable=1,width=1260,height=980\'); return false;"><img width="15" height="15" style="border: none;" src="images/search.gif" alt="(Preview)" /></a>',
                     CATSUtility::getIndexName(),
                     $attachmentsRS[$rowNumber]['attachmentID']
                 );
@@ -506,6 +525,52 @@ class CandidatesUI extends UserInterface
             else
             {
                 $attachmentsRS[$rowNumber]['previewLink'] = '&nbsp;';
+            }
+
+            $attachmentsRS[$rowNumber]['canGenerateJechoReport'] =
+                $this->canGenerateJechoReportFromAttachment($attachmentsRS[$rowNumber]);
+            $attachmentsRS[$rowNumber]['canDeleteAttachment'] =
+                $this->canDeleteAttachment($attachmentsRS[$rowNumber]);
+            $attachmentsRS[$rowNumber]['isJechoAIReport'] =
+                $this->isJechoAIReportAttachment($attachmentsRS[$rowNumber]);
+            $attachmentsRS[$rowNumber]['isAutoCleanupAIDraft'] =
+                $this->isAutoCleanupAIDraftAttachment($attachmentsRS[$rowNumber]);
+
+            if ($attachmentsRS[$rowNumber]['canGenerateJechoReport'])
+            {
+                $zhBaseFileName = $parser->makeJechoReportFilename(
+                    $attachmentsRS[$rowNumber]['originalFilename'],
+                    $candidateName,
+                    'zh'
+                );
+                $enBaseFileName = $parser->makeJechoReportFilename(
+                    $attachmentsRS[$rowNumber]['originalFilename'],
+                    $candidateName,
+                    'en'
+                );
+
+                $attachmentsRS[$rowNumber]['jechoReportBaseFilenameZh'] = $zhBaseFileName;
+                $attachmentsRS[$rowNumber]['jechoReportBaseFilenameEn'] = $enBaseFileName;
+                $attachmentsRS[$rowNumber]['jechoReportExistsZh'] = in_array(
+                    strtolower($zhBaseFileName),
+                    array_map('strtolower', $attachmentFileNames)
+                );
+                $attachmentsRS[$rowNumber]['jechoReportExistsEn'] = in_array(
+                    strtolower($enBaseFileName),
+                    array_map('strtolower', $attachmentFileNames)
+                );
+                $attachmentsRS[$rowNumber]['jechoReportNextFilenameZh'] = $parser->makeNextJechoReportFilename(
+                    $attachmentsRS[$rowNumber]['originalFilename'],
+                    $candidateName,
+                    'zh',
+                    $attachmentFileNames
+                );
+                $attachmentsRS[$rowNumber]['jechoReportNextFilenameEn'] = $parser->makeNextJechoReportFilename(
+                    $attachmentsRS[$rowNumber]['originalFilename'],
+                    $candidateName,
+                    'en',
+                    $attachmentFileNames
+                );
             }
         }
         $pipelines = new Pipelines($this->_siteID);
@@ -669,6 +734,7 @@ class CandidatesUI extends UserInterface
         $this->_template->assign('lists', $lists);
         $this->_template->assign('user', $user);
         $this->_template->assign('canMail', $canMail);
+        $this->_template->assign('currentUserID', $this->_userID);
 
         if (!eval(Hooks::get('CANDIDATE_SHOW'))) return;
 
@@ -686,14 +752,12 @@ class CandidatesUI extends UserInterface
      */
     private function add($contents = '', $fields = array())
     {
+        $aiResumeParser = new AIResumeParser();
         $candidates = new Candidates($this->_siteID);
 
         /* Get possible sources. */
         $sourcesRS = $candidates->getPossibleSources();
         $sourcesString = ListEditor::getStringFromList($sourcesRS, 'name');
-
-        /* Get extra fields. */
-        $extraFieldRS = $candidates->extraFields->getValuesForAdd();
 
         /* Get passed variables. */
         $preassignedFields = $_GET;
@@ -701,6 +765,18 @@ class CandidatesUI extends UserInterface
         {
             $preassignedFields = array_merge($preassignedFields, $fields);
         }
+
+        /* Get extra fields, pre-filling AI-generated summaries if available. */
+        $extraFieldPreassigned = array();
+        if (!empty($preassignedFields['aiCareerSummary']))
+        {
+            $extraFieldPreassigned['Career Summary'] = $preassignedFields['aiCareerSummary'];
+        }
+        if (!empty($preassignedFields['aiSkillSummary']))
+        {
+            $extraFieldPreassigned['Skill Summary'] = $preassignedFields['aiSkillSummary'];
+        }
+        $extraFieldRS = $candidates->extraFields->getValuesForAdd($extraFieldPreassigned);
 
         /* Get preattached resume, if any. */
         if ($this->isRequiredIDValid('attachmentID', $_GET))
@@ -723,7 +799,7 @@ class CandidatesUI extends UserInterface
             if ($associatedAttachmentRS['hasText'])
             {
                 $associatedAttachmentRS['previewLink'] = sprintf(
-                    '<a href="#" onclick="window.open(\'%s?m=candidates&amp;a=viewResume&amp;attachmentID=%s\', \'viewResume\', \'scrollbars=1,width=800,height=760\')"><img width="15" height="15" style="border: none;" src="images/popup.gif" alt="(Preview)" /></a>',
+                    '<a href="#" onclick="window.open(\'%s?m=candidates&amp;a=viewResume&amp;attachmentID=%s\', \'viewResume\', \'scrollbars=1,resizable=1,width=1260,height=980\'); return false;"><img width="15" height="15" style="border: none;" src="images/popup.gif" alt="(Preview)" /></a>',
                     CATSUtility::getIndexName(),
                     $associatedAttachmentRS['attachmentID']
                 );
@@ -772,7 +848,7 @@ class CandidatesUI extends UserInterface
         if (!eval(Hooks::get('CANDIDATE_ADD'))) return;
 
         /* If parsing is not enabled server-wide, say so. */
-        if (!LicenseUtility::isParsingEnabled())
+        if (!LicenseUtility::isParsingEnabled() && !$aiResumeParser->isEnabled())
         {
             $isParsingEnabled = false;
         }
@@ -796,8 +872,16 @@ class CandidatesUI extends UserInterface
             $isParsingEnabled = false;
         }
 
-        if (is_array($parsingStatus = LicenseUtility::getParsingStatus()) &&
-            isset($parsingStatus['parseLimit']))
+        $parsingStatus = LicenseUtility::getParsingStatus();
+        if (!is_array($parsingStatus))
+        {
+            $parsingStatus = array(
+                'parseLimit' => -1,
+                'parseUsed' => 0
+            );
+        }
+        if (isset($parsingStatus['parseLimit']) &&
+            LicenseUtility::isParsingEnabled())
         {
             $parsingStatus['parseLimit'] = $parsingStatus['parseLimit'] - 1;
         }
@@ -826,7 +910,9 @@ class CandidatesUI extends UserInterface
 
     public function checkParsingFunctions()
     {
-        if (LicenseUtility::isParsingEnabled())
+        $aiResumeParser = new AIResumeParser();
+
+        if (LicenseUtility::isParsingEnabled() || $aiResumeParser->isEnabled())
         {
             if (isset($_POST['documentText'])) $contents = $_POST['documentText'];
             else $contents = '';
@@ -858,7 +944,15 @@ class CandidatesUI extends UserInterface
                 'race'            => $this->getTrimmedInput('race', $_POST),
                 'veteran'         => $this->getTrimmedInput('veteran', $_POST),
                 'disability'      => $this->getTrimmedInput('disability', $_POST),
+                'chineseName'     => $this->getTrimmedInput('chineseName', $_POST),
+                'jobTitle'        => $this->getTrimmedInput('jobTitle', $_POST),
+                'functions'       => $this->getTrimmedInput('functions', $_POST),
+                'jobLevel'        => $this->getTrimmedInput('jobLevel', $_POST),
+                'major'           => $this->getTrimmedInput('major', $_POST),
                 'documentTempFile'=> $this->getTrimmedInput('documentTempFile', $_POST),
+                'aiParseLogID'    => $this->getTrimmedInput('aiParseLogID', $_POST),
+                'aiDocumentLanguage' => $this->getTrimmedInput('aiDocumentLanguage', $_POST),
+                'aiResumeExtension' => $this->getTrimmedInput('aiResumeExtension', $_POST),
                 'isFromParser'    => true
             );
 
@@ -868,6 +962,26 @@ class CandidatesUI extends UserInterface
              */
             if (isset($_POST['loadDocument']) && $_POST['loadDocument'] == 'true')
             {
+                // Check for PHP upload errors before attempting to process
+                // Only report errors when the user actually selected a file (ignore UPLOAD_ERR_NO_FILE)
+                if (isset($_FILES['documentFile']) && $_FILES['documentFile']['error'] !== UPLOAD_ERR_OK
+                    && $_FILES['documentFile']['error'] !== UPLOAD_ERR_NO_FILE)
+                {
+                    $uploadErrorMessages = array(
+                        UPLOAD_ERR_INI_SIZE   => '檔案超過伺服器允許的大小限制（' . ini_get('upload_max_filesize') . '）。',
+                        UPLOAD_ERR_FORM_SIZE  => '檔案超過表單允許的大小限制。',
+                        UPLOAD_ERR_PARTIAL    => '檔案只上傳了一部分，請重試。',
+                        UPLOAD_ERR_NO_FILE    => '未選擇任何檔案。',
+                        UPLOAD_ERR_NO_TMP_DIR => '伺服器暫存目錄設定錯誤，請聯絡管理員。',
+                        UPLOAD_ERR_CANT_WRITE => '伺服器無法寫入檔案，請聯絡管理員。',
+                    );
+                    $errCode = $_FILES['documentFile']['error'];
+                    $fields['aiParseError'] = isset($uploadErrorMessages[$errCode])
+                        ? $uploadErrorMessages[$errCode]
+                        : '上傳失敗，錯誤代碼：' . $errCode;
+                    return array('', $fields);
+                }
+
                 // Get the upload file from the post data
                 $newFileName = FileUtility::getUploadFileFromPost(
                     $this->_siteID, // The site ID
@@ -877,6 +991,10 @@ class CandidatesUI extends UserInterface
 
                 if ($newFileName !== false)
                 {
+                    // New file uploaded — reset previously AI-parsed notes so they don't
+                    // accumulate across multiple parses on the same add page.
+                    $fields['notes'] = '';
+
                     // Get the relative path to the file (to perform operations on)
                     $newFilePath = FileUtility::getUploadFilePath(
                         $this->_siteID, // The site ID
@@ -900,12 +1018,15 @@ class CandidatesUI extends UserInterface
                     }
                     else
                     {
-                        $contents = @file_get_contents($newFilePath);
+                        $contents = '';
                         $fields['binaryData'] = true;
+                        $fields['aiParseError'] = 'This file could not be converted to text automatically.';
                     }
 
                     // Save the short (un-pathed) name
                     $fields['documentTempFile'] = $newFileName;
+                    $fields['aiResumeExtension'] = strtolower(pathinfo($newFileName, PATHINFO_EXTENSION));
+                    $fields['aiOriginalFileName'] = $newFileName;
 
                     if (isset($_COOKIE['CATS_SP_TEMP_FILE']) && ($oldFile = $_COOKIE['CATS_SP_TEMP_FILE']) != '' &&
                         strcasecmp($oldFile, $newFileName))
@@ -923,7 +1044,8 @@ class CandidatesUI extends UserInterface
                     setcookie('CATS_SP_TEMP_FILE', $newFileName, time() + (60*60*24*7));
                 }
 
-                if (isset($_POST['parseDocument']) && $_POST['parseDocument'] == 'true' && $contents != '')
+                if (isset($_POST['parseDocument']) && $_POST['parseDocument'] == 'true' && $contents != '' &&
+                    !isset($fields['binaryData']))
                 {
                     // ...
                 }
@@ -938,21 +1060,51 @@ class CandidatesUI extends UserInterface
              */
             if (isset($_POST['parseDocument']) && $_POST['parseDocument'] == 'true' && $contents != '')
             {
-                $pu = new ParseUtility();
-                if ($res = $pu->documentParse('untitled', strlen($contents), '', $contents))
+                $parseSourceType = (isset($_POST['documentTempFile']) && $_POST['documentTempFile'] != '') ? 'upload' : 'paste';
+                $parseFileName = '';
+                if (isset($fields['aiOriginalFileName']) && $fields['aiOriginalFileName'] != '')
                 {
-                    if (isset($res['first_name'])) $fields['firstName'] = $res['first_name']; else $fields['firstName'] = '';
-                    if (isset($res['last_name'])) $fields['lastName'] = $res['last_name']; else $fields['lastName'] = '';
-                    $fields['middleName'] = '';
-                    if (isset($res['email_address'])) $fields['email1'] = $res['email_address']; else $fields['email1'] = '';
-                    $fields['email2'] = '';
-                    if (isset($res['us_address'])) $fields['address'] = $res['us_address']; else $fields['address'] = '';
-                    if (isset($res['city'])) $fields['city'] = $res['city']; else $fields['city'] = '';
-                    if (isset($res['state'])) $fields['state'] = $res['state']; else $fields['state'] = '';
-                    if (isset($res['zip_code'])) $fields['zip'] = $res['zip_code']; else $fields['zip'] = '';
-                    if (isset($res['phone_number'])) $fields['phoneHome'] = $res['phone_number']; else $fields['phoneHome'] = '';
-                    $fields['phoneWork'] = $fields['phoneCell'] = '';
-                    if (isset($res['skills'])) $fields['keySkills'] = str_replace("\n", ' ', str_replace('"', '\'\'', $res['skills']));
+                    $parseFileName = $fields['aiOriginalFileName'];
+                }
+                else if (isset($_POST['documentTempFile']) && $_POST['documentTempFile'] != '')
+                {
+                    $parseFileName = $_POST['documentTempFile'];
+                }
+
+                $aiResult = $this->parseCandidateResumeWithAI(
+                    $contents,
+                    $fields,
+                    $parseSourceType,
+                    $parseFileName
+                );
+
+        if ($aiResult !== false)
+        {
+            if (isset($fields['notes']) && trim($fields['notes']) != '' &&
+                isset($aiResult['notes']) && trim($aiResult['notes']) != '')
+            {
+                $aiResult['notes'] = trim($fields['notes']) . "\n\n" . trim($aiResult['notes']);
+            }
+            $fields = array_merge($fields, $aiResult);
+        }
+                else
+                {
+                    $pu = new ParseUtility();
+                    if ($res = $pu->documentParse('untitled', strlen($contents), '', $contents))
+                    {
+                        if (isset($res['first_name'])) $fields['firstName'] = $res['first_name']; else $fields['firstName'] = '';
+                        if (isset($res['last_name'])) $fields['lastName'] = $res['last_name']; else $fields['lastName'] = '';
+                        $fields['middleName'] = '';
+                        if (isset($res['email_address'])) $fields['email1'] = $res['email_address']; else $fields['email1'] = '';
+                        $fields['email2'] = '';
+                        if (isset($res['us_address'])) $fields['address'] = $res['us_address']; else $fields['address'] = '';
+                        if (isset($res['city'])) $fields['city'] = $res['city']; else $fields['city'] = '';
+                        if (isset($res['state'])) $fields['state'] = $res['state']; else $fields['state'] = '';
+                        if (isset($res['zip_code'])) $fields['zip'] = $res['zip_code']; else $fields['zip'] = '';
+                        if (isset($res['phone_number'])) $fields['phoneHome'] = $res['phone_number']; else $fields['phoneHome'] = '';
+                        $fields['phoneWork'] = $fields['phoneCell'] = '';
+                        if (isset($res['skills'])) $fields['keySkills'] = str_replace("\n", ' ', str_replace('"', '\'\'', $res['skills']));
+                    }
                 }
 
                 return array($contents, $fields);
@@ -960,6 +1112,265 @@ class CandidatesUI extends UserInterface
         }
 
         return false;
+    }
+
+    private function parseCandidateResumeWithAI($contents, $fields, $sourceType, $fileName = '')
+    {
+        $parser = new AIResumeParser();
+        if (!$parser->isEnabled())
+        {
+            return false;
+        }
+
+        $languageCode = $parser->detectLanguageCode($contents, $fileName);
+        $result = $parser->parseResumeText($contents, array(
+            'sourceType' => $sourceType,
+            'fileName' => $fileName,
+            'languageHint' => $languageCode
+        ));
+        if ($result === false)
+        {
+            $fields['aiParseError'] = $parser->getLastError();
+            return false;
+        }
+
+        $originalFilename = ($fileName != '') ? $fileName : ('Resume_' . date('Ymd') . '.txt');
+        $storedFilename = '';
+        if (isset($fields['documentTempFile']) && $fields['documentTempFile'] != '')
+        {
+            $storedFilename = $fields['documentTempFile'];
+        }
+
+        $parseLogID = $parser->createParseLog(
+            $this->_siteID,
+            $this->_userID,
+            $sourceType,
+            $originalFilename,
+            $storedFilename,
+            $languageCode,
+            $result
+        );
+
+        return array_merge(
+            $this->mapAIParseResultToCandidateFields($result),
+            array(
+                'aiParseLogID' => $parseLogID,
+                'aiDocumentLanguage' => $languageCode,
+                'aiParseError' => '',
+                'aiResumeExtension' => $this->getAIResumeExtension($fields, $fileName, $sourceType)
+            )
+        );
+    }
+
+    private function mapAIParseResultToCandidateFields($result)
+    {
+        $candidate = isset($result['candidate']) ? $result['candidate'] : array();
+
+        $mapped = array(
+            'firstName' => isset($candidate['first_name']) ? $candidate['first_name'] : '',
+            'lastName' => isset($candidate['last_name']) ? $candidate['last_name'] : '',
+            'middleName' => '',
+            'email' => isset($candidate['email']) ? $candidate['email'] : '',
+            'email1' => isset($candidate['email']) ? $candidate['email'] : '',
+            'email2' => '',
+            'phoneHome' => isset($candidate['phone']) ? $candidate['phone'] : '',
+            'phoneCell' => '',
+            'phoneWork' => '',
+            'address' => isset($candidate['address']) ? $candidate['address'] : '',
+            'city' => isset($candidate['city']) ? $candidate['city'] : '',
+            'state' => isset($candidate['state']) ? $candidate['state'] : '',
+            'zip' => isset($candidate['zip_code']) ? $candidate['zip_code'] : '',
+            'currentEmployer' => isset($candidate['current_employer']) ? $candidate['current_employer'] : '',
+            'jobTitle' => isset($candidate['job_title_en']) ? $candidate['job_title_en'] : '',
+            'functions' => isset($candidate['function_en']) ? $candidate['function_en'] : '',
+            'jobLevel' => $this->formatAIJobLevelForDisplay(
+                isset($candidate['job_level']) ? $candidate['job_level'] : ''
+            ),
+            'webSite' => isset($candidate['website']) ? $candidate['website'] : '',
+            'linkedin' => isset($candidate['linkedin']) ? $candidate['linkedin'] : '',
+            'github' => isset($candidate['github']) ? $candidate['github'] : '',
+            'facebook' => isset($candidate['facebook']) ? $candidate['facebook'] : '',
+            'googleplus' => isset($candidate['googleplus']) ? $candidate['googleplus'] : '',
+            'twitter' => isset($candidate['twitter']) ? $candidate['twitter'] : '',
+            'cakeresume' => isset($candidate['cakeresume']) ? $candidate['cakeresume'] : '',
+            'link1' => isset($candidate['link1']) ? $candidate['link1'] : '',
+            'link2' => isset($candidate['link2']) ? $candidate['link2'] : '',
+            'link3' => isset($candidate['link3']) ? $candidate['link3'] : '',
+            'highestDegree' => isset($candidate['highest_degree']) ? $candidate['highest_degree'] : '',
+            'major' => isset($candidate['major']) ? $candidate['major'] : '',
+            'keySkills' => isset($candidate['key_skills_en']) ? implode(', ', $candidate['key_skills_en']) : '',
+            'chineseName' => $this->buildChineseNameFromAIResult($candidate),
+            'notes' => $this->buildAINotesFromResult($result)
+        );
+
+        if (isset($candidate['skills_raw']) && empty($mapped['keySkills']))
+        {
+            $mapped['keySkills'] = implode(', ', $candidate['skills_raw']);
+        }
+
+        if (!empty($candidate['career_summary']))
+        {
+            $mapped['aiCareerSummary'] = $candidate['career_summary'];
+        }
+        if (!empty($candidate['skill_summary']))
+        {
+            $mapped['aiSkillSummary'] = $candidate['skill_summary'];
+        }
+
+        return $mapped;
+    }
+
+    private function buildAINotesFromResult($result)
+    {
+        $candidate = isset($result['candidate']) ? $result['candidate'] : array();
+        $lines = array();
+
+        if (!empty($candidate['job_title_raw']) && !empty($candidate['job_title_en']))
+        {
+            $lines[] = 'AI job title normalized from "' . $candidate['job_title_raw'] . '" to "' . $candidate['job_title_en'] . '".';
+        }
+        if (!empty($candidate['function_raw']) && !empty($candidate['function_en']))
+        {
+            $lines[] = 'AI function normalized from "' . $candidate['function_raw'] . '" to "' . $candidate['function_en'] . '".';
+        }
+        if (!empty($candidate['job_level']))
+        {
+            $lines[] = 'AI inferred job level: ' . $this->formatAIJobLevelForDisplay($candidate['job_level']) . '.';
+        }
+        if (!empty($candidate['key_skills_zh']))
+        {
+            $lines[] = 'AI key skills (ZH): ' . implode(', ', $candidate['key_skills_zh']) . '.';
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function buildChineseNameFromAIResult($candidate)
+    {
+        if (!empty($candidate['chinese_name']))
+        {
+            return $candidate['chinese_name'];
+        }
+
+        return '';
+    }
+
+    private function formatAIJobLevelForDisplay($jobLevel)
+    {
+        $jobLevel = trim((string) $jobLevel);
+        if ($jobLevel == '')
+        {
+            return '';
+        }
+
+        $normalized = strtolower($jobLevel);
+        $labels = array(
+            'intern' => 'Intern',
+            'junior' => 'Junior',
+            'mid' => 'Mid',
+            'senior' => 'Senior',
+            'staff' => 'Staff',
+            'principal' => 'Principal',
+            'lead' => 'Lead',
+            'manager' => 'Manager',
+            'director' => 'Director',
+            'vp' => 'VP',
+            'c_level' => 'C-Level'
+        );
+
+        if (isset($labels[$normalized]))
+        {
+            return $labels[$normalized];
+        }
+
+        return ucwords(str_replace('_', ' ', $normalized));
+    }
+
+    private function getAIResumeExtension($fields, $fileName, $sourceType)
+    {
+        if (isset($fields['aiResumeExtension']) && $fields['aiResumeExtension'] != '')
+        {
+            return strtolower($fields['aiResumeExtension']);
+        }
+
+        if ($fileName != '')
+        {
+            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            if ($extension != '')
+            {
+                return $extension;
+            }
+        }
+
+        if ($sourceType == 'paste')
+        {
+            return 'txt';
+        }
+
+        return 'pdf';
+    }
+
+    private function buildStandardResumeFilenameFromPost()
+    {
+        $parseLogID = $this->getTrimmedInput('aiParseLogID', $_POST);
+        if ($parseLogID == '')
+        {
+            return false;
+        }
+
+        $firstName = $this->getTrimmedInput('firstName', $_POST);
+        $lastName = $this->getTrimmedInput('lastName', $_POST);
+        $candidateName = trim($firstName . ' ' . $lastName);
+        if ($candidateName == '')
+        {
+            $candidateName = 'Candidate';
+        }
+
+        $languageCode = $this->getTrimmedInput('aiDocumentLanguage', $_POST);
+        if ($languageCode == '')
+        {
+            $languageCode = 'mixed';
+        }
+
+        $extension = $this->getTrimmedInput('aiResumeExtension', $_POST);
+        if ($extension == '')
+        {
+            $extension = 'txt';
+        }
+
+        $parser = new AIResumeParser();
+        return $parser->makeStandardFilename($candidateName, $languageCode, $extension);
+    }
+
+    private function removeDocumentTempFile()
+    {
+        $tempFile = $this->getTrimmedInput('documentTempFile', $_REQUEST);
+        $parseLogID = $this->getTrimmedInput('aiParseLogID', $_REQUEST);
+
+        if ($tempFile != '')
+        {
+            $tempFullPath = FileUtility::getUploadFilePath(
+                $this->_siteID,
+                'addcandidate',
+                $tempFile
+            );
+            if ($tempFullPath !== false && file_exists($tempFullPath))
+            {
+                @unlink($tempFullPath);
+            }
+        }
+
+        if ($parseLogID != '')
+        {
+            $parser = new AIResumeParser();
+            $parser->markStatus($parseLogID, 'discarded');
+        }
+
+        setcookie('CATS_SP_TEMP_FILE', '', time() - 3600);
+
+        header('Content-Type: text/plain; charset=UTF-8');
+        echo 'OK';
+        die();
     }
 
     /*
@@ -1851,6 +2262,50 @@ class CandidatesUI extends UserInterface
         $this->_template->display('./modules/candidates/Search.tpl');
     }
 
+    /**
+     * Adds owner abbreviations and resume IDs to search results in bulk.
+     *
+     * @param array result set
+     * @param Candidates candidates library instance
+     * @return array hydrated result set
+     */
+    private function populateCandidateSearchResultMetadata($rs, $candidates)
+    {
+        if (empty($rs))
+        {
+            return $rs;
+        }
+
+        $resumeIDsByCandidateID = $candidates->getResumeIDsByCandidateIDs(
+            ResultSetUtility::getColumnValues($rs, 'candidateID')
+        );
+
+        foreach ($rs as $rowIndex => $row)
+        {
+            if (!empty($row['ownerFirstName']))
+            {
+                $rs[$rowIndex]['ownerAbbrName'] = StringUtility::makeInitialName(
+                    $row['ownerFirstName'],
+                    $row['ownerLastName'],
+                    false,
+                    LAST_NAME_MAXLEN
+                );
+            }
+            else
+            {
+                $rs[$rowIndex]['ownerAbbrName'] = 'None';
+            }
+
+            $candidateID = (int) $row['candidateID'];
+            if (isset($resumeIDsByCandidateID[$candidateID]))
+            {
+                $rs[$rowIndex]['resumeID'] = $resumeIDsByCandidateID[$candidateID];
+            }
+        }
+
+        return $rs;
+    }
+
     /*
      * Called by handleRequest() to process displaying the search results.
      */
@@ -1922,29 +2377,7 @@ class CandidatesUI extends UserInterface
         {
             case 'searchByFullName':
                 $rs = $search->byFullName($query, $sortBy, $sortDirection);
-
-                foreach ($rs as $rowIndex => $row)
-                {
-                    if (!empty($row['ownerFirstName']))
-                    {
-                        $rs[$rowIndex]['ownerAbbrName'] = StringUtility::makeInitialName(
-                            $row['ownerFirstName'],
-                            $row['ownerLastName'],
-                            false,
-                            LAST_NAME_MAXLEN
-                        );
-                    }
-                    else
-                    {
-                        $rs[$rowIndex]['ownerAbbrName'] = 'None';
-                    }
-
-                    $rsResume = $candidates->getResumes($row['candidateID']);
-                    if (isset($rsResume[0]))
-                    {
-                        $rs[$rowIndex]['resumeID'] = $rsResume[0]['attachmentID'];
-                    }
-                }
+                $rs = $this->populateCandidateSearchResultMetadata($rs, $candidates);
 
                 $isResumeMode = false;
                 $isKeywordsMode = false;
@@ -1954,29 +2387,7 @@ class CandidatesUI extends UserInterface
 
             case 'searchByKeySkills':
                 $rs = $search->byKeySkills($query, $sortBy, $sortDirection);
-
-                foreach ($rs as $rowIndex => $row)
-                {
-                    if (!empty($row['ownerFirstName']))
-                    {
-                        $rs[$rowIndex]['ownerAbbrName'] = StringUtility::makeInitialName(
-                            $row['ownerFirstName'],
-                            $row['ownerLastName'],
-                            false,
-                            LAST_NAME_MAXLEN
-                        );
-                    }
-                    else
-                    {
-                        $rs[$rowIndex]['ownerAbbrName'] = 'None';
-                    }
-
-                    $rsResume = $candidates->getResumes($row['candidateID']);
-                    if (isset($rsResume[0]))
-                    {
-                        $rs[$rowIndex]['resumeID'] = $rsResume[0]['attachmentID'];
-                    }
-                }
+                $rs = $this->populateCandidateSearchResultMetadata($rs, $candidates);
 
                 $isResumeMode = false;
                 $isKeywordsMode = false;
@@ -1986,34 +2397,21 @@ class CandidatesUI extends UserInterface
                 break;
 
             case 'searchByKeywords':
-                $rs = $search->byKeywords($query, $sortBy, $sortDirection);
+                $rs = $search->byKeywords(
+                    $query,
+                    $sortBy,
+                    $sortDirection,
+                    $this->getTrimmedInput('advancedSearchParser', $_GET),
+                    $this->getTrimmedInput('advancedSearchOn', $_GET)
+                );
 
                 foreach ($rs as $rowIndex => $row)
                 {
                     $rs[$rowIndex]['excerpt'] = SearchUtility::searchExcerpt(
                         $query, $row['text']
                     );
-                    
-                    if (!empty($row['ownerFirstName']))
-                    {
-                        $rs[$rowIndex]['ownerAbbrName'] = StringUtility::makeInitialName(
-                            $row['ownerFirstName'],
-                            $row['ownerLastName'],
-                            false,
-                            LAST_NAME_MAXLEN
-                        );
-                    }
-                    else
-                    {
-                        $rs[$rowIndex]['ownerAbbrName'] = 'None';
-                    }
-
-                    $rsResume = $candidates->getResumes($row['candidateID']);
-                    if (isset($rsResume[0]))
-                    {
-                        $rs[$rowIndex]['resumeID'] = $rsResume[0]['attachmentID'];
-                    }
                 }
+                $rs = $this->populateCandidateSearchResultMetadata($rs, $candidates);
 
                 $isResumeMode = false;
                 $isKeywordsMode = true;
@@ -2092,29 +2490,7 @@ class CandidatesUI extends UserInterface
 
             case 'phoneNumber':
                 $rs = $search->byPhone($query, $sortBy, $sortDirection);
-
-                foreach ($rs as $rowIndex => $row)
-                {
-                    if (!empty($row['ownerFirstName']))
-                    {
-                        $rs[$rowIndex]['ownerAbbrName'] = StringUtility::makeInitialName(
-                            $row['ownerFirstName'],
-                            $row['ownerLastName'],
-                            false,
-                            LAST_NAME_MAXLEN
-                        );
-                    }
-                    else
-                    {
-                        $rs[$rowIndex]['ownerAbbrName'] = 'None';
-                    }
-
-                    $rsResume = $candidates->getResumes($row['candidateID']);
-                    if (isset($rsResume[0]))
-                    {
-                        $rs[$rowIndex]['resumeID'] = $rsResume[0]['attachmentID'];
-                    }
-                }
+                $rs = $this->populateCandidateSearchResultMetadata($rs, $candidates);
 
                 $isResumeMode = false;
                 $isKeywordsMode = false;
@@ -2185,8 +2561,26 @@ class CandidatesUI extends UserInterface
 
         if (!empty($data))
         {
-            /* Keyword highlighting. */
-            $data['text'] = SearchUtility::makePreview($query, $data['text']);
+            $decodedText = DatabaseSearch::fulltextDecode($data['text']);
+            $data['retrievalURL'] = $this->buildResumeRetrievalURL($data);
+            $data['isPDFResume'] = $this->isPDFResume($data);
+            $data['isStyledMarkdownResume'] = $this->isStyledMarkdownResume($data, $decodedText);
+
+            if ($data['isPDFResume'])
+            {
+                $data['text'] = $decodedText;
+            }
+            else if ($data['isStyledMarkdownResume'])
+            {
+                $data['rawText'] = $decodedText;
+                $data['renderedHtml'] = $this->renderStyledMarkdownResume($decodedText);
+                $data['text'] = $decodedText;
+            }
+            else
+            {
+                /* Keyword highlighting. */
+                $data['text'] = SearchUtility::makePreview($query, $data['text']);
+            }
         }
 
         if (!eval(Hooks::get('CANDIDATE_VIEW_RESUME'))) return;
@@ -2194,6 +2588,330 @@ class CandidatesUI extends UserInterface
         $this->_template->assign('active', $this);
         $this->_template->assign('data', $data);
         $this->_template->display('./modules/candidates/ResumeView.tpl');
+    }
+
+    private function buildResumeRetrievalURL($resume)
+    {
+        if (empty($resume['attachmentID']) || empty($resume['directoryName']))
+        {
+            return '';
+        }
+
+        return sprintf(
+            '%s?m=attachments&amp;a=getAttachment&amp;id=%s&amp;directoryNameHash=%s',
+            CATSUtility::getIndexName(),
+            $resume['attachmentID'],
+            urlencode(md5($resume['directoryName']))
+        );
+    }
+
+    private function isPDFResume($resume)
+    {
+        $originalFilename = isset($resume['originalFilename']) ? trim($resume['originalFilename']) : '';
+        $contentType = isset($resume['contentType']) ? trim($resume['contentType']) : '';
+
+        return (
+            preg_match('/\.pdf$/i', $originalFilename) ||
+            strcasecmp($contentType, 'application/pdf') == 0
+        );
+    }
+
+    private function isStyledMarkdownResume($resume, $decodedText)
+    {
+        $originalFilename = isset($resume['originalFilename']) ? trim($resume['originalFilename']) : '';
+        $title = isset($resume['title']) ? trim($resume['title']) : '';
+
+        if ($originalFilename == '' || !preg_match('/\.md$/i', $originalFilename))
+        {
+            return false;
+        }
+
+        if ($this->isJechoAIReportAttachment($resume))
+        {
+            return true;
+        }
+
+        if (preg_match('/^Jecho(?:_AI)?[ _]Report/i', $originalFilename) ||
+            preg_match('/^Jecho(?: AI)? Report/i', $title))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function renderStyledMarkdownResume($markdown)
+    {
+        $markdown = str_replace(array("\r\n", "\r"), "\n", trim((string) $markdown));
+        if ($markdown == '')
+        {
+            return '';
+        }
+
+        $lines = explode("\n", $markdown);
+        $html = array();
+        $paragraphLines = array();
+        $listItems = array();
+        $lineCount = count($lines);
+
+        for ($i = 0; $i < $lineCount; $i++)
+        {
+            $line = rtrim($lines[$i]);
+            $trimmedLine = trim($line);
+
+            if ($trimmedLine == '')
+            {
+                $this->flushStyledResumeParagraph($html, $paragraphLines);
+                $this->flushStyledResumeList($html, $listItems);
+                continue;
+            }
+
+            if ($this->isStyledResumeTableHeader($lines, $i))
+            {
+                $this->flushStyledResumeParagraph($html, $paragraphLines);
+                $this->flushStyledResumeList($html, $listItems);
+
+                $html[] = $this->renderStyledResumeTable($lines, $i);
+                continue;
+            }
+
+            if (preg_match('/^(#{1,6})\s*(.+)$/', $trimmedLine, $matches))
+            {
+                $this->flushStyledResumeParagraph($html, $paragraphLines);
+                $this->flushStyledResumeList($html, $listItems);
+
+                $level = strlen($matches[1]);
+                $html[] = sprintf(
+                    '<h%d>%s</h%d>',
+                    $level,
+                    $this->renderStyledResumeInline($matches[2]),
+                    $level
+                );
+                continue;
+            }
+
+            if (preg_match('/^\s*-\s+(.+)$/', $line, $matches))
+            {
+                $this->flushStyledResumeParagraph($html, $paragraphLines);
+                $listItems[] = $this->renderStyledResumeInline($matches[1]);
+                continue;
+            }
+
+            if ($this->isStyledResumeRawHtmlLine($trimmedLine))
+            {
+                $this->flushStyledResumeParagraph($html, $paragraphLines);
+                $this->flushStyledResumeList($html, $listItems);
+                $html[] = $trimmedLine;
+                continue;
+            }
+
+            $paragraphLines[] = $trimmedLine;
+        }
+
+        $this->flushStyledResumeParagraph($html, $paragraphLines);
+        $this->flushStyledResumeList($html, $listItems);
+
+        return implode("\n", $html);
+    }
+
+    private function flushStyledResumeParagraph(&$html, &$paragraphLines)
+    {
+        if (empty($paragraphLines))
+        {
+            return;
+        }
+
+        $html[] = '<p>' . $this->renderStyledResumeInline(implode(' ', $paragraphLines)) . '</p>';
+        $paragraphLines = array();
+    }
+
+    private function flushStyledResumeList(&$html, &$listItems)
+    {
+        if (empty($listItems))
+        {
+            return;
+        }
+
+        $html[] = "<ul>\n<li>" . implode("</li>\n<li>", $listItems) . "</li>\n</ul>";
+        $listItems = array();
+    }
+
+    private function isStyledResumeRawHtmlLine($line)
+    {
+        return (bool) preg_match('/^<\/?(div|span|img|a)\b/i', $line);
+    }
+
+    private function isStyledResumeTableHeader($lines, &$offset)
+    {
+        if (!isset($lines[$offset + 1]))
+        {
+            return false;
+        }
+
+        $headerLine = trim($lines[$offset]);
+        $separatorLine = trim($lines[$offset + 1]);
+
+        if (strpos($headerLine, '|') === false)
+        {
+            return false;
+        }
+
+        return (bool) preg_match('/^\|?[\s:\-|\t]+\|?$/', $separatorLine);
+    }
+
+    private function renderStyledResumeTable($lines, &$offset)
+    {
+        $headerCells = $this->splitStyledResumeTableRow($lines[$offset]);
+        $alignments = $this->parseStyledResumeTableAlignments($lines[$offset + 1]);
+        $leadingEmptyColumns = $this->countLeadingEmptyStyledResumeTableColumns($headerCells);
+
+        if ($leadingEmptyColumns > 0)
+        {
+            $headerCells = array_slice($headerCells, $leadingEmptyColumns);
+            $alignments = array_slice($alignments, $leadingEmptyColumns);
+        }
+
+        $rowHtml = array();
+
+        $headCells = array();
+        foreach ($headerCells as $column => $cell)
+        {
+            $headCells[] = sprintf(
+                '<th%s>%s</th>',
+                $this->buildStyledResumeAlignmentAttribute($alignments, $column),
+                $this->renderStyledResumeInline($cell)
+            );
+        }
+
+        $rowHtml[] = "<table>\n<thead>\n<tr>" . implode('', $headCells) . "</tr>\n</thead>";
+
+        $bodyRows = array();
+        for ($i = $offset + 2; isset($lines[$i]); $i++)
+        {
+            $rowLine = trim($lines[$i]);
+            if ($rowLine == '' || strpos($rowLine, '|') === false)
+            {
+                break;
+            }
+
+            $cells = $this->splitStyledResumeTableRow($lines[$i]);
+            if ($leadingEmptyColumns > 0)
+            {
+                $cells = array_slice($cells, $leadingEmptyColumns);
+            }
+
+            $columns = array();
+            foreach ($cells as $column => $cell)
+            {
+                $columns[] = sprintf(
+                    '<td%s>%s</td>',
+                    $this->buildStyledResumeAlignmentAttribute($alignments, $column),
+                    $this->renderStyledResumeInline($cell)
+                );
+            }
+
+            $bodyRows[] = '<tr>' . implode('', $columns) . '</tr>';
+        }
+
+        if (!empty($bodyRows))
+        {
+            $rowHtml[] = "<tbody>\n" . implode("\n", $bodyRows) . "\n</tbody>";
+        }
+
+        $rowHtml[] = '</table>';
+        $offset = $i - 1;
+
+        return implode("\n", $rowHtml);
+    }
+
+    private function countLeadingEmptyStyledResumeTableColumns($cells)
+    {
+        $leadingEmptyColumns = 0;
+
+        foreach ($cells as $cell)
+        {
+            if (trim($cell) !== '')
+            {
+                break;
+            }
+
+            $leadingEmptyColumns++;
+        }
+
+        if ($leadingEmptyColumns < 2)
+        {
+            return 0;
+        }
+
+        return $leadingEmptyColumns;
+    }
+
+    private function splitStyledResumeTableRow($line)
+    {
+        $line = trim((string) $line);
+        $line = preg_replace('/^\|/', '', $line);
+        $line = preg_replace('/\|$/', '', $line);
+
+        return array_map('trim', explode('|', $line));
+    }
+
+    private function parseStyledResumeTableAlignments($line)
+    {
+        $cells = $this->splitStyledResumeTableRow($line);
+        $alignments = array();
+
+        foreach ($cells as $cell)
+        {
+            $cell = trim($cell);
+            if ($cell == '')
+            {
+                $alignments[] = '';
+            }
+            else if (preg_match('/^:-+:$/', $cell))
+            {
+                $alignments[] = 'center';
+            }
+            else if (preg_match('/^-+:$/', $cell))
+            {
+                $alignments[] = 'right';
+            }
+            else
+            {
+                $alignments[] = 'left';
+            }
+        }
+
+        return $alignments;
+    }
+
+    private function buildStyledResumeAlignmentAttribute($alignments, $column)
+    {
+        if (!isset($alignments[$column]) || $alignments[$column] == '')
+        {
+            return '';
+        }
+
+        return ' style="text-align: ' . $alignments[$column] . ';"';
+    }
+
+    private function renderStyledResumeInline($text)
+    {
+        $text = trim((string) $text);
+        if ($text == '')
+        {
+            return '';
+        }
+
+        if (!preg_match('/<\/?[a-z][^>]*>/i', $text))
+        {
+            $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+        }
+
+        $text = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $text);
+        $text = preg_replace('/\*(.+?)\*/s', '<em>$1</em>', $text);
+        $text = preg_replace('/\[(.+?)\]\((https?:\/\/[^\s\)]+)\)/', '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>', $text);
+
+        return $text;
     }
 
     private function addEditImage()
@@ -2275,11 +2993,21 @@ class CandidatesUI extends UserInterface
         }
 
         $candidateID = $_GET['candidateID'];
+        $candidates = new Candidates($this->_siteID);
+        $candidate = $candidates->get($candidateID);
+        $attachments = new Attachments($this->_siteID);
+        $attachmentsRS = $attachments->getAll(DATA_ITEM_CANDIDATE, $candidateID);
+        $attachmentFileNames = ResultSetUtility::getColumnValues(
+            $attachmentsRS,
+            'originalFilename'
+        );
 
         if (!eval(Hooks::get('CANDIDATE_CREATE_ATTACHMENT'))) return;
 
         $this->_template->assign('isFinishedMode', false);
         $this->_template->assign('candidateID', $candidateID);
+        $this->_template->assign('candidateData', $candidate);
+        $this->_template->assign('attachmentFileNames', $attachmentFileNames);
         $this->_template->display(
             './modules/candidates/CreateAttachmentModal.tpl'
         );
@@ -2301,23 +3029,50 @@ class CandidatesUI extends UserInterface
             CommonErrors::fatalModal(COMMONERROR_BADINDEX, $this, 'Invalid candidate ID.');
         }
 
-        /* Bail out if we don't have a valid resume status. */
-        if (!$this->isRequiredIDValid('resume', $_POST, true) ||
-            $_POST['resume'] < 0 || $_POST['resume'] > 1)
-        {
-            CommonErrors::fatalModal(COMMONERROR_RECORDERROR, $this, 'Invalid resume status.');
-        }
-
         $candidateID = $_POST['candidateID'];
+        $fileType = $this->getTrimmedInput('fileType', $_POST);
+        if ($fileType == '')
+        {
+            CommonErrors::fatalModal(COMMONERROR_RECORDERROR, $this, 'Invalid attachment type.');
+        }
 
-        if ($_POST['resume'] == '1')
+        $filenameMode = $this->getTrimmedInput('filenameMode', $_POST);
+        if ($filenameMode != 'suggested' && $filenameMode != 'original' && $filenameMode != 'manual')
         {
-            $isResume = true;
+            $filenameMode = 'suggested';
         }
-        else
+
+        $suggestedFilename = $this->getTrimmedInput('suggestedFilename', $_POST);
+        if ($filenameMode == 'suggested' && $suggestedFilename == '')
         {
-            $isResume = false;
+            CommonErrors::fatalModal(COMMONERROR_RECORDERROR, $this, 'Invalid suggested filename.');
         }
+        $manualFilename = $this->getTrimmedInput('manualFilename', $_POST);
+        if ($filenameMode == 'manual' && $manualFilename == '')
+        {
+            CommonErrors::fatalModal(COMMONERROR_RECORDERROR, $this, 'Invalid manual filename.');
+        }
+
+        if (empty($_FILES['file']['name']))
+        {
+            CommonErrors::fatalModal(COMMONERROR_RECORDERROR, $this, 'You must select a file to upload.');
+        }
+
+        if ($filenameMode == 'suggested' || $filenameMode == 'manual')
+        {
+            $normalizedFilename = $this->buildAttachmentUploadFilename(
+                ($filenameMode == 'manual' ? $manualFilename : $suggestedFilename),
+                $_FILES['file']['name']
+            );
+
+            if ($normalizedFilename === false)
+            {
+                CommonErrors::fatalModal(COMMONERROR_RECORDERROR, $this, 'Invalid filename or unsupported file extension.');
+            }
+
+            $_FILES['file']['name'] = $normalizedFilename;
+        }
+        $isResume = $this->attachmentFileTypeIsResume($fileType);
 
         if (!eval(Hooks::get('CANDIDATE_ON_CREATE_ATTACHMENT_PRE'))) return;
 
@@ -2354,16 +3109,59 @@ class CandidatesUI extends UserInterface
         );
     }
 
+    private function attachmentFileTypeIsResume($fileType)
+    {
+        return in_array($fileType, array('resume', 'jecho_report'));
+    }
+
+    private function buildAttachmentUploadFilename($suggestedFilename, $originalFilename)
+    {
+        $suggestedFilename = trim((string) $suggestedFilename);
+        $originalFilename = trim((string) $originalFilename);
+
+        if ($suggestedFilename == '' || $originalFilename == '')
+        {
+            return false;
+        }
+
+        $extension = strtolower(FileUtility::getFileExtension($originalFilename));
+        $allowedExtensions = array('doc', 'docx', 'pdf', 'html', 'txt', 'md', 'jpg', 'png');
+
+        if ($extension == '' || !in_array($extension, $allowedExtensions))
+        {
+            return false;
+        }
+
+        $baseName = pathinfo($suggestedFilename, PATHINFO_FILENAME);
+        if ($baseName == '')
+        {
+            $baseName = $suggestedFilename;
+        }
+
+        $baseName = preg_replace('/[\/\\\\:\*\?"<>\|]+/', '_', $baseName);
+        $baseName = preg_replace('/\s+/', '_', $baseName);
+        $baseName = preg_replace('/_+/', '_', $baseName);
+        $baseName = trim($baseName, '._');
+
+        if ($baseName == '')
+        {
+            return false;
+        }
+
+        $finalFilename = $baseName . '.' . $extension;
+        if (strlen($finalFilename) > 255)
+        {
+            return false;
+        }
+
+        return $finalFilename;
+    }
+
     /*
      * Called by handleRequest() to process deleting an attachment.
      */
     private function onDeleteAttachment()
     {
-        if ($this->_accessLevel < ACCESS_LEVEL_DELETE)
-        {
-            CommonErrors::fatal(COMMONERROR_PERMISSION, $this, 'Invalid user level for action.');
-        }
-
         /* Bail out if we don't have a valid attachment ID. */
         if (!$this->isRequiredIDValid('attachmentID', $_GET))
         {
@@ -2379,15 +3177,267 @@ class CandidatesUI extends UserInterface
         $candidateID  = $_GET['candidateID'];
         $attachmentID = $_GET['attachmentID'];
 
+        $attachments = new Attachments($this->_siteID);
+        $attachment = $attachments->get($attachmentID);
+        if (empty($attachment) ||
+            (int) $attachment['dataItemID'] != (int) $candidateID ||
+            (int) $attachment['dataItemType'] != DATA_ITEM_CANDIDATE)
+        {
+            CommonErrors::fatalModal(COMMONERROR_BADINDEX, $this, 'Invalid attachment ID.');
+        }
+
+        if (!$this->canDeleteAttachment($attachment))
+        {
+            CommonErrors::fatal(COMMONERROR_PERMISSION, $this, 'Invalid user level for action.');
+        }
+
         if (!eval(Hooks::get('CANDIDATE_ON_DELETE_ATTACHMENT_PRE'))) return;
 
-        $attachments = new Attachments($this->_siteID);
         $attachments->delete($attachmentID);
 
         if (!eval(Hooks::get('CANDIDATE_ON_DELETE_ATTACHMENT_POST'))) return;
 
         CATSUtility::transferRelativeURI(
             'm=candidates&a=show&candidateID=' . $candidateID
+        );
+    }
+
+    private function onGenerateJechoReport()
+    {
+        if ($this->_accessLevel < ACCESS_LEVEL_EDIT)
+        {
+            CommonErrors::fatal(COMMONERROR_PERMISSION, $this, 'Invalid user level for action.');
+        }
+
+        if (!$this->isRequiredIDValid('candidateID', $_GET))
+        {
+            CommonErrors::fatal(COMMONERROR_BADINDEX, $this, 'Invalid candidate ID.');
+        }
+
+        if (!$this->isRequiredIDValid('attachmentID', $_GET))
+        {
+            CommonErrors::fatal(COMMONERROR_BADINDEX, $this, 'Invalid attachment ID.');
+        }
+
+        $language = strtolower($this->getTrimmedInput('language', $_GET));
+        if ($language != 'zh' && $language != 'en')
+        {
+            CommonErrors::fatal(COMMONERROR_BADINDEX, $this, 'Invalid report language.');
+        }
+        $createNewVersion = ($this->getTrimmedInput('createNewVersion', $_GET) == '1');
+
+        $candidateID = $_GET['candidateID'];
+        $attachmentID = $_GET['attachmentID'];
+
+        $attachments = new Attachments($this->_siteID);
+        $attachment = $attachments->get($attachmentID);
+
+        if (empty($attachment) ||
+            (int) $attachment['dataItemID'] != (int) $candidateID ||
+            (int) $attachment['dataItemType'] != DATA_ITEM_CANDIDATE)
+        {
+            CommonErrors::fatal(COMMONERROR_BADINDEX, $this, 'Invalid candidate attachment.');
+        }
+
+        if (!$this->canGenerateJechoReportFromAttachment($attachment))
+        {
+            CommonErrors::fatal(COMMONERROR_RECORDERROR, $this, 'This attachment cannot be used to generate a Jecho report.');
+        }
+
+        $candidates = new Candidates($this->_siteID);
+        $resume = $candidates->getResume($attachmentID);
+        if (empty($resume))
+        {
+            CommonErrors::fatal(COMMONERROR_RECORDERROR, $this, 'This attachment is not a resume or has no extracted text.');
+        }
+
+        $resumeText = trim(DatabaseSearch::fulltextDecode($resume['text']));
+        if ($resumeText == '')
+        {
+            CommonErrors::fatal(COMMONERROR_RECORDERROR, $this, 'This attachment has no extracted text to transform.');
+        }
+
+        $candidateName = trim($resume['firstName'] . ' ' . $resume['lastName']);
+        if ($candidateName == '')
+        {
+            $candidateName = 'Candidate';
+        }
+
+        $generationLockName = $this->buildJechoReportGenerationLockName(
+            $candidateID,
+            $attachmentID,
+            $language
+        );
+        if (!$this->acquireJechoReportGenerationLock($generationLockName))
+        {
+            CommonErrors::fatal(
+                COMMONERROR_BADFIELDS,
+                $this,
+                'A Jecho report is already being generated for this attachment and language. Please wait a moment and try again.'
+            );
+        }
+
+        $parser = new AIResumeParser();
+        $allAttachments = $attachments->getAll(DATA_ITEM_CANDIDATE, $candidateID);
+        $existingFileNames = ResultSetUtility::getColumnValues(
+            $allAttachments,
+            'originalFilename'
+        );
+
+        // Release the session lock before the long-running AI request so the
+        // same user can keep using the site in other tabs while generation runs.
+        session_write_close();
+
+        $markdown = $parser->generateJechoReportMarkdown($resumeText, array(
+            'targetLanguage' => $language,
+            'fileName' => $attachment['originalFilename'],
+            'candidateName' => $candidateName
+        ));
+        if ($markdown === false)
+        {
+            $this->releaseJechoReportGenerationLock($generationLockName);
+            CommonErrors::fatal(COMMONERROR_RECORDERROR, $this, $parser->getLastError());
+        }
+
+        $reportFileName = $parser->makeJechoReportFilename(
+            $attachment['originalFilename'],
+            $candidateName,
+            $language
+        );
+        if (in_array(strtolower($reportFileName), array_map('strtolower', $existingFileNames)))
+        {
+            $reportFileName = $parser->makeNextJechoReportFilename(
+                $attachment['originalFilename'],
+                $candidateName,
+                $language,
+                $existingFileNames
+            );
+        }
+
+        $generationLogID = $parser->createParseLog(
+            $this->_siteID,
+            $this->_userID,
+            'jecho_report',
+            $attachment['originalFilename'],
+            $reportFileName,
+            $language,
+            $parser->getUsageResultFromLastResponse('openai', OPENAI_MODEL),
+            'generated',
+            false
+        );
+        $parser->linkCandidate($generationLogID, $candidateID);
+
+        $attachmentCreator = new AttachmentCreator($this->_siteID);
+        $attachmentCreator->createFromText(
+            DATA_ITEM_CANDIDATE,
+            $candidateID,
+            $markdown,
+            $reportFileName,
+            true
+        );
+
+        if ($attachmentCreator->isError())
+        {
+            $parser->markStatus($generationLogID, 'attachment_error');
+            $this->releaseJechoReportGenerationLock($generationLockName);
+            CommonErrors::fatal(COMMONERROR_FILEERROR, $this, $attachmentCreator->getError());
+        }
+
+        if ($attachmentCreator->duplicatesOccurred())
+        {
+            $parser->markStatus($generationLogID, 'duplicate');
+            $this->releaseJechoReportGenerationLock($generationLockName);
+            CommonErrors::fatal(COMMONERROR_RECORDERROR, $this, 'This Jecho report already exists for the candidate.');
+        }
+
+        $this->releaseJechoReportGenerationLock($generationLockName);
+        CATSUtility::transferRelativeURI(
+            'm=candidates&a=show&candidateID=' . $candidateID
+        );
+    }
+
+    private function buildJechoReportGenerationLockName($candidateID, $attachmentID, $language)
+    {
+        return 'JechoReport_' . md5(
+            $this->_siteID . ':' . (int) $candidateID . ':' . (int) $attachmentID . ':' . strtolower($language)
+        );
+    }
+
+    private function acquireJechoReportGenerationLock($lockName)
+    {
+        $db = DatabaseConnection::getInstance();
+        $sql = sprintf(
+            "SELECT GET_LOCK(%s, 0) AS lockAcquired",
+            $db->makeQueryString($lockName)
+        );
+        $rs = $db->getAssoc($sql);
+
+        return (!empty($rs) && isset($rs['lockAcquired']) && (int) $rs['lockAcquired'] === 1);
+    }
+
+    private function releaseJechoReportGenerationLock($lockName)
+    {
+        $db = DatabaseConnection::getInstance();
+        $db->releaseAdvisoryLock($lockName);
+    }
+
+    private function canGenerateJechoReportFromAttachment($attachment)
+    {
+        if (empty($attachment) || empty($attachment['hasText']))
+        {
+            return false;
+        }
+
+        $originalFilename = isset($attachment['originalFilename']) ? $attachment['originalFilename'] : '';
+        $title = isset($attachment['title']) ? $attachment['title'] : '';
+
+        if ($this->isJechoAIReportAttachment($attachment) ||
+            preg_match('/^Jecho[ _]Report_/i', $originalFilename) ||
+            preg_match('/^Jecho[ _]Report/i', $title))
+        {
+            return false;
+        }
+
+        return (bool) preg_match('/^Resume_/i', $originalFilename);
+    }
+
+    private function canDeleteAttachment($attachment)
+    {
+        if ($this->_accessLevel >= ACCESS_LEVEL_DELETE)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function isJechoAIReportAttachment($attachment)
+    {
+        $originalFilename = isset($attachment['originalFilename']) ? $attachment['originalFilename'] : '';
+        $title = isset($attachment['title']) ? $attachment['title'] : '';
+
+        return (
+            preg_match('/^Jecho_AI_Report_/i', $originalFilename) ||
+            preg_match('/^Jecho_Report_/i', $originalFilename) ||
+            preg_match('/^Jecho AI Report_/i', $originalFilename) ||
+            preg_match('/^Jecho Report_/i', $originalFilename) ||
+            preg_match('/^Jecho_AI_Report/i', $title) ||
+            preg_match('/^Jecho_Report/i', $title) ||
+            preg_match('/^Jecho AI Report/i', $title) ||
+            preg_match('/^Jecho Report/i', $title)
+        );
+    }
+
+    private function isAutoCleanupAIDraftAttachment($attachment)
+    {
+        $originalFilename = isset($attachment['originalFilename']) ? $attachment['originalFilename'] : '';
+        $title = isset($attachment['title']) ? $attachment['title'] : '';
+
+        return (
+            preg_match('/^Jecho_AI_Report_/i', $originalFilename) ||
+            preg_match('/^Jecho AI Report_/i', $originalFilename) ||
+            preg_match('/^Jecho_AI_Report/i', $title) ||
+            preg_match('/^Jecho AI Report/i', $title)
         );
     }
 
@@ -2752,7 +3802,7 @@ class CandidatesUI extends UserInterface
          * file already and just needs to be attached. The attachment has also successfully
          * been DocumentToText converted, so we know it's a good file.
          */
-        else if (LicenseUtility::isParsingEnabled())
+        else if (LicenseUtility::isParsingEnabled() || (new AIResumeParser())->isEnabled())
         {
             /**
              * Description: User clicks "browse" and selects a resume file. User doesn't click
@@ -2795,9 +3845,15 @@ class CandidatesUI extends UserInterface
             {
                 if (!eval(Hooks::get('CANDIDATE_ON_CREATE_ATTACHMENT_PRE'))) return;
 
+                $standardResumeFilename = $this->buildStandardResumeFilenameFromPost();
+                if ($standardResumeFilename === false)
+                {
+                    $standardResumeFilename = $tempFile;
+                }
+
                 $attachmentCreator = new AttachmentCreator($this->_siteID);
                 $attachmentCreator->createFromFile(
-                    DATA_ITEM_CANDIDATE, $candidateID, $tempFullPath, $tempFile, '', true, true
+                    DATA_ITEM_CANDIDATE, $candidateID, $tempFullPath, $standardResumeFilename, '', true, true
                 );
 
                 if ($attachmentCreator->isError())
@@ -2831,9 +3887,15 @@ class CandidatesUI extends UserInterface
 
                 if (!eval(Hooks::get('CANDIDATE_ON_CREATE_ATTACHMENT_PRE'))) return;
 
+                $standardResumeFilename = $this->buildStandardResumeFilenameFromPost();
+                if ($standardResumeFilename === false)
+                {
+                    $standardResumeFilename = 'MyResume.txt';
+                }
+
                 $attachmentCreator = new AttachmentCreator($this->_siteID);
                 $attachmentCreator->createFromText(
-                    DATA_ITEM_CANDIDATE, $candidateID, $_POST['documentText'], 'MyResume.txt', true
+                    DATA_ITEM_CANDIDATE, $candidateID, $_POST['documentText'], $standardResumeFilename, true
                 );
 
                 if ($attachmentCreator->isError())
@@ -2873,6 +3935,13 @@ class CandidatesUI extends UserInterface
             // FIXME: Show parse errors!
         }
 
+
+        $aiParseLogID = $this->getTrimmedInput('aiParseLogID', $_POST);
+        if ($aiParseLogID != '')
+        {
+            $parser = new AIResumeParser();
+            $parser->markSavedCandidate($aiParseLogID, $candidateID);
+        }
 
         if (!eval(Hooks::get('CANDIDATE_ON_ADD_POST'))) return;
 

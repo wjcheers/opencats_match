@@ -177,8 +177,13 @@ class DocumentToText
                 break;
 
             case DOCUMENT_TYPE_DOCX:
-                $this->_setError('The DOCX format is not yet supported by CATS.');
-                return false;
+                if (!defined('DOCX2TXT_PATH') || DOCX2TXT_PATH == '')
+                {
+                    $this->_setError('The DOCX format has not been configured.');
+                    return false;
+                }
+
+                $command = '"'. DOCX2TXT_PATH . '" ' . $escapedFilename . ' -';
                 break;
 
             case DOCUMENT_TYPE_UNKNOWN:

@@ -993,25 +993,11 @@ class CompaniesDataGrid extends DataGrid
      */
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
-        if ($this->getMiscArgument() != 0)
-        {
-            $savedListID = (int) $this->getMiscArgument();
-            $joinSQL  .= ' INNER JOIN saved_list_entry
-                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_COMPANY.'
-                                    AND saved_list_entry.data_item_id = company.company_id
-                                    AND saved_list_entry.site_id = '.$this->_siteID.'
-                                    AND saved_list_entry.saved_list_id = '.$savedListID;
-        }
-        else
-        {
-            $joinSQL  .= ' LEFT JOIN saved_list_entry
-                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_COMPANY.'
-                                    AND saved_list_entry.data_item_id = company.company_id
-                                    AND saved_list_entry.site_id = '.$this->_siteID;
-        }
+        $savedListJoinData = $this->getSavedListJoinData($joinSQL);
+        $joinSQL = $savedListJoinData['joinSQL'];
 
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 IF(attachment_id, 1, 0) AS attachmentPresent,
                 company.is_hot AS isHot,
                 company.company_id AS companyID,
@@ -1040,7 +1026,7 @@ class CompaniesDataGrid extends DataGrid
             %s
             %s
             %s",
-            $distinct,
+            ($this->useFoundRows() ? 'SQL_CALC_FOUND_ROWS ' : '') . $distinct,
             $selectSQL,
             DATA_ITEM_COMPANY,
             $joinSQL,
@@ -1053,6 +1039,88 @@ class CompaniesDataGrid extends DataGrid
         );
 
         return $sql;
+    }
+
+    protected function useFoundRows()
+    {
+        return false;
+    }
+
+    protected function getCountSQL($joinSQL, $whereSQL, $havingSQL)
+    {
+        $savedListJoinData = $this->getSavedListJoinData($joinSQL);
+        $joinSQL = $savedListJoinData['joinSQL'];
+
+        return sprintf(
+            "SELECT
+                COUNT(*) AS rowCount
+            FROM
+            (
+                SELECT
+                    company.company_id
+                FROM
+                    company
+                LEFT JOIN user AS owner_user
+                    ON company.owner = owner_user.user_id
+                LEFT JOIN joborder
+                    ON company.company_id = joborder.company_id
+                LEFT JOIN contact
+                    ON company.billing_contact = contact.contact_id
+                LEFT JOIN attachment
+                    ON company.company_id = attachment.data_item_id
+                    AND attachment.data_item_type = %s
+                %s
+                WHERE
+                    company.site_id = %s
+                %s
+                %s
+                GROUP BY company.company_id
+                %s
+            ) AS companyCountQuery",
+            DATA_ITEM_COMPANY,
+            $joinSQL,
+            $this->_siteID,
+            (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
+            $this->_assignedCriterion,
+            (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : ''
+        );
+    }
+
+    private function hasVisibleColumn($columnName)
+    {
+        foreach ($this->_currentColumns as $data)
+        {
+            if (isset($data['name']) && $data['name'] == $columnName)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getSavedListJoinData($joinSQL)
+    {
+        if ($this->getMiscArgument() != 0)
+        {
+            $savedListID = (int) $this->getMiscArgument();
+            $joinSQL  .= ' INNER JOIN saved_list_entry
+                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_COMPANY.'
+                                    AND saved_list_entry.data_item_id = company.company_id
+                                    AND saved_list_entry.site_id = '.$this->_siteID.'
+                                    AND saved_list_entry.saved_list_id = '.$savedListID;
+        }
+        else if ($this->hasVisibleColumn('Added To List'))
+        {
+            $joinSQL  .= ' LEFT JOIN saved_list_entry
+                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_COMPANY.'
+                                    AND saved_list_entry.data_item_id = company.company_id
+                                    AND saved_list_entry.site_id = '.$this->_siteID;
+        }
+
+        return array(
+            'joinSQL' => $joinSQL
+        );
     }
 }
 

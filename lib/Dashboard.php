@@ -68,27 +68,37 @@ class Dashboard
                 IF (company.is_hot = 1, 'jobLinkHot', 'jobLinkCold') as companyClassName,
                 IF (candidate.is_hot = 1, 'jobLinkHot', 'jobLinkCold') as candidateClassName,
                 DATE_FORMAT(
-                    candidate_joborder_status_history.date, '%%m-%%d-%%y'
+                    recent_placements.date, '%%m-%%d-%%y'
                 ) AS date,
-                candidate_joborder_status_history.date AS datesort
+                recent_placements.date AS datesort
             FROM
-                candidate_joborder_status_history
+                (
+                    SELECT
+                        candidate_id,
+                        joborder_id,
+                        date
+                    FROM
+                        candidate_joborder_status_history
+                    WHERE
+                        status_to = 800
+                    AND
+                        site_id = %s
+                    ORDER BY
+                        date DESC
+                    LIMIT
+                        10
+                ) AS recent_placements
             LEFT JOIN candidate ON
-                candidate.candidate_id = candidate_joborder_status_history.candidate_id
+                candidate.candidate_id = recent_placements.candidate_id
             LEFT JOIN joborder ON
-                joborder.joborder_id = candidate_joborder_status_history.joborder_id
+                joborder.joborder_id = recent_placements.joborder_id
             LEFT JOIN company ON
                 joborder.company_id = company.company_id
             LEFT JOIN user ON
                 joborder.recruiter = user.user_id
-            WHERE
-                status_to = 800
-            AND
-                candidate_joborder_status_history.site_id = %s
             ORDER BY 
                 datesort DESC
-            LIMIT
-                10",
+            ",
             $this->_siteID
         );
 

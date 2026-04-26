@@ -160,6 +160,20 @@
                                                 </tr>
                                             </table>
                                             <br />
+                                            <input type="checkbox" id="docxEnabled" checked onclick="if (this.checked) { document.getElementById('docxExecutable').disabled = false; document.getElementById('docxExecutable').value = document.getElementById('docxExecutableOrg').value; } else { document.getElementById('docxExecutable').disabled = true; document.getElementById('docxExecutable').value = ''; }">
+                                            &nbsp;
+                                            <img src="images/file/doc.gif" alt="" />&nbsp;&nbsp;.docx file (Microsoft Word Document)
+                                            <table>
+                                                <tr>
+                                                    <td width="10px;">&nbsp;</td>
+                                                    <td width="170px;">Path to docx2txt Executable:</td>
+                                                    <td>
+                                                        <input type="text" name="docxExecutable" id="docxExecutable" style="width:250px;" />
+                                                        <input type="hidden" name="docxExecutableOrg" id="docxExecutableOrg" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <br />
                                             <input type="checkbox" id="pdfEnabled" checked onclick="if (this.checked) { document.getElementById('pdfExecutable').disabled = false; document.getElementById('pdfExecutable').value = document.getElementById('pdfExecutableOrg').value; } else { document.getElementById('pdfExecutable').disabled = true; document.getElementById('pdfExecutable').value = ''; }">
                                             &nbsp;
                                             <img src="images/file/pdf.gif" alt="" />&nbsp;&nbsp;.pdf file (Adobe Acrobat Document)
@@ -203,7 +217,7 @@
                                             </table>
                                             <br />
                                             <br />
-                                            <input type="button" class="button" value="Test Configuration" onclick="Installpage_populate('a=testResumeParsing&amp;docExecutable='+escape(document.getElementById('docExecutable').value)+'&amp;pdfExecutable='+escape(document.getElementById('pdfExecutable').value)+'&amp;htmlExecutable='+escape(document.getElementById('htmlExecutable').value)+'&amp;rtfExecutable='+escape(document.getElementById('rtfExecutable').value));" />&nbsp;&nbsp;&nbsp;
+                                            <input type="button" class="button" value="Test Configuration" onclick="Installpage_populate('a=testResumeParsing&amp;docExecutable='+escape(document.getElementById('docExecutable').value)+'&amp;docxExecutable='+escape(document.getElementById('docxExecutable').value)+'&amp;pdfExecutable='+escape(document.getElementById('pdfExecutable').value)+'&amp;htmlExecutable='+escape(document.getElementById('htmlExecutable').value)+'&amp;rtfExecutable='+escape(document.getElementById('rtfExecutable').value));" />&nbsp;&nbsp;&nbsp;
                                             <input type="button" class="button" value="Skip this Step" onclick="document.getElementById('resumeParsing').style.display='none';showTextBlock('mailSettings');Installpage_populate('a=mailSettings');">
                                         </div>
                                         <div id="mailSettings" style="display: none;">

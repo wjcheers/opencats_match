@@ -513,6 +513,30 @@ class ActivityEntries
     }
 
     /**
+     * Returns whether any activities exist for the current site.
+     *
+     * This preserves the old Activity page display behavior without paying the
+     * cost of a full COUNT(*) on every request.
+     *
+     * @return boolean
+     */
+    public function hasAny()
+    {
+        $sql = sprintf(
+            "SELECT
+                activity.activity_id
+            FROM
+                activity
+            WHERE
+                activity.site_id = %s
+            LIMIT 1",
+            $this->_siteID
+        );
+
+        return (bool) $this->_db->getAssoc($sql);
+    }
+
+    /**
      * Returns an activity entry.
      *
      * @param integer Activity ID.

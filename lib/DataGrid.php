@@ -1442,8 +1442,39 @@ class DataGrid
         $this->_rs = $db->getAllAssoc($sql);
 
         /* Get total number of results before limit. */
-        $rs2 = $db->getAssoc("SELECT FOUND_ROWS() as rowCount");
-        $this->_totalEntries = $rs2['rowCount'];
+        if ($this->useFoundRows())
+        {
+            $rs2 = $db->getAssoc("SELECT FOUND_ROWS() as rowCount");
+            $this->_totalEntries = $rs2['rowCount'];
+        }
+        else
+        {
+            $countSQL = $this->getCountSQL($joinSQL, $whereSQL, $havingSQL);
+            $this->_totalEntries = (int) $db->getColumn($countSQL, 0, 0);
+        }
+    }
+
+    /**
+     * Returns whether this datagrid should use FOUND_ROWS() for totals.
+     *
+     * @return boolean
+     */
+    protected function useFoundRows()
+    {
+        return true;
+    }
+
+    /**
+     * Returns a count SQL statement for datagrids that do not use FOUND_ROWS().
+     *
+     * @param string SQL join clause
+     * @param string SQL where clause
+     * @param string SQL having clause
+     * @return string SQL statement
+     */
+    protected function getCountSQL($joinSQL, $whereSQL, $havingSQL)
+    {
+        return '';
     }
 
     /**

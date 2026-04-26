@@ -369,8 +369,8 @@ class awImage {
 
 			// Test some text has been printed
 			$data = ob_get_contents();
-			if($data !== '') {
-				exit;
+			if($data !== FALSE && $data !== '') {
+				@ob_clean();
 			}
 
 			// Send headers to the browser

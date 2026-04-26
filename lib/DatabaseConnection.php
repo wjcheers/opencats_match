@@ -138,6 +138,25 @@ class DatabaseConnection
             return false;
         }
 
+        /* Force UTF-8 for legacy mysql_* connections so multibyte text from
+         * Dockerized MySQL/MariaDB instances is read and written correctly.
+         */
+        $setNamesResult = @mysql_query(
+            "SET NAMES 'utf8' COLLATE 'utf8_unicode_ci'",
+            $this->_connection
+        );
+        if (!$setNamesResult)
+        {
+            $error = mysql_error($this->_connection);
+
+            die(
+                '<!-- NOSPACEFILTER --><p style="background: #ec3737; '
+                . 'padding: 4px; margin-top: 0; font: normal normal bold '
+                . '12px/130% Arial, Tahoma, sans-serif;">Error Setting '
+                . "Database Character Set</p><pre>\n\n" . $error . "</pre>\n\n"
+            );
+        }
+
         return true;
     }
 

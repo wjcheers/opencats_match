@@ -9,6 +9,80 @@
             <?php TemplateUtility::printQuickSearch(); ?>
 <?php endif; ?>
 
+        <script type="text/javascript">
+            function generateJechoReport(linkObject)
+            {
+                var baseFilename = linkObject.getAttribute('data-base-filename');
+                var nextFilename = linkObject.getAttribute('data-next-filename');
+                var languageLabel = linkObject.getAttribute('data-language-label');
+                var fileExists = (linkObject.getAttribute('data-file-exists') == '1');
+                var createNewVersion = false;
+                var message = '';
+
+                if (fileExists)
+                {
+                    message = '已存在同名報告 "' + baseFilename + '"。\n是否改為產生新版本 "' + nextFilename + '"？';
+                    createNewVersion = true;
+                }
+                else
+                {
+                    message = '是否產生' + languageLabel + ' Jecho 報告 "' + baseFilename + '"？';
+                }
+
+                if (!confirm(message))
+                {
+                    return false;
+                }
+
+                var links = document.getElementsByTagName('a');
+                var index;
+
+                for (index = 0; index < links.length; index++)
+                {
+                    if (links[index].getAttribute('data-jecho-generate') == '1')
+                    {
+                        links[index].style.pointerEvents = 'none';
+                        links[index].style.color = '#999';
+                        links[index].onclick = function() { return false; };
+                    }
+                }
+
+                var statuses = document.getElementsByTagName('span');
+                for (index = 0; index < statuses.length; index++)
+                {
+                    if (statuses[index].getAttribute('data-jecho-status') == '1')
+                    {
+                        statuses[index].style.display = 'none';
+                    }
+                }
+
+                var statusID = linkObject.getAttribute('data-status-id');
+                if (statusID)
+                {
+                    var statusNode = document.getElementById(statusID);
+                    if (statusNode)
+                    {
+                        statusNode.style.display = 'inline';
+                    }
+                }
+
+                var globalNotice = document.getElementById('jechoGeneratingNotice');
+                if (globalNotice)
+                {
+                    globalNotice.style.display = 'block';
+                }
+
+                var targetURL = linkObject.href;
+                if (createNewVersion)
+                {
+                    targetURL += '&createNewVersion=1';
+                }
+
+                window.location.href = targetURL;
+                return false;
+            }
+        </script>
+
         <div id="contents">
             <table>
                 <tr>
@@ -20,6 +94,7 @@
             </table>
 
             <p class="note">Candidate Details</p>
+            <p class="warning" id="jechoGeneratingNotice" style="display: none;">Generating report. Please do not click any buttons or close this page.</p>
 
             <?php if ($this->data['isAdminHidden'] == 1): ?>
                 <p class="warning">This Candidate is hidden.  Only CATS Administrators can view it or search for it.  To make it visible by the site users, click <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=administrativeHideShow&amp;candidateID=<?php echo($this->candidateID); ?>&amp;state=0" style="font-weight:bold;">Here.</a></p>
@@ -547,13 +622,44 @@
                                                             &nbsp;
                                                             <?php $this->_($attachmentsData['originalFilename']) ?>
                                                         </a>
+                                                        <?php if (!empty($attachmentsData['isAutoCleanupAIDraft'])): ?>
+                                                            &nbsp;<span style="color: #666; border: 1px solid #ccc; padding: 0px 6px; border-radius: 6px;">AI Draft / Auto cleanup in 60 days</span>
+                                                        <?php endif; ?>
                                                     </td>
                                                     <td><?php echo($attachmentsData['previewLink']); ?></td>
                                                     <td><?php $this->_($attachmentsData['dateCreated']) ?></td>
                                                     <td>(<?php $this->_($attachmentsData['enteredByFullName']) ?>)</td>
                                                     <td>
+                                                        <?php if (!$this->isPopup && $this->accessLevel >= ACCESS_LEVEL_EDIT && !empty($attachmentsData['canGenerateJechoReport'])): ?>
+                                                            <a
+                                                                href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=generateJechoReport&amp;candidateID=<?php echo($this->candidateID); ?>&amp;attachmentID=<?php $this->_($attachmentsData['attachmentID']) ?>&amp;language=zh"
+                                                                onclick="return generateJechoReport(this);"
+                                                                title="Gen Report (ZH)"
+                                                                data-jecho-generate="1"
+                                                                data-status-id="jechoStatus<?php $this->_($attachmentsData['attachmentID']) ?>"
+                                                                data-base-filename="<?php echo htmlspecialchars($attachmentsData['jechoReportBaseFilenameZh']); ?>"
+                                                                data-next-filename="<?php echo htmlspecialchars($attachmentsData['jechoReportNextFilenameZh']); ?>"
+                                                                data-file-exists="<?php echo !empty($attachmentsData['jechoReportExistsZh']) ? '1' : '0'; ?>"
+                                                                data-language-label="中文版"
+                                                            >Gen Report (ZH)</a>
+                                                            &nbsp;
+                                                            <a
+                                                                href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=generateJechoReport&amp;candidateID=<?php echo($this->candidateID); ?>&amp;attachmentID=<?php $this->_($attachmentsData['attachmentID']) ?>&amp;language=en"
+                                                                onclick="return generateJechoReport(this);"
+                                                                title="Gen Report (EN)"
+                                                                data-jecho-generate="1"
+                                                                data-status-id="jechoStatus<?php $this->_($attachmentsData['attachmentID']) ?>"
+                                                                data-base-filename="<?php echo htmlspecialchars($attachmentsData['jechoReportBaseFilenameEn']); ?>"
+                                                                data-next-filename="<?php echo htmlspecialchars($attachmentsData['jechoReportNextFilenameEn']); ?>"
+                                                                data-file-exists="<?php echo !empty($attachmentsData['jechoReportExistsEn']) ? '1' : '0'; ?>"
+                                                                data-language-label="英文版"
+                                                            >Gen Report (EN)</a>
+                                                            &nbsp;
+                                                            <span id="jechoStatus<?php $this->_($attachmentsData['attachmentID']) ?>" style="display: none; color: #666;" data-jecho-status="1">Generating...</span>
+                                                            &nbsp;
+                                                        <?php endif; ?>
                                                         <?php if (!$this->isPopup): ?>
-                                                            <?php if ($this->accessLevel >= ACCESS_LEVEL_DELETE): ?>
+                                                            <?php if (!empty($attachmentsData['canDeleteAttachment'])): ?>
                                                                 <a href="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=deleteAttachment&amp;candidateID=<?php echo($this->candidateID); ?>&amp;attachmentID=<?php $this->_($attachmentsData['attachmentID']) ?>" onclick="javascript:return confirm('Delete this attachment?');">
                                                                     <img src="images/actions/delete.gif" alt="" width="16" height="16" border="0" title="Delete" />
                                                                 </a>
@@ -569,7 +675,7 @@
                                             <?php if (isset($this->attachmentLinkHTML)): ?>
                                                 <?php echo($this->attachmentLinkHTML); ?>
                                             <?php else: ?>
-                                                <a href="#" onclick="showPopWin('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=createAttachment&amp;candidateID=<?php echo($this->candidateID); ?>', 400, 125, null); return false;">
+                                                <a href="#" onclick="showPopWin('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=createAttachment&amp;candidateID=<?php echo($this->candidateID); ?>', 720, 420, null); return false;">
                                             <?php endif; ?>
                                                 <img src="images/paperclip_add.gif" width="16" height="16" border="0" alt="Add Attachment" class="absmiddle" />&nbsp;Add Attachment
                                             </a>

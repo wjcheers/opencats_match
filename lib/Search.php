@@ -384,8 +384,69 @@ class SearchCandidates
      */
     public function byFullName($wildCardString, $sortBy, $sortDirection)
     {
-        $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
-        $wildCardString = $this->_db->makeQueryString($wildCardString);
+        $wildCardString = trim(preg_replace('/\s+/', ' ', $wildCardString));
+        $nameTokens = preg_split('/[\s,]+/', $wildCardString, -1, PREG_SPLIT_NO_EMPTY);
+        $wildCardStringAnywhereSQL = $this->_db->makeQueryString(
+            '%' . $wildCardString . '%'
+        );
+
+        if ($wildCardString === '')
+        {
+            return array();
+        }
+
+        if (strpos($wildCardString, '*') !== false)
+        {
+            $wildCardString = '%' . str_replace('*', '%', $wildCardString) . '%';
+            $wildCardString = $this->_db->makeQueryString($wildCardString);
+
+            $nameCriterion = sprintf(
+                "(
+                    candidate.first_name LIKE %s
+                    OR candidate.last_name LIKE %s
+                    OR candidate.chinese_name LIKE %s
+                    OR CONCAT(candidate.first_name, ' ', candidate.last_name) LIKE %s
+                    OR CONCAT(candidate.last_name, ' ', candidate.first_name) LIKE %s
+                    OR CONCAT(candidate.last_name, ', ', candidate.first_name) LIKE %s
+                )",
+                $wildCardString,
+                $wildCardString,
+                $wildCardString,
+                $wildCardString,
+                $wildCardString,
+                $wildCardString
+            );
+        }
+        else if (count($nameTokens) >= 2)
+        {
+            $nameCriterion = sprintf(
+                "(
+                    candidate.chinese_name LIKE %s
+                    OR CONCAT(candidate.first_name, ' ', candidate.last_name) LIKE %s
+                    OR CONCAT(candidate.last_name, ' ', candidate.first_name) LIKE %s
+                    OR CONCAT(candidate.last_name, ', ', candidate.first_name) LIKE %s
+                )",
+                $wildCardStringAnywhereSQL,
+                $wildCardStringAnywhereSQL,
+                $wildCardStringAnywhereSQL,
+                $wildCardStringAnywhereSQL
+            );
+        }
+        else
+        {
+            $singleToken = $this->_db->makeQueryString($nameTokens[0] . '%');
+
+            $nameCriterion = sprintf(
+                "(
+                    candidate.first_name LIKE %s
+                    OR candidate.last_name LIKE %s
+                    OR candidate.chinese_name LIKE %s
+                )",
+                $singleToken,
+                $singleToken,
+                $singleToken
+            );
+        }
 
         $sql = sprintf(
             "SELECT
@@ -414,11 +475,7 @@ class SearchCandidates
             LEFT JOIN user AS owner_user
                 ON candidate.owner = owner_user.user_id
             WHERE
-            (
-                CONCAT(candidate.first_name, ' ', candidate.last_name) LIKE %s
-                OR CONCAT(candidate.last_name, ' ', candidate.first_name) LIKE %s
-                OR CONCAT(candidate.last_name, ', ', candidate.first_name) LIKE %s
-            )
+                %s
             AND
                 candidate.is_admin_hidden = 0
             AND
@@ -426,9 +483,7 @@ class SearchCandidates
             ORDER BY
                 %s %s
             LIMIT 1000",
-            $wildCardString,
-            $wildCardString,
-            $wildCardString,
+            $nameCriterion,
             $this->_siteID,
             $sortBy,
             $sortDirection
@@ -501,11 +556,99 @@ class SearchCandidates
      * @param string wildcard match string
      * @return array candidates data
      */
-    public function byKeywords($wildCardString, $sortBy, $sortDirection)
+    public function byKeywords($wildCardString, $sortBy, $sortDirection,
+        $advancedSearchParser = '', $advancedSearchOn = 0)
     {
-        $WHERE = DatabaseSearch::makeBooleanSQLWhere(
-            $wildCardString, $this->_db, "CONCAT_WS(' ', candidate.key_skills, candidate.current_employer, candidate.email1, candidate.job_title, candidate.major, candidate.city, candidate.state, candidate.address)"
-        );
+        $useAdvancedSearch = (!empty($advancedSearchOn) &&
+            (int) $advancedSearchOn > 0 &&
+            trim($advancedSearchParser) != '');
+
+        if (
+            DatabaseSearch::requiresFulltextFallback($wildCardString) ||
+            !DatabaseSearch::hasIndex(
+                $this->_db,
+                'candidate',
+                'FT_candidate_keywords'
+            )
+        )
+        {
+            $WHERE = DatabaseSearch::makeBooleanSQLWhereMultiField(
+                $wildCardString,
+                $this->_db,
+                array(
+                    'candidate.key_skills',
+                    'candidate.current_employer',
+                    'candidate.email1',
+                    'candidate.job_title',
+                    'candidate.major',
+                    'candidate.city',
+                    'candidate.state',
+                    'candidate.address'
+                )
+            );
+
+            $sql = sprintf(
+                "SELECT
+                    CONCAT_WS(' ', candidate.key_skills, candidate.current_employer, candidate.email1, candidate.job_title, candidate.major, candidate.city, candidate.state, candidate.address)
+                        AS text,
+                    candidate.candidate_id AS candidateID,
+                    candidate.first_name AS firstName,
+                    candidate.last_name AS lastName,
+                    candidate.chinese_name AS chineseName,
+                    candidate.city AS city,
+                    candidate.state AS state,
+                    candidate.phone_home AS phoneHome,
+                    candidate.phone_cell AS phoneCell,
+                    candidate.key_skills AS keySkills,
+                    candidate.email1 AS email1,
+                    owner_user.first_name AS ownerFirstName,
+                    owner_user.last_name AS ownerLastName,
+                    candidate.date_created AS dateCreatedSort,
+                    candidate.date_modified AS dateModifiedSort,
+                    DATE_FORMAT(
+                        candidate.date_created, '%%m-%%d-%%y'
+                    ) AS dateCreated,
+                    DATE_FORMAT(
+                        candidate.date_modified, '%%m-%%d-%%y'
+                    ) AS dateModified
+                FROM
+                    candidate
+                LEFT JOIN user AS owner_user
+                    ON candidate.owner = owner_user.user_id
+                WHERE
+                    %s
+                AND
+                    candidate.is_admin_hidden = 0
+                AND
+                    candidate.site_id = %s
+                AND
+                    candidate.is_active = 1
+                ORDER BY
+                    %s %s
+                LIMIT 1000",
+                $WHERE,
+                $this->_siteID,
+                $sortBy,
+                $sortDirection
+            );
+
+            return $this->_db->getAllAssoc($sql);
+        }
+
+        if ($useAdvancedSearch)
+        {
+            $booleanQuery = DatabaseSearch::advancedToMySQLBoolean(
+                $advancedSearchParser,
+                $wildCardString
+            );
+        }
+        else
+        {
+            $booleanQuery = DatabaseSearch::humanToMySQLBoolean(
+                $wildCardString
+            );
+        }
+        $booleanQuerySQL = $this->_db->makeQueryString($booleanQuery);
 
         $sql = sprintf(
             "SELECT
@@ -536,18 +679,27 @@ class SearchCandidates
             LEFT JOIN user AS owner_user
                 ON candidate.owner = owner_user.user_id
             WHERE
-                %s
-            AND
                 candidate.is_admin_hidden = 0
             AND
                 candidate.site_id = %s
             AND
                 candidate.is_active = 1
+            AND
+                MATCH(
+                    candidate.key_skills,
+                    candidate.current_employer,
+                    candidate.email1,
+                    candidate.job_title,
+                    candidate.major,
+                    candidate.city,
+                    candidate.state,
+                    candidate.address
+                ) AGAINST (%s IN BOOLEAN MODE)
             ORDER BY
                 %s %s
             LIMIT 1000",
-            $WHERE,
             $this->_siteID,
+            $booleanQuerySQL,
             $sortBy,
             $sortDirection
         );
@@ -1462,14 +1614,14 @@ class Trans
                 $len = strlen($str);  
                 $a = 0;  
                 while ($a < $len){  
-                        if (ord($str{$a})>=224 && ord($str{$a})<=239){  
-                                if (($temp = strpos( $this->utf8_gb2312, $str{$a} . $str{$a+1} . $str{$a+2})) !== false){  
-                                        $str_t .= $this->utf8_big5{$temp} . $this->utf8_big5{$temp+1} . $this->utf8_big5{$temp+2};  
+                        if (ord($str[$a])>=224 && ord($str[$a])<=239){
+                                if (($temp = strpos( $this->utf8_gb2312, $str[$a] . $str[$a+1] . $str[$a+2])) !== false){
+                                        $str_t .= $this->utf8_big5[$temp] . $this->utf8_big5[$temp+1] . $this->utf8_big5[$temp+2];
                                         $a += 3;  
                                         continue;  
                                 }  
                         }  
-                        $str_t .= $str{$a};  
+                        $str_t .= $str[$a];
                         $a += 1;  
                 }  
                 return $str_t;  
@@ -1481,14 +1633,14 @@ class Trans
                 $len = strlen($str);  
                 $a = 0;  
                 while ($a < $len){  
-                        if (ord($str{$a})>=224 && ord($str{$a})<=239){  
-                                if (($temp = strpos( $this->utf8_big5, $str{$a} . $str{$a+1} . $str{$a+2})) !== false){  
-                                        $str_t .= $this->utf8_gb2312{$temp} . $this->utf8_gb2312{$temp+1} . $this->utf8_gb2312{$temp+2};  
+                        if (ord($str[$a])>=224 && ord($str[$a])<=239){
+                                if (($temp = strpos( $this->utf8_big5, $str[$a] . $str[$a+1] . $str[$a+2])) !== false){
+                                        $str_t .= $this->utf8_gb2312[$temp] . $this->utf8_gb2312[$temp+1] . $this->utf8_gb2312[$temp+2];
                                         $a += 3;  
                                         continue;  
                                 }  
                         }  
-                        $str_t .= $str{$a};  
+                        $str_t .= $str[$a];
                         $a += 1;  
                 }  
                 return $str_t;  
@@ -2263,6 +2415,8 @@ class SearchByResumePager extends Pager
     private $_siteID;
     private $_db;
     private $_WHERE;
+    private $_useFulltext = false;
+    private $_fulltextBooleanQuerySQL = '';
 
 
     public function __construct($rowsPerPage, $currentPage, $siteID,
@@ -2354,39 +2508,97 @@ class SearchByResumePager extends Pager
         }
         else
         {
-            $this->_WHERE = DatabaseSearch::makeBooleanSQLWhere(
-                DatabaseSearch::fulltextEncode($wildCardString),
-                $this->_db,
-                'attachment.text'
-            );
+            if (!DatabaseSearch::requiresFulltextFallback($wildCardString))
+            {
+                $hasAttachmentFulltextIndex = DatabaseSearch::hasIndex(
+                    $this->_db,
+                    'attachment',
+                    'FT_attachment_text'
+                );
+            }
+            else
+            {
+                $hasAttachmentFulltextIndex = false;
+            }
+
+            if ($hasAttachmentFulltextIndex)
+            {
+                $this->_useFulltext = true;
+                $booleanQuery = DatabaseSearch::humanToMySQLBoolean(
+                    $wildCardString
+                );
+                $this->_fulltextBooleanQuerySQL = $this->_db->makeQueryString(
+                    $booleanQuery
+                );
+                $this->_WHERE = '1';
+            }
+            else
+            {
+                $this->_WHERE = DatabaseSearch::makeBooleanSQLWhere(
+                    DatabaseSearch::fulltextEncode($wildCardString),
+                    $this->_db,
+                    'attachment.text'
+                );
+            }
         }
 
         /* How many companies do we have? */
-        $sql = sprintf(
-            "SELECT
-                COUNT(*) AS count
-            FROM
-                attachment
-            LEFT JOIN candidate
-                ON attachment.data_item_id = candidate.candidate_id
-                AND attachment.data_item_type = %s
-                AND attachment.site_id = candidate.site_id
-            LEFT JOIN user AS owner_user
-                ON candidate.owner = owner_user.user_id
-            WHERE
-                resume = 1
-            AND
-                %s
-            AND
-                (ISNULL(candidate.is_admin_hidden) OR (candidate.is_admin_hidden = 0))
-            AND
-                (ISNULL(candidate.is_active) OR (candidate.is_active = 1))
-            AND
-                attachment.site_id = %s",
-            DATA_ITEM_CANDIDATE,
-            $this->_WHERE,
-            $this->_siteID
-        );
+        if ($this->_useFulltext)
+        {
+            $sql = sprintf(
+                "SELECT
+                    COUNT(*) AS count
+                FROM
+                    attachment
+                LEFT JOIN candidate
+                    ON attachment.data_item_id = candidate.candidate_id
+                    AND attachment.data_item_type = %s
+                    AND attachment.site_id = candidate.site_id
+                LEFT JOIN user AS owner_user
+                    ON candidate.owner = owner_user.user_id
+                WHERE
+                    resume = 1
+                AND
+                    attachment.site_id = %s
+                AND
+                    MATCH(attachment.text) AGAINST (%s IN BOOLEAN MODE)
+                AND
+                    (ISNULL(candidate.is_admin_hidden) OR (candidate.is_admin_hidden = 0))
+                AND
+                    (ISNULL(candidate.is_active) OR (candidate.is_active = 1))",
+                DATA_ITEM_CANDIDATE,
+                $this->_siteID,
+                $this->_fulltextBooleanQuerySQL
+            );
+        }
+        else
+        {
+            $sql = sprintf(
+                "SELECT
+                    COUNT(*) AS count
+                FROM
+                    attachment
+                LEFT JOIN candidate
+                    ON attachment.data_item_id = candidate.candidate_id
+                    AND attachment.data_item_type = %s
+                    AND attachment.site_id = candidate.site_id
+                LEFT JOIN user AS owner_user
+                    ON candidate.owner = owner_user.user_id
+                WHERE
+                    resume = 1
+                AND
+                    %s
+                AND
+                    (ISNULL(candidate.is_admin_hidden) OR (candidate.is_admin_hidden = 0))
+                AND
+                    (ISNULL(candidate.is_active) OR (candidate.is_active = 1))
+                AND
+                    attachment.site_id = %s",
+                DATA_ITEM_CANDIDATE,
+                $this->_WHERE,
+                $this->_siteID
+            );
+        }
         $rs = $this->_db->getAssoc($sql);
 
         /* Pass "Search By Resume"-specific parameters to Pager constructor. */
@@ -2397,60 +2609,119 @@ class SearchByResumePager extends Pager
     //FIXME: Document me.
     public function getPage()
     {
-        $sql = sprintf(
-            "SELECT
-                attachment.attachment_id AS attachmentID,
-                attachment.data_item_id AS candidateID,
-                attachment.title AS title,
-                attachment.text AS text,
-                candidate.first_name AS firstName,
-                candidate.last_name AS lastName,
-                candidate.chinese_name AS chineseName,
-                candidate.city AS city,
-                candidate.state AS state,
-                DATE_FORMAT(
-                    candidate.date_created, '%%m-%%d-%%y'
-                ) AS dateCreated,
-                candidate.date_created AS dateCreatedSort,
-                DATE_FORMAT(
-                    candidate.date_modified, '%%m-%%d-%%y'
-                ) AS dateModified,
-                candidate.date_modified AS dateModifiedSort,
-                owner_user.first_name AS ownerFirstName,
-                owner_user.last_name AS ownerLastName,
-                CONCAT(owner_user.last_name, owner_user.first_name) AS ownerSort
-            FROM
-                attachment
-            LEFT JOIN candidate
-                ON attachment.data_item_id = candidate.candidate_id
-                AND attachment.site_id = candidate.site_id
-            LEFT JOIN user AS owner_user
-                ON candidate.owner = owner_user.user_id
-            WHERE
-                resume = 1
-            AND
-                %s
-            AND
-                (attachment.data_item_type = %s OR attachment.data_item_type = %s)
-            AND
-                attachment.site_id = %s
-            AND
-                (ISNULL(candidate.is_admin_hidden) OR (candidate.is_admin_hidden = 0))
-            AND
-                (ISNULL(candidate.is_active) OR (candidate.is_active = 1))
-            ORDER BY
-                %s %s
-            LIMIT %s, %s",
+        if ($this->_useFulltext)
+        {
+            $sql = sprintf(
+                "SELECT
+                    attachment.attachment_id AS attachmentID,
+                    attachment.data_item_id AS candidateID,
+                    attachment.title AS title,
+                    attachment.text AS text,
+                    candidate.first_name AS firstName,
+                    candidate.last_name AS lastName,
+                    candidate.chinese_name AS chineseName,
+                    candidate.city AS city,
+                    candidate.state AS state,
+                    DATE_FORMAT(
+                        candidate.date_created, '%%m-%%d-%%y'
+                    ) AS dateCreated,
+                    candidate.date_created AS dateCreatedSort,
+                    DATE_FORMAT(
+                        candidate.date_modified, '%%m-%%d-%%y'
+                    ) AS dateModified,
+                    candidate.date_modified AS dateModifiedSort,
+                    owner_user.first_name AS ownerFirstName,
+                    owner_user.last_name AS ownerLastName,
+                    CONCAT(owner_user.last_name, owner_user.first_name) AS ownerSort
+                FROM
+                    attachment
+                LEFT JOIN candidate
+                    ON attachment.data_item_id = candidate.candidate_id
+                    AND attachment.site_id = candidate.site_id
+                LEFT JOIN user AS owner_user
+                    ON candidate.owner = owner_user.user_id
+                WHERE
+                    resume = 1
+                AND
+                    MATCH(attachment.text) AGAINST (%s IN BOOLEAN MODE)
+                AND
+                    (attachment.data_item_type = %s OR attachment.data_item_type = %s)
+                AND
+                    attachment.site_id = %s
+                AND
+                    (ISNULL(candidate.is_admin_hidden) OR (candidate.is_admin_hidden = 0))
+                AND
+                    (ISNULL(candidate.is_active) OR (candidate.is_active = 1))
+                ORDER BY
+                    %s %s
+                LIMIT %s, %s",
+                $this->_fulltextBooleanQuerySQL,
+                DATA_ITEM_CANDIDATE,
+                DATA_ITEM_BULKRESUME,
+                $this->_siteID,
+                $this->_sortBy,
+                $this->_sortDirection,
+                $this->_thisPageStartRow,
+                $this->_rowsPerPage
+            );
+        }
+        else
+        {
+            $sql = sprintf(
+                "SELECT
+                    attachment.attachment_id AS attachmentID,
+                    attachment.data_item_id AS candidateID,
+                    attachment.title AS title,
+                    attachment.text AS text,
+                    candidate.first_name AS firstName,
+                    candidate.last_name AS lastName,
+                    candidate.chinese_name AS chineseName,
+                    candidate.city AS city,
+                    candidate.state AS state,
+                    DATE_FORMAT(
+                        candidate.date_created, '%%m-%%d-%%y'
+                    ) AS dateCreated,
+                    candidate.date_created AS dateCreatedSort,
+                    DATE_FORMAT(
+                        candidate.date_modified, '%%m-%%d-%%y'
+                    ) AS dateModified,
+                    candidate.date_modified AS dateModifiedSort,
+                    owner_user.first_name AS ownerFirstName,
+                    owner_user.last_name AS ownerLastName,
+                    CONCAT(owner_user.last_name, owner_user.first_name) AS ownerSort
+                FROM
+                    attachment
+                LEFT JOIN candidate
+                    ON attachment.data_item_id = candidate.candidate_id
+                    AND attachment.site_id = candidate.site_id
+                LEFT JOIN user AS owner_user
+                    ON candidate.owner = owner_user.user_id
+                WHERE
+                    resume = 1
+                AND
+                    %s
+                AND
+                    (attachment.data_item_type = %s OR attachment.data_item_type = %s)
+                AND
+                    attachment.site_id = %s
+                AND
+                    (ISNULL(candidate.is_admin_hidden) OR (candidate.is_admin_hidden = 0))
+                AND
+                    (ISNULL(candidate.is_active) OR (candidate.is_active = 1))
+                ORDER BY
+                    %s %s
+                LIMIT %s, %s",
 
-            $this->_WHERE,
-            DATA_ITEM_CANDIDATE,
-            DATA_ITEM_BULKRESUME,
-            $this->_siteID,
-            $this->_sortBy,
-            $this->_sortDirection,
-            $this->_thisPageStartRow,
-            $this->_rowsPerPage
-        );
+                $this->_WHERE,
+                DATA_ITEM_CANDIDATE,
+                DATA_ITEM_BULKRESUME,
+                $this->_siteID,
+                $this->_sortBy,
+                $this->_sortDirection,
+                $this->_thisPageStartRow,
+                $this->_rowsPerPage
+            );
+        }
 
         return $this->_db->getAllAssoc($sql);
     }

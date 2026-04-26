@@ -38,6 +38,7 @@ include_once('./lib/InfoString.php');
 class ActivityDataGrid extends DataGrid
 {
     protected $_siteID;
+    protected $_useOptimizedActivityQuery;
 
 
     // FIXME: Fix ugly indenting - ~400 character lines = bad.
@@ -86,6 +87,7 @@ class ActivityDataGrid extends DataGrid
 
         $this->_db = DatabaseConnection::getInstance();
         $this->_siteID = $siteID;
+        $this->_useOptimizedActivityQuery = false;
         $this->_assignedCriterion = "";
         $this->_dataItemIDColumn = 'company.company_id';
 
@@ -183,7 +185,17 @@ class ActivityDataGrid extends DataGrid
      * @return array clients data
      */
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
-    {   
+    {
+        $this->_useOptimizedActivityQuery = $this->_canUseOptimizedActivityQuery(
+            $whereSQL,
+            $havingSQL
+        );
+
+        if ($this->_useOptimizedActivityQuery)
+        {
+            return $this->_getOptimizedActivitySQL($orderSQL, $limitSQL);
+        }
+
         // FIXME: Factor out Session dependency.
         $userCriterion = '';
         if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_DELETE)
@@ -192,6 +204,7 @@ class ActivityDataGrid extends DataGrid
                 "AND activity.entered_by = %s", $_SESSION['CATS']->getUserID()
             );
         }
+
             $sql = sprintf(
                 "SELECT SQL_CALC_FOUND_ROWS %s
                     activity.activity_id AS activityID,
@@ -243,7 +256,7 @@ class ActivityDataGrid extends DataGrid
                     activity.site_id = %s
                     %s
                     %s
-                UNION
+                UNION ALL
                 SELECT %s
                     activity.activity_id AS activityID,
                     activity.data_item_id AS dataItemID,
@@ -292,7 +305,7 @@ class ActivityDataGrid extends DataGrid
                     activity.site_id = %s
                     %s
                     %s
-                UNION
+                UNION ALL
                 SELECT %s
                     activity.activity_id AS activityID,
                     activity.data_item_id AS dataItemID,
@@ -369,6 +382,272 @@ class ActivityDataGrid extends DataGrid
             );
 
         return $sql;
+    }
+
+    protected function useFoundRows()
+    {
+        return !$this->_useOptimizedActivityQuery;
+    }
+
+    protected function getCountSQL($joinSQL, $whereSQL, $havingSQL)
+    {
+        if (!$this->_canUseOptimizedActivityQuery($whereSQL, $havingSQL))
+        {
+            return '';
+        }
+
+        $userCriterion = '';
+        if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_DELETE)
+        {
+            $userCriterion = sprintf(
+                "AND activity.entered_by = %s", $_SESSION['CATS']->getUserID()
+            );
+        }
+
+        return sprintf(
+            "SELECT
+                COUNT(*) AS rowCount
+            FROM
+                activity FORCE INDEX (IDX_activity_site_type_created_job)
+            WHERE
+                activity.site_id = %s
+            AND
+                activity.data_item_type IN (%s, %s, %s)
+            %s
+            %s",
+            $this->_siteID,
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
+            $userCriterion,
+            $this->dateCriterion
+        );
+    }
+
+    private function _canUseOptimizedActivityQuery($whereSQL, $havingSQL)
+    {
+        if (strlen(trim($whereSQL)) > 0 || strlen(trim($havingSQL)) > 0)
+        {
+            return false;
+        }
+
+        if (isset($this->_parameters['exportIDs']))
+        {
+            return false;
+        }
+
+        if (!isset($this->_parameters['sortBy']) ||
+            $this->_parameters['sortBy'] != 'dateCreatedSort')
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function _getOptimizedActivitySQL($orderSQL, $limitSQL)
+    {
+        $userCriterion = '';
+        if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_DELETE)
+        {
+            $userCriterion = sprintf(
+                "AND activity.entered_by = %s", $_SESSION['CATS']->getUserID()
+            );
+        }
+
+        $innerOrderSQL = 'ORDER BY activity.date_created '
+            . $this->_parameters['sortDirection'];
+
+        return sprintf(
+            "SELECT
+                activity.activity_id AS activityID,
+                activity.data_item_id AS dataItemID,
+                activity.data_item_type AS dataItemType,
+                activity.site_id AS siteID,
+                data_item_type.short_description AS item,
+                IF(
+                    activity.data_item_type = %s,
+                    candidate.first_name,
+                    IF(activity.data_item_type = %s, contact.first_name, '')
+                ) AS firstName,
+                IF(
+                    activity.data_item_type = %s,
+                    candidate.last_name,
+                    IF(activity.data_item_type = %s, contact.last_name, '')
+                ) AS lastName,
+                IF(
+                    activity.data_item_type = %s,
+                    candidate.is_hot,
+                    IF(activity.data_item_type = %s, contact.is_hot, 0)
+                ) AS isHot,
+                joborder.is_hot AS jobIsHot,
+                IF(
+                    activity.data_item_type = %s,
+                    direct_company.is_hot,
+                    IF(
+                        activity.data_item_type = %s,
+                        contact_company.is_hot,
+                        job_company.is_hot
+                    )
+                ) AS companyIsHot,
+                IF(
+                    activity.data_item_type = %s,
+                    direct_company.company_id,
+                    IF(
+                        activity.data_item_type = %s,
+                        contact_company.company_id,
+                        job_company.company_id
+                    )
+                ) AS companyID,
+                activity.joborder_id AS jobOrderID,
+                activity.notes AS notes,
+                activity_type.short_description AS typeDescription,
+                DATE_FORMAT(
+                    activity.date_created, '%%m-%%d-%%y (%%h:%%i %%p)'
+                ) AS dateCreated,
+                activity.date_created AS dateCreatedSort,
+                entered_by_user.first_name AS enteredByFirstName,
+                entered_by_user.last_name AS enteredByLastName,
+                CONCAT(entered_by_user.last_name, entered_by_user.first_name) AS enteredBySort,
+                IF(
+                    ISNULL(joborder.title),
+                    IF(
+                        ISNULL(
+                            IF(
+                                activity.data_item_type = %s,
+                                direct_company.name,
+                                IF(
+                                    activity.data_item_type = %s,
+                                    contact_company.name,
+                                    job_company.name
+                                )
+                            )
+                        ),
+                        'General',
+                        CONCAT(
+                            '(',
+                            IF(
+                                activity.data_item_type = %s,
+                                direct_company.name,
+                                IF(
+                                    activity.data_item_type = %s,
+                                    contact_company.name,
+                                    job_company.name
+                                )
+                            ),
+                            ')'
+                        )
+                    ),
+                    CONCAT(
+                        joborder.title,
+                        ' (',
+                        IF(
+                            activity.data_item_type = %s,
+                            direct_company.name,
+                            IF(
+                                activity.data_item_type = %s,
+                                contact_company.name,
+                                job_company.name
+                            )
+                        ),
+                        ')'
+                    )
+                ) AS regarding,
+                IF(
+                    activity.data_item_type = %s,
+                    ' ',
+                    joborder.title
+                ) AS regardingJobTitle,
+                IF(
+                    activity.data_item_type = %s,
+                    direct_company.name,
+                    IF(
+                        activity.data_item_type = %s,
+                        contact_company.name,
+                        job_company.name
+                    )
+                ) AS regardingCompanyName
+            FROM
+                (
+                    SELECT
+                        activity.activity_id,
+                        activity.data_item_id,
+                        activity.data_item_type,
+                        activity.site_id,
+                        activity.joborder_id,
+                        activity.entered_by,
+                        activity.type,
+                        activity.notes,
+                        activity.date_created
+                    FROM
+                        activity FORCE INDEX (IDX_site_created)
+                    WHERE
+                        activity.site_id = %s
+                    AND
+                        activity.data_item_type IN (%s, %s, %s)
+                    %s
+                    %s
+                    %s
+                    %s
+                ) AS activity
+            JOIN data_item_type
+                ON activity.data_item_type = data_item_type.data_item_type_id
+            LEFT JOIN user AS entered_by_user
+                ON activity.entered_by = entered_by_user.user_id
+            LEFT JOIN activity_type
+                ON activity.type = activity_type.activity_type_id
+            LEFT JOIN joborder
+                ON activity.joborder_id = joborder.joborder_id
+            LEFT JOIN candidate
+                ON activity.data_item_type = %s
+                AND activity.data_item_id = candidate.candidate_id
+            LEFT JOIN contact
+                ON activity.data_item_type = %s
+                AND activity.data_item_id = contact.contact_id
+            LEFT JOIN company AS direct_company
+                ON activity.data_item_type = %s
+                AND activity.data_item_id = direct_company.company_id
+            LEFT JOIN company AS contact_company
+                ON activity.data_item_type = %s
+                AND contact.company_id = contact_company.company_id
+            LEFT JOIN company AS job_company
+                ON joborder.company_id = job_company.company_id
+            %s
+            %s",
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_CONTACT,
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_CONTACT,
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_CONTACT,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
+            $this->_siteID,
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
+            $userCriterion,
+            $this->dateCriterion,
+            $innerOrderSQL,
+            $limitSQL,
+            DATA_ITEM_CANDIDATE,
+            DATA_ITEM_CONTACT,
+            DATA_ITEM_COMPANY,
+            DATA_ITEM_CONTACT,
+            $orderSQL,
+            ''
+        );
     }
 }
 

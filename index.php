@@ -79,8 +79,18 @@ include_once('./lib/UserInterface.php'); /* Depends: Template, Session. */
 include_once('./lib/ModuleUtility.php'); /* Depends: UserInterface */
 include_once('./lib/TemplateUtility.php'); /* Depends: ModuleUtility, Hooks */
 
-ini_set('session.cookie_secure',1);
-ini_set('session.cookie_path','/;samesite=None;');
+$isHTTPS = (
+    (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+    || (!empty($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
+    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])
+        && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+);
+
+ini_set('session.cookie_secure', $isHTTPS ? 1 : 0);
+ini_set(
+    'session.cookie_path',
+    $isHTTPS ? '/;samesite=None;' : '/;samesite=Lax;'
+);
 
 /* Give the session a unique name to avoid conflicts and start the session. */
 @session_name(CATS_SESSION_NAME);

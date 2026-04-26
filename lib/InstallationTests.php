@@ -121,6 +121,11 @@ class InstallationTests
         {
             $result = false;
         }
+
+        if (!InstallationTests::checkUploadDir())
+        {
+            $result = false;
+        }
         
         if (!InstallationTests::checkConfigWritable())
         {
@@ -461,6 +466,11 @@ class InstallationTests
         return (!self::DEBUG_FAIL && self::_checkReadWrite('./attachments'));
     }
 
+    public static function checkUploadDir()
+    {
+        return (!self::DEBUG_FAIL && self::_checkReadWrite('./upload'));
+    }
+
     public static function checkTempDir()
     {
         return (!self::DEBUG_FAIL && self::_checkReadWrite('./temp'));
@@ -663,6 +673,38 @@ class InstallationTests
                 UNRTF_PATH
             );
         }
+        return true;
+    }
+
+    /* Check for docx2txt. */
+    public static function checkDocx2txt()
+    {
+        if (self::DEBUG_FAIL || !defined('DOCX2TXT_PATH') || !is_executable(DOCX2TXT_PATH))
+        {
+            if (defined('DOCX2TXT_PATH') && file_exists(DOCX2TXT_PATH))
+            {
+                echo sprintf(
+                    '<tr class="fail"><td>docx2txt binary %s is not executable (permissions: %s).</td></tr>',
+                    DOCX2TXT_PATH,
+                    FileUtility::getOctalPermissions(DOCX2TXT_PATH)
+                );
+            }
+            else
+            {
+                echo sprintf(
+                    '<tr class="fail"><td>docx2txt binary %s does not exist.</td></tr>',
+                    defined('DOCX2TXT_PATH') ? DOCX2TXT_PATH : ''
+                );
+            }
+
+            return false;
+        }
+
+        echo sprintf(
+            '<tr class="pass"><td>docx2txt binary %s is executable.</td></tr>',
+            DOCX2TXT_PATH
+        );
+
         return true;
     }
 

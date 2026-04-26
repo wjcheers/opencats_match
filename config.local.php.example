@@ -1,0 +1,15 @@
+<?php
+
+return array(
+    'DATABASE_USER' => 'app',
+    'DATABASE_PASS' => 'app123',
+    'DATABASE_HOST' => 'db',
+    'DATABASE_NAME' => 'testdb',
+
+    /* AI resume parsing. */
+    'ENABLE_AI_RESUME_PARSER' => false,
+    'OPENAI_API_KEY' => '',
+    'OPENAI_MODEL' => 'gpt-5.4-mini',
+    'OPENAI_BASE_URL' => 'https://api.openai.com/v1',
+    'OPENAI_TIMEOUT' => 60
+);

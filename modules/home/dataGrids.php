@@ -36,7 +36,33 @@ include_once('./lib/InfoString.php');
 include_once('./lib/Pipelines.php');
 
 
-class MyPipelineDashboard extends DataGrid
+class HomeDataGrid extends DataGrid
+{
+    protected function useFoundRows()
+    {
+        return false;
+    }
+
+    protected function getCountSQL($joinSQL, $whereSQL, $havingSQL)
+    {
+        $countDataSQL = $this->getSQL(
+            '1 AS homeCountRow',
+            $joinSQL,
+            $whereSQL,
+            $havingSQL,
+            '',
+            ''
+        );
+
+        return sprintf(
+            "SELECT COUNT(*) FROM (\n%s\n) AS homeDashboardCount",
+            $countDataSQL
+        );
+    }
+}
+
+
+class MyPipelineDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -135,7 +161,7 @@ class MyPipelineDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate_joborder.candidate_joborder_id as candidateJoborderID,
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
@@ -201,7 +227,7 @@ class MyPipelineDashboard extends DataGrid
     }
 }
 
-class ImportantPipelineDashboard extends DataGrid
+class ImportantPipelineDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -307,7 +333,7 @@ class ImportantPipelineDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate_joborder.candidate_joborder_id as candidateJoborderID,
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
@@ -375,7 +401,7 @@ class ImportantPipelineDashboard extends DataGrid
     }
 }
 
-class QualifyingPipelineDashboard extends DataGrid
+class QualifyingPipelineDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -481,7 +507,7 @@ class QualifyingPipelineDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate_joborder.candidate_joborder_id as candidateJoborderID,
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
@@ -542,7 +568,7 @@ class QualifyingPipelineDashboard extends DataGrid
 }
 
 
-class JechoingPipelineDashboard extends DataGrid
+class JechoingPipelineDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -648,7 +674,7 @@ class JechoingPipelineDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate_joborder.candidate_joborder_id as candidateJoborderID,
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
@@ -708,7 +734,7 @@ class JechoingPipelineDashboard extends DataGrid
     }
 }
 
-class VerifiedPipelineDashboard extends DataGrid
+class VerifiedPipelineDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -814,7 +840,7 @@ class VerifiedPipelineDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate_joborder.candidate_joborder_id as candidateJoborderID,
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
@@ -875,7 +901,7 @@ class VerifiedPipelineDashboard extends DataGrid
 }
 
 
-class AwaitingPipelineDashboard extends DataGrid
+class AwaitingPipelineDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -981,7 +1007,7 @@ class AwaitingPipelineDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate_joborder.candidate_joborder_id as candidateJoborderID,
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
@@ -1042,7 +1068,7 @@ class AwaitingPipelineDashboard extends DataGrid
 }
 
 
-class UploadedPipelineDashboard extends DataGrid
+class UploadedPipelineDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -1148,7 +1174,7 @@ class UploadedPipelineDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate_joborder.candidate_joborder_id as candidateJoborderID,
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
@@ -1208,7 +1234,7 @@ class UploadedPipelineDashboard extends DataGrid
     }
 }
 
-class EverVerifiedPipelineDashboard extends DataGrid
+class EverVerifiedPipelineDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -1314,7 +1340,7 @@ class EverVerifiedPipelineDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate_joborder.candidate_joborder_id as candidateJoborderID,
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
@@ -1381,7 +1407,7 @@ class EverVerifiedPipelineDashboard extends DataGrid
 }
 
 
-class SubmittedPipelineDashboard extends DataGrid
+class SubmittedPipelineDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -1487,7 +1513,7 @@ class SubmittedPipelineDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate_joborder.candidate_joborder_id as candidateJoborderID,
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
@@ -1547,7 +1573,7 @@ class SubmittedPipelineDashboard extends DataGrid
     }
 }
 
-class InterviewingPipelineDashboard extends DataGrid
+class InterviewingPipelineDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -1653,7 +1679,7 @@ class InterviewingPipelineDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate_joborder.candidate_joborder_id as candidateJoborderID,
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
@@ -1713,7 +1739,7 @@ class InterviewingPipelineDashboard extends DataGrid
     }
 }
 
-class OfferedPipelineDashboard extends DataGrid
+class OfferedPipelineDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -1819,7 +1845,7 @@ class OfferedPipelineDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate_joborder.candidate_joborder_id as candidateJoborderID,
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
@@ -1880,7 +1906,7 @@ class OfferedPipelineDashboard extends DataGrid
 }
 
 
-class DriftingDashboard extends DataGrid
+class DriftingDashboard extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -1982,7 +2008,7 @@ class DriftingDashboard extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate.first_name as firstName,
                 candidate.last_name as lastName,
                 candidate.candidate_id as candidateID,
@@ -2053,7 +2079,7 @@ include_once('./lib/ActivityEntries.php');
 include_once('./lib/Hooks.php');
 include_once('./lib/InfoString.php');
 
-class CallsDataGrid extends DataGrid
+class CallsDataGrid extends HomeDataGrid
 {
     protected $_siteID;
 
@@ -2136,7 +2162,7 @@ class CallsDataGrid extends DataGrid
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 activity.activity_id AS activityID,
                 activity.data_item_id AS dataItemID,
                 activity.data_item_type AS dataItemType,
@@ -2244,8 +2270,8 @@ class CallsDataGrid extends DataGrid
                 %s
                 %s
             %s
-            ORDER BY dateCreatedSort DESC
-            LIMIT 6",
+            %s
+            %s",
             $distinct,
             DATA_ITEM_CANDIDATE,
             $this->_userID,
@@ -2258,7 +2284,9 @@ class CallsDataGrid extends DataGrid
             $this->_siteID,
             $this->dateCriterion,
             (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
-            (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : ''
+            (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : '',
+            $orderSQL,
+            $limitSQL
         );
 
         return $sql;

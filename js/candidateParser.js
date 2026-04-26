@@ -1,17 +1,64 @@
-var transferOn = new Image(47, 18);
-transferOn.src = 'images/parser/transfer.gif';
-var transferOff = new Image(47, 18);
-transferOff.src = 'images/parser/transfer_grey.gif';
+var transferButtonLocked = false;
+
+function setTransferButtonEnabled(enabled)
+{
+    var button = document.getElementById('transfer');
+
+    if (!button)
+    {
+        return;
+    }
+
+    if (transferButtonLocked)
+    {
+        return;
+    }
+
+    button.disabled = !enabled;
+    button.style.cursor = enabled ? 'pointer' : 'not-allowed';
+    button.style.background = enabled ? '#3f84c5' : '#d7dfe8';
+    button.style.borderColor = enabled ? '#2f6fad' : '#b8c3cf';
+    button.style.color = enabled ? '#ffffff' : '#6b7785';
+    button.innerHTML = 'AI 解析履歷';
+}
+
+function submitAddCandidateForm()
+{
+    var form = document.getElementById('addCandidateForm');
+
+    if (!form)
+    {
+        return;
+    }
+
+    if (window.HTMLFormElement && HTMLFormElement.prototype.submit)
+    {
+        HTMLFormElement.prototype.submit.call(form);
+    }
+    else
+    {
+        form.submit();
+    }
+}
 
 function loadDocumentFileContents()
 {
     var file = document.getElementById('documentFile');
     var obj = document.getElementById('loadDocument');
+    var btn = document.getElementById('documentLoad');
 
     obj.value = '';
-
     obj.value = 'true';
-    document.addCandidateForm.submit();
+
+    if (btn)
+    {
+        btn.disabled = true;
+        btn.value = '上傳中...';
+    }
+
+    window.setTimeout(function() {
+        submitAddCandidateForm();
+    }, 10);
 }
 
 function parseDocumentFileContents()
@@ -20,7 +67,7 @@ function parseDocumentFileContents()
     var file = document.getElementById('documentFile');
     var obj = document.getElementById('loadDocument');
     var obj2 = document.getElementById('parseDocument');
-    var img = document.getElementById('transfer');
+    var button = document.getElementById('transfer');
 
     obj.value = '';
     obj2.value = '';
@@ -30,32 +77,47 @@ function parseDocumentFileContents()
         return;
     }
 
+    if (!window.confirm('AI 解析履歷會覆蓋目前表單中的候選人欄位資料，是否繼續？'))
+    {
+        return;
+    }
+
     obj.value = 'true';
     obj2.value = 'true';
-    document.addCandidateForm.submit();
+    transferButtonLocked = true;
+
+    if (button)
+    {
+        button.disabled = true;
+        button.style.cursor = 'wait';
+        button.style.background = '#d7dfe8';
+        button.style.borderColor = '#b8c3cf';
+        button.style.color = '#6b7785';
+        button.innerHTML = 'AI 解析中...';
+        button.onclick = null;
+    }
+    var loading = document.getElementById('aiParsingLoading');
+    if (loading)
+    {
+        loading.style.display = 'inline';
+    }
+
+    window.setTimeout(function() {
+        submitAddCandidateForm();
+    }, 50);
 }
 
 function documentFileChange()
 {
     var obj = document.getElementById('documentLoad');
-    var img = document.getElementById('transfer');
-
     if (obj && obj.value != '')
     {
-        if (img)
-        {
-            img.src = transferOn.src;
-            img.style.cursor='pointer';
-        }
+        setTransferButtonEnabled(true);
         obj.disabled=false;
     }
     else
     {
-        if (img)
-        {
-            img.style.cursor='default';
-            img.src = transferOff.src;
-        }
+        setTransferButtonEnabled(false);
         obj.disabled=true;
     }
 }
@@ -63,25 +125,16 @@ function documentFileChange()
 function documentCheck()
 {
     var obj = document.getElementById('documentText');
-    var img = document.getElementById('transfer');
     var file = document.getElementById('documentFile');
     var tempFile = document.getElementById('documentTempFile');
 
     if ((obj.value).length > 0 || file.value != '')
     {
-        if (img)
-        {
-            img.src = transferOn.src;
-            img.style.cursor='pointer';
-        }
+        setTransferButtonEnabled(true);
     }
     else
     {
-        if (img)
-        {
-            img.style.cursor='default';
-            img.src = transferOff.src;
-        }
+        setTransferButtonEnabled(false);
     }
 }
 
@@ -92,10 +145,66 @@ function removeDocumentFile()
     var obj3 = document.getElementById('loadDocument');
     var obj4 = document.getElementById('parseDocument');
     var obj5 = document.getElementById('showAttachmentDetails');
+    var obj6 = document.getElementById('aiParseLogID');
+    var obj7 = document.getElementById('aiDocumentLanguage');
+    var obj8 = document.getElementById('aiResumeExtension');
+
+    if ((obj2.value != '') || (obj6 && obj6.value != ''))
+    {
+        var requestURL = 'index.php?m=candidates&a=removeDocumentTempFile&documentTempFile=' + encodeURIComponent(obj2.value);
+        if (obj6 && obj6.value != '')
+        {
+            requestURL += '&aiParseLogID=' + encodeURIComponent(obj6.value);
+        }
+
+        if (window.XMLHttpRequest)
+        {
+            try
+            {
+                var request = new XMLHttpRequest();
+                request.open('GET', requestURL, false);
+                request.send(null);
+            }
+            catch (e)
+            {
+            }
+        }
+    }
 
     obj1.value = '';
     obj2.value = '';
     obj3.value = '';
     obj4.value = '';
-    obj5.style.display = 'none';
+    transferButtonLocked = false;
+    if (obj6)
+    {
+        obj6.value = '';
+    }
+    if (obj7)
+    {
+        obj7.value = '';
+    }
+    if (obj8)
+    {
+        obj8.value = '';
+    }
+    if (obj5)
+    {
+        obj5.style.display = 'none';
+    }
+}
+
+function resetAddCandidateForm()
+{
+    var form = document.getElementById('addCandidateForm');
+
+    if (!form)
+    {
+        return false;
+    }
+
+    removeDocumentFile();
+    window.location.href = form.action;
+
+    return false;
 }

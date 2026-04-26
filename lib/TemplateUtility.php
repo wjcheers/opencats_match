@@ -50,6 +50,30 @@ class TemplateUtility
     private function __construct() {}
     private function __clone() {}
 
+    /**
+     * Returns a cache-busting query string for a static asset.
+     *
+     * Uses the file modification time when the file exists locally so browser
+     * caches are refreshed immediately after edits. Falls back to the legacy
+     * build/version token when the file is not found.
+     *
+     * @param string asset path relative to repo root
+     * @param string fallback token including leading ? or &
+     * @return string query string
+     */
+    private static function _getAssetCacheSuffix($assetPath, $fallbackSuffix)
+    {
+        $localPath = dirname(__FILE__) . '/../' . $assetPath;
+        if (file_exists($localPath))
+        {
+            $separator = (strpos($assetPath, '?') === false) ? '?' : '&';
+
+            return $separator . 'v=' . filemtime($localPath);
+        }
+
+        return $fallbackSuffix;
+    }
+
 
     /**
      * Prints the template header HTML for a non-modal window.
@@ -817,7 +841,9 @@ class TemplateUtility
 		echo '<p id="footerText" align="center">禁止將部分內容或檔案攜出辦公處所以外之場所<br />', "\n";
         echo '<p id="footerText">CATS Version ', CATS_VERSION, $buildString,
              '. <span id="toolbarVersion"></span>Powered by <a href="http://www.catsone.com/"><strong>CATS</strong></a>.</p>', "\n";
-        echo '<span id="footerResponse">Server Response Time: ', $loadTime, ' seconds.</span><br />';
+        $loadTimeMilliseconds = sprintf('%0.1f', ((double) $loadTime) * 1000);
+        echo '<span id="footerResponse">Server Response Time: ', $loadTime,
+            ' seconds (', $loadTimeMilliseconds, ' ms).</span><br />';
         echo '<span id="footerCopyright">', COPYRIGHT_HTML, '</span>', "\n";
         if (!eval(Hooks::get('TEMPLATEUTILITY_SHOWPRIVACYPOLICY'))) return;
         echo '</div>', "\n";
@@ -1167,7 +1193,7 @@ class TemplateUtility
         echo '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">', "\n";
         echo '<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">', "\n";
         echo '<head>', "\n";
-        echo '<title>', $pageTitle, ' - CATS</title>', "\n";
+        echo '<title>', $pageTitle, ' - ', CATS_SESSION_NAME, '</title>', "\n";
         echo '<meta http-equiv="Content-Type" content="text/html; charset=', HTML_ENCODING, '" />', "\n";
         echo '<link rel="icon" href="images/favicon.ico" type="image/x-icon" />', "\n";
         echo '<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />', "\n";
@@ -1175,10 +1201,18 @@ class TemplateUtility
              CATSUtility::getIndexName(), '?m=rss" />', "\n";
 
         /* Core JS files */
-        echo '<script type="text/javascript" src="js/lib.js'.$javascriptAntiCache.'"></script>', "\n";
-        echo '<script type="text/javascript" src="js/quickAction.js'.$javascriptAntiCache.'"></script>', "\n";
-        echo '<script type="text/javascript" src="js/calendarDateInput.js'.$javascriptAntiCache.'"></script>', "\n";
-        echo '<script type="text/javascript" src="js/submodal/subModal.js'.$javascriptAntiCache.'"></script>', "\n";
+        echo '<script type="text/javascript" src="js/lib.js',
+            self::_getAssetCacheSuffix('js/lib.js', $javascriptAntiCache),
+            '"></script>', "\n";
+        echo '<script type="text/javascript" src="js/quickAction.js',
+            self::_getAssetCacheSuffix('js/quickAction.js', $javascriptAntiCache),
+            '"></script>', "\n";
+        echo '<script type="text/javascript" src="js/calendarDateInput.js',
+            self::_getAssetCacheSuffix('js/calendarDateInput.js', $javascriptAntiCache),
+            '"></script>', "\n";
+        echo '<script type="text/javascript" src="js/submodal/subModal.js',
+            self::_getAssetCacheSuffix('js/submodal/subModal.js', $javascriptAntiCache),
+            '"></script>', "\n";
         echo '<script type="text/javascript">CATSIndexName = "'.CATSUtility::getIndexName().'";</script>', "\n";
 
        $headIncludes[] = 'main.css';
@@ -1188,7 +1222,9 @@ class TemplateUtility
             /* Done manually to prevent a global dependency on FileUtility. */
             if ($filename == 'tinymce')
             {
-                echo ('<script language="javascript" type="text/javascript" src="lib/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>'."\n".
+                echo ('<script language="javascript" type="text/javascript" src="lib/tinymce/jscripts/tiny_mce/tiny_mce.js'
+                    . self::_getAssetCacheSuffix('lib/tinymce/jscripts/tiny_mce/tiny_mce.js', $javascriptAntiCache)
+                    . '"></script>'."\n".
                       '<script language="javascript" type="text/javascript">tinyMCE.init({
                             mode : "specific_textareas",
                             editor_selector : "mceEditor",
@@ -1218,16 +1254,18 @@ class TemplateUtility
             {
 
                 $extension = substr($filename, strrpos($filename, '.') + 1);
-
-                $filename .= $javascriptAntiCache;
+                $filenameWithCache = $filename . self::_getAssetCacheSuffix(
+                    $filename,
+                    $javascriptAntiCache
+                );
 
                 if ($extension == 'js')
                 {
-                    echo '<script type="text/javascript" src="', $filename, '"></script>', "\n";
+                    echo '<script type="text/javascript" src="', $filenameWithCache, '"></script>', "\n";
                 }
                 else if ($extension == 'css')
                 {
-                    echo '<style type="text/css" media="all">@import "', $filename, '";</style>', "\n";
+                    echo '<style type="text/css" media="all">@import "', $filenameWithCache, '";</style>', "\n";
                 }
             }
         }

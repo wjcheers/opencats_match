@@ -568,6 +568,7 @@ class Attachments
                     directory_name AS directoryName,
                     md5_sum AS md5sum,
                     file_size_kb AS fileSizeKB,
+                    attachment.entered_by AS enteredByUserID,
                     DATE_FORMAT(date_created, '%%m-%%d-%%y (%%h:%%i:%%s %%p)') AS dateCreated,
                     CONCAT(
                         entered_by_user.first_name, ' ', entered_by_user.last_name
@@ -608,6 +609,7 @@ class Attachments
                     directory_name AS directoryName,
                     md5_sum AS md5sum,
                     file_size_kb AS fileSizeKB,
+                    attachment.entered_by AS enteredByUserID,
                     DATE_FORMAT(date_created, '%%m-%%d-%%y (%%h:%%i:%%s %%p)') AS dateCreated,
                     CONCAT(
                         entered_by_user.first_name, ' ', entered_by_user.last_name
@@ -682,6 +684,7 @@ class Attachments
                 directory_name AS directoryName,
                 md5_sum AS md5sum,
                 file_size_kb AS fileSizeKB,
+                entered_by AS enteredByUserID,
                 DATE_FORMAT(date_created, '%%m-%%d-%%y (%%h:%%i:%%s %%p)') AS dateCreated
             FROM
                 attachment

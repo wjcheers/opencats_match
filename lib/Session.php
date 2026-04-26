@@ -923,7 +923,38 @@ class CATSSession
                 );
                 $rs = $db->query($sql);
 
+                $this->_cleanUpStaleTempFiles();
+
                 break;
+        }
+    }
+
+    private function _cleanUpStaleTempFiles()
+    {
+        $uploadDir = dirname(__FILE__) . '/../upload/addcandidate';
+        if (!is_dir($uploadDir))
+        {
+            return;
+        }
+
+        $cutoff = time() - 86400; // 24 hours
+        $this->_cleanUpStaleTempFilesInDirectory($uploadDir, $cutoff);
+    }
+
+    private function _cleanUpStaleTempFilesInDirectory($directory, $cutoff)
+    {
+        foreach (glob($directory . '/*') as $file)
+        {
+            if (is_dir($file))
+            {
+                $this->_cleanUpStaleTempFilesInDirectory($file, $cutoff);
+                continue;
+            }
+
+            if (is_file($file) && filemtime($file) < $cutoff)
+            {
+                @unlink($file);
+            }
         }
     }
 
@@ -1044,7 +1075,15 @@ class CATSSession
      */
     public function startTimer()
     {
-        $this->_startTime = microtime();
+        if (isset($_SERVER['REQUEST_TIME_FLOAT']) &&
+            is_numeric($_SERVER['REQUEST_TIME_FLOAT']))
+        {
+            $this->_startTime = (double) $_SERVER['REQUEST_TIME_FLOAT'];
+        }
+        else
+        {
+            $this->_startTime = microtime(true);
+        }
     }
 
     /**
@@ -1055,18 +1094,20 @@ class CATSSession
      */
     public function getExecutionTime()
     {
-        $this->_endTime = microtime();
+        $this->_endTime = microtime(true);
 
         if (!isset($this->_startTime) || empty($this->_startTime))
         {
             $this->_startTime = $this->_endTime;
         }
 
-        list($a_dec, $a_sec) = explode(' ', $this->_startTime);
-        list($b_dec, $b_sec) = explode(' ', $this->_endTime);
+        $duration = (double) $this->_endTime - (double) $this->_startTime;
+        if ($duration < 0)
+        {
+            $duration = 0;
+        }
 
-        $duration = $b_sec - $a_sec + $b_dec - $a_dec;
-        $duration = sprintf('%0.2f', $duration);
+        $duration = sprintf('%0.4f', $duration);
 
         return $duration;
     }

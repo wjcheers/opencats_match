@@ -117,6 +117,10 @@ class ReportsUI extends UserInterface
                 $this->showCustomRangeReport();
                 break;
 
+            case 'showAIUsageReport':
+                $this->showAIUsageReport();
+                break;
+
             case 'reports':
             default:
                 $this->reports();
@@ -128,106 +132,321 @@ class ReportsUI extends UserInterface
     {
         /* Grab an instance of Statistics. */
         $statistics = new Statistics($this->_siteID);
-
-        /* Get company statistics. */
-        $statisticsData['totalCompanies']     = $statistics->getCompanyCount(TIME_PERIOD_TODATE);
-        $statisticsData['companiesToday']     = $statistics->getCompanyCount(TIME_PERIOD_TODAY);
-        $statisticsData['companiesYesterday'] = $statistics->getCompanyCount(TIME_PERIOD_YESTERDAY);
-        $statisticsData['companiesThisWeek']  = $statistics->getCompanyCount(TIME_PERIOD_THISWEEK);
-        $statisticsData['companiesLastWeek']  = $statistics->getCompanyCount(TIME_PERIOD_LASTWEEK);
-        $statisticsData['companiesThisMonth'] = $statistics->getCompanyCount(TIME_PERIOD_THISMONTH);
-        $statisticsData['companiesLastMonth'] = $statistics->getCompanyCount(TIME_PERIOD_LASTMONTH);
-        $statisticsData['companiesThisQuarter'] = $statistics->getCompanyCount(TIME_PERIOD_THISQUARTER);
-        $statisticsData['companiesLastQuarter'] = $statistics->getCompanyCount(TIME_PERIOD_LASTQUARTER);
-        $statisticsData['companiesThisYear']  = $statistics->getCompanyCount(TIME_PERIOD_THISYEAR);
-        $statisticsData['companiesLastYear']  = $statistics->getCompanyCount(TIME_PERIOD_LASTYEAR);
-
-        /* Get candidate statistics. */
-        $statisticsData['totalCandidates']     = $statistics->getCandidateCount(TIME_PERIOD_TODATE);
-        $statisticsData['candidatesToday']     = $statistics->getCandidateCount(TIME_PERIOD_TODAY);
-        $statisticsData['candidatesYesterday'] = $statistics->getCandidateCount(TIME_PERIOD_YESTERDAY);
-        $statisticsData['candidatesThisWeek']  = $statistics->getCandidateCount(TIME_PERIOD_THISWEEK);
-        $statisticsData['candidatesLastWeek']  = $statistics->getCandidateCount(TIME_PERIOD_LASTWEEK);
-        $statisticsData['candidatesThisMonth'] = $statistics->getCandidateCount(TIME_PERIOD_THISMONTH);
-        $statisticsData['candidatesLastMonth'] = $statistics->getCandidateCount(TIME_PERIOD_LASTMONTH);
-        $statisticsData['candidatesThisQuarter'] = $statistics->getCandidateCount(TIME_PERIOD_THISQUARTER);
-        $statisticsData['candidatesLastQuarter'] = $statistics->getCandidateCount(TIME_PERIOD_LASTQUARTER);
-        $statisticsData['candidatesThisYear']  = $statistics->getCandidateCount(TIME_PERIOD_THISYEAR);
-        $statisticsData['candidatesLastYear']  = $statistics->getCandidateCount(TIME_PERIOD_LASTYEAR);
-
-        /* Get pipeline statistics. */
-        $statisticsData['totalPipelines']     = $statistics->getPipelineCount(TIME_PERIOD_TODATE);
-        $statisticsData['pipelinesToday']     = $statistics->getPipelineCount(TIME_PERIOD_TODAY);
-        $statisticsData['pipelinesYesterday'] = $statistics->getPipelineCount(TIME_PERIOD_YESTERDAY);
-        $statisticsData['pipelinesThisWeek']  = $statistics->getPipelineCount(TIME_PERIOD_THISWEEK);
-        $statisticsData['pipelinesLastWeek']  = $statistics->getPipelineCount(TIME_PERIOD_LASTWEEK);
-        $statisticsData['pipelinesThisMonth'] = $statistics->getPipelineCount(TIME_PERIOD_THISMONTH);
-        $statisticsData['pipelinesLastMonth'] = $statistics->getPipelineCount(TIME_PERIOD_LASTMONTH);
-        $statisticsData['pipelinesThisQuarter'] = $statistics->getPipelineCount(TIME_PERIOD_THISQUARTER);
-        $statisticsData['pipelinesLastQuarter'] = $statistics->getPipelineCount(TIME_PERIOD_LASTQUARTER);
-        $statisticsData['pipelinesThisYear']  = $statistics->getPipelineCount(TIME_PERIOD_THISYEAR);
-        $statisticsData['pipelinesLastYear']  = $statistics->getPipelineCount(TIME_PERIOD_LASTYEAR);
-
-        /* Get submission statistics. */
-        $statisticsData['totalSubmissions']     = $statistics->getSubmissionCount(TIME_PERIOD_TODATE);
-        $statisticsData['submissionsToday']     = $statistics->getSubmissionCount(TIME_PERIOD_TODAY);
-        $statisticsData['submissionsYesterday'] = $statistics->getSubmissionCount(TIME_PERIOD_YESTERDAY);
-        $statisticsData['submissionsThisWeek']  = $statistics->getSubmissionCount(TIME_PERIOD_THISWEEK);
-        $statisticsData['submissionsLastWeek']  = $statistics->getSubmissionCount(TIME_PERIOD_LASTWEEK);
-        $statisticsData['submissionsThisMonth'] = $statistics->getSubmissionCount(TIME_PERIOD_THISMONTH);
-        $statisticsData['submissionsLastMonth'] = $statistics->getSubmissionCount(TIME_PERIOD_LASTMONTH);
-        $statisticsData['submissionsThisQuarter'] = $statistics->getSubmissionCount(TIME_PERIOD_THISQUARTER);
-        $statisticsData['submissionsLastQuarter'] = $statistics->getSubmissionCount(TIME_PERIOD_LASTQUARTER);
-        $statisticsData['submissionsThisYear']  = $statistics->getSubmissionCount(TIME_PERIOD_THISYEAR);
-        $statisticsData['submissionsLastYear']  = $statistics->getSubmissionCount(TIME_PERIOD_LASTYEAR);
-
-		/* Get placement statistics. */
-        $statisticsData['totalPlacements']     = $statistics->getPlacementCount(TIME_PERIOD_TODATE);
-        $statisticsData['placementsToday']     = $statistics->getPlacementCount(TIME_PERIOD_TODAY);
-        $statisticsData['placementsYesterday'] = $statistics->getPlacementCount(TIME_PERIOD_YESTERDAY);
-        $statisticsData['placementsThisWeek']  = $statistics->getPlacementCount(TIME_PERIOD_THISWEEK);
-        $statisticsData['placementsLastWeek']  = $statistics->getPlacementCount(TIME_PERIOD_LASTWEEK);
-        $statisticsData['placementsThisMonth'] = $statistics->getPlacementCount(TIME_PERIOD_THISMONTH);
-        $statisticsData['placementsLastMonth'] = $statistics->getPlacementCount(TIME_PERIOD_LASTMONTH);
-        $statisticsData['placementsThisQuarter'] = $statistics->getPlacementCount(TIME_PERIOD_THISQUARTER);
-        $statisticsData['placementsLastQuarter'] = $statistics->getPlacementCount(TIME_PERIOD_LASTQUARTER);
-        $statisticsData['placementsThisYear']  = $statistics->getPlacementCount(TIME_PERIOD_THISYEAR);
-        $statisticsData['placementsLastYear']  = $statistics->getPlacementCount(TIME_PERIOD_LASTYEAR);
-
-        /* Get contact statistics. */
-        $statisticsData['totalContacts']     = $statistics->getContactCount(TIME_PERIOD_TODATE);
-        $statisticsData['contactsToday']     = $statistics->getContactCount(TIME_PERIOD_TODAY);
-        $statisticsData['contactsYesterday'] = $statistics->getContactCount(TIME_PERIOD_YESTERDAY);
-        $statisticsData['contactsThisWeek']  = $statistics->getContactCount(TIME_PERIOD_THISWEEK);
-        $statisticsData['contactsLastWeek']  = $statistics->getContactCount(TIME_PERIOD_LASTWEEK);
-        $statisticsData['contactsThisMonth'] = $statistics->getContactCount(TIME_PERIOD_THISMONTH);
-        $statisticsData['contactsLastMonth'] = $statistics->getContactCount(TIME_PERIOD_LASTMONTH);
-        $statisticsData['contactsThisQuarter'] = $statistics->getContactCount(TIME_PERIOD_THISQUARTER);
-        $statisticsData['contactsLastQuarter'] = $statistics->getContactCount(TIME_PERIOD_LASTQUARTER);
-        $statisticsData['contactsThisYear']  = $statistics->getContactCount(TIME_PERIOD_THISYEAR);
-        $statisticsData['contactsLastYear']  = $statistics->getContactCount(TIME_PERIOD_LASTYEAR);
-
-		/* Get offer statistics. */
-        $statisticsData['totalOffers']     = $statistics->getOfferCount(TIME_PERIOD_TODATE);
-        
-        /* Get job order statistics. */
-        $statisticsData['totalJobOrders']     = $statistics->getJobOrderCount(TIME_PERIOD_TODATE);
-        $statisticsData['jobOrdersToday']     = $statistics->getJobOrderCount(TIME_PERIOD_TODAY);
-        $statisticsData['jobOrdersYesterday'] = $statistics->getJobOrderCount(TIME_PERIOD_YESTERDAY);
-        $statisticsData['jobOrdersThisWeek']  = $statistics->getJobOrderCount(TIME_PERIOD_THISWEEK);
-        $statisticsData['jobOrdersLastWeek']  = $statistics->getJobOrderCount(TIME_PERIOD_LASTWEEK);
-        $statisticsData['jobOrdersThisMonth'] = $statistics->getJobOrderCount(TIME_PERIOD_THISMONTH);
-        $statisticsData['jobOrdersLastMonth'] = $statistics->getJobOrderCount(TIME_PERIOD_LASTMONTH);
-        $statisticsData['jobOrdersThisQuarter'] = $statistics->getJobOrderCount(TIME_PERIOD_THISQUARTER);
-        $statisticsData['jobOrdersLastQuarter'] = $statistics->getJobOrderCount(TIME_PERIOD_LASTQUARTER);
-        $statisticsData['jobOrdersThisYear']  = $statistics->getJobOrderCount(TIME_PERIOD_THISYEAR);
-        $statisticsData['jobOrdersLastYear']  = $statistics->getJobOrderCount(TIME_PERIOD_LASTYEAR);
+        $statisticsData = $statistics->getReportsDashboardStatistics();
+        $aiParseDashboardData = $this->getAIParseDashboardStatistics(
+            $this->canViewAllAIUsageReport() ? 0 : $this->_userID
+        );
 
         if (!eval(Hooks::get('REPORTS_SHOW'))) return;
 
         $this->_template->assign('active', $this);
         $this->_template->assign('statisticsData', $statisticsData);
+        $this->_template->assign('aiParseDashboardData', $aiParseDashboardData);
         $this->_template->display('./modules/reports/Reports.tpl');
+    }
+
+    private function showAIUsageReport()
+    {
+        $canViewAll = $this->canViewAllAIUsageReport();
+        $periodToken = $this->getTrimmedInput('period', $_GET);
+        if ($periodToken == '')
+        {
+            $periodToken = 'today';
+        }
+
+        $userID = (int) $this->getTrimmedInput('userID', $_GET);
+        if (!$canViewAll)
+        {
+            $userID = $this->_userID;
+        }
+        $periodData = $this->getAIParsePeriodData($periodToken);
+
+        $statistics = new Statistics($this->_siteID);
+        $usersRS = $canViewAll ? $statistics->getReportUsers(TIME_PERIOD_TODATE) : array();
+        $summary = $this->getAIParseSummary($periodData, $userID);
+        $records = $this->getAIParseRecords($periodData, $userID);
+
+        if (!eval(Hooks::get('REPORTS_SHOW_AI_USAGE'))) return;
+
+        $this->_template->assign('active', $this);
+        $this->_template->assign('reportTitle', $periodData['title']);
+        $this->_template->assign('periodToken', $periodToken);
+        $this->_template->assign('periodData', $periodData);
+        $this->_template->assign('usersRS', $usersRS);
+        $this->_template->assign('userID', $userID);
+        $this->_template->assign('canViewAllAIUsage', $canViewAll);
+        $this->_template->assign('aiParseSummary', $summary);
+        $this->_template->assign('aiParseRecords', $records);
+        $this->_template->display('./modules/reports/AIUsageReport.tpl');
+    }
+
+    private function aiParseTablesExist()
+    {
+        $db = DatabaseConnection::getInstance();
+        $logTable = $db->getAssoc("SHOW TABLES LIKE 'ai_resume_parse_log'");
+        return !empty($logTable);
+    }
+
+    private function getAIParseDashboardStatistics($userID)
+    {
+        $emptyData = array(
+            'enabled' => false,
+            'today' => 0,
+            'yesterday' => 0,
+            'thisWeek' => 0,
+            'lastWeek' => 0,
+            'thisMonth' => 0,
+            'lastMonth' => 0,
+            'toDate' => 0
+        );
+
+        if (!$this->aiParseTablesExist())
+        {
+            return $emptyData;
+        }
+
+        $emptyData['enabled'] = true;
+        $periodKeys = array('today', 'yesterday', 'thisWeek', 'lastWeek', 'thisMonth', 'lastMonth', 'toDate');
+
+        foreach ($periodKeys as $periodKey)
+        {
+            $periodData = $this->getAIParsePeriodData($periodKey);
+            $summary = $this->getAIParseSummary($periodData, $userID);
+            $emptyData[$periodKey] = (int) $summary['totalCount'];
+        }
+
+        return $emptyData;
+    }
+
+    private function canViewAllAIUsageReport()
+    {
+        return ($this->_accessLevel >= ACCESS_LEVEL_SA);
+    }
+
+    private function getAIParsePeriodData($periodToken)
+    {
+        $today = date('Y-m-d');
+
+        switch ($periodToken)
+        {
+            case 'yesterday':
+                return array(
+                    'token' => 'yesterday',
+                    'title' => 'AI Resume Usage Report: Yesterday',
+                    'label' => 'Yesterday',
+                    'start' => date('Y-m-d 00:00:00', strtotime('-1 day', strtotime($today))),
+                    'end' => $today . ' 00:00:00'
+                );
+
+            case 'thisWeek':
+                return array(
+                    'token' => 'thisWeek',
+                    'title' => 'AI Resume Usage Report: This Week',
+                    'label' => 'This Week',
+                    'start' => date('Y-m-d 00:00:00', strtotime('monday this week')),
+                    'end' => null
+                );
+
+            case 'lastWeek':
+                return array(
+                    'token' => 'lastWeek',
+                    'title' => 'AI Resume Usage Report: Last Week',
+                    'label' => 'Last Week',
+                    'start' => date('Y-m-d 00:00:00', strtotime('monday last week')),
+                    'end' => date('Y-m-d 00:00:00', strtotime('monday this week'))
+                );
+
+            case 'thisMonth':
+                return array(
+                    'token' => 'thisMonth',
+                    'title' => 'AI Resume Usage Report: This Month',
+                    'label' => 'This Month',
+                    'start' => date('Y-m-01 00:00:00'),
+                    'end' => null
+                );
+
+            case 'lastMonth':
+                return array(
+                    'token' => 'lastMonth',
+                    'title' => 'AI Resume Usage Report: Last Month',
+                    'label' => 'Last Month',
+                    'start' => date('Y-m-01 00:00:00', strtotime('first day of last month')),
+                    'end' => date('Y-m-01 00:00:00')
+                );
+
+            case 'toDate':
+                return array(
+                    'token' => 'toDate',
+                    'title' => 'AI Resume Usage Report: To Date',
+                    'label' => 'To Date',
+                    'start' => null,
+                    'end' => null
+                );
+
+            case 'today':
+            default:
+                return array(
+                    'token' => 'today',
+                    'title' => 'AI Resume Usage Report: Today',
+                    'label' => 'Today',
+                    'start' => $today . ' 00:00:00',
+                    'end' => null
+                );
+        }
+    }
+
+    private function getAIParseSummary($periodData, $userID)
+    {
+        if (!$this->aiParseTablesExist())
+        {
+            return array(
+                'totalCount' => 0,
+                'parseCount' => 0,
+                'reportCount' => 0,
+                'savedCount' => 0,
+                'successCount' => 0,
+                'inputTokens' => 0,
+                'outputTokens' => 0
+            );
+        }
+
+        $db = DatabaseConnection::getInstance();
+        $whereSQL = $this->buildAIParseWhereSQL($periodData, $userID);
+        $sql = sprintf(
+            "SELECT
+                COUNT(*) AS totalCount,
+                SUM(source_type IN ('upload', 'paste')) AS parseCount,
+                SUM(source_type = 'jecho_report') AS reportCount,
+                SUM(status = 'saved') AS savedCount,
+                SUM(status IN ('success', 'saved')) AS successCount,
+                SUM(input_tokens) AS inputTokens,
+                SUM(output_tokens) AS outputTokens
+            FROM
+                ai_resume_parse_log
+            WHERE
+                %s",
+            $whereSQL
+        );
+        $rs = $db->getAssoc($sql);
+
+        return array(
+            'totalCount' => isset($rs['totalCount']) ? (int) $rs['totalCount'] : 0,
+            'parseCount' => isset($rs['parseCount']) ? (int) $rs['parseCount'] : 0,
+            'reportCount' => isset($rs['reportCount']) ? (int) $rs['reportCount'] : 0,
+            'savedCount' => isset($rs['savedCount']) ? (int) $rs['savedCount'] : 0,
+            'successCount' => isset($rs['successCount']) ? (int) $rs['successCount'] : 0,
+            'inputTokens' => isset($rs['inputTokens']) ? (int) $rs['inputTokens'] : 0,
+            'outputTokens' => isset($rs['outputTokens']) ? (int) $rs['outputTokens'] : 0
+        );
+    }
+
+    private function getAIParseRecords($periodData, $userID)
+    {
+        if (!$this->aiParseTablesExist())
+        {
+            return array();
+        }
+
+        $db = DatabaseConnection::getInstance();
+        $whereSQL = $this->buildAIParseWhereSQL($periodData, $userID);
+        $sql = sprintf(
+            "SELECT
+                ai_resume_parse_log.id AS parseLogID,
+                ai_resume_parse_log.source_type AS sourceType,
+                ai_resume_parse_log.original_filename AS originalFilename,
+                ai_resume_parse_log.document_language AS documentLanguage,
+                ai_resume_parse_log.provider AS provider,
+                ai_resume_parse_log.model AS model,
+                ai_resume_parse_log.input_tokens AS inputTokens,
+                ai_resume_parse_log.output_tokens AS outputTokens,
+                ai_resume_parse_log.status AS status,
+                ai_resume_parse_log.saved_candidate_id AS savedCandidateID,
+                DATE_FORMAT(ai_resume_parse_log.created_at, '%%m-%%d-%%y %%h:%%i %%p') AS createdAt,
+                CONCAT(user.first_name, ' ', user.last_name) AS userFullName
+            FROM
+                ai_resume_parse_log
+            LEFT JOIN user
+                ON ai_resume_parse_log.user_id = user.user_id
+            WHERE
+                %s
+            ORDER BY
+                ai_resume_parse_log.created_at DESC
+            LIMIT 200",
+            $whereSQL
+        );
+
+        $records = $db->getAllAssoc($sql);
+        foreach ($records as $index => $row)
+        {
+            $records[$index]['sourceLabel'] = $this->formatAIUsageSourceType($row['sourceType']);
+            $records[$index]['statusLabel'] = $this->formatAIUsageStatus($row['status']);
+        }
+
+        return $records;
+    }
+
+    private function buildAIParseWhereSQL($periodData, $userID)
+    {
+        $db = DatabaseConnection::getInstance();
+        $criteria = array();
+        $criteria[] = 'ai_resume_parse_log.site_id = ' . $db->makeQueryInteger($this->_siteID);
+
+        if (!empty($periodData['start']))
+        {
+            $criteria[] = 'ai_resume_parse_log.created_at >= ' . $db->makeQueryString($periodData['start']);
+        }
+        if (!empty($periodData['end']))
+        {
+            $criteria[] = 'ai_resume_parse_log.created_at < ' . $db->makeQueryString($periodData['end']);
+        }
+        if ((int) $userID > 0)
+        {
+            $criteria[] = 'ai_resume_parse_log.user_id = ' . $db->makeQueryInteger($userID);
+        }
+
+        return implode(' AND ', $criteria);
+    }
+
+    private function formatAIUsageSourceType($sourceType)
+    {
+        switch ($sourceType)
+        {
+            case 'upload':
+                return 'Parse Resume (Upload)';
+
+            case 'paste':
+                return 'Parse Resume (Paste)';
+
+            case 'jecho_report':
+                return 'Generate Jecho Report';
+
+            default:
+                return ucwords(str_replace('_', ' ', $sourceType));
+        }
+    }
+
+    private function formatAIUsageStatus($status)
+    {
+        switch ($status)
+        {
+            case 'saved':
+                return 'Saved Candidate';
+
+            case 'success':
+                return 'Parsed';
+
+            case 'generated':
+                return 'Generated';
+
+            case 'duplicate':
+                return 'Duplicate Output';
+
+            case 'attachment_error':
+                return 'Attachment Error';
+
+            default:
+                return ucwords(str_replace('_', ' ', $status));
+        }
     }
 
     private function showCustomRangeReport()
@@ -310,186 +529,11 @@ class ReportsUI extends UserInterface
         $data = array();
         $db = DatabaseConnection::getInstance();
         
-        // Build user criterion if userID is specified
-        $userCriterion = '';
-        if (!empty($userID) && $userID != '')
-        {
-            $userCriterion = sprintf("AND candidate.owner = %s", $db->makeQueryInteger($userID));
-        }
-        
-        // Get company statistics
-        $criterion = $statistics->makeDateRangeCriterion('date_created', $startDate, $endDate);
-        if (!empty($userID) && $userID != '')
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM company WHERE site_id = %s AND entered_by = %s %s",
-                $this->_siteID,
-                $db->makeQueryInteger($userID),
-                $criterion
-            );
-        }
-        else
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM company WHERE site_id = %s %s",
-                $this->_siteID,
-                $criterion
-            );
-        }
-        $rs = $db->getAssoc($sql);
-        $data['companies'] = $rs['count'];
-        
-        // Get candidate statistics
-        $criterion = $statistics->makeDateRangeCriterion('date_created', $startDate, $endDate);
-        if (!empty($userID) && $userID != '')
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM candidate WHERE site_id = %s AND entered_by = %s %s",
-                $this->_siteID,
-                $db->makeQueryInteger($userID),
-                $criterion
-            );
-        }
-        else
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM candidate WHERE site_id = %s %s",
-                $this->_siteID,
-                $criterion
-            );
-        }
-        $rs = $db->getAssoc($sql);
-        $data['candidates'] = $rs['count'];
-        
-        // Get job order statistics
-        $criterion = $statistics->makeDateRangeCriterion('date_created', $startDate, $endDate);
-        if (!empty($userID) && $userID != '')
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM joborder WHERE site_id = %s AND entered_by = %s %s",
-                $this->_siteID,
-                $db->makeQueryInteger($userID),
-                $criterion
-            );
-        }
-        else
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM joborder WHERE site_id = %s %s",
-                $this->_siteID,
-                $criterion
-            );
-        }
-        $rs = $db->getAssoc($sql);
-        $data['jobOrders'] = $rs['count'];
-        
-        // Get pipeline statistics
-        $criterion = $statistics->makeDateRangeCriterion('candidate_joborder.date_created', $startDate, $endDate);
-        if (!empty($userID) && $userID != '')
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM candidate_joborder 
-                 LEFT JOIN candidate ON candidate.candidate_id = candidate_joborder.candidate_id
-                 WHERE candidate_joborder.site_id = %s AND candidate.owner = %s %s",
-                $this->_siteID,
-                $db->makeQueryInteger($userID),
-                $criterion
-            );
-        }
-        else
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM candidate_joborder WHERE candidate_joborder.site_id = %s %s",
-                $this->_siteID,
-                $criterion
-            );
-        }
-        $rs = $db->getAssoc($sql);
-        $data['pipelines'] = $rs['count'];
-        
-        // Get submission statistics
-        $criterion = $statistics->makeDateRangeCriterion('candidate_joborder_status_history.date', $startDate, $endDate);
-        if (!empty($userID) && $userID != '')
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM candidate_joborder_status_history 
-                 LEFT JOIN joborder ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
-                 LEFT JOIN candidate ON candidate.candidate_id = candidate_joborder_status_history.candidate_id
-                 WHERE status_to = 400
-                 AND candidate_joborder_status_history.site_id = %s
-                 AND candidate.owner = %s %s",
-                $this->_siteID,
-                $db->makeQueryInteger($userID),
-                $criterion
-            );
-        }
-        else
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM candidate_joborder_status_history 
-                 LEFT JOIN joborder ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
-                 WHERE status_to = 400
-                 AND candidate_joborder_status_history.site_id = %s %s",
-                $this->_siteID,
-                $criterion
-            );
-        }
-        $rs = $db->getAssoc($sql);
-        $data['submissions'] = $rs['count'];
-        
-        // Get placement statistics
-        $criterion = $statistics->makeDateRangeCriterion('candidate_joborder_status_history.date', $startDate, $endDate);
-        if (!empty($userID) && $userID != '')
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM candidate_joborder_status_history 
-                 LEFT JOIN joborder ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
-                 LEFT JOIN candidate ON candidate.candidate_id = candidate_joborder_status_history.candidate_id
-                 WHERE status_to = 800
-                 AND candidate_joborder_status_history.site_id = %s
-                 AND candidate.owner = %s %s",
-                $this->_siteID,
-                $db->makeQueryInteger($userID),
-                $criterion
-            );
-        }
-        else
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM candidate_joborder_status_history 
-                 LEFT JOIN joborder ON joborder.joborder_id = candidate_joborder_status_history.joborder_id
-                 WHERE status_to = 800
-                 AND candidate_joborder_status_history.site_id = %s %s",
-                $this->_siteID,
-                $criterion
-            );
-        }
-        $rs = $db->getAssoc($sql);
-        $data['placements'] = $rs['count'];
-        
-        // Get contact statistics
-        $criterion = $statistics->makeDateRangeCriterion('date_created', $startDate, $endDate);
-        if (!empty($userID) && $userID != '')
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM contact WHERE site_id = %s AND entered_by = %s %s",
-                $this->_siteID,
-                $db->makeQueryInteger($userID),
-                $criterion
-            );
-        }
-        else
-        {
-            $sql = sprintf(
-                "SELECT COUNT(*) AS count FROM contact WHERE site_id = %s %s",
-                $this->_siteID,
-                $criterion
-            );
-        }
-        $rs = $db->getAssoc($sql);
-        $data['contacts'] = $rs['count'];
-        
-        return $data;
+        return $statistics->getDateRangeDashboardStatistics(
+            $startDate,
+            $endDate,
+            (!empty($userID) ? $userID : null)
+        );
     }
 
     private function graphView()

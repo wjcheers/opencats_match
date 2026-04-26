@@ -50,6 +50,15 @@
                     <input type="hidden" name="jobOrderID" id="jobOrderID" value="<?php echo($this->jobOrderID); ?>" />
                 <?php endif; ?>
                 <input type="hidden" name="postback" id="postback" value="postback" />
+                <input type="hidden" name="aiParseLogID" id="aiParseLogID" value="<?php echo (isset($this->preassignedFields['aiParseLogID']) ? $this->preassignedFields['aiParseLogID'] : ''); ?>" />
+                <input type="hidden" name="aiDocumentLanguage" id="aiDocumentLanguage" value="<?php echo (isset($this->preassignedFields['aiDocumentLanguage']) ? $this->preassignedFields['aiDocumentLanguage'] : ''); ?>" />
+                <input type="hidden" name="aiResumeExtension" id="aiResumeExtension" value="<?php echo (isset($this->preassignedFields['aiResumeExtension']) ? $this->preassignedFields['aiResumeExtension'] : ''); ?>" />
+
+                <?php if (isset($this->preassignedFields['aiParseError']) && $this->preassignedFields['aiParseError'] != ''): ?>
+                    <div style="margin-bottom: 10px; padding: 8px; border: 1px solid #cc9999; background-color: #fff3f3; color: #800000; width: <?php if ($this->isModal): ?>100%<?php else: ?>1200px<?php endif; ?>;">
+                        AI resume parsing failed: <?php $this->_($this->preassignedFields['aiParseError']); ?>
+                    </div>
+                <?php endif; ?>
 
                 <table class="editTable" width="<?php if ($this->isModal): ?>100%<?php else: ?>1225<?php endif; ?>">
                     <?php if ($this->isParsingEnabled): ?>
@@ -114,8 +123,22 @@
                                             <div style="color: #666666; text-align: center;">
                                             (<b>hint:</b> you may also paste the resume contents)
                                             <br /><br />
+                                            <?php if (!($this->parsingStatus['parseLimit'] >= 0 && $this->parsingStatus['parseUsed'] >= $this->parsingStatus['parseLimit'])): ?>
+                                            <span style="display:inline-block; text-align:center; vertical-align:middle;">
+                                                <button
+                                                    type="button"
+                                                    id="transfer"
+                                                    onclick="parseDocumentFileContents();"
+                                                    <?php if ($this->contents == ''): ?>disabled="disabled"<?php endif; ?>
+                                                    style="padding:6px 12px; border:1px solid #2f6fad; border-radius:4px; background:<?php echo ($this->contents != '' ? '#3f84c5' : '#d7dfe8'); ?>; color:<?php echo ($this->contents != '' ? '#ffffff' : '#6b7785'); ?>; font-size:12px; font-weight:bold; cursor:<?php echo ($this->contents != '' ? 'pointer' : 'not-allowed'); ?>;"
+                                                >AI 解析履歷</button>
+                                                <span style="display:block; margin-top:5px; font-size:11px; color:#666666;">使用上方上傳或貼上的履歷內容，自動帶入候選人欄位。</span>
+                                            </span>
+                                            <span id="aiParsingLoading" style="display:none; margin-left:8px; font-size:11px; color:#7a6000; background:#fffbe6; border:1px solid #e6c700; padding:3px 8px; vertical-align:middle;">&#x23F3; AI 解析中，請稍候...</span>
+                                            <br /><br />
+                                            <?php endif; ?>
                                             <?php if (LicenseUtility::isProfessional() || file_exists('modules/asp')): ?>
-                                            Need to upload multiple resumes? <a href="<?php echo CATSUtility::getIndexName(); ?>?m=import&a=massImport">Click here!</a>
+                                            &nbsp;
                                             <?php else: ?>
                                                 <?php if ($this->parsingStatus['parseLimit'] >= 0 && (($used = $this->parsingStatus['parseUsed']) / ($limit = $this->parsingStatus['parseLimit']) * 100) > 50): ?>
                                                     <?php if ($used == $limit): ?><span style="color: #800000;"><?php endif; ?>
@@ -330,9 +353,6 @@
                             <?php if ($this->isParsingEnabled): ?>
                                 <?php if ($this->parsingStatus['parseLimit'] >= 0 && $this->parsingStatus['parseUsed'] >= $this->parsingStatus['parseLimit']): ?>
                                     &nbsp;
-                                <?php else: ?>
-                                    <?php if ($this->isModal): ?>&nbsp;&nbsp;<?php else: ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php endif; ?>
-                                    <img id="transfer" src="images/parser/transfer<?php echo ($this->contents != '' ? '' : '_grey'); ?>.gif" <?php echo ($this->contents != '' ? 'style="cursor: pointer;"' : ''); ?> border="0" alt="Import Resume" onclick="parseDocumentFileContents();" />
                                 <?php endif; ?>
                             <?php else: ?>
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -750,7 +770,7 @@
                 </table>
                 
                 <input type="submit" tabindex="<?php echo($tabIndex++); ?>" class="button" id="submit" value="Add Candidate" />&nbsp;
-                <input type="reset"  tabindex="<?php echo($tabIndex++); ?>" class="button" value="Reset" />&nbsp;
+                <input type="button" tabindex="<?php echo($tabIndex++); ?>" class="button" value="Reset" onclick="return resetAddCandidateForm();" />&nbsp;
                 <?php if ($this->isModal): ?>
                     <input type="button" tabindex="<?php echo($tabIndex++); ?>" class="button" value="Back to Search" onclick="javascript:goToURL('<?php echo(CATSUtility::getIndexName()); ?>?m=joborders&amp;a=considerCandidateSearch&amp;jobOrderID=<?php echo($this->jobOrderID); ?>');" />
                 <?php else: ?>
@@ -759,6 +779,67 @@
             </form>
 
 <script type="text/javascript">
+    function adjustCandidateSummaryFields(formId)
+    {
+        var form = document.getElementById(formId);
+        if (!form)
+        {
+            return;
+        }
+
+        var labels = form.querySelectorAll('td.tdVertical label');
+        for (var i = 0; i < labels.length; i++)
+        {
+            var labelText = labels[i].textContent.replace(/\s+/g, ' ').replace(/:\s*$/, '').trim();
+            if (labelText !== 'Career Summary' && labelText !== 'Skill Summary')
+            {
+                continue;
+            }
+
+            var row = labels[i].closest('tr');
+            if (!row)
+            {
+                continue;
+            }
+
+            var textarea = row.querySelector('textarea');
+            if (!textarea)
+            {
+                continue;
+            }
+
+            textarea.style.width = '700px';
+            textarea.rows = Math.max(parseInt(textarea.rows, 10) || 0, 8);
+        }
+    }
+
+    // Clean up temp file if user leaves the page without saving
+    var _catsFormSubmitting = false;
+    document.getElementById('addCandidateForm').addEventListener('submit', function() {
+        _catsFormSubmitting = true;
+    });
+    window.addEventListener('beforeunload', function() {
+        if (_catsFormSubmitting) return;
+        var tempFile = document.getElementById('documentTempFile');
+        var logID    = document.getElementById('aiParseLogID');
+        if ((tempFile && tempFile.value !== '') || (logID && logID.value !== '')) {
+            var url = 'index.php?m=candidates&a=removeDocumentTempFile&documentTempFile='
+                + encodeURIComponent(tempFile ? tempFile.value : '');
+            if (logID && logID.value !== '') {
+                url += '&aiParseLogID=' + encodeURIComponent(logID.value);
+            }
+            // Use sendBeacon for reliable delivery on page unload
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(url);
+            } else {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, false);
+                try { xhr.send(null); } catch(e) {}
+            }
+        }
+    });
+
+    adjustCandidateSummaryFields('addCandidateForm');
     document.addCandidateForm.firstName.focus();
     <?php if(isset($this->preassignedFields['email']) || isset($this->preassignedFields['email1'])): ?>
         checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['email'])) echo(urlencode($this->preassignedFields['email'])); else if(isset($this->preassignedFields['email1'])) echo(urlencode($this->preassignedFields['email1'])); ?>"));

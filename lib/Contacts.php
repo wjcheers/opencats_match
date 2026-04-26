@@ -1040,25 +1040,12 @@ class ContactsDataGrid extends DataGrid
                 "AND contact.owner = %s", $_SESSION['CATS']->getUserID()
             );
         }
-        if ($this->getMiscArgument() != 0)
-        {
-            $savedListID = (int) $this->getMiscArgument();
-            $joinSQL  .= ' INNER JOIN saved_list_entry
-                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_CONTACT.'
-                                    AND saved_list_entry.data_item_id = contact.contact_id
-                                    AND saved_list_entry.site_id = '.$this->_siteID.'
-                                    AND saved_list_entry.saved_list_id = '.$savedListID;
-        }
-        else
-        {
-            $joinSQL  .= ' LEFT JOIN saved_list_entry
-                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_CONTACT.'
-                                    AND saved_list_entry.data_item_id = contact.contact_id
-                                    AND saved_list_entry.site_id = '.$this->_siteID;
-        }
+        $savedListJoinData = $this->getSavedListJoinData($joinSQL);
+        $joinSQL = $savedListJoinData['joinSQL'];
+        $requiresGrouping = $savedListJoinData['requiresGrouping'];
 
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 contact.is_hot AS isHot,
                 contact.contact_id AS contactID,
                 contact.contact_id AS exportID,
@@ -1080,23 +1067,117 @@ class ContactsDataGrid extends DataGrid
             %s
             %s
             %s
-            GROUP BY contact.contact_id
+            %s
             %s
             %s
             %s",
-            $distinct,
+            ($this->useFoundRows() ? 'SQL_CALC_FOUND_ROWS ' : '') . $distinct,
             $selectSQL,
             $joinSQL,
             $this->_siteID,
             $userCriterion,
             (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
             $this->_assignedCriterion,
+            ($requiresGrouping ? 'GROUP BY contact.contact_id' : ''),
             (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : '',
             $orderSQL,
             $limitSQL
         );
 
         return $sql;
+    }
+
+    protected function useFoundRows()
+    {
+        return false;
+    }
+
+    protected function getCountSQL($joinSQL, $whereSQL, $havingSQL)
+    {
+        $userCriterion = '';
+        if ($_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_DELETE)
+        {
+            $userCriterion = sprintf(
+                "AND contact.owner = %s", $_SESSION['CATS']->getUserID()
+            );
+        }
+
+        $savedListJoinData = $this->getSavedListJoinData($joinSQL);
+        $joinSQL = $savedListJoinData['joinSQL'];
+        $requiresGrouping = $savedListJoinData['requiresGrouping'];
+
+        return sprintf(
+            "SELECT
+                COUNT(*) AS rowCount
+            FROM
+            (
+                SELECT
+                    contact.contact_id
+                FROM
+                    contact
+                LEFT JOIN company
+                    ON contact.company_id = company.company_id
+                LEFT JOIN user AS owner_user
+                    ON contact.owner = owner_user.user_id
+                %s
+                WHERE
+                    contact.site_id = %s
+                %s
+                %s
+                %s
+                %s
+                %s
+            ) AS contactCountQuery",
+            $joinSQL,
+            $this->_siteID,
+            $userCriterion,
+            (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
+            $this->_assignedCriterion,
+            ($requiresGrouping ? ' GROUP BY contact.contact_id' : ''),
+            (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : ''
+        );
+    }
+
+    private function hasVisibleColumn($columnName)
+    {
+        foreach ($this->_currentColumns as $data)
+        {
+            if (isset($data['name']) && $data['name'] == $columnName)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getSavedListJoinData($joinSQL)
+    {
+        $requiresGrouping = false;
+
+        if ($this->getMiscArgument() != 0)
+        {
+            $savedListID = (int) $this->getMiscArgument();
+            $joinSQL  .= ' INNER JOIN saved_list_entry
+                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_CONTACT.'
+                                    AND saved_list_entry.data_item_id = contact.contact_id
+                                    AND saved_list_entry.site_id = '.$this->_siteID.'
+                                    AND saved_list_entry.saved_list_id = '.$savedListID;
+            $requiresGrouping = true;
+        }
+        else if ($this->hasVisibleColumn('Added To List'))
+        {
+            $joinSQL  .= ' LEFT JOIN saved_list_entry
+                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_CONTACT.'
+                                    AND saved_list_entry.data_item_id = contact.contact_id
+                                    AND saved_list_entry.site_id = '.$this->_siteID;
+            $requiresGrouping = true;
+        }
+
+        return array(
+            'joinSQL' => $joinSQL,
+            'requiresGrouping' => $requiresGrouping
+        );
     }
 }
 

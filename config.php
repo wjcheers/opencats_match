@@ -27,14 +27,33 @@
  * $Id: config.php 3826 2007-12-10 06:03:18Z will $
  */
 
+/* Optional local overrides. This file should stay untracked. */
+$localConfig = array();
+$localConfigFile = dirname(__FILE__) . '/config.local.php';
+if (is_readable($localConfigFile))
+{
+    $localConfig = include($localConfigFile);
+    if (!is_array($localConfig))
+    {
+        $localConfig = array();
+    }
+}
+
 /* License key. */
 define('LICENSE_KEY','3163GQ-54ISGW-14E4SHD-ES9ICL-X02DTG-GYRSQ6');
 
 /* Database configuration. */
-define('DATABASE_USER', 'cats');
-define('DATABASE_PASS', 'password');
-define('DATABASE_HOST', 'localhost');
-define('DATABASE_NAME', 'cats');
+define('DATABASE_USER', isset($localConfig['DATABASE_USER']) ? $localConfig['DATABASE_USER'] : 'cats');
+define('DATABASE_PASS', isset($localConfig['DATABASE_PASS']) ? $localConfig['DATABASE_PASS'] : 'password');
+define('DATABASE_HOST', isset($localConfig['DATABASE_HOST']) ? $localConfig['DATABASE_HOST'] : 'localhost');
+define('DATABASE_NAME', isset($localConfig['DATABASE_NAME']) ? $localConfig['DATABASE_NAME'] : 'cats');
+
+/* OpenAI / AI resume parsing configuration. */
+define('ENABLE_AI_RESUME_PARSER', isset($localConfig['ENABLE_AI_RESUME_PARSER']) ? (bool) $localConfig['ENABLE_AI_RESUME_PARSER'] : false);
+define('OPENAI_API_KEY', isset($localConfig['OPENAI_API_KEY']) ? $localConfig['OPENAI_API_KEY'] : '');
+define('OPENAI_MODEL', isset($localConfig['OPENAI_MODEL']) ? $localConfig['OPENAI_MODEL'] : 'gpt-5.4-mini');
+define('OPENAI_BASE_URL', isset($localConfig['OPENAI_BASE_URL']) ? $localConfig['OPENAI_BASE_URL'] : 'https://api.openai.com/v1');
+define('OPENAI_TIMEOUT', isset($localConfig['OPENAI_TIMEOUT']) ? (int) $localConfig['OPENAI_TIMEOUT'] : 60);
 
 /* Resfly.com Resume Import Services Enabled */
 define('PARSING_ENABLED', false);
@@ -68,6 +87,9 @@ define('HTML2TEXT_PATH', "/usr/bin/html2text");
  * http://www.gnu.org/software/unrtf/unrtf.html
  */
 define('UNRTF_PATH', "/usr/bin/unrtf");
+
+/* docx2txt settings for Microsoft Word DOCX files. */
+define('DOCX2TXT_PATH', "/usr/bin/docx2txt");
 
 /* Temporary directory. Set this to a directory that is writable by the
  * web server. The default should be fine for most systems. Remember to
@@ -121,20 +143,12 @@ define('HTML_ENCODING', 'UTF-8');
 /* AJAX Encoding. */
 define('AJAX_ENCODING', 'UTF-8');
 
-/* Insert BOM in the beginning of CSV file */
-/* This is UTF-8 BOM, EF BB BF for UTF-8 */
-define('INSERT_BOM_CSV_LENGTH', '3');
-define('INSERT_BOM_CSV_1', '239');
-define('INSERT_BOM_CSV_2', '187');
-define('INSERT_BOM_CSV_3', '191');
-define('INSERT_BOM_CSV_4', '');
-
 /* Path to modules. */
 define('MODULES_PATH', './modules/');
 
 /* Unique session name. The only reason you might want to modify this is
  * for multiple CATS installations on one server. A-Z, 0-9 only! */
-define('CATS_SESSION_NAME', 'CATS');
+define('CATS_SESSION_NAME', isset($localConfig['CATS_SESSION_NAME']) ? $localConfig['CATS_SESSION_NAME'] : 'CATS');
 
 /* Subject line of e-mails sent to candidates via the career portal when they
  * apply for a job order.
@@ -163,7 +177,7 @@ define('FORGOT_PASSWORD_BODY',      'You recently requested that your CATS: Appl
 define('ENABLE_DEMO_MODE', false);
 
 /* Offset to GMT Time. */
-define('OFFSET_GMT', 8);
+define('OFFSET_GMT', 0);
 
 /* Should we enforce only one session per user (excluding demo)? */
 define('ENABLE_SINGLE_SESSION', false);
@@ -205,11 +219,17 @@ define('MAIL_SENDMAIL_PATH', "/usr/sbin/sendmail");
 define('MAIL_SMTP_HOST', "smtp.gmail.com");
 define('MAIL_SMTP_PORT', 465);
 define('MAIL_SMTP_AUTH', true);
-define('MAIL_SMTP_USER', "abc");
-define('MAIL_SMTP_PASS', "def");
+define('MAIL_SMTP_USER', isset($localConfig['MAIL_SMTP_USER']) ? $localConfig['MAIL_SMTP_USER'] : "");
+define('MAIL_SMTP_PASS', isset($localConfig['MAIL_SMTP_PASS']) ? $localConfig['MAIL_SMTP_PASS'] : "");
 
 /* Event reminder E-Mail Template. */
-$GLOBALS['eventReminderEmail'] = <<<EOF
+if (isset($localConfig['eventReminderEmail']))
+{
+    $GLOBALS['eventReminderEmail'] = $localConfig['eventReminderEmail'];
+}
+else
+{
+    $GLOBALS['eventReminderEmail'] = <<<EOF
 
 提醒您即將到來的活動。
 
@@ -224,6 +244,7 @@ https://www.catsone.com/index.php?m=calendar
 --
 CATS
 EOF;
+}
 
 /* Enable replication slave mode? This is probably only useful for the CATS
  * core team. If this setting is enabled, no writing to the database will

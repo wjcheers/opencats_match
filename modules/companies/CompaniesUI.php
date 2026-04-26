@@ -1203,11 +1203,21 @@ class CompaniesUI extends UserInterface
         }
 
         $companyID = $_GET['companyID'];
+        $companies = new Companies($this->_siteID);
+        $company = $companies->get($companyID);
+        $attachments = new Attachments($this->_siteID);
+        $attachmentsRS = $attachments->getAll(DATA_ITEM_COMPANY, $companyID);
+        $attachmentFileNames = ResultSetUtility::getColumnValues(
+            $attachmentsRS,
+            'originalFilename'
+        );
 
         if (!eval(Hooks::get('CLIENTS_CREATE_ATTACHMENT'))) return;
 
         $this->_template->assign('isFinishedMode', false);
         $this->_template->assign('companyID', $companyID);
+        $this->_template->assign('companyData', $company);
+        $this->_template->assign('attachmentFileNames', $attachmentFileNames);
         $this->_template->display(
             './modules/companies/CreateAttachmentModal.tpl'
         );
@@ -1231,6 +1241,49 @@ class CompaniesUI extends UserInterface
         }
 
         $companyID = $_POST['companyID'];
+        $fileType = $this->getTrimmedInput('fileType', $_POST);
+        if ($fileType == '')
+        {
+            CommonErrors::fatalModal(COMMONERROR_RECORDERROR, $this, 'Invalid attachment type.');
+        }
+
+        $filenameMode = $this->getTrimmedInput('filenameMode', $_POST);
+        if ($filenameMode != 'suggested' && $filenameMode != 'original' && $filenameMode != 'manual')
+        {
+            $filenameMode = 'suggested';
+        }
+
+        $suggestedFilename = $this->getTrimmedInput('suggestedFilename', $_POST);
+        if ($filenameMode == 'suggested' && $suggestedFilename == '')
+        {
+            CommonErrors::fatalModal(COMMONERROR_RECORDERROR, $this, 'Invalid suggested filename.');
+        }
+
+        $manualFilename = $this->getTrimmedInput('manualFilename', $_POST);
+        if ($filenameMode == 'manual' && $manualFilename == '')
+        {
+            CommonErrors::fatalModal(COMMONERROR_RECORDERROR, $this, 'Invalid manual filename.');
+        }
+
+        if (empty($_FILES['file']['name']))
+        {
+            CommonErrors::fatalModal(COMMONERROR_RECORDERROR, $this, 'You must select a file to upload.');
+        }
+
+        if ($filenameMode == 'suggested' || $filenameMode == 'manual')
+        {
+            $normalizedFilename = $this->buildAttachmentUploadFilename(
+                ($filenameMode == 'manual' ? $manualFilename : $suggestedFilename),
+                $_FILES['file']['name']
+            );
+
+            if ($normalizedFilename === false)
+            {
+                CommonErrors::fatalModal(COMMONERROR_RECORDERROR, $this, 'Invalid filename or unsupported file extension.');
+            }
+
+            $_FILES['file']['name'] = $normalizedFilename;
+        }
 
         if (!eval(Hooks::get('CLIENTS_ON_CREATE_ATTACHMENT_PRE'))) return;
 
@@ -1251,6 +1304,49 @@ class CompaniesUI extends UserInterface
         $this->_template->display(
             './modules/companies/CreateAttachmentModal.tpl'
         );
+    }
+
+    private function buildAttachmentUploadFilename($suggestedFilename, $originalFilename)
+    {
+        $suggestedFilename = trim((string) $suggestedFilename);
+        $originalFilename = trim((string) $originalFilename);
+
+        if ($suggestedFilename == '' || $originalFilename == '')
+        {
+            return false;
+        }
+
+        $extension = strtolower(FileUtility::getFileExtension($originalFilename));
+        $allowedExtensions = array('doc', 'docx', 'pdf', 'html', 'txt', 'md', 'jpg', 'png');
+
+        if ($extension == '' || !in_array($extension, $allowedExtensions))
+        {
+            return false;
+        }
+
+        $baseName = pathinfo($suggestedFilename, PATHINFO_FILENAME);
+        if ($baseName == '')
+        {
+            $baseName = $suggestedFilename;
+        }
+
+        $baseName = preg_replace('/[\/\\\\:\*\?"<>\|]+/', '_', $baseName);
+        $baseName = preg_replace('/\s+/', '_', $baseName);
+        $baseName = preg_replace('/_+/', '_', $baseName);
+        $baseName = trim($baseName, '._');
+
+        if ($baseName == '')
+        {
+            return false;
+        }
+
+        $finalFilename = $baseName . '.' . $extension;
+        if (strlen($finalFilename) > 255)
+        {
+            return false;
+        }
+
+        return $finalFilename;
     }
 
     /*

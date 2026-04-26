@@ -1,0 +1,341 @@
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans:400,700|Noto+Sans+TC:300,400,700|Noto+Sans+SC:300,400,700|Cormorant+Garamond:600,700');
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: #eef3f5;
+    color: #24323a;
+    font-family: 'Noto Sans', 'Noto Sans TC', 'Noto Sans SC', sans-serif;
+}
+
+body.resumePreviewBody {
+    min-width: 860px;
+}
+
+body.resumePreviewBody.showRawMarkdown .resumeRenderedView {
+    display: none;
+}
+
+body.resumePreviewBody.showRawMarkdown .resumeRawSource {
+    display: block;
+}
+
+.resumeToolbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: rgba(238, 243, 245, 0.94);
+    border-bottom: 1px solid #d7e1e6;
+    backdrop-filter: blur(10px);
+}
+
+.resumeToolbarTitle {
+    font-size: 14px;
+    color: #61737d;
+}
+
+.resumeToolbarActions {
+    display: flex;
+    gap: 10px;
+}
+
+.resumeToolbarButton {
+    display: inline-block;
+    padding: 9px 14px;
+    border: 1px solid #00a0b4;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #00828c;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.resumeToolbarButtonPrimary {
+    background: #00a0b4;
+    color: #ffffff;
+}
+
+.resumePreviewShell {
+    padding: 18px 22px 28px;
+}
+
+.resumeRenderedView {
+    display: block;
+}
+
+#write {
+    position: relative;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 34px 52px 44px 176px;
+    background: #ffffff;
+    box-shadow: 0 18px 40px rgba(30, 56, 67, 0.12);
+    font-size: 14px;
+    line-height: 1.8;
+    word-break: break-word;
+    overflow: hidden;
+}
+
+#write img {
+    max-width: 100%;
+}
+
+#write > div:first-child {
+    position: relative;
+    float: left;
+    width: 388px;
+    min-height: 138px;
+    margin: 6px 22px 24px -6px;
+    overflow: visible;
+}
+
+#write > div:first-child img {
+    display: block;
+    max-width: 272px;
+    margin: 0 auto;
+}
+
+#write div[title~="watermark"]:before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: -88px;
+    color: #ececec;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 82px;
+    font-weight: 700;
+    line-height: 0.88;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    -webkit-print-color-adjust: exact;
+    pointer-events: none;
+    white-space: pre;
+}
+
+#write div[title~="jecho"]:before {
+    content: "JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO JECHO";
+}
+
+#write div[title~="nbi-blind-resume"]:before {
+    content: "NBI NBI NBI NBI";
+    font-size: 48pt;
+}
+
+#write div[title~="eei-blind-resume"]:before {
+    content: "EEI EEI EEI EEI";
+    font-size: 48pt;
+}
+
+#write > table:first-of-type {
+    width: calc(100% - 410px);
+    margin: 0 0 24px 410px;
+    background: #f4f4f4;
+}
+
+#write > table:first-of-type th,
+#write > table:first-of-type td {
+    padding: 16px 28px;
+    border: none;
+    font-size: 22px;
+    line-height: 1.3;
+}
+
+#write > table:first-of-type th {
+    width: 31%;
+    color: #2b2b2b;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+}
+
+#write > table:first-of-type td {
+    color: #2b2b2b;
+    font-weight: 700;
+}
+
+#write > div[style*="border-bottom"] {
+    clear: both;
+    margin: 2px 0 48px !important;
+    padding-top: 0 !important;
+    border-bottom-color: #d9d9d9 !important;
+}
+
+#write h1,
+#write h2,
+#write h3,
+#write h4,
+#write h5,
+#write h6 {
+    color: #333333;
+    line-height: 1.35;
+}
+
+#write > h3 {
+    clear: both;
+    margin: 0 0 26px;
+    padding-left: 30px;
+    border-left: 6px solid #1aa7bf;
+    font-size: 2.35rem;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+#write > h4 {
+    display: inline-block;
+    margin: 20px 0 0;
+    padding: 2px 8px;
+    border: 1px solid #999999;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+#write > h4:before {
+    content: "\25F7";
+    padding-right: 5px;
+}
+
+#write > h5 {
+    margin: 0 0 0 25px;
+    padding-top: 15px;
+    font-size: 1.6rem;
+    font-weight: 400;
+}
+
+#write > h6 {
+    margin: 0 0 0 25px;
+    color: #00828c;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+#write > h4 ~ h5,
+#write > h4 ~ h6 {
+    padding-left: 25px;
+    border-left: 1px solid #cccccc;
+}
+
+#write > h3 + h5,
+#write > h3 + h6,
+#write > h3 + h5 ~ h5,
+#write > h3 + h5 + h6 ~ h5 + h6 {
+    margin-left: 0;
+    padding-left: 25px;
+    border-left: none;
+}
+
+#write p {
+    margin: 0 0 18px;
+    font-size: 18px;
+    line-height: 1.9;
+}
+
+#write ul {
+    margin: 0 0 28px 62px;
+    padding: 0;
+}
+
+#write li {
+    margin-bottom: 16px;
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+#write table {
+    width: 100%;
+    margin: 12px 0 32px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+#write th,
+#write td {
+    padding: 14px 24px;
+    border: 1px solid #dfe3e8;
+    vertical-align: top;
+    font-size: 18px;
+}
+
+#write thead th {
+    color: #2c3338;
+    font-weight: 700;
+    background: #f9fafb;
+}
+
+#write a {
+    color: #00828c;
+}
+
+.resumeRawSource {
+    display: none;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px 28px;
+    background: #1e2327;
+    color: #f5f7f8;
+    border-radius: 10px;
+    box-shadow: 0 12px 28px rgba(30, 56, 67, 0.18);
+    font: 13px/1.7 Menlo, Monaco, Consolas, monospace;
+    white-space: pre-wrap;
+}
+
+@media print {
+    html,
+    body,
+    body.resumePreviewBody {
+        background: #ffffff;
+        min-width: 0;
+    }
+
+    .resumeToolbar,
+    .resumeRawSource {
+        display: none !important;
+    }
+
+    .resumePreviewShell {
+        padding: 0;
+    }
+
+    #write {
+        max-width: 860px !important;
+        margin: 0 !important;
+        padding: 0 0 0 2cm !important;
+        box-shadow: none;
+    }
+
+    #write > div:first-child {
+        width: 220px;
+        min-height: 120px;
+        margin-right: 26px;
+    }
+
+    #write > table:first-of-type {
+        width: calc(100% - 246px);
+        margin-left: 246px;
+    }
+
+    #write div[title~="watermark"]:before {
+        top: -2px;
+        left: -54px;
+        font-size: 68px;
+    }
+
+    @page:first {
+        margin: 1.5cm 1cm 1.5cm 0;
+    }
+
+    @page {
+        size: A4 portrait;
+        margin: 1.5cm 1cm 1.5cm 0;
+    }
+}

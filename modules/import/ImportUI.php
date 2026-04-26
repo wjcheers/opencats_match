@@ -87,11 +87,11 @@ class ImportUI extends UserInterface
                 break;
 
             case 'showMassImport':
-                $this->showMassImport();
+                CATSUtility::transferRelativeURI('m=candidates&a=add');
                 break;
 
             case 'massImport':
-                $this->massImport();
+                CATSUtility::transferRelativeURI('m=candidates&a=add');
                 break;
 
             case 'massImportDocument':

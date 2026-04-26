@@ -62,6 +62,10 @@ function checkCreateAttachmentForm(form)
     var errorMessage = '';
 
     errorMessage += checkAttachmentFile();
+    errorMessage += checkAttachmentSuggestedFilename();
+    errorMessage += checkAttachmentManualFilename();
+    errorMessage += checkAttachmentCompanyRequirement();
+    errorMessage += checkAttachmentFilenameLength();
 
     if (errorMessage != '')
     {
@@ -387,6 +391,97 @@ function checkAttachmentFile()
     return errorMessage;
 }
 
+function checkAttachmentSuggestedFilename()
+{
+    var errorMessage = '';
+    var field = document.getElementById('suggestedFilename');
+    var originalMode = document.getElementById('filenameModeOriginal');
+
+    if (!field)
+    {
+        return errorMessage;
+    }
+
+    if ((originalMode && originalMode.checked) ||
+        (document.getElementById('filenameModeManual') && document.getElementById('filenameModeManual').checked))
+    {
+        return errorMessage;
+    }
+
+    if (field.value == '')
+    {
+        errorMessage = "    - You must enter a suggested filename.\n";
+    }
+
+    return errorMessage;
+}
+
+function checkAttachmentManualFilename()
+{
+    var errorMessage = '';
+    var manualMode = document.getElementById('filenameModeManual');
+    var field = document.getElementById('manualFilename');
+
+    if (!manualMode || !manualMode.checked || !field)
+    {
+        return errorMessage;
+    }
+
+    if (field.value == '')
+    {
+        errorMessage = "    - You must enter a manual filename.\n";
+    }
+
+    return errorMessage;
+}
+
+function checkAttachmentCompanyRequirement()
+{
+    var errorMessage = '';
+    var fileTypeField = document.getElementById('fileType');
+    var companyField = document.getElementById('attachmentCompany');
+    var companyLabel = document.getElementById('attachmentCompanyLabel');
+
+    if (!fileTypeField || !companyField || typeof attachmentNamingRules == 'undefined')
+    {
+        return errorMessage;
+    }
+
+    var rule = attachmentNamingRules[fileTypeField.value];
+    if (rule && rule.companyRequired && companyField.value.replace(/\s+/g, '') == '')
+    {
+        errorMessage = "    - You must enter a company for this file type.\n";
+        if (companyLabel)
+        {
+            companyLabel.style.color = '#ff0000';
+        }
+    }
+    else if (companyLabel)
+    {
+        companyLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+
+function checkAttachmentFilenameLength()
+{
+    var errorMessage = '';
+    var field = document.getElementById('finalFilename');
+
+    if (!field)
+    {
+        return errorMessage;
+    }
+
+    if (field.value.length > 255)
+    {
+        errorMessage = "    - Final filename must be 255 characters or fewer.\n";
+    }
+
+    return errorMessage;
+}
+
 function checkPhoneNumber()
 {
     var errorMessage = '';
@@ -504,5 +599,3 @@ function loadMailTemplate(no)
     }
     fieldLabel = document.getElementById('emailBodyLabel');
 }
-
-

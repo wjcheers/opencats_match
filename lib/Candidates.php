@@ -1153,6 +1153,39 @@ class Candidates
     }
 
     /**
+     * Returns whether the site has at least one candidate.
+     *
+     * @param boolean Include administratively hidden candidates?
+     * @return boolean True if at least one candidate exists.
+     */
+    public function hasAny($allowAdministrativeHidden = false)
+    {
+        if (!$allowAdministrativeHidden)
+        {
+            $adminHiddenCriterion = 'AND candidate.is_admin_hidden = 0';
+        }
+        else
+        {
+            $adminHiddenCriterion = '';
+        }
+
+        $sql = sprintf(
+            "SELECT
+                candidate.candidate_id
+            FROM
+                candidate
+            WHERE
+                candidate.site_id = %s
+            %s
+            LIMIT 1",
+            $this->_siteID,
+            $adminHiddenCriterion
+        );
+
+        return !empty($this->_db->getAssoc($sql));
+    }
+
+    /**
      * Returns the entire candidates list.
      *
      * @param boolean Include administratively hidden candidates?
@@ -1249,6 +1282,66 @@ class Candidates
     }
 
     /**
+     * Returns the first resume attachment ID for each candidate ID provided.
+     *
+     * @param array Candidate IDs.
+     * @return array Map of candidate ID => attachment ID.
+     */
+    public function getResumeIDsByCandidateIDs($candidateIDs)
+    {
+        if (empty($candidateIDs))
+        {
+            return array();
+        }
+
+        $candidateIDsValidated = array();
+        foreach ($candidateIDs as $candidateID)
+        {
+            $candidateID = (int) $candidateID;
+            if ($candidateID > 0)
+            {
+                $candidateIDsValidated[$candidateID] = $candidateID;
+            }
+        }
+
+        if (empty($candidateIDsValidated))
+        {
+            return array();
+        }
+
+        $sql = sprintf(
+            "SELECT
+                attachment.data_item_id AS candidateID,
+                MIN(attachment.attachment_id) AS attachmentID
+            FROM
+                attachment
+            WHERE
+                attachment.resume = 1
+            AND
+                attachment.data_item_type = %s
+            AND
+                attachment.site_id = %s
+            AND
+                attachment.data_item_id IN (%s)
+            GROUP BY
+                attachment.data_item_id",
+            DATA_ITEM_CANDIDATE,
+            $this->_siteID,
+            implode(',', $candidateIDsValidated)
+        );
+
+        $rs = $this->_db->getAllAssoc($sql);
+        $resumeIDsByCandidateID = array();
+
+        foreach ($rs as $row)
+        {
+            $resumeIDsByCandidateID[(int) $row['candidateID']] = (int) $row['attachmentID'];
+        }
+
+        return $resumeIDsByCandidateID;
+    }
+
+    /**
      * Returns a candidate resume attachment by attachment.
      *
      * @param integer Attachment ID.
@@ -1262,6 +1355,10 @@ class Candidates
                 attachment.attachment_id AS attachmentID,
                 attachment.data_item_id AS candidateID,
                 attachment.title AS title,
+                attachment.original_filename AS originalFilename,
+                attachment.stored_filename AS storedFilename,
+                attachment.content_type AS contentType,
+                attachment.directory_name AS directoryName,
                 attachment.text AS text,
                 candidate.first_name AS firstName,
                 candidate.last_name AS lastName
@@ -2136,35 +2233,14 @@ class CandidatesDataGrid extends DataGrid
      */
     public function getSQL($selectSQL, $joinSQL, $whereSQL, $havingSQL, $orderSQL, $limitSQL, $distinct = '')
     {
-        // FIXME: Factor out Session dependency.
-        if ($_SESSION['CATS']->isLoggedIn() && $_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_MULTI_SA)
-        {
-            $adminHiddenCriterion = 'AND candidate.is_admin_hidden = 0';
-        }
-        else
-        {
-            $adminHiddenCriterion = '';
-        }
+        $adminHiddenCriterion = $this->getAdministrativeHiddenCriterion();
 
-        if ($this->getMiscArgument() != 0)
-        {
-            $savedListID = (int) $this->getMiscArgument();
-            $joinSQL  .= ' INNER JOIN saved_list_entry
-                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_CANDIDATE.'
-                                    AND saved_list_entry.data_item_id = candidate.candidate_id
-                                    AND saved_list_entry.site_id = '.$this->_siteID.'
-                                    AND saved_list_entry.saved_list_id = '.$savedListID;
-        }
-        else
-        {
-            $joinSQL  .= ' LEFT JOIN saved_list_entry
-                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_CANDIDATE.'
-                                    AND saved_list_entry.data_item_id = candidate.candidate_id
-                                    AND saved_list_entry.site_id = '.$this->_siteID;         
-        }
+        $savedListJoinData = $this->getSavedListJoinData($joinSQL);
+        $joinSQL = $savedListJoinData['joinSQL'];
+        $requiresGrouping = $savedListJoinData['requiresGrouping'];
 
         $sql = sprintf(
-            "SELECT SQL_CALC_FOUND_ROWS %s
+            "SELECT %s
                 candidate.candidate_id AS candidateID,
                 candidate.candidate_id AS exportID,
                 candidate.is_hot AS isHot,
@@ -2185,23 +2261,146 @@ class CandidatesDataGrid extends DataGrid
             %s
             %s
             %s
-            GROUP BY candidate.candidate_id
+            %s
             %s
             %s
             %s",
-            $distinct,
+            ($this->useFoundRows() ? 'SQL_CALC_FOUND_ROWS ' : '') . $distinct,
             $selectSQL,
             $joinSQL,
             $this->_siteID,
             $adminHiddenCriterion,
             (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
             $this->_assignedCriterion,
+            ($requiresGrouping ? 'GROUP BY candidate.candidate_id' : ''),
             (strlen($havingSQL) > 0) ? ' HAVING ' . $havingSQL : '',
             $orderSQL,
             $limitSQL
         );
 
         return $sql;
+    }
+
+    /**
+     * Returns whether this datagrid should use FOUND_ROWS() for totals.
+     *
+     * @return boolean
+     */
+    protected function useFoundRows()
+    {
+        return false;
+    }
+
+    /**
+     * Returns a count SQL statement for the current candidate datagrid query.
+     *
+     * @param string SQL join clause
+     * @param string SQL where clause
+     * @param string SQL having clause
+     * @return string SQL statement
+     */
+    protected function getCountSQL($joinSQL, $whereSQL, $havingSQL)
+    {
+        $savedListJoinData = $this->getSavedListJoinData($joinSQL);
+        $joinSQL = $savedListJoinData['joinSQL'];
+        $requiresGrouping = $savedListJoinData['requiresGrouping'];
+
+        return sprintf(
+            "SELECT
+                COUNT(*) AS rowCount
+            FROM
+            (
+                SELECT
+                    candidate.candidate_id
+                FROM
+                    candidate
+                %s
+                WHERE
+                    candidate.site_id = %s
+                %s
+                %s
+                %s
+                %s
+                %s
+            ) AS candidateCountQuery",
+            $joinSQL,
+            $this->_siteID,
+            $this->getAdministrativeHiddenCriterion(),
+            (strlen($whereSQL) > 0) ? ' AND ' . $whereSQL : '',
+            $this->_assignedCriterion,
+            ($requiresGrouping ? ' GROUP BY candidate.candidate_id' : ''),
+            (strlen($havingSQL) > 0 ? ' HAVING ' . $havingSQL : '')
+        );
+    }
+
+    /**
+     * Returns true if a named column is currently visible in the datagrid.
+     *
+     * @param string column name
+     * @return boolean
+     */
+    private function hasVisibleColumn($columnName)
+    {
+        foreach ($this->_currentColumns as $data)
+        {
+            if (isset($data['name']) && $data['name'] == $columnName)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the administrative hidden criterion for candidate lists.
+     *
+     * @return string SQL criterion
+     */
+    private function getAdministrativeHiddenCriterion()
+    {
+        if ($_SESSION['CATS']->isLoggedIn() &&
+            $_SESSION['CATS']->getAccessLevel() < ACCESS_LEVEL_MULTI_SA)
+        {
+            return 'AND candidate.is_admin_hidden = 0';
+        }
+
+        return '';
+    }
+
+    /**
+     * Applies saved-list joins when needed and reports whether grouping is required.
+     *
+     * @param string SQL join clause
+     * @return array updated join SQL and grouping flag
+     */
+    private function getSavedListJoinData($joinSQL)
+    {
+        $requiresGrouping = false;
+
+        if ($this->getMiscArgument() != 0)
+        {
+            $savedListID = (int) $this->getMiscArgument();
+            $joinSQL  .= ' INNER JOIN saved_list_entry
+                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_CANDIDATE.'
+                                    AND saved_list_entry.data_item_id = candidate.candidate_id
+                                    AND saved_list_entry.site_id = '.$this->_siteID.'
+                                    AND saved_list_entry.saved_list_id = '.$savedListID;
+            $requiresGrouping = true;
+        }
+        else if ($this->hasVisibleColumn('Added To List'))
+        {
+            $joinSQL  .= ' LEFT JOIN saved_list_entry
+                                    ON saved_list_entry.data_item_type = '.DATA_ITEM_CANDIDATE.'
+                                    AND saved_list_entry.data_item_id = candidate.candidate_id
+                                    AND saved_list_entry.site_id = '.$this->_siteID;
+            $requiresGrouping = true;
+        }
+
+        return array(
+            'joinSQL' => $joinSQL,
+            'requiresGrouping' => $requiresGrouping
+        );
     }
 }
 

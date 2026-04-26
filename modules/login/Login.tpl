@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
     <head>
-        <title>CATS - Login</title>
+        <title><?php echo CATS_SESSION_NAME; ?> - Login</title>
         <meta http-equiv="Content-Type" content="text/html; charset=<?php echo(HTML_ENCODING); ?>" />
         <link rel="icon" href="images/favicon.ico" type="image/x-icon" />
         <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
@@ -17,7 +17,7 @@
     <!-- CATS_LOGIN -->
     <?php TemplateUtility::printPopupContainer(); ?>
         <div id="headerBlock">
-            <span id="mainLogo">C&nbsp;A&nbsp;T&nbsp;S</span><br />
+            <span id="mainLogo"><?php echo implode('&nbsp;', str_split(CATS_SESSION_NAME)); ?></span><br />
             <span id="subMainLogo">Applicant Tracking System</span>
         </div>
 
@@ -38,7 +38,7 @@
                         <img src="images/folder1_locked.jpg" width="64" height="64" alt="security" />
                     </div>
                     <br />
-                    <span>Welcome to CATS!</span><br />
+                    <span>Welcome to <?php echo CATS_SESSION_NAME; ?>!</span><br />
                     <span style="font-size: 10px;">Version <?php echo(CATSUtility::getVersion()); ?></span>
 
                     <?php if (ENABLE_DEMO_MODE && !($this->siteName != '' && $this->siteName != 'choose') || ($this->siteName == 'demo')): ?>

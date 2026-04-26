@@ -806,6 +806,50 @@
                     </td>
                 </tr>
             </table>
+
+            <?php if (!empty($this->aiParseDashboardData['enabled'])): ?>
+            <br />
+            <table border="0" width="1225">
+                <tr>
+                    <td width="420" valign="top">
+                        <table class="statisticsTable" width="400">
+                            <tr>
+                                <th align="left">AI Resume Usage</th>
+                                <th align="right">&nbsp;&nbsp;</th>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left"><a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showAIUsageReport&amp;period=today" target="_blank">Today</a></td>
+                                <td align="right"><?php $this->_($this->aiParseDashboardData['today']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="oddTableRow">
+                                <td align="left"><a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showAIUsageReport&amp;period=yesterday" target="_blank">Yesterday</a></td>
+                                <td align="right"><?php $this->_($this->aiParseDashboardData['yesterday']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left"><a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showAIUsageReport&amp;period=thisWeek" target="_blank">This Week</a></td>
+                                <td align="right"><?php $this->_($this->aiParseDashboardData['thisWeek']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="oddTableRow">
+                                <td align="left"><a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showAIUsageReport&amp;period=lastWeek" target="_blank">Last Week</a></td>
+                                <td align="right"><?php $this->_($this->aiParseDashboardData['lastWeek']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left"><a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showAIUsageReport&amp;period=thisMonth" target="_blank">This Month</a></td>
+                                <td align="right"><?php $this->_($this->aiParseDashboardData['thisMonth']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="oddTableRow">
+                                <td align="left"><a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showAIUsageReport&amp;period=lastMonth" target="_blank">Last Month</a></td>
+                                <td align="right"><?php $this->_($this->aiParseDashboardData['lastMonth']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
+                                <td align="left"><a href="<?php echo(CATSUtility::getIndexName()); ?>?m=reports&amp;a=showAIUsageReport&amp;period=toDate" target="_blank">To Date</a></td>
+                                <td align="right"><?php $this->_($this->aiParseDashboardData['toDate']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <?php endif; ?>
         </div>
     </div>
     <div id="bottomShadow"></div>

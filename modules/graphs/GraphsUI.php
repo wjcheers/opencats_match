@@ -70,6 +70,19 @@ class GraphsUI extends UserInterface
     }
 
 
+    private function prepareGraphOutput()
+    {
+        if (ob_get_level() < 1)
+        {
+            ob_start();
+        }
+        else if (ob_get_length() !== false && ob_get_length() > 0)
+        {
+            @ob_clean();
+        }
+    }
+
+
     public function handleRequest()
     {
         $action = $this->getAction();
@@ -143,6 +156,7 @@ class GraphsUI extends UserInterface
 
         if (!eval(Hooks::get('GRAPH_TEST'))) return;
 
+        $this->prepareGraphOutput();
         $graph->draw();
         die();
     }
@@ -184,6 +198,7 @@ class GraphsUI extends UserInterface
 
         if (!eval(Hooks::get('GRAPH_JOB_ORDER_REPORT'))) return;
 
+        $this->prepareGraphOutput();
         $graph->draw(IMG_JPG);
         die();
     }
@@ -241,6 +256,7 @@ class GraphsUI extends UserInterface
 
         if (!eval(Hooks::get('GRAPH_WEEKLY_ACTIVITY'))) return;
 
+        $this->prepareGraphOutput();
         $graph->draw();
         die();
     }
@@ -296,6 +312,7 @@ class GraphsUI extends UserInterface
 
         if (!eval(Hooks::get('GRAPH_NEW_CANDIDATES'))) return;
 
+        $this->prepareGraphOutput();
         $graph->draw();
         die();
     }
@@ -350,6 +367,7 @@ class GraphsUI extends UserInterface
 
         if (!eval(Hooks::get('GRAPH_NEW_JOB_ORDERS'))) return;
 
+        $this->prepareGraphOutput();
         $graph->draw();
         die();
     }
@@ -381,6 +399,7 @@ class GraphsUI extends UserInterface
 
         if (!eval(Hooks::get('GRAPH_GENERIC'))) return;
 
+        $this->prepareGraphOutput();
         $graph->draw();
         die();
     }
@@ -397,6 +416,7 @@ class GraphsUI extends UserInterface
 
         if (!eval(Hooks::get('GRAPH_GENERIC_PIE'))) return;
 
+        $this->prepareGraphOutput();
         $graph->draw();
         die();
     }
@@ -457,6 +477,7 @@ class GraphsUI extends UserInterface
             $y, $x, $colorArray, $this->width, $this->height, "Submissions", "Interviews", "Hires", $view, $noData
         );
         
+        $this->prepareGraphOutput();
         $graph->draw();
         die();
     }
@@ -529,6 +550,7 @@ class GraphsUI extends UserInterface
 
         if (!eval(Hooks::get('GRAPH_MINI_PIPELINE'))) return;
 
+        $this->prepareGraphOutput();
         $graph->draw();
         die();
     }
@@ -584,6 +606,7 @@ class GraphsUI extends UserInterface
 
         if (!eval(Hooks::get('GRAPH_NEW_SUBMISSIONS'))) return;
 
+        $this->prepareGraphOutput();
         $graph->draw();
         die();
     }
@@ -609,6 +632,7 @@ class GraphsUI extends UserInterface
         }
 
         $graph = new WordVerify($text);
+        $this->prepareGraphOutput();
         $graph->draw();
 
         die();

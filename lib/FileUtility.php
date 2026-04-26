@@ -62,7 +62,11 @@ class FileUtility
     {
         $fileExtension = self::getFileExtension($filename);
 
-        if ($contentType === 'text/plain' || $fileExtension == 'txt')
+        if ($contentType === 'text/plain' ||
+            $contentType === 'text/markdown' ||
+            $contentType === 'text/x-markdown' ||
+            $fileExtension == 'txt' ||
+            $fileExtension == 'md')
         {
             return DOCUMENT_TYPE_TEXT;
         }
@@ -78,7 +82,8 @@ class FileUtility
             return DOCUMENT_TYPE_DOC;
         }
 
-        if ($contentType == 'application/vnd.ms-word.document.12' ||
+        if ($contentType == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+            $contentType == 'application/vnd.ms-word.document.12' ||
             $fileExtension == 'docx')
         {
             return DOCUMENT_TYPE_DOCX;

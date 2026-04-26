@@ -37,6 +37,7 @@
 /*************** ADD NEW TASKS HERE (scheduling is set inside the task) ****************/
 
 QueueProcessor::registerRecurringTask('./modules/queue/tasks/CleanExceptions.php');
+QueueProcessor::registerRecurringTask('./modules/queue/tasks/CleanJechoAIReports.php');
 
 // Sphinx task for updating deltas, rebuilding of the index, etc.
 if (ENABLE_SPHINX)

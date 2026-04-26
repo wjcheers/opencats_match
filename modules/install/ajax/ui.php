@@ -387,6 +387,35 @@ switch ($action)
                 </script>';
         }
 
+        if (!defined('DOCX2TXT_PATH') || DOCX2TXT_PATH == '')
+        {
+            echo '
+                <script type="text/javascript">
+                    document.getElementById(\'docxEnabled\').checked = false;
+                    document.getElementById(\'docxExecutable\').disabled = true;
+                    document.getElementById(\'docxExecutable\').value = \'\';
+                    document.getElementById(\'docxExecutableOrg\').value = \'\';
+                </script>';
+        }
+        else
+        {
+            $docx2txtWithSlashes = str_replace('\\', '\\\\', DOCX2TXT_PATH);
+
+            include_once ('lib/SystemUtility.php');
+            if (strpos(strtolower($docx2txtWithSlashes), "c:\\") === 0 && !SystemUtility::isWindows())
+            {
+                $docx2txtWithSlashes = '/usr/bin/docx2txt';
+            }
+
+            echo '
+                <script type="text/javascript">
+                    document.getElementById(\'docxEnabled\').checked = true;
+                    document.getElementById(\'docxExecutable\').disabled = false;
+                    document.getElementById(\'docxExecutable\').value = \'' . $docx2txtWithSlashes . '\';
+                    document.getElementById(\'docxExecutableOrg\').value = \'' . $docx2txtWithSlashes . '\';
+                </script>';
+        }
+
         echo '<script type="text/javascript">showTextBlock(\'resumeParsing\');</script>';
         break;
 
@@ -413,6 +442,10 @@ switch ($action)
         $unrtfWithSlashes = str_replace('\\', '\\\\', $unrtfPath);
         CATSUtility::changeConfigSetting('UNRTF_PATH', '"' . $unrtfWithSlashes . '"');
 
+        $docx2txtPath = $_REQUEST['docxExecutable'];
+        $docx2txtWithSlashes = str_replace('\\', '\\\\', $docx2txtPath);
+        CATSUtility::changeConfigSetting('DOCX2TXT_PATH', '"' . $docx2txtWithSlashes . '"');
+
         break;
 
     case 'testResumeParsing2':
@@ -426,6 +459,7 @@ switch ($action)
 
         $antiwordResults = !(ANTIWORD_PATH != '' && !InstallationTests::checkAntiword());
         $pdftotextResults = !(PDFTOTEXT_PATH != '' && !InstallationTests::checkPdftotext());
+        $docx2txtResults = !(defined('DOCX2TXT_PATH') && DOCX2TXT_PATH != '' && !InstallationTests::checkDocx2txt());
         $html2textResults = !(HTML2TEXT_PATH != '' && !InstallationTests::checkHtml2text());
         if (UNRTF_PATH != '' && !$html2textResults)
         {
@@ -437,7 +471,7 @@ switch ($action)
             $unrtfResults = !(UNRTF_PATH != '' && !InstallationTests::checkUnrtf());
         }
 
-        if (!$antiwordResults || !$pdftotextResults)
+        if (!$antiwordResults || !$pdftotextResults || !$docx2txtResults)
         {
             echo '<script type="text/javascript">showTextBlock(\'testFailed\');</script>';
         }

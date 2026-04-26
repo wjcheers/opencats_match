@@ -37,7 +37,7 @@
                             </select>&nbsp;
                             <input type="text" class="inputbox" id="searchText" name="wildCardString" value="<?php if (!empty($this->wildCardString)) $this->_($this->wildCardString); ?>" style="width:550px" />&nbsp;*&nbsp;
                             <input type="submit" class="button" id="searchCandidates" name="searchCandidates" value="Search" />
-                            <?php TemplateUtility::printAdvancedSearch('searchByKeySkills,searchByResume'); ?>
+                            <?php TemplateUtility::printAdvancedSearch('searchByKeySkills,searchByResume,searchByKeywords'); ?>
                         </form>
                     </td>
                 </tr>
@@ -125,7 +125,7 @@
                                     </td>
                                 <?php endif; ?>
                                 <td valign="top">
-                                    <a href="#" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=viewResume&amp;wildCardString=<?php $this->_(urlencode($this->wildCardString)); ?>&amp;attachmentID=<?php $this->_($data['attachmentID']); ?>', 'viewResume', 'scrollbars=1,width=700,height=600')">
+                                    <a href="#" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=viewResume&amp;wildCardString=<?php $this->_(urlencode($this->wildCardString)); ?>&amp;attachmentID=<?php $this->_($data['attachmentID']); ?>', 'viewResume', 'scrollbars=1,resizable=1,width=1260,height=980'); return false;">
                                         <img src="images/resume_preview_inline.gif" class="abstop" alt="(Preview)" border="0" width="15" height="15" />
                                     </a>&nbsp;
                                     <?php echo($data['excerpt']); ?>
@@ -212,7 +212,7 @@
                                 </td>
                                 <td>
                                     <?php if (isset($data['resumeID'])): ?>
-                                        <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=viewResume&amp;wildCardString=<?php $this->_(urlencode($this->wildCardString)); ?>&amp;attachmentID=<?php $this->_($data['resumeID']); ?>', 'viewResume', 'scrollbars=1,width=700,height=600')" Title="View resume">
+                                        <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=viewResume&amp;wildCardString=<?php $this->_(urlencode($this->wildCardString)); ?>&amp;attachmentID=<?php $this->_($data['resumeID']); ?>', 'viewResume', 'scrollbars=1,resizable=1,width=1260,height=980')" Title="View resume">
                                             <img src="images/resume_preview_inline.gif" class="abstop" alt="(Preview)" border="0" width="15" height="15" />
                                         </a>
                                     <?php endif; ?>
@@ -292,7 +292,7 @@
                                 </td>
                                 <td>
                                     <?php if (isset($data['resumeID'])): ?>
-                                        <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=viewResume&amp;wildCardString=<?php $this->_(urlencode($this->wildCardString)); ?>&amp;attachmentID=<?php $this->_($data['resumeID']); ?>', 'viewResume', 'scrollbars=1,width=700,height=600')" Title="View resume">
+                                        <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=viewResume&amp;wildCardString=<?php $this->_(urlencode($this->wildCardString)); ?>&amp;attachmentID=<?php $this->_($data['resumeID']); ?>', 'viewResume', 'scrollbars=1,resizable=1,width=1260,height=980')" Title="View resume">
                                             <img src="images/resume_preview_inline.gif" class="abstop" alt="(Preview)" border="0" width="15" height="15" />
                                         </a>
                                     <?php endif; ?>

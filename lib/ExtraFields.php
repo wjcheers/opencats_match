@@ -613,12 +613,14 @@ class ExtraFields
      *
      * @return array extra fields
      */
-    public function getValuesForAdd()
+    public function getValuesForAdd($preassignedByName = array())
     {
         $extraFields = $this->getSettings();
-        
+
         foreach ($extraFields as $index => $data)
         {
+            $preassignedValue = isset($preassignedByName[$data['fieldName']]) ? $preassignedByName[$data['fieldName']] : '';
+
             switch ($data['extraFieldType'])
             {
                 case EXTRA_FIELD_CHECKBOX:
@@ -627,13 +629,13 @@ class ExtraFields
                         <input type="hidden" id="extraField'.$index.'" name="extraField'.$index.'" />
                     ';
                 break;
-                
+
                 case EXTRA_FIELD_TEXTAREA:
                     $extraFields[$index]['addHTML'] = '
-                        <textarea id="extraField'.$index.'" class="inputbox" name="extraField'.$index.'" style="width: 150px;" ></textarea>
+                        <textarea id="extraField'.$index.'" class="inputbox" name="extraField'.$index.'" style="width: 150px;" >'.htmlspecialchars($preassignedValue).'</textarea>
                     ';
                     $extraFields[$index]['careersAddHTML'] = '
-                        <textarea id="extraField'.$index.'" class="inputBoxArea" name="extraField'.$index.'"></textarea>
+                        <textarea id="extraField'.$index.'" class="inputBoxArea" name="extraField'.$index.'">'.htmlspecialchars($preassignedValue).'</textarea>
                     ';
                 break;
                 
@@ -683,15 +685,15 @@ class ExtraFields
                 case EXTRA_FIELD_TEXT:
                 default:
                     $extraFields[$index]['addHTML'] = '
-                        <input id="extraField'.$index.'" class="inputbox" name="extraField'.$index.'" style="width: 150px;"  />
+                        <input id="extraField'.$index.'" class="inputbox" name="extraField'.$index.'" style="width: 150px;" value="'.htmlspecialchars($preassignedValue).'" />
                     ';
                     $extraFields[$index]['careersAddHTML'] = '
-                        <input id="extraField'.$index.'" class="inputBoxNormal" name="extraField'.$index.'"/>
+                        <input id="extraField'.$index.'" class="inputBoxNormal" name="extraField'.$index.'" value="'.htmlspecialchars($preassignedValue).'"/>
                     ';
                 break;
             }
         }
-        
+
         return $extraFields;
     }    
     
