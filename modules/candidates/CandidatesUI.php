@@ -1086,6 +1086,8 @@ class CandidatesUI extends UserInterface
             if (isset($_POST['parseDocument']) && $_POST['parseDocument'] == 'true' && $contents != '')
             {
                 $parseSourceType = (isset($_POST['documentTempFile']) && $_POST['documentTempFile'] != '') ? 'upload' : 'paste';
+                $parseContext = (isset($_POST['candidateID']) && $_POST['candidateID'] != '') ? 'edit' : 'add';
+                $parseSourceType = $parseContext . '_' . $parseSourceType;
                 $parseFileName = '';
                 if (isset($fields['aiOriginalFileName']) && $fields['aiOriginalFileName'] != '')
                 {
@@ -1379,7 +1381,7 @@ class CandidatesUI extends UserInterface
             }
         }
 
-        if ($sourceType == 'paste')
+        if ($sourceType == 'paste' || substr($sourceType, -6) == '_paste')
         {
             return 'txt';
         }

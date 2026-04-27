@@ -1054,6 +1054,18 @@ class ReportsUI extends UserInterface
             case 'paste':
                 return 'Parse Resume (Paste)';
 
+            case 'add_upload':
+                return 'Add Candidate Parse (Upload)';
+
+            case 'add_paste':
+                return 'Add Candidate Parse (Paste)';
+
+            case 'edit_upload':
+                return 'Edit Candidate Parse (Upload)';
+
+            case 'edit_paste':
+                return 'Edit Candidate Parse (Paste)';
+
             case 'jecho_report':
                 return 'Generate Jecho Report';
 
