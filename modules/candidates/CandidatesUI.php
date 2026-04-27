@@ -922,6 +922,9 @@ class CandidatesUI extends UserInterface
                 'firstName'       => $this->getTrimmedInput('firstName', $_POST),
                 'middleName'      => $this->getTrimmedInput('middleName', $_POST),
                 'lastName'        => $this->getTrimmedInput('lastName', $_POST),
+                'isActive'        => $this->isChecked('isActive', $_POST) ? 1 : 0,
+                'isHot'           => $this->isChecked('isHot', $_POST) ? 1 : 0,
+                'owner'           => $this->getTrimmedInput('owner', $_POST),
                 'email1'          => $this->getTrimmedInput('email1', $_POST),
                 'email2'          => $this->getTrimmedInput('email2', $_POST),
                 'phoneHome'       => $this->getTrimmedInput('phoneHome', $_POST),
@@ -937,7 +940,7 @@ class CandidatesUI extends UserInterface
                 'currentPay'      => $this->getTrimmedInput('currentPay', $_POST),
                 'desiredPay'      => $this->getTrimmedInput('desiredPay', $_POST),
                 'notes'           => $this->getTrimmedInput('notes', $_POST),
-                'canRelocate'     => $this->getTrimmedInput('canRelocate', $_POST),
+                'canRelocate'     => $this->isChecked('canRelocate', $_POST) ? 1 : 0,
                 'webSite'         => $this->getTrimmedInput('webSite', $_POST),
                 'bestTimeToCall'  => $this->getTrimmedInput('bestTimeToCall', $_POST),
                 'gender'          => $this->getTrimmedInput('gender', $_POST),
@@ -946,9 +949,28 @@ class CandidatesUI extends UserInterface
                 'disability'      => $this->getTrimmedInput('disability', $_POST),
                 'chineseName'     => $this->getTrimmedInput('chineseName', $_POST),
                 'jobTitle'        => $this->getTrimmedInput('jobTitle', $_POST),
+                'extraGender'     => $this->getTrimmedInput('extraGender', $_POST),
+                'maritalStatus'   => $this->getTrimmedInput('maritalStatus', $_POST),
+                'birthYear'       => $this->getTrimmedInput('birthYear', $_POST),
+                'highestDegree'   => $this->getTrimmedInput('highestDegree', $_POST),
                 'functions'       => $this->getTrimmedInput('functions', $_POST),
                 'jobLevel'        => $this->getTrimmedInput('jobLevel', $_POST),
                 'major'           => $this->getTrimmedInput('major', $_POST),
+                'nationality'     => $this->getTrimmedInput('nationality', $_POST),
+                'facebook'        => $this->getTrimmedInput('facebook', $_POST),
+                'github'          => $this->getTrimmedInput('github', $_POST),
+                'linkedin'        => $this->getTrimmedInput('linkedin', $_POST),
+                'googleplus'      => $this->getTrimmedInput('googleplus', $_POST),
+                'twitter'         => $this->getTrimmedInput('twitter', $_POST),
+                'cakeresume'      => $this->getTrimmedInput('cakeresume', $_POST),
+                'link1'           => $this->getTrimmedInput('link1', $_POST),
+                'link2'           => $this->getTrimmedInput('link2', $_POST),
+                'link3'           => $this->getTrimmedInput('link3', $_POST),
+                'line'            => $this->getTrimmedInput('line', $_POST),
+                'qq'              => $this->getTrimmedInput('qq', $_POST),
+                'skype'           => $this->getTrimmedInput('skype', $_POST),
+                'wechat'          => $this->getTrimmedInput('wechat', $_POST),
+                'dateAvailable'   => $this->getTrimmedInput('dateAvailable', $_POST),
                 'documentTempFile'=> $this->getTrimmedInput('documentTempFile', $_POST),
                 'aiParseLogID'    => $this->getTrimmedInput('aiParseLogID', $_POST),
                 'aiDocumentLanguage' => $this->getTrimmedInput('aiDocumentLanguage', $_POST),
@@ -991,9 +1013,12 @@ class CandidatesUI extends UserInterface
 
                 if ($newFileName !== false)
                 {
-                    // New file uploaded — reset previously AI-parsed notes so they don't
+                    // New file uploaded on add — reset previously AI-parsed notes so they don't
                     // accumulate across multiple parses on the same add page.
-                    $fields['notes'] = '';
+                    if (!isset($_POST['candidateID']) || $_POST['candidateID'] == '')
+                    {
+                        $fields['notes'] = '';
+                    }
 
                     // Get the relative path to the file (to perform operations on)
                     $newFilePath = FileUtility::getUploadFilePath(
@@ -1078,32 +1103,58 @@ class CandidatesUI extends UserInterface
                     $parseFileName
                 );
 
-        if ($aiResult !== false)
-        {
-            if (isset($fields['notes']) && trim($fields['notes']) != '' &&
-                isset($aiResult['notes']) && trim($aiResult['notes']) != '')
-            {
-                $aiResult['notes'] = trim($fields['notes']) . "\n\n" . trim($aiResult['notes']);
-            }
-            $fields = array_merge($fields, $aiResult);
-        }
+                $isEditParse = isset($_POST['candidateID']) && $_POST['candidateID'] != '';
+
+                if ($aiResult !== false)
+                {
+                    if ($isEditParse)
+                    {
+                        $fields['aiSuggestedFields'] = $this->filterCandidateAIParseSuggestions($aiResult);
+                        foreach (array('aiParseLogID', 'aiDocumentLanguage', 'aiParseError', 'aiResumeExtension') as $aiMetaField)
+                        {
+                            if (isset($aiResult[$aiMetaField]))
+                            {
+                                $fields[$aiMetaField] = $aiResult[$aiMetaField];
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (isset($fields['notes']) && trim($fields['notes']) != '' &&
+                            isset($aiResult['notes']) && trim($aiResult['notes']) != '')
+                        {
+                            $aiResult['notes'] = trim($fields['notes']) . "\n\n" . trim($aiResult['notes']);
+                        }
+                        $fields = array_merge($fields, $aiResult);
+                    }
+                }
                 else
                 {
                     $pu = new ParseUtility();
                     if ($res = $pu->documentParse('untitled', strlen($contents), '', $contents))
                     {
-                        if (isset($res['first_name'])) $fields['firstName'] = $res['first_name']; else $fields['firstName'] = '';
-                        if (isset($res['last_name'])) $fields['lastName'] = $res['last_name']; else $fields['lastName'] = '';
-                        $fields['middleName'] = '';
-                        if (isset($res['email_address'])) $fields['email1'] = $res['email_address']; else $fields['email1'] = '';
-                        $fields['email2'] = '';
-                        if (isset($res['us_address'])) $fields['address'] = $res['us_address']; else $fields['address'] = '';
-                        if (isset($res['city'])) $fields['city'] = $res['city']; else $fields['city'] = '';
-                        if (isset($res['state'])) $fields['state'] = $res['state']; else $fields['state'] = '';
-                        if (isset($res['zip_code'])) $fields['zip'] = $res['zip_code']; else $fields['zip'] = '';
-                        if (isset($res['phone_number'])) $fields['phoneHome'] = $res['phone_number']; else $fields['phoneHome'] = '';
-                        $fields['phoneWork'] = $fields['phoneCell'] = '';
-                        if (isset($res['skills'])) $fields['keySkills'] = str_replace("\n", ' ', str_replace('"', '\'\'', $res['skills']));
+                        $parsedFields = array();
+                        if (isset($res['first_name'])) $parsedFields['firstName'] = $res['first_name']; else $parsedFields['firstName'] = '';
+                        if (isset($res['last_name'])) $parsedFields['lastName'] = $res['last_name']; else $parsedFields['lastName'] = '';
+                        $parsedFields['middleName'] = '';
+                        if (isset($res['email_address'])) $parsedFields['email1'] = $res['email_address']; else $parsedFields['email1'] = '';
+                        $parsedFields['email2'] = '';
+                        if (isset($res['us_address'])) $parsedFields['address'] = $res['us_address']; else $parsedFields['address'] = '';
+                        if (isset($res['city'])) $parsedFields['city'] = $res['city']; else $parsedFields['city'] = '';
+                        if (isset($res['state'])) $parsedFields['state'] = $res['state']; else $parsedFields['state'] = '';
+                        if (isset($res['zip_code'])) $parsedFields['zip'] = $res['zip_code']; else $parsedFields['zip'] = '';
+                        if (isset($res['phone_number'])) $parsedFields['phoneHome'] = $res['phone_number']; else $parsedFields['phoneHome'] = '';
+                        $parsedFields['phoneWork'] = $parsedFields['phoneCell'] = '';
+                        if (isset($res['skills'])) $parsedFields['keySkills'] = str_replace("\n", ' ', str_replace('"', '\'\'', $res['skills']));
+
+                        if ($isEditParse)
+                        {
+                            $fields['aiSuggestedFields'] = $this->filterCandidateAIParseSuggestions($parsedFields);
+                        }
+                        else
+                        {
+                            $fields = array_merge($fields, $parsedFields);
+                        }
                     }
                 }
 
@@ -1218,6 +1269,32 @@ class CandidatesUI extends UserInterface
         }
 
         return $mapped;
+    }
+
+    private function filterCandidateAIParseSuggestions($fields)
+    {
+        $suggestedFields = array();
+        $candidateFieldNames = array(
+            'firstName', 'middleName', 'lastName', 'chineseName', 'nationality',
+            'email1', 'email2', 'phoneHome', 'phoneCell', 'phoneWork',
+            'webSite', 'facebook', 'linkedin', 'github', 'googleplus',
+            'twitter', 'cakeresume', 'link1', 'link2', 'link3',
+            'address', 'city', 'state', 'zip', 'source', 'currentEmployer',
+            'jobTitle', 'currentPay', 'desiredPay', 'keySkills', 'extraGender',
+            'maritalStatus', 'birthYear', 'highestDegree', 'major', 'line',
+            'qq', 'skype', 'wechat', 'functions', 'jobLevel',
+            'aiCareerSummary', 'aiSkillSummary', 'notes'
+        );
+
+        foreach ($candidateFieldNames as $fieldName)
+        {
+            if (isset($fields[$fieldName]) && trim((string) $fields[$fieldName]) != '')
+            {
+                $suggestedFields[$fieldName] = $fields[$fieldName];
+            }
+        }
+
+        return $suggestedFields;
     }
 
     private function buildAINotesFromResult($result)
@@ -1403,15 +1480,16 @@ class CandidatesUI extends UserInterface
     /*
      * Called by handleRequest() to process loading the edit page.
      */
-    private function edit()
+    private function edit($contents = '', $fields = array())
     {
         /* Bail out if we don't have a valid candidate ID. */
-        if (!$this->isRequiredIDValid('candidateID', $_GET))
+        $request = count($fields) > 0 ? $_POST : $_GET;
+        if (!$this->isRequiredIDValid('candidateID', $request))
         {
             CommonErrors::fatal(COMMONERROR_BADINDEX, $this, 'Invalid candidate ID.');
         }
 
-        $candidateID = $_GET['candidateID'];
+        $candidateID = $request['candidateID'];
 
         $candidates = new Candidates($this->_siteID);
         $data = $candidates->getForEditing($candidateID);
@@ -1426,6 +1504,25 @@ class CandidatesUI extends UserInterface
         {
             $this->listByView('This candidate is hidden - only a CATS Administrator can unlock the candidate.');
             return;
+        }
+
+        $aiSuggestedFields = array();
+        if (isset($fields['aiSuggestedFields']) && is_array($fields['aiSuggestedFields']))
+        {
+            $aiSuggestedFields = $fields['aiSuggestedFields'];
+            unset($fields['aiSuggestedFields']);
+        }
+
+        if (count($fields) > 0)
+        {
+            foreach ($fields as $fieldName => $fieldValue)
+            {
+                $data[$fieldName] = $fieldValue;
+            }
+            if (isset($fields['email']) && !isset($fields['email1']))
+            {
+                $data['email1'] = $fields['email'];
+            }
         }
 
         $users = new Users($this->_siteID);
@@ -1487,6 +1584,21 @@ class CandidatesUI extends UserInterface
         {
             $data['dateAvailableMDY'] = $data['dateAvailable'];
         }
+        if (isset($fields['dateAvailable']))
+        {
+            $data['dateAvailableMDY'] = $fields['dateAvailable'];
+        }
+
+        $aiResumeParser = new AIResumeParser();
+        $isParsingEnabled = (LicenseUtility::isParsingEnabled() || $aiResumeParser->isEnabled());
+        $parsingStatus = LicenseUtility::getParsingStatus();
+        if (!is_array($parsingStatus))
+        {
+            $parsingStatus = array(
+                'parseLimit' => -1,
+                'parseUsed' => 0
+            );
+        }
 
         if (!eval(Hooks::get('CANDIDATE_EDIT'))) return;
 
@@ -1504,6 +1616,10 @@ class CandidatesUI extends UserInterface
         $this->_template->assign('canEmail', $canEmail);
         $this->_template->assign('EEOSettingsRS', $EEOSettingsRS);
         $this->_template->assign('emailTemplateDisabled', $emailTemplateDisabled);
+        $this->_template->assign('isParsingEnabled', $isParsingEnabled);
+        $this->_template->assign('parsingStatus', $parsingStatus);
+        $this->_template->assign('contents', $contents);
+        $this->_template->assign('aiSuggestedFields', $aiSuggestedFields);
         $this->_template->display('./modules/candidates/Edit.tpl');
     }
 
@@ -1524,6 +1640,11 @@ class CandidatesUI extends UserInterface
         {
             CommonErrors::fatalModal(COMMONERROR_BADINDEX, $this, 'Invalid candidate ID.');
             return;
+        }
+
+        if (is_array($mp = $this->checkParsingFunctions()))
+        {
+            return $this->edit($mp[0], $mp[1]);
         }
 
         /* Bail out if we don't have a valid owner user ID. */
@@ -1779,11 +1900,113 @@ class CandidatesUI extends UserInterface
 
         $candidates->updatePossibleSources($sourcesDifferences);
 
+        $this->attachParsedResumeToCandidate($candidateID);
+
+        $aiParseLogID = $this->getTrimmedInput('aiParseLogID', $_POST);
+        if ($aiParseLogID != '')
+        {
+            $parser = new AIResumeParser();
+            $parser->markSavedCandidate($aiParseLogID, $candidateID);
+        }
+
         if (!eval(Hooks::get('CANDIDATE_ON_EDIT_POST'))) return;
 
         CATSUtility::transferRelativeURI(
             'm=candidates&a=show&candidateID=' . $candidateID
         );
+    }
+
+    private function attachParsedResumeToCandidate($candidateID)
+    {
+        if (!LicenseUtility::isParsingEnabled() && !(new AIResumeParser())->isEnabled())
+        {
+            return;
+        }
+
+        $attachmentCreated = false;
+        $tempFile = false;
+        $tempFullPath = false;
+
+        $newFile = FileUtility::getUploadFileFromPost($this->_siteID, 'addcandidate', 'documentFile');
+        if ($newFile !== false)
+        {
+            $tempFile = $newFile;
+            $tempFullPath = FileUtility::getUploadFilePath($this->_siteID, 'addcandidate', $newFile);
+        }
+        else if (isset($_POST['documentTempFile']) && !empty($_POST['documentTempFile']))
+        {
+            $tempFile = $_POST['documentTempFile'];
+            $tempFullPath = FileUtility::getUploadFilePath(
+                $this->_siteID,
+                'addcandidate',
+                $tempFile
+            );
+        }
+
+        if ($tempFile !== false && $tempFullPath !== false)
+        {
+            if (!eval(Hooks::get('CANDIDATE_ON_CREATE_ATTACHMENT_PRE'))) return;
+
+            $standardResumeFilename = $this->buildStandardResumeFilenameFromPost();
+            if ($standardResumeFilename === false)
+            {
+                $standardResumeFilename = $tempFile;
+            }
+
+            $attachmentCreator = new AttachmentCreator($this->_siteID);
+            $attachmentCreator->createFromFile(
+                DATA_ITEM_CANDIDATE, $candidateID, $tempFullPath, $standardResumeFilename, '', true, true
+            );
+
+            if ($attachmentCreator->isError())
+            {
+                CommonErrors::fatal(COMMONERROR_FILEERROR, $this, $attachmentCreator->getError());
+            }
+
+            if ($attachmentCreator->duplicatesOccurred())
+            {
+                $this->listByView(
+                    'This attachment has already been added to this candidate.'
+                );
+                return;
+            }
+
+            if (!eval(Hooks::get('CANDIDATE_ON_CREATE_ATTACHMENT_POST'))) return;
+
+            setcookie('CATS_SP_TEMP_FILE', '');
+            $attachmentCreated = true;
+        }
+
+        if (!$attachmentCreated && isset($_POST['documentText']) && !empty($_POST['documentText']))
+        {
+            if (!eval(Hooks::get('CANDIDATE_ON_CREATE_ATTACHMENT_PRE'))) return;
+
+            $standardResumeFilename = $this->buildStandardResumeFilenameFromPost();
+            if ($standardResumeFilename === false)
+            {
+                $standardResumeFilename = 'MyResume.txt';
+            }
+
+            $attachmentCreator = new AttachmentCreator($this->_siteID);
+            $attachmentCreator->createFromText(
+                DATA_ITEM_CANDIDATE, $candidateID, $_POST['documentText'], $standardResumeFilename, true
+            );
+
+            if ($attachmentCreator->isError())
+            {
+                CommonErrors::fatal(COMMONERROR_FILEERROR, $this, $attachmentCreator->getError());
+            }
+
+            if ($attachmentCreator->duplicatesOccurred())
+            {
+                $this->listByView(
+                    'This attachment has already been added to this candidate.'
+                );
+                return;
+            }
+
+            if (!eval(Hooks::get('CANDIDATE_ON_CREATE_ATTACHMENT_POST'))) return;
+        }
     }
 
     /*

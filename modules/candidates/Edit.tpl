@@ -1,5 +1,5 @@
 <?php /* $Id: Edit.tpl 3695 2007-11-26 22:01:04Z brian $ */ ?>
-<?php TemplateUtility::printHeader('Candidates', array('modules/candidates/validator.js', 'js/sweetTitles.js', 'js/listEditor.js', 'js/candidate.js', 'js/doubleListEditor.js')); ?>
+<?php TemplateUtility::printHeader('Candidates', array('modules/candidates/validator.js', 'js/sweetTitles.js', 'js/listEditor.js', 'js/candidate.js', 'js/doubleListEditor.js', 'js/candidateParser.js')); ?>
 <?php TemplateUtility::printHeaderBlock(); ?>
 <?php TemplateUtility::printTabs($this->active); ?>
 
@@ -32,11 +32,166 @@
                 </tr>
             </table>
 
-            <form name="editCandidateForm" id="editCandidateForm" action="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=edit" method="post" onsubmit="return (checkEditForm(document.editCandidateForm) && onSubmitEmailInSystem() && onSubmitPhoneInSystem() && onSubmitLinkInSystem());" autocomplete="off">
+            <form name="editCandidateForm" id="editCandidateForm" enctype="multipart/form-data" action="<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=edit" method="post" onsubmit="return (checkEditForm(document.editCandidateForm) && onSubmitEmailInSystem() && onSubmitPhoneInSystem() && onSubmitLinkInSystem());" autocomplete="off">
                 <input type="hidden" name="postback" id="postback" value="postback" />
                 <input type="hidden" id="candidateID" name="candidateID" value="<?php $this->_($this->data['candidateID']); ?>" />
+                <input type="hidden" name="aiParseLogID" id="aiParseLogID" value="<?php echo (isset($this->data['aiParseLogID']) ? $this->data['aiParseLogID'] : ''); ?>" />
+                <input type="hidden" name="aiDocumentLanguage" id="aiDocumentLanguage" value="<?php echo (isset($this->data['aiDocumentLanguage']) ? $this->data['aiDocumentLanguage'] : ''); ?>" />
+                <input type="hidden" name="aiResumeExtension" id="aiResumeExtension" value="<?php echo (isset($this->data['aiResumeExtension']) ? $this->data['aiResumeExtension'] : ''); ?>" />
 
-                <table class="editTable" width="1000">
+                <?php if (isset($this->data['aiParseError']) && $this->data['aiParseError'] != ''): ?>
+                    <div style="margin-bottom: 10px; padding: 8px; border: 1px solid #cc9999; background-color: #fff3f3; color: #800000; width: 980px;">
+                        AI resume parsing failed: <?php $this->_($this->data['aiParseError']); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (isset($this->aiSuggestedFields) && count($this->aiSuggestedFields) > 0): ?>
+                <?php
+                    $aiFieldLabels = array(
+                        'firstName' => 'First Name',
+                        'middleName' => 'Middle Name',
+                        'lastName' => 'Last Name',
+                        'chineseName' => 'Chinese Name',
+                        'nationality' => 'Nationality',
+                        'email1' => 'E-Mail',
+                        'email2' => '2nd E-Mail',
+                        'phoneHome' => 'Home Phone',
+                        'phoneCell' => 'Cell Phone',
+                        'phoneWork' => 'Work Phone',
+                        'webSite' => 'Web Site',
+                        'facebook' => 'Facebook',
+                        'linkedin' => 'Linkedin',
+                        'github' => 'Github',
+                        'googleplus' => 'GooglePlus',
+                        'twitter' => 'Twitter',
+                        'cakeresume' => 'Cakeresume',
+                        'link1' => 'Link1',
+                        'link2' => 'Link2',
+                        'link3' => 'Link3',
+                        'address' => 'Address',
+                        'city' => 'City',
+                        'state' => 'State',
+                        'source' => 'Source',
+                        'currentEmployer' => 'Current Employer',
+                        'jobTitle' => 'Job Title',
+                        'currentPay' => 'Current Pay',
+                        'desiredPay' => 'Desired Pay',
+                        'keySkills' => 'Key Skills',
+                        'extraGender' => 'Gender',
+                        'maritalStatus' => 'Marital Status',
+                        'birthYear' => 'Birth Year',
+                        'highestDegree' => 'Highest Education Degree',
+                        'major' => 'Major',
+                        'line' => 'Line',
+                        'qq' => 'Telegram',
+                        'skype' => 'Skype',
+                        'wechat' => 'Wechat',
+                        'functions' => 'Functions',
+                        'jobLevel' => 'Job Level',
+                        'notes' => 'Misc. Notes'
+                    );
+                    $aiFieldTargets = array('source' => 'sourceSelect');
+                    $aiCurrentValues = $this->data;
+                    for ($i = 0; $i < count($this->extraFieldRS); $i++)
+                    {
+                        if ($this->extraFieldRS[$i]['fieldName'] == 'Career Summary')
+                        {
+                            $aiFieldLabels['aiCareerSummary'] = 'Career Summary';
+                            $aiFieldTargets['aiCareerSummary'] = 'extraField' . $i;
+                            $aiCurrentValues['aiCareerSummary'] = isset($this->extraFieldRS[$i]['value']) ? $this->extraFieldRS[$i]['value'] : '';
+                        }
+                        if ($this->extraFieldRS[$i]['fieldName'] == 'Skill Summary')
+                        {
+                            $aiFieldLabels['aiSkillSummary'] = 'Skill Summary';
+                            $aiFieldTargets['aiSkillSummary'] = 'extraField' . $i;
+                            $aiCurrentValues['aiSkillSummary'] = isset($this->extraFieldRS[$i]['value']) ? $this->extraFieldRS[$i]['value'] : '';
+                        }
+                    }
+                ?>
+                <p class="note">AI Parsed Field Suggestions</p>
+                <table class="editTable" width="1225" id="aiSuggestionTable" style="table-layout: fixed;">
+                    <tr>
+                        <th align="center" width="45">Keep</th>
+                        <th align="center" width="45">AI</th>
+                        <th align="center" width="45">Merge</th>
+                        <th align="left" width="135">Field</th>
+                        <th align="left" width="465">Current Value</th>
+                        <th align="left" width="455">AI Suggested Value</th>
+                    </tr>
+                    <?php $aiSuggestionIndex = 0; ?>
+                    <?php foreach ($this->aiSuggestedFields as $fieldName => $suggestedValue): ?>
+                        <?php
+                            if (!isset($aiFieldLabels[$fieldName])) continue;
+                            $currentValue = isset($aiCurrentValues[$fieldName]) ? $aiCurrentValues[$fieldName] : '';
+                            $targetID = isset($aiFieldTargets[$fieldName]) ? $aiFieldTargets[$fieldName] : $fieldName;
+                            $useAI = (trim((string) $currentValue) == '' && $fieldName != 'notes');
+                            $choiceName = 'aiSuggestionChoice' . $aiSuggestionIndex++;
+                            $allowMerge = in_array($fieldName, array('keySkills', 'notes', 'aiCareerSummary', 'aiSkillSummary'));
+                            if (in_array($fieldName, array('notes', 'aiCareerSummary', 'aiSkillSummary')))
+                            {
+                                $valueMaxHeight = '126px';
+                            }
+                            else if ($fieldName == 'keySkills')
+                            {
+                                $valueMaxHeight = '86px';
+                            }
+                            else
+                            {
+                                $valueMaxHeight = '54px';
+                            }
+                        ?>
+                        <tr class="aiSuggestionRow">
+                            <td class="tdData" align="center" style="vertical-align: top; padding-top: 4px; padding-bottom: 4px; padding-left: 2px; padding-right: 2px;">
+                                <input type="radio" name="<?php echo($choiceName); ?>" class="aiSuggestionChoice" value="current"<?php if (!$useAI): ?> checked="checked"<?php endif; ?> />
+                            </td>
+                            <td class="tdData" align="center" style="vertical-align: top; padding-top: 4px; padding-bottom: 4px; padding-left: 2px; padding-right: 2px;">
+                                <input type="radio" name="<?php echo($choiceName); ?>" class="aiSuggestionChoice" value="ai"<?php if ($useAI): ?> checked="checked"<?php endif; ?> />
+                            </td>
+                            <td class="tdData" align="center" style="vertical-align: top; padding-top: 4px; padding-bottom: 4px; padding-left: 2px; padding-right: 2px;">
+                                <?php if ($allowMerge): ?>
+                                <input type="radio" name="<?php echo($choiceName); ?>" class="aiSuggestionChoice" value="merge" />
+                                <?php else: ?>
+                                &nbsp;
+                                <?php endif; ?>
+                            </td>
+                            <td class="tdVertical" style="vertical-align: top; padding-top: 4px; padding-bottom: 4px;">
+                                <?php $this->_($aiFieldLabels[$fieldName]); ?>
+                                <input type="hidden" class="aiSuggestionTarget" value="<?php $this->_($targetID); ?>" />
+                                <textarea class="aiSuggestionValue" style="display:none;"><?php echo htmlspecialchars($suggestedValue); ?></textarea>
+                            </td>
+                            <td class="tdData" style="vertical-align: top; padding-top: 4px; padding-bottom: 4px; max-width: 465px;">
+                                <div style="white-space: pre-wrap; max-height: <?php echo($valueMaxHeight); ?>; overflow: auto; line-height: 16px;"><?php $this->_($currentValue); ?></div>
+                            </td>
+                            <td class="tdData" style="vertical-align: top; padding-top: 4px; padding-bottom: 4px; max-width: 455px;">
+                                <div style="white-space: pre-wrap; max-height: <?php echo($valueMaxHeight); ?>; overflow: auto; line-height: 16px; background-color: #f7fbff; padding: 2px 4px;"><?php $this->_($suggestedValue); ?></div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <td class="tdData" colspan="6">
+                            <input type="button" class="button" id="applyAIParsedFields" value="Apply AI Choices" onclick="applySelectedAIParsedFields();" />
+                            <span id="aiSuggestionAppliedStatus" style="display:none; margin-left:8px; color:#006000; font-size:11px;">Applied to the form. Click Save to update the candidate.</span>
+                        </td>
+                    </tr>
+                </table>
+                <?php endif; ?>
+
+                <table class="editTable" width="1225">
+                    <?php if ($this->isParsingEnabled): ?>
+                    <tr>
+                        <td class="tdVertical" colspan="2">
+                            <img src="images/parser/manual.gif" border="0" />
+                        </td>
+                        <td class="tdVertical">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td align="left"><img src="images/parser/import.gif" border="0" /></td>
+                                    <td align="right">&nbsp;</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <?php endif; ?>
                     <tr>
                         <td class="tdVertical" valign="top" style="height: 28px;">
                             <label id="isHotLabel" for="isHot">Active:</label>
@@ -44,6 +199,63 @@
                         <td class="tdData" >
                             <input type="checkbox" id="isActive" name="isActive"<?php if ($this->data['isActive'] == 1): ?> checked<?php endif; ?> />
                             <img title="Unchecking this box indicates the candidate is inactive, and will no longer display on the resume search results." src="images/information.gif" alt="" width="16" height="16" />
+                        </td>
+                        <td rowspan="12" align="center" valign="top">
+                            <?php if ($this->isParsingEnabled): ?>
+                                <input type="hidden" name="loadDocument" id="loadDocument" value="" />
+                                <input type="hidden" name="parseDocument" id="parseDocument" value="" />
+                                <input type="hidden" name="documentTempFile" id="documentTempFile" value="<?php echo (isset($this->data['documentTempFile']) ? $this->data['documentTempFile'] : ''); ?>" />
+                                <table cellpadding="0" cellspacing="0" border="0">
+                                    <tr>
+                                        <td valign="middle" align="right" colspan="2">
+                                            <img src="images/parser/arrow.gif" border="0" />
+                                            <input type="hidden" name="MAX_FILE_SIZE" VALUE="10000000" />
+                                            <input type="file" id="documentFile" name="documentFile" onchange="documentFileChange();" size="40" />
+                                            <input type="button" id="documentLoad" value="Upload" onclick="loadDocumentFileContents();" disabled />
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" align="left" colspan="2">
+                                            <?php if (isset($this->data['documentTempFile']) && ($tempFile = $this->data['documentTempFile']) != ''): ?>
+                                            <div id="showAttachmentDetails" style="height: 20px; background-color: #e0e0e0; width: 500px; margin: 1px 0 5px 0; padding: 0 3px 0 5px;">
+                                                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                                    <tr>
+                                                        <td align="left" valign="top" nowrap="nowrap" style="font-size: 11px;">
+                                                            <img src="images/parser/attachment.gif" border="0" style="padding-top: 3px;" />
+                                                            Attachment: <span style="font-weight: bold;"><?php echo $tempFile; ?></span>
+                                                        </td>
+                                                        <td align="right" valign="top" nowrap="nowrap" style="font-size: 11px;">
+                                                            <a href="javascript:void(0);" onclick="removeDocumentFile();">(remove)</a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <?php endif; ?>
+                                            <textarea class="inputbox" tabindex="90" name="documentText" id="documentText" rows="5" cols="40" onmousemove="documentCheck();" onchange="documentCheck();" onmousedown="documentCheck();" onkeypress="documentCheck();" style="width: 500px; height: 210px; padding: 3px;"><?php echo $this->contents; ?></textarea>
+                                            <br/>
+                                            <div style="color: #666666; text-align: center;">
+                                            (<b>hint:</b> you may also paste the resume contents)
+                                            <br /><br />
+                                            <?php if (!($this->parsingStatus['parseLimit'] >= 0 && $this->parsingStatus['parseUsed'] >= $this->parsingStatus['parseLimit'])): ?>
+                                            <span style="display:inline-block; text-align:center; vertical-align:middle;">
+                                                <button
+                                                    type="button"
+                                                    id="transfer"
+                                                    onclick="parseDocumentFileContents();"
+                                                    <?php if ($this->contents == ''): ?>disabled="disabled"<?php endif; ?>
+                                                    style="padding:6px 12px; border:1px solid #2f6fad; border-radius:4px; background:<?php echo ($this->contents != '' ? '#3f84c5' : '#d7dfe8'); ?>; color:<?php echo ($this->contents != '' ? '#ffffff' : '#6b7785'); ?>; font-size:12px; font-weight:bold; cursor:<?php echo ($this->contents != '' ? 'pointer' : 'not-allowed'); ?>;"
+                                                >AI 解析履歷</button>
+                                                <span style="display:block; margin-top:5px; font-size:11px; color:#666666;">使用上方上傳或貼上的履歷內容，產生可選擇套用的候選人欄位。</span>
+                                            </span>
+                                            <span id="aiParsingLoading" style="display:none; margin-left:8px; font-size:11px; color:#7a6000; background:#fffbe6; border:1px solid #e6c700; padding:3px 8px; vertical-align:middle;">&#x23F3; AI 解析中，請稍候...</span>
+                                            <br /><br />
+                                            <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     
@@ -338,16 +550,16 @@
                
                 <?php if($this->EEOSettingsRS['enabled'] == 1): ?>
                     <?php if(!$this->EEOSettingsRS['canSeeEEOInfo']): ?>
-                        <table class="editTable" width="1000">
+                        <table class="editTable" width="1225">
                             <tr>
                                 <td>
                                     Editing EEO data is disabled.
                                 </td>
                             </tr>
                         </tr>
-                        <table class="editTable" width="1000" style="display:none;">
+                        <table class="editTable" width="1225" style="display:none;">
                     <?php else: ?>
-                        <table class="editTable" width="1000">
+                        <table class="editTable" width="1225">
                     <?php endif; ?>               
 
                          <?php if ($this->EEOSettingsRS['genderTracking'] == 1): ?>
@@ -427,7 +639,7 @@
                     </tr>
                 </table>
                 
-                <table class="editTable" width="1000">
+                <table class="editTable" width="1225">
                     <tr>
                         <td class="tdVertical">
                             <label id="canRelocateLabel" for="canRelocate">Can Relocate:</label>
@@ -641,6 +853,123 @@
             </form>
 
             <script type="text/javascript">
+                function getAIParsedFieldSeparator(target)
+                {
+                    if (target.id == 'keySkills')
+                    {
+                        return ', ';
+                    }
+
+                    if (target.tagName && target.tagName.toLowerCase() == 'textarea')
+                    {
+                        return "\n\n";
+                    }
+
+                    return ' ';
+                }
+
+                function combineAIParsedFieldValues(currentValue, aiValue, separator)
+                {
+                    currentValue = currentValue.replace(/^\s+|\s+$/g, '');
+                    aiValue = aiValue.replace(/^\s+|\s+$/g, '');
+
+                    if (currentValue == '')
+                    {
+                        return aiValue;
+                    }
+                    if (aiValue == '' || currentValue == aiValue)
+                    {
+                        return currentValue;
+                    }
+                    if (currentValue.indexOf(aiValue) !== -1)
+                    {
+                        return currentValue;
+                    }
+
+                    return currentValue + separator + aiValue;
+                }
+
+                function applyAIParsedFieldValue(targetID, value, mode)
+                {
+                    var target = document.getElementById(targetID);
+                    if (!target)
+                    {
+                        return;
+                    }
+
+                    if (target.type == 'checkbox')
+                    {
+                        target.checked = (value == '1' || value == 'Yes' || value == 'true');
+                    }
+                    else
+                    {
+                        if (mode == 'merge')
+                        {
+                            var separator = getAIParsedFieldSeparator(target);
+                            value = combineAIParsedFieldValues(target.value, value, separator);
+                        }
+
+                        if (target.tagName && target.tagName.toLowerCase() == 'select')
+                        {
+                            var hasOption = false;
+                            for (var i = 0; i < target.options.length; i++)
+                            {
+                                if (target.options[i].value == value)
+                                {
+                                    hasOption = true;
+                                    break;
+                                }
+                            }
+                            if (!hasOption && value != '')
+                            {
+                                target.options[target.options.length] = new Option(value, value);
+                            }
+                        }
+                        target.value = value;
+                    }
+                }
+
+                function applySelectedAIParsedFields()
+                {
+                    var rows = document.querySelectorAll('#aiSuggestionTable tr.aiSuggestionRow');
+                    for (var i = 0; i < rows.length; i++)
+                    {
+                        var choice = rows[i].querySelector('.aiSuggestionChoice:checked');
+                        if (!choice || choice.value == 'current')
+                        {
+                            continue;
+                        }
+
+                        var target = rows[i].querySelector('.aiSuggestionTarget');
+                        var value = rows[i].querySelector('.aiSuggestionValue');
+                        if (target && value)
+                        {
+                            applyAIParsedFieldValue(target.value, value.value, choice.value);
+                        }
+                    }
+
+                    var button = document.getElementById('applyAIParsedFields');
+                    if (button)
+                    {
+                        button.disabled = true;
+                        button.value = 'Applied';
+                        button.style.background = '#d7dfe8';
+                        button.style.borderColor = '#b8c3cf';
+                        button.style.color = '#6b7785';
+                        button.style.cursor = 'not-allowed';
+                    }
+                    var status = document.getElementById('aiSuggestionAppliedStatus');
+                    if (status)
+                    {
+                        status.style.display = 'inline';
+                    }
+                    var choices = document.querySelectorAll('#aiSuggestionTable .aiSuggestionChoice');
+                    for (var i = 0; i < choices.length; i++)
+                    {
+                        choices[i].disabled = true;
+                    }
+                }
+
                 function adjustCandidateSummaryFields(formId)
                 {
                     var form = document.getElementById(formId);

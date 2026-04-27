@@ -22,9 +22,13 @@ function setTransferButtonEnabled(enabled)
     button.innerHTML = 'AI 解析履歷';
 }
 
-function submitAddCandidateForm()
+function submitCandidateParserForm()
 {
     var form = document.getElementById('addCandidateForm');
+    if (!form)
+    {
+        form = document.getElementById('editCandidateForm');
+    }
 
     if (!form)
     {
@@ -57,7 +61,7 @@ function loadDocumentFileContents()
     }
 
     window.setTimeout(function() {
-        submitAddCandidateForm();
+        submitCandidateParserForm();
     }, 10);
 }
 
@@ -77,7 +81,11 @@ function parseDocumentFileContents()
         return;
     }
 
-    if (!window.confirm('AI 解析履歷會覆蓋目前表單中的候選人欄位資料，是否繼續？'))
+    var confirmMessage = document.getElementById('editCandidateForm')
+        ? 'AI 解析履歷後會顯示可套用欄位，您可以選擇要補充哪些資料。是否繼續？'
+        : 'AI 解析履歷會覆蓋目前表單中的候選人欄位資料，是否繼續？';
+
+    if (!window.confirm(confirmMessage))
     {
         return;
     }
@@ -103,7 +111,7 @@ function parseDocumentFileContents()
     }
 
     window.setTimeout(function() {
-        submitAddCandidateForm();
+        submitCandidateParserForm();
     }, 50);
 }
 
