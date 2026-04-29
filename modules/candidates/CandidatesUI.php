@@ -961,6 +961,7 @@ class CandidatesUI extends UserInterface
 
         if ($aiResult !== false)
         {
+            $aiResult = $this->sanitizeCandidateAIParseResult($aiResult);
             if ($candidateID > 0)
             {
                 $fields['aiSuggestedFields'] = $this->filterCandidateAIParseSuggestions($aiResult);
@@ -1078,22 +1079,23 @@ class CandidatesUI extends UserInterface
 
         if ($sourceURL != '')
         {
+            $normalizedSourceURL = $this->normalizeCandidateLinkValue($sourceURL);
             if (stripos($sourceURL, 'linkedin.com/') !== false)
             {
-                $fields['linkedin'] = $sourceURL;
+                $fields['linkedin'] = $normalizedSourceURL;
             }
             else if (stripos($sourceURL, 'cake.me/') !== false ||
                 stripos($sourceURL, 'cakeresume.com/') !== false)
             {
-                $fields['cakeresume'] = $sourceURL;
+                $fields['cakeresume'] = $normalizedSourceURL;
             }
             else
             {
-                $fields['link1'] = $sourceURL;
+                $fields['link1'] = $normalizedSourceURL;
             }
         }
 
-        return $fields;
+        return $this->normalizeCandidateLinkFields($fields);
     }
 
     private function prepareExtensionImportEditFields($fields)
@@ -1461,6 +1463,7 @@ class CandidatesUI extends UserInterface
 
                 if ($aiResult !== false)
                 {
+                    $aiResult = $this->sanitizeCandidateAIParseResult($aiResult);
                     if ($isEditParse)
                     {
                         $fields['aiSuggestedFields'] = $this->filterCandidateAIParseSuggestions($aiResult);
@@ -1501,6 +1504,7 @@ class CandidatesUI extends UserInterface
                         $parsedFields['phoneWork'] = $parsedFields['phoneCell'] = '';
                         if (isset($res['skills'])) $parsedFields['keySkills'] = str_replace("\n", ' ', str_replace('"', '\'\'', $res['skills']));
 
+                        $parsedFields = $this->sanitizeCandidateAIParseResult($parsedFields);
                         if ($isEditParse)
                         {
                             $fields['aiSuggestedFields'] = $this->filterCandidateAIParseSuggestions($parsedFields);
@@ -1642,13 +1646,95 @@ class CandidatesUI extends UserInterface
 
         foreach ($candidateFieldNames as $fieldName)
         {
-            if (isset($fields[$fieldName]) && trim((string) $fields[$fieldName]) != '')
+            if (isset($fields[$fieldName]) && !$this->isCandidateImportEmptyValue($fields[$fieldName]))
             {
                 $suggestedFields[$fieldName] = $fields[$fieldName];
             }
         }
 
-        return $suggestedFields;
+        return $this->normalizeCandidateLinkFields($suggestedFields);
+    }
+
+    private function sanitizeCandidateAIParseResult($fields)
+    {
+        if (!is_array($fields))
+        {
+            return array();
+        }
+
+        $sanitized = array();
+        $metaFields = array('aiParseLogID', 'aiDocumentLanguage', 'aiParseError', 'aiResumeExtension');
+        foreach ($fields as $fieldName => $fieldValue)
+        {
+            if (in_array($fieldName, $metaFields))
+            {
+                if (!$this->isCandidateImportEmptyValue($fieldValue))
+                {
+                    $sanitized[$fieldName] = $fieldValue;
+                }
+                continue;
+            }
+
+            if ($this->isCandidateImportEmptyValue($fieldValue))
+            {
+                continue;
+            }
+
+            $sanitized[$fieldName] = $fieldValue;
+        }
+
+        return $this->normalizeCandidateLinkFields($sanitized);
+    }
+
+    private function isCandidateImportEmptyValue($value)
+    {
+        if ($value === null)
+        {
+            return true;
+        }
+        if (is_array($value))
+        {
+            return count($value) == 0;
+        }
+
+        return trim((string) $value) == '';
+    }
+
+    private function normalizeCandidateLinkFields($fields)
+    {
+        if (!is_array($fields))
+        {
+            return array();
+        }
+
+        foreach ($this->getCandidateLinkFieldNames() as $fieldName)
+        {
+            if (isset($fields[$fieldName]) && !$this->isCandidateImportEmptyValue($fields[$fieldName]))
+            {
+                $fields[$fieldName] = $this->normalizeCandidateLinkValue($fields[$fieldName]);
+            }
+        }
+
+        return $fields;
+    }
+
+    private function normalizeCandidateLinkValue($value)
+    {
+        $value = trim((string) $value);
+        if ($value == '' || preg_match('/^https?:\/\//i', $value))
+        {
+            return $value;
+        }
+
+        return 'https://' . preg_replace('/^\/+/', '', $value);
+    }
+
+    private function getCandidateLinkFieldNames()
+    {
+        return array(
+            'webSite', 'facebook', 'linkedin', 'github', 'googleplus',
+            'twitter', 'cakeresume', 'link1', 'link2', 'link3'
+        );
     }
 
     private function getInvalidCandidateLinkField($links)
