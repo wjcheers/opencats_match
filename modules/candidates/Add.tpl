@@ -840,7 +840,15 @@
     });
 
     adjustCandidateSummaryFields('addCandidateForm');
+    attachAddCandidateRequiredFieldValidation();
     document.addCandidateForm.firstName.focus();
+    <?php if (
+        isset($this->preassignedFields['aiParseLogID']) &&
+        $this->preassignedFields['aiParseLogID'] != '' &&
+        (!isset($this->preassignedFields['aiParseError']) || $this->preassignedFields['aiParseError'] == '')
+    ): ?>
+        highlightMissingAddCandidateRequiredFields();
+    <?php endif; ?>
     <?php if(isset($this->preassignedFields['email']) || isset($this->preassignedFields['email1'])): ?>
         checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['email'])) echo(urlencode($this->preassignedFields['email'])); else if(isset($this->preassignedFields['email1'])) echo(urlencode($this->preassignedFields['email1'])); ?>"));
     <?php endif; ?>

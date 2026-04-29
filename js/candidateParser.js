@@ -1,4 +1,57 @@
 var transferButtonLocked = false;
+var aiParsedDocumentBaseline = null;
+
+function normalizeDocumentForAIParse(value)
+{
+    return (value || '').replace(/\s+/g, ' ').trim();
+}
+
+function hasPriorAIParse()
+{
+    var logID = document.getElementById('aiParseLogID');
+    return !!(
+        (logID && logID.value !== '') ||
+        document.getElementById('aiSuggestionTable')
+    );
+}
+
+function initializeAIParsedDocumentBaseline()
+{
+    var text = document.getElementById('documentText');
+    if (!text || !hasPriorAIParse())
+    {
+        aiParsedDocumentBaseline = null;
+        return;
+    }
+
+    aiParsedDocumentBaseline = normalizeDocumentForAIParse(text.value);
+}
+
+function hasDocumentChangedSinceAIParse()
+{
+    var text = document.getElementById('documentText');
+    if (!text || aiParsedDocumentBaseline === null)
+    {
+        return true;
+    }
+
+    return normalizeDocumentForAIParse(text.value) !== aiParsedDocumentBaseline;
+}
+
+function isAIParseAllowedByDocumentState()
+{
+    var text = document.getElementById('documentText');
+    var file = document.getElementById('documentFile');
+    var hasText = !!(text && normalizeDocumentForAIParse(text.value) !== '');
+    var hasFile = !!(file && file.value !== '');
+
+    if (hasFile)
+    {
+        return true;
+    }
+
+    return hasText && hasDocumentChangedSinceAIParse();
+}
 
 function setTransferButtonEnabled(enabled)
 {
@@ -14,12 +67,35 @@ function setTransferButtonEnabled(enabled)
         return;
     }
 
+    enabled = enabled && isAIParseAllowedByDocumentState();
+
     button.disabled = !enabled;
     button.style.cursor = enabled ? 'pointer' : 'not-allowed';
     button.style.background = enabled ? '#3f84c5' : '#d7dfe8';
     button.style.borderColor = enabled ? '#2f6fad' : '#b8c3cf';
     button.style.color = enabled ? '#ffffff' : '#6b7785';
     button.innerHTML = 'AI 解析履歷';
+    button.title = enabled ? '' : getAIParseDisabledReason();
+}
+
+function getAIParseDisabledReason()
+{
+    var text = document.getElementById('documentText');
+    var file = document.getElementById('documentFile');
+    var hasText = !!(text && normalizeDocumentForAIParse(text.value) !== '');
+    var hasFile = !!(file && file.value !== '');
+
+    if (!hasText && !hasFile)
+    {
+        return '請先上傳或貼上履歷內容。';
+    }
+
+    if (aiParsedDocumentBaseline !== null && !hasDocumentChangedSinceAIParse())
+    {
+        return '履歷內容尚未有實質變更，無需重新 AI 解析。';
+    }
+
+    return '';
 }
 
 function submitCandidateParserForm()
@@ -75,6 +151,12 @@ function parseDocumentFileContents()
 
     obj.value = '';
     obj2.value = '';
+
+    if (!isAIParseAllowedByDocumentState())
+    {
+        documentCheck();
+        return;
+    }
 
     if (text.value == '' && file.value == '')
     {
@@ -184,6 +266,7 @@ function removeDocumentFile()
     obj3.value = '';
     obj4.value = '';
     transferButtonLocked = false;
+    aiParsedDocumentBaseline = null;
     if (obj6)
     {
         obj6.value = '';
@@ -200,6 +283,20 @@ function removeDocumentFile()
     {
         obj5.style.display = 'none';
     }
+}
+
+if (window.addEventListener)
+{
+    window.addEventListener('load', function() {
+        var text = document.getElementById('documentText');
+        if (text)
+        {
+            text.oninput = documentCheck;
+            text.onkeyup = documentCheck;
+        }
+        initializeAIParsedDocumentBaseline();
+        documentCheck();
+    });
 }
 
 function resetAddCandidateForm()

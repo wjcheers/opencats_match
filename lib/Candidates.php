@@ -982,17 +982,17 @@ class Candidates
             $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
             $encLink4Query,
             $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),
-            str_replace(array('cakeresume.com/me/', 'cakeresume.com/search/', 'cakeresume.com/', 'cakeresume.com/resumes/resumes/'), 'cakeresume.com/resumes/', $encLink4Query),
+            str_replace(array('cake.me/me/', 'cake.me/search/', 'cake.me/', 'cake.me/resumes/resumes/', 'cakeresume.com/me/', 'cakeresume.com/search/', 'cakeresume.com/', 'cakeresume.com/resumes/resumes/'), 'cakeresume.com/resumes/', $encLink4Query),
             $this->_db->makeQueryString('%' . trim(urlDecode(
-                str_replace(array('cakeresume.com/me/', 'cakeresume.com/search/', 'cakeresume.com/', 'cakeresume.com/resumes/resumes/'), 'cakeresume.com/resumes/', $link)
+                str_replace(array('cake.me/me/', 'cake.me/search/', 'cake.me/', 'cake.me/resumes/resumes/', 'cakeresume.com/me/', 'cakeresume.com/search/', 'cakeresume.com/', 'cakeresume.com/resumes/resumes/'), 'cakeresume.com/resumes/', $link)
             )) . '%'),
-            str_replace(array('cakeresume.com/me/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/search/search/'), 'cakeresume.com/search/', $encLink4Query),
+            str_replace(array('cake.me/me/', 'cake.me/resumes/', 'cake.me/', 'cake.me/search/search/', 'cakeresume.com/me/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/search/search/'), 'cakeresume.com/search/', $encLink4Query),
             $this->_db->makeQueryString('%' . trim(urlDecode(
-                str_replace(array('cakeresume.com/me/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/search/search/'), 'cakeresume.com/search/', $link)
+                str_replace(array('cake.me/me/', 'cake.me/resumes/', 'cake.me/', 'cake.me/search/search/', 'cakeresume.com/me/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/search/search/'), 'cakeresume.com/search/', $link)
             )) . '%'),
-            str_replace(array('cakeresume.com/search/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/me/me/'), 'cakeresume.com/me/', $encLink4Query),
+            str_replace(array('cake.me/search/', 'cake.me/resumes/', 'cake.me/', 'cake.me/me/me/', 'cakeresume.com/search/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/me/me/'), 'cakeresume.com/me/', $encLink4Query),
             $this->_db->makeQueryString('%' . trim(urlDecode(
-                str_replace(array('cakeresume.com/search/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/me/me/'), 'cakeresume.com/me/', $link)
+                str_replace(array('cake.me/search/', 'cake.me/resumes/', 'cake.me/', 'cake.me/me/me/', 'cakeresume.com/search/', 'cakeresume.com/resumes/', 'cakeresume.com/', 'cakeresume.com/me/me/'), 'cakeresume.com/me/', $link)
             )) . '%'),
             $encLink4Query,
             $this->_db->makeQueryString('%' . trim(urlDecode($link)) . '%'),

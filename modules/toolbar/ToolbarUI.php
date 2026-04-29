@@ -31,6 +31,7 @@ include_once('./lib/SystemInfo.php');
 include_once('./lib/Mailer.php');
 include_once('./lib/Site.php');
 include_once('./lib/Candidates.php');
+include_once('./lib/ActivityEntries.php');
 include_once('./lib/DocumentToText.php');
 include_once('./lib/License.php');
 
@@ -79,6 +80,10 @@ class ToolbarUI extends UserInterface
 
             case 'checkLinkIsInSystem':
                 $this->checkLinkIsInSystem();
+                break;
+
+            case 'getCandidateSummary':
+                $this->getCandidateSummary();
                 break;
 
             case 'checkSocialMediaIsInSystem':
@@ -222,6 +227,79 @@ class ToolbarUI extends UserInterface
         }
 
         flush();
+    }
+
+    private function getCandidateSummary()
+    {
+        $this->_authenticate();
+
+        $candidateID = $this->getTrimmedInput('candidateID', $_GET);
+        if (empty($candidateID) || !is_numeric($candidateID))
+        {
+            $this->outputJSON(array(
+                'success' => false,
+                'error' => 'Invalid candidate ID.'
+            ));
+            return;
+        }
+
+        $candidates = new Candidates($this->_siteID);
+        $candidate = $candidates->get((int) $candidateID);
+        if (empty($candidate))
+        {
+            $this->outputJSON(array(
+                'success' => false,
+                'error' => 'Candidate not found.'
+            ));
+            return;
+        }
+
+        $activityEntries = new ActivityEntries($this->_siteID);
+        $activityRS = $activityEntries->getAllByDataItem((int) $candidateID, DATA_ITEM_CANDIDATE);
+        $recentActivities = array();
+        if (!empty($activityRS))
+        {
+            $activityRS = array_reverse(array_slice($activityRS, -2));
+            foreach ($activityRS as $activity)
+            {
+                $recentActivities[] = array(
+                    'type' => isset($activity['typeDescription']) ? $activity['typeDescription'] : '',
+                    'notes' => isset($activity['notes']) ? strip_tags($activity['notes']) : '',
+                    'dateCreated' => isset($activity['dateCreated']) ? $activity['dateCreated'] : '',
+                    'enteredBy' => trim(
+                        (isset($activity['enteredByFirstName']) ? $activity['enteredByFirstName'] : '') . ' ' .
+                        (isset($activity['enteredByLastName']) ? $activity['enteredByLastName'] : '')
+                    )
+                );
+            }
+        }
+
+        $this->outputJSON(array(
+            'success' => true,
+            'candidate' => array(
+                'candidateID' => $candidate['candidateID'],
+                'name' => $candidate['candidateFullName'],
+                'jobTitle' => $candidate['jobTitle'],
+                'currentEmployer' => $candidate['currentEmployer'],
+                'ownerFullName' => $candidate['ownerFullName'],
+                'dateModified' => $candidate['dateModified'],
+                'email1' => $candidate['email1'],
+                'phoneCell' => $candidate['phoneCell'],
+                'phoneHome' => $candidate['phoneHome'],
+                'recentActivities' => $recentActivities
+            )
+        ));
+    }
+
+    private function outputJSON($payload)
+    {
+        if (ob_get_length() !== false)
+        {
+            @ob_clean();
+        }
+        header('Content-Type: application/json; charset=UTF-8');
+        echo json_encode($payload);
+        die();
     }
 
     private function checkSocialMediaIsInSystem()

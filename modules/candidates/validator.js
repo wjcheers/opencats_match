@@ -25,6 +25,7 @@ function checkAddForm(form)
     errorMessage += checkPhoneHome();
     errorMessage += checkPhoneCell();
     errorMessage += checkPhoneWork();
+    errorMessage += checkCandidateLinks();
 
     if (errorMessage != '')
     {
@@ -47,6 +48,7 @@ function checkEditForm(form)
     errorMessage += checkPhoneHome();
     errorMessage += checkPhoneCell();
     errorMessage += checkPhoneWork();
+    errorMessage += checkCandidateLinks();
 
     if (errorMessage != '')
     {
@@ -55,6 +57,30 @@ function checkEditForm(form)
     }
 
     return true;
+}
+
+function highlightMissingAddCandidateRequiredFields()
+{
+    checkFirstName();
+    checkLastName();
+}
+
+function attachAddCandidateRequiredFieldValidation()
+{
+    var firstName = document.getElementById('firstName');
+    var lastName = document.getElementById('lastName');
+
+    if (firstName)
+    {
+        firstName.onkeyup = checkFirstName;
+        firstName.onchange = checkFirstName;
+    }
+
+    if (lastName)
+    {
+        lastName.onkeyup = checkLastName;
+        lastName.onchange = checkLastName;
+    }
 }
 
 function checkCreateAttachmentForm(form)
@@ -167,6 +193,49 @@ function checkFirstName()
     else
     {
         fieldLabel.style.color = '#000';
+    }
+
+    return errorMessage;
+}
+
+function checkCandidateLinks()
+{
+    var errorMessage = '';
+    var linkFields = [
+        ['webSite', 'webSiteLabel', 'Web Site'],
+        ['facebook', 'facebookLabel', 'Facebook'],
+        ['linkedin', 'linkedinLabel', 'Linkedin'],
+        ['github', 'githubLabel', 'Github'],
+        ['googleplus', 'googleplusLabel', 'GooglePlus'],
+        ['twitter', 'twitterLabel', 'Twitter'],
+        ['cakeresume', 'cakeresumeLabel', 'Cakeresume'],
+        ['link1', 'link1Label', 'Link1'],
+        ['link2', 'link2Label', 'Link2'],
+        ['link3', 'link3Label', 'Link3']
+    ];
+
+    for (var i = 0; i < linkFields.length; i++)
+    {
+        var field = document.getElementById(linkFields[i][0]);
+        var label = document.getElementById(linkFields[i][1]);
+        if (!field)
+        {
+            continue;
+        }
+
+        var value = field.value.replace(/^\s+|\s+$/g, '');
+        if (value != '' && !/^https?:\/\//i.test(value))
+        {
+            errorMessage += '    - ' + linkFields[i][2] + ' must start with http:// or https://.\n';
+            if (label)
+            {
+                label.style.color = '#ff0000';
+            }
+        }
+        else if (label)
+        {
+            label.style.color = '#000';
+        }
     }
 
     return errorMessage;

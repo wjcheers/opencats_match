@@ -112,6 +112,10 @@ class CandidatesUI extends UserInterface
 
                 break;
 
+            case 'importFromExtension':
+                $this->importFromExtension();
+                break;
+
             case 'delete':
                 $this->onDelete();
                 break;
@@ -908,6 +912,354 @@ class CandidatesUI extends UserInterface
         $this->_template->display('./modules/candidates/Add.tpl');
     }
 
+    private function importFromExtension()
+    {
+        if ($this->_accessLevel < ACCESS_LEVEL_EDIT)
+        {
+            $this->outputExtensionImportJSON(array(
+                'success' => false,
+                'error' => 'Permission denied.'
+            ));
+            return;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST')
+        {
+            $this->storeExtensionImportPayload();
+            return;
+        }
+
+        $importID = $this->getTrimmedInput('importID', $_GET);
+        if ($importID === '' || !is_numeric($importID))
+        {
+            CommonErrors::fatal(COMMONERROR_BADINDEX, $this, 'Invalid import ID.');
+        }
+
+        $payload = $_SESSION['CATS']->retrieveData((int) $importID);
+        if (!is_array($payload) || !isset($payload['documentText']))
+        {
+            CommonErrors::fatal(COMMONERROR_BADINDEX, $this, 'The extension import could not be found.');
+        }
+
+        $contents = $payload['documentText'];
+        $fields = $this->buildExtensionImportFields($payload);
+        $candidateID = $this->findExtensionImportCandidate($payload);
+
+        $aiResult = false;
+        if (trim($contents) != '')
+        {
+            $sourceType = $this->normalizeExtensionImportSourceType(
+                isset($payload['captureMode']) ? $payload['captureMode'] : ''
+            );
+            $aiResult = $this->parseCandidateResumeWithAI(
+                $contents,
+                $fields,
+                $sourceType,
+                $this->buildExtensionImportFilename($payload)
+            );
+        }
+
+        if ($aiResult !== false)
+        {
+            if ($candidateID > 0)
+            {
+                $fields['aiSuggestedFields'] = $this->filterCandidateAIParseSuggestions($aiResult);
+                foreach (array('aiParseLogID', 'aiDocumentLanguage', 'aiParseError', 'aiResumeExtension') as $aiMetaField)
+                {
+                    if (isset($aiResult[$aiMetaField]))
+                    {
+                        $fields[$aiMetaField] = $aiResult[$aiMetaField];
+                    }
+                }
+            }
+            else
+            {
+                if (isset($fields['notes']) && trim($fields['notes']) != '' &&
+                    isset($aiResult['notes']) && trim($aiResult['notes']) != '')
+                {
+                    $aiResult['notes'] = trim($fields['notes']) . "\n\n" . trim($aiResult['notes']);
+                }
+                $fields = array_merge($fields, $aiResult);
+                $candidateID = $this->findExtensionImportCandidate(array_merge($payload, $fields));
+            }
+        }
+
+        if ($candidateID > 0)
+        {
+            $fields['candidateID'] = $candidateID;
+            $fields = $this->prepareExtensionImportEditFields($fields);
+            return $this->edit($contents, $fields);
+        }
+
+        return $this->add($contents, $fields);
+    }
+
+    private function storeExtensionImportPayload()
+    {
+        $documentText = $this->getTrimmedInput('documentText', $_POST);
+        if ($documentText == '')
+        {
+            $this->outputExtensionImportJSON(array(
+                'success' => false,
+                'error' => 'No resume text was received.'
+            ));
+            return;
+        }
+
+        $payload = array(
+            'documentText' => $documentText,
+            'sourceURL' => $this->getTrimmedInput('sourceURL', $_POST),
+            'pageTitle' => $this->getTrimmedInput('pageTitle', $_POST),
+            'sourceType' => $this->getTrimmedInput('sourceType', $_POST),
+            'captureMode' => $this->getTrimmedInput('captureMode', $_POST),
+            'email' => $this->getTrimmedInput('email', $_POST),
+            'phone' => $this->getTrimmedInput('phone', $_POST)
+        );
+
+        $importID = $_SESSION['CATS']->storeData($payload);
+        $candidateID = $this->findExtensionImportCandidate($payload);
+        $redirectURL = CATSUtility::getIndexName()
+            . '?m=candidates&a=importFromExtension&importID=' . urlencode($importID);
+
+        $this->outputExtensionImportJSON(array(
+            'success' => true,
+            'candidateID' => $candidateID,
+            'redirectURL' => $redirectURL
+        ));
+    }
+
+    private function outputExtensionImportJSON($payload)
+    {
+        if (ob_get_length() !== false)
+        {
+            @ob_clean();
+        }
+        header('Content-Type: application/json; charset=UTF-8');
+        echo json_encode($payload);
+        die();
+    }
+
+    private function buildExtensionImportFields($payload)
+    {
+        $sourceURL = isset($payload['sourceURL']) ? $payload['sourceURL'] : '';
+        $sourceType = isset($payload['sourceType']) ? $payload['sourceType'] : '';
+        $sourceLabel = $this->buildExtensionImportSourceLabel($sourceType, $sourceURL);
+        $notes = array();
+
+        if ($sourceURL != '')
+        {
+            $notes[] = 'Imported from: ' . $sourceURL;
+        }
+        if (!empty($payload['pageTitle']))
+        {
+            $notes[] = 'Source page title: ' . $payload['pageTitle'];
+        }
+        if (!empty($payload['captureMode']))
+        {
+            $notes[] = 'Capture mode: ' . $payload['captureMode'];
+        }
+
+        $fields = array(
+            'source' => $sourceLabel,
+            'notes' => implode("\n", $notes),
+            'documentTempFile' => '',
+            'aiResumeExtension' => 'txt',
+            'isFromParser' => true
+        );
+
+        if (isset($payload['email']) && trim($payload['email']) != '')
+        {
+            $fields['email1'] = trim($payload['email']);
+        }
+        if (isset($payload['phone']) && trim($payload['phone']) != '')
+        {
+            $fields['phoneHome'] = trim($payload['phone']);
+        }
+
+        if ($sourceURL != '')
+        {
+            if (stripos($sourceURL, 'linkedin.com/') !== false)
+            {
+                $fields['linkedin'] = $sourceURL;
+            }
+            else if (stripos($sourceURL, 'cake.me/') !== false ||
+                stripos($sourceURL, 'cakeresume.com/') !== false)
+            {
+                $fields['cakeresume'] = $sourceURL;
+            }
+            else
+            {
+                $fields['link1'] = $sourceURL;
+            }
+        }
+
+        return $fields;
+    }
+
+    private function prepareExtensionImportEditFields($fields)
+    {
+        $candidateFieldNames = array(
+            'firstName', 'middleName', 'lastName', 'chineseName', 'nationality',
+            'email1', 'email2', 'phoneHome', 'phoneCell', 'phoneWork',
+            'webSite', 'facebook', 'linkedin', 'github', 'googleplus',
+            'twitter', 'cakeresume', 'link1', 'link2', 'link3',
+            'address', 'city', 'state', 'zip', 'source', 'currentEmployer',
+            'jobTitle', 'currentPay', 'desiredPay', 'keySkills', 'extraGender',
+            'maritalStatus', 'birthYear', 'highestDegree', 'major', 'line',
+            'qq', 'skype', 'wechat', 'functions', 'jobLevel',
+            'aiCareerSummary', 'aiSkillSummary', 'notes'
+        );
+
+        $aiSuggestedFields = array();
+        if (isset($fields['aiSuggestedFields']) && is_array($fields['aiSuggestedFields']))
+        {
+            $aiSuggestedFields = $fields['aiSuggestedFields'];
+        }
+
+        foreach ($candidateFieldNames as $fieldName)
+        {
+            if (isset($fields[$fieldName]) && trim((string) $fields[$fieldName]) != '' &&
+                (!isset($aiSuggestedFields[$fieldName]) || trim((string) $aiSuggestedFields[$fieldName]) == ''))
+            {
+                $aiSuggestedFields[$fieldName] = $fields[$fieldName];
+            }
+            unset($fields[$fieldName]);
+        }
+
+        if (count($aiSuggestedFields) > 0)
+        {
+            $fields['aiSuggestedFields'] = $aiSuggestedFields;
+        }
+        else
+        {
+            unset($fields['aiSuggestedFields']);
+        }
+
+        return $fields;
+    }
+
+    private function findExtensionImportCandidate($payload)
+    {
+        $candidates = new Candidates($this->_siteID);
+        $checks = array();
+
+        if (!empty($payload['sourceURL']))
+        {
+            $checks[] = array('type' => 'link', 'value' => $payload['sourceURL']);
+        }
+        foreach (array('linkedin', 'cakeresume', 'github', 'facebook', 'twitter', 'link1', 'link2', 'link3', 'webSite') as $linkField)
+        {
+            if (!empty($payload[$linkField]))
+            {
+                $checks[] = array('type' => 'link', 'value' => $payload[$linkField]);
+            }
+        }
+        foreach (array('email', 'email1', 'email2') as $emailField)
+        {
+            if (!empty($payload[$emailField]))
+            {
+                $checks[] = array('type' => 'email', 'value' => $payload[$emailField]);
+            }
+        }
+        foreach (array('phone', 'phoneHome', 'phoneCell', 'phoneWork') as $phoneField)
+        {
+            if (!empty($payload[$phoneField]))
+            {
+                $checks[] = array('type' => 'phone', 'value' => $payload[$phoneField]);
+            }
+        }
+
+        foreach ($checks as $check)
+        {
+            if ($check['type'] == 'link')
+            {
+                $candidateID = $candidates->getIDByLink($this->normalizeExtensionImportURL($check['value']));
+            }
+            else if ($check['type'] == 'email')
+            {
+                $candidateID = $candidates->getIDByEmail($check['value']);
+            }
+            else
+            {
+                $candidateID = $candidates->getIDByPhone($check['value']);
+            }
+
+            if ($candidateID > 0)
+            {
+                return $candidateID;
+            }
+        }
+
+        return -1;
+    }
+
+    private function normalizeExtensionImportURL($url)
+    {
+        $url = trim($url);
+        if ($url == '')
+        {
+            return '';
+        }
+
+        $parts = @parse_url($url);
+        if (!is_array($parts) || empty($parts['host']))
+        {
+            return rtrim($url, '/');
+        }
+
+        $host = strtolower($parts['host']);
+        $path = isset($parts['path']) ? rtrim($parts['path'], '/') : '';
+
+        return $host . $path;
+    }
+
+    private function buildExtensionImportSourceLabel($sourceType, $sourceURL)
+    {
+        $sourceType = strtolower(trim($sourceType));
+        $sourceURL = strtolower(trim($sourceURL));
+
+        if ($sourceType == 'linkedin' || strpos($sourceURL, 'linkedin.com') !== false)
+        {
+            return 'LinkedIn';
+        }
+        if ($sourceType == 'cake' || $sourceType == 'cakeresume' ||
+            strpos($sourceURL, 'cake.me') !== false ||
+            strpos($sourceURL, 'cakeresume.com') !== false)
+        {
+            return 'CakeResume';
+        }
+        if ($sourceType != '')
+        {
+            return ucfirst($sourceType);
+        }
+
+        return 'Web Resume';
+    }
+
+    private function normalizeExtensionImportSourceType($captureMode)
+    {
+        $captureMode = strtolower(trim($captureMode));
+        if (!in_array($captureMode, array('quick', 'selection', 'manual')))
+        {
+            $captureMode = 'quick';
+        }
+
+        return 'ext_' . $captureMode;
+    }
+
+    private function buildExtensionImportFilename($payload)
+    {
+        $sourceType = isset($payload['sourceType']) ? $payload['sourceType'] : 'web';
+        $sourceType = preg_replace('/[^A-Za-z0-9]+/', '_', $sourceType);
+        $sourceType = trim($sourceType, '_');
+        if ($sourceType == '')
+        {
+            $sourceType = 'web';
+        }
+
+        return 'Extension_Import_' . $sourceType . '_' . date('Ymd_His') . '.txt';
+    }
+
     public function checkParsingFunctions()
     {
         $aiResumeParser = new AIResumeParser();
@@ -1299,6 +1651,33 @@ class CandidatesUI extends UserInterface
         return $suggestedFields;
     }
 
+    private function getInvalidCandidateLinkField($links)
+    {
+        $labels = array(
+            'webSite' => 'Web Site',
+            'facebook' => 'Facebook',
+            'linkedin' => 'Linkedin',
+            'github' => 'Github',
+            'googleplus' => 'GooglePlus',
+            'twitter' => 'Twitter',
+            'cakeresume' => 'Cakeresume',
+            'link1' => 'Link1',
+            'link2' => 'Link2',
+            'link3' => 'Link3'
+        );
+
+        foreach ($links as $fieldName => $link)
+        {
+            $link = trim((string) $link);
+            if ($link != '' && !preg_match('/^https?:\/\//i', $link))
+            {
+                return isset($labels[$fieldName]) ? $labels[$fieldName] : $fieldName;
+            }
+        }
+
+        return false;
+    }
+
     private function buildAINotesFromResult($result)
     {
         $candidate = isset($result['candidate']) ? $result['candidate'] : array();
@@ -1485,7 +1864,7 @@ class CandidatesUI extends UserInterface
     private function edit($contents = '', $fields = array())
     {
         /* Bail out if we don't have a valid candidate ID. */
-        $request = count($fields) > 0 ? $_POST : $_GET;
+        $request = (isset($fields['candidateID']) && $fields['candidateID'] != '') ? $fields : (count($fields) > 0 ? $_POST : $_GET);
         if (!$this->isRequiredIDValid('candidateID', $request))
         {
             CommonErrors::fatal(COMMONERROR_BADINDEX, $this, 'Invalid candidate ID.');
@@ -1844,6 +2223,23 @@ class CandidatesUI extends UserInterface
         if (empty($firstName) || empty($lastName))
         {
             CommonErrors::fatal(COMMONERROR_MISSINGFIELDS, $this, 'Required fields are missing.');
+        }
+
+        $invalidLinkField = $this->getInvalidCandidateLinkField(array(
+            'webSite' => $webSite,
+            'facebook' => $facebook,
+            'linkedin' => $linkedin,
+            'github' => $github,
+            'googleplus' => $googleplus,
+            'twitter' => $twitter,
+            'cakeresume' => $cakeresume,
+            'link1' => $link1,
+            'link2' => $link2,
+            'link3' => $link3
+        ));
+        if ($invalidLinkField !== false)
+        {
+            CommonErrors::fatal(COMMONERROR_MISSINGFIELDS, $this, $invalidLinkField . ' must start with http:// or https://.');
         }
 
         if (!eval(Hooks::get('CANDIDATE_ON_EDIT_PRE'))) return;
@@ -3926,6 +4322,23 @@ class CandidatesUI extends UserInterface
         if (empty($firstName) || empty($lastName))
         {
             CommonErrors::fatal(COMMONERROR_MISSINGFIELDS, $this);
+        }
+
+        $invalidLinkField = $this->getInvalidCandidateLinkField(array(
+            'webSite' => $webSite,
+            'facebook' => $facebook,
+            'linkedin' => $linkedin,
+            'github' => $github,
+            'googleplus' => $googleplus,
+            'twitter' => $twitter,
+            'cakeresume' => $cakeresume,
+            'link1' => $link1,
+            'link2' => $link2,
+            'link3' => $link3
+        ));
+        if ($invalidLinkField !== false)
+        {
+            CommonErrors::fatal(COMMONERROR_MISSINGFIELDS, $this, $invalidLinkField . ' must start with http:// or https://.');
         }
 
         if (!eval(Hooks::get('CANDIDATE_ON_ADD_PRE'))) return;
