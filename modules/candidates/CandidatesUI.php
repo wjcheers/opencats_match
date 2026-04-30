@@ -943,7 +943,14 @@ class CandidatesUI extends UserInterface
 
         $contents = $payload['documentText'];
         $fields = $this->buildExtensionImportFields($payload);
-        $candidateID = $this->findExtensionImportCandidate($payload);
+        if (isset($payload['forcedCandidateID']) && (int) $payload['forcedCandidateID'] > 0)
+        {
+            $candidateID = (int) $payload['forcedCandidateID'];
+        }
+        else
+        {
+            $candidateID = $this->findExtensionImportCandidate($payload);
+        }
 
         if (trim($contents) != '')
         {
@@ -982,8 +989,16 @@ class CandidatesUI extends UserInterface
             'phone' => $this->getTrimmedInput('phone', $_POST)
         );
 
+        $forcedCandidateID = $this->getTrimmedInput('candidateID', $_POST);
+        if ($forcedCandidateID !== '' && is_numeric($forcedCandidateID) && (int) $forcedCandidateID > 0)
+        {
+            $payload['forcedCandidateID'] = (int) $forcedCandidateID;
+        }
+
         $importID = $_SESSION['CATS']->storeData($payload);
-        $candidateID = $this->findExtensionImportCandidate($payload);
+        $candidateID = isset($payload['forcedCandidateID'])
+            ? $payload['forcedCandidateID']
+            : $this->findExtensionImportCandidate($payload);
         $redirectURL = CATSUtility::getIndexName()
             . '?m=candidates&a=importFromExtension&importID=' . urlencode($importID);
 
