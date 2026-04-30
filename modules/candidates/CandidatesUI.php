@@ -1609,6 +1609,56 @@ class CandidatesUI extends UserInterface
         return $mapped;
     }
 
+    private function dropAIParseSuggestionsMatchingCandidate($suggestions, $data)
+    {
+        if (!is_array($suggestions) || !is_array($data))
+        {
+            return $suggestions;
+        }
+
+        $caseInsensitiveFields = array(
+            'email1', 'email2',
+            'webSite', 'facebook', 'linkedin', 'github', 'googleplus',
+            'twitter', 'cakeresume', 'link1', 'link2', 'link3'
+        );
+        $digitsOnlyFields = array('phoneHome', 'phoneCell', 'phoneWork');
+
+        $filtered = array();
+        foreach ($suggestions as $fieldName => $suggestedValue)
+        {
+            if (!isset($data[$fieldName]))
+            {
+                $filtered[$fieldName] = $suggestedValue;
+                continue;
+            }
+
+            $existing = trim((string) $data[$fieldName]);
+            $suggested = trim((string) $suggestedValue);
+
+            if (in_array($fieldName, $digitsOnlyFields))
+            {
+                $existing = preg_replace('/[^0-9]/', '', $existing);
+                $suggested = preg_replace('/[^0-9]/', '', $suggested);
+            }
+
+            if (in_array($fieldName, $caseInsensitiveFields))
+            {
+                if (strcasecmp($existing, $suggested) === 0)
+                {
+                    continue;
+                }
+            }
+            elseif ($existing === $suggested)
+            {
+                continue;
+            }
+
+            $filtered[$fieldName] = $suggestedValue;
+        }
+
+        return $filtered;
+    }
+
     private function filterCandidateAIParseSuggestions($fields)
     {
         $suggestedFields = array();
@@ -1977,6 +2027,11 @@ class CandidatesUI extends UserInterface
             {
                 $data['email1'] = $fields['email'];
             }
+        }
+
+        if (count($aiSuggestedFields) > 0)
+        {
+            $aiSuggestedFields = $this->dropAIParseSuggestionsMatchingCandidate($aiSuggestedFields, $data);
         }
 
         $users = new Users($this->_siteID);
