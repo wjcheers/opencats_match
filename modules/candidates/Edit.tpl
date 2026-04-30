@@ -1006,6 +1006,11 @@
 
                 adjustCandidateSummaryFields('editCandidateForm');
                 document.editCandidateForm.firstName.focus();
+                <?php if (!empty($this->aiAutoParseFromImport) && $this->isParsingEnabled): ?>
+                    if (typeof parseDocumentFileContents === 'function') {
+                        parseDocumentFileContents(true);
+                    }
+                <?php endif; ?>
             </script>
         </div>
     </div>

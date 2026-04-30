@@ -864,6 +864,11 @@
     <?php if(isset($this->preassignedFields['phoneHome']) || isset($this->preassignedFields['phoneHome'])): ?>
             checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneHome'])) echo(urlencode($this->preassignedFields['phoneHome'])); else if(isset($this->preassignedFields['phoneHome'])) echo(urlencode($this->preassignedFields['phoneHome'])); ?>"));
     <?php endif; ?>
+    <?php if (!empty($this->preassignedFields['aiAutoParseFromImport']) && $this->isParsingEnabled): ?>
+        if (typeof parseDocumentFileContents === 'function') {
+            parseDocumentFileContents(true);
+        }
+    <?php endif; ?>
 </script>
 
 <?php if ($this->isModal): ?>

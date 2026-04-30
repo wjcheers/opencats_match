@@ -945,44 +945,9 @@ class CandidatesUI extends UserInterface
         $fields = $this->buildExtensionImportFields($payload);
         $candidateID = $this->findExtensionImportCandidate($payload);
 
-        $aiResult = false;
         if (trim($contents) != '')
         {
-            $sourceType = $this->normalizeExtensionImportSourceType(
-                isset($payload['captureMode']) ? $payload['captureMode'] : ''
-            );
-            $aiResult = $this->parseCandidateResumeWithAI(
-                $contents,
-                $fields,
-                $sourceType,
-                $this->buildExtensionImportFilename($payload)
-            );
-        }
-
-        if ($aiResult !== false)
-        {
-            $aiResult = $this->sanitizeCandidateAIParseResult($aiResult);
-            if ($candidateID > 0)
-            {
-                $fields['aiSuggestedFields'] = $this->filterCandidateAIParseSuggestions($aiResult);
-                foreach (array('aiParseLogID', 'aiDocumentLanguage', 'aiParseError', 'aiResumeExtension') as $aiMetaField)
-                {
-                    if (isset($aiResult[$aiMetaField]))
-                    {
-                        $fields[$aiMetaField] = $aiResult[$aiMetaField];
-                    }
-                }
-            }
-            else
-            {
-                if (isset($fields['notes']) && trim($fields['notes']) != '' &&
-                    isset($aiResult['notes']) && trim($aiResult['notes']) != '')
-                {
-                    $aiResult['notes'] = trim($fields['notes']) . "\n\n" . trim($aiResult['notes']);
-                }
-                $fields = array_merge($fields, $aiResult);
-                $candidateID = $this->findExtensionImportCandidate(array_merge($payload, $fields));
-            }
+            $fields['aiAutoParseFromImport'] = true;
         }
 
         if ($candidateID > 0)
@@ -1980,6 +1945,13 @@ class CandidatesUI extends UserInterface
             unset($fields['aiSuggestedFields']);
         }
 
+        $aiAutoParseFromImport = false;
+        if (!empty($fields['aiAutoParseFromImport']))
+        {
+            $aiAutoParseFromImport = true;
+            unset($fields['aiAutoParseFromImport']);
+        }
+
         if (count($fields) > 0)
         {
             foreach ($fields as $fieldName => $fieldValue)
@@ -2087,6 +2059,7 @@ class CandidatesUI extends UserInterface
         $this->_template->assign('parsingStatus', $parsingStatus);
         $this->_template->assign('contents', $contents);
         $this->_template->assign('aiSuggestedFields', $aiSuggestedFields);
+        $this->_template->assign('aiAutoParseFromImport', $aiAutoParseFromImport);
         $this->_template->display('./modules/candidates/Edit.tpl');
     }
 
