@@ -76,7 +76,7 @@ class Attachments
     public function add($dataItemType, $dataItemID, $attachmentTitle,
         $originalFilename, $storedFilename, $contentType, $isResume,
         $resumeText, $isProfileImage, $directoryName, $fileSize = 0,
-        $md5sum = '', $enteredBy)
+        $md5sum = '', $enteredBy = 0)
     {
         /* If this is a profile image, delete all other profile images (users
          * can only have one).

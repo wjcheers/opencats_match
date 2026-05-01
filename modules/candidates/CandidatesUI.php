@@ -952,7 +952,8 @@ class CandidatesUI extends UserInterface
             $candidateID = $this->findExtensionImportCandidate($payload);
         }
 
-        if (trim($contents) != '')
+        if (trim($contents) != '' &&
+            (!isset($fields['aiSuggestedFields']) || !is_array($fields['aiSuggestedFields']) || count($fields['aiSuggestedFields']) == 0))
         {
             $fields['aiAutoParseFromImport'] = true;
         }
@@ -979,18 +980,48 @@ class CandidatesUI extends UserInterface
             return;
         }
 
+        $sourceURL = $this->getTrimmedInput('sourceURL', $_POST);
+        $pageTitle = $this->getTrimmedInput('pageTitle', $_POST);
+        if ($this->isExtensionImportInternalCandidateWorkflowURL($sourceURL))
+        {
+            $sourceURL = '';
+            $pageTitle = '';
+        }
+
         $payload = array(
             'documentText' => $documentText,
-            'sourceURL' => $this->getTrimmedInput('sourceURL', $_POST),
-            'pageTitle' => $this->getTrimmedInput('pageTitle', $_POST),
+            'sourceURL' => $sourceURL,
+            'pageTitle' => $pageTitle,
             'sourceType' => $this->getTrimmedInput('sourceType', $_POST),
-            'captureMode' => $this->getTrimmedInput('captureMode', $_POST),
             'email' => $this->getTrimmedInput('email', $_POST),
             'phone' => $this->getTrimmedInput('phone', $_POST)
         );
 
+        if ($payload['sourceType'] == 'cats')
+        {
+            $aiSuggestedFields = $this->getTrimmedInput('aiSuggestedFields', $_POST);
+            if ($aiSuggestedFields != '')
+            {
+                $decodedAIFields = json_decode($aiSuggestedFields, true);
+                if (is_array($decodedAIFields))
+                {
+                    $payload['aiSuggestedFields'] = $this->filterCandidateAIParseSuggestions($decodedAIFields);
+                }
+            }
+
+            foreach (array('aiParseLogID', 'aiDocumentLanguage', 'aiResumeExtension', 'aiJechoReportRequested', 'aiJechoReportMarkdown') as $aiMetaField)
+            {
+                $aiMetaValue = $this->getTrimmedInput($aiMetaField, $_POST);
+                if ($aiMetaValue != '')
+                {
+                    $payload[$aiMetaField] = $aiMetaValue;
+                }
+            }
+        }
+
         $forcedCandidateID = $this->getTrimmedInput('candidateID', $_POST);
-        if ($forcedCandidateID !== '' && is_numeric($forcedCandidateID) && (int) $forcedCandidateID > 0)
+        if ($payload['sourceType'] == 'cats' &&
+            $forcedCandidateID !== '' && is_numeric($forcedCandidateID) && (int) $forcedCandidateID > 0)
         {
             $payload['forcedCandidateID'] = (int) $forcedCandidateID;
         }
@@ -1023,6 +1054,12 @@ class CandidatesUI extends UserInterface
     private function buildExtensionImportFields($payload)
     {
         $sourceURL = isset($payload['sourceURL']) ? $payload['sourceURL'] : '';
+        $pageTitle = isset($payload['pageTitle']) ? $payload['pageTitle'] : '';
+        if ($this->isExtensionImportInternalCandidateWorkflowURL($sourceURL))
+        {
+            $sourceURL = '';
+            $pageTitle = '';
+        }
         $sourceType = isset($payload['sourceType']) ? $payload['sourceType'] : '';
         $sourceLabel = $this->buildExtensionImportSourceLabel($sourceType, $sourceURL);
         $notes = array();
@@ -1031,22 +1068,32 @@ class CandidatesUI extends UserInterface
         {
             $notes[] = 'Imported from: ' . $sourceURL;
         }
-        if (!empty($payload['pageTitle']))
+        if ($pageTitle != '')
         {
-            $notes[] = 'Source page title: ' . $payload['pageTitle'];
+            $notes[] = 'Source page title: ' . $pageTitle;
         }
-        if (!empty($payload['captureMode']))
-        {
-            $notes[] = 'Capture mode: ' . $payload['captureMode'];
-        }
-
         $fields = array(
             'source' => $sourceLabel,
             'notes' => implode("\n", $notes),
+            'extensionSourceURL' => $sourceURL,
+            'extensionSourcePageTitle' => $pageTitle,
             'documentTempFile' => '',
             'aiResumeExtension' => 'txt',
+            'aiSavePasteAsJechoReport' => 1,
             'isFromParser' => true
         );
+
+        if (isset($payload['aiSuggestedFields']) && is_array($payload['aiSuggestedFields']))
+        {
+            $fields['aiSuggestedFields'] = $payload['aiSuggestedFields'];
+        }
+        foreach (array('aiParseLogID', 'aiDocumentLanguage', 'aiResumeExtension', 'aiJechoReportRequested', 'aiJechoReportMarkdown') as $aiMetaField)
+        {
+            if (isset($payload[$aiMetaField]) && trim((string) $payload[$aiMetaField]) != '')
+            {
+                $fields[$aiMetaField] = $payload[$aiMetaField];
+            }
+        }
 
         if (isset($payload['email']) && trim($payload['email']) != '')
         {
@@ -1076,6 +1123,29 @@ class CandidatesUI extends UserInterface
         }
 
         return $this->normalizeCandidateLinkFields($fields);
+    }
+
+    private function isExtensionImportInternalCandidateWorkflowURL($url)
+    {
+        $url = trim($url);
+        if ($url == '')
+        {
+            return false;
+        }
+
+        $parts = @parse_url(html_entity_decode($url, ENT_QUOTES, 'UTF-8'));
+        if (!is_array($parts) || empty($parts['query']))
+        {
+            return false;
+        }
+
+        $query = array();
+        parse_str($parts['query'], $query);
+        $module = isset($query['m']) ? strtolower($query['m']) : '';
+        $action = isset($query['a']) ? strtolower($query['a']) : '';
+
+        return $module == 'candidates' &&
+            in_array($action, array('add', 'edit', 'importFromExtension'));
     }
 
     private function prepareExtensionImportEditFields($fields)
@@ -1218,17 +1288,6 @@ class CandidatesUI extends UserInterface
         return 'Web Resume';
     }
 
-    private function normalizeExtensionImportSourceType($captureMode)
-    {
-        $captureMode = strtolower(trim($captureMode));
-        if (!in_array($captureMode, array('quick', 'selection', 'manual')))
-        {
-            $captureMode = 'quick';
-        }
-
-        return 'ext_' . $captureMode;
-    }
-
     private function buildExtensionImportFilename($payload)
     {
         $sourceType = isset($payload['sourceType']) ? $payload['sourceType'] : 'web';
@@ -1252,6 +1311,7 @@ class CandidatesUI extends UserInterface
             else $contents = '';
 
             // Retain all field data since this isn't done over AJAX (yet)
+            $aiJechoReportRequested = $this->isAIJechoReportRequestedFromPost() ? 1 : 0;
             $fields = array(
                 'firstName'       => $this->getTrimmedInput('firstName', $_POST),
                 'middleName'      => $this->getTrimmedInput('middleName', $_POST),
@@ -1309,6 +1369,11 @@ class CandidatesUI extends UserInterface
                 'aiParseLogID'    => $this->getTrimmedInput('aiParseLogID', $_POST),
                 'aiDocumentLanguage' => $this->getTrimmedInput('aiDocumentLanguage', $_POST),
                 'aiResumeExtension' => $this->getTrimmedInput('aiResumeExtension', $_POST),
+                'aiSavePasteAsJechoReport' => $aiJechoReportRequested,
+                'aiJechoReportRequested' => $aiJechoReportRequested,
+                'aiJechoReportMarkdown' => $this->getTrimmedInput('aiJechoReportMarkdown', $_POST),
+                'extensionSourceURL' => $this->getTrimmedInput('extensionSourceURL', $_POST),
+                'extensionSourcePageTitle' => $this->getTrimmedInput('extensionSourcePageTitle', $_POST),
                 'isFromParser'    => true
             );
 
@@ -1447,7 +1512,7 @@ class CandidatesUI extends UserInterface
                     if ($isEditParse)
                     {
                         $fields['aiSuggestedFields'] = $this->filterCandidateAIParseSuggestions($aiResult);
-                        foreach (array('aiParseLogID', 'aiDocumentLanguage', 'aiParseError', 'aiResumeExtension') as $aiMetaField)
+                        foreach (array('aiParseLogID', 'aiDocumentLanguage', 'aiParseError', 'aiResumeExtension', 'aiJechoReportRequested', 'aiJechoReportMarkdown') as $aiMetaField)
                         {
                             if (isset($aiResult[$aiMetaField]))
                             {
@@ -1512,10 +1577,14 @@ class CandidatesUI extends UserInterface
         }
 
         $languageCode = $parser->detectLanguageCode($contents, $fileName);
+        $includeJechoReport = !empty($fields['aiJechoReportRequested']) &&
+            ($sourceType == 'paste' || substr($sourceType, -6) == '_paste');
         $result = $parser->parseResumeText($contents, array(
             'sourceType' => $sourceType,
             'fileName' => $fileName,
-            'languageHint' => $languageCode
+            'languageHint' => $languageCode,
+            'includeJechoReport' => $includeJechoReport,
+            'targetLanguage' => ($languageCode == 'en') ? 'en' : 'zh'
         ));
         if ($result === false)
         {
@@ -1540,15 +1609,23 @@ class CandidatesUI extends UserInterface
             $result
         );
 
-        return array_merge(
+        $mappedFields = array_merge(
             $this->mapAIParseResultToCandidateFields($result),
             array(
                 'aiParseLogID' => $parseLogID,
                 'aiDocumentLanguage' => $languageCode,
                 'aiParseError' => '',
-                'aiResumeExtension' => $this->getAIResumeExtension($fields, $fileName, $sourceType)
+                'aiResumeExtension' => $this->getAIResumeExtension($fields, $fileName, $sourceType),
+                'aiJechoReportRequested' => $includeJechoReport ? 1 : 0
             )
         );
+
+        if (!empty($result['jecho_report_markdown']))
+        {
+            $mappedFields['aiJechoReportMarkdown'] = $result['jecho_report_markdown'];
+        }
+
+        return $mappedFields;
     }
 
     private function mapAIParseResultToCandidateFields($result)
@@ -1678,7 +1755,15 @@ class CandidatesUI extends UserInterface
         {
             if (isset($fields[$fieldName]) && !$this->isCandidateImportEmptyValue($fields[$fieldName]))
             {
-                $suggestedFields[$fieldName] = $fields[$fieldName];
+                $fieldValue = $fields[$fieldName];
+                if ($fieldName == 'notes')
+                {
+                    $fieldValue = $this->removeInternalCandidateWorkflowSourceNotes($fieldValue);
+                }
+                if (!$this->isCandidateImportEmptyValue($fieldValue))
+                {
+                    $suggestedFields[$fieldName] = $fieldValue;
+                }
             }
         }
 
@@ -1693,7 +1778,7 @@ class CandidatesUI extends UserInterface
         }
 
         $sanitized = array();
-        $metaFields = array('aiParseLogID', 'aiDocumentLanguage', 'aiParseError', 'aiResumeExtension');
+        $metaFields = array('aiParseLogID', 'aiDocumentLanguage', 'aiParseError', 'aiResumeExtension', 'aiJechoReportRequested', 'aiJechoReportMarkdown');
         foreach ($fields as $fieldName => $fieldValue)
         {
             if (in_array($fieldName, $metaFields))
@@ -1710,10 +1795,47 @@ class CandidatesUI extends UserInterface
                 continue;
             }
 
+            if ($fieldName == 'notes')
+            {
+                $fieldValue = $this->removeInternalCandidateWorkflowSourceNotes($fieldValue);
+                if ($this->isCandidateImportEmptyValue($fieldValue))
+                {
+                    continue;
+                }
+            }
+
             $sanitized[$fieldName] = $fieldValue;
         }
 
         return $this->normalizeCandidateLinkFields($sanitized);
+    }
+
+    private function removeInternalCandidateWorkflowSourceNotes($notes)
+    {
+        $lines = preg_split('/\r\n|\r|\n/', (string) $notes);
+        $filteredLines = array();
+        $skipNextSourceTitle = false;
+
+        foreach ($lines as $line)
+        {
+            if (preg_match('/^\s*Imported from:\s*(.+?)\s*$/i', $line, $matches) &&
+                $this->isExtensionImportInternalCandidateWorkflowURL($matches[1]))
+            {
+                $skipNextSourceTitle = true;
+                continue;
+            }
+
+            if ($skipNextSourceTitle && preg_match('/^\s*Source page title:\s*/i', $line))
+            {
+                $skipNextSourceTitle = false;
+                continue;
+            }
+
+            $skipNextSourceTitle = false;
+            $filteredLines[] = $line;
+        }
+
+        return trim(implode("\n", $filteredLines));
     }
 
     private function isCandidateImportEmptyValue($value)
@@ -1741,6 +1863,11 @@ class CandidatesUI extends UserInterface
         {
             if (isset($fields[$fieldName]) && !$this->isCandidateImportEmptyValue($fields[$fieldName]))
             {
+                if ($this->isExtensionImportInternalCandidateWorkflowURL($fields[$fieldName]))
+                {
+                    unset($fields[$fieldName]);
+                    continue;
+                }
                 $fields[$fieldName] = $this->normalizeCandidateLinkValue($fields[$fieldName]);
             }
         }
@@ -1914,6 +2041,68 @@ class CandidatesUI extends UserInterface
 
         $parser = new AIResumeParser();
         return $parser->makeStandardFilename($candidateName, $languageCode, $extension);
+    }
+
+    private function buildParsedResumeTextFilenameFromPost()
+    {
+        if ($this->getAIJechoReportMarkdownFromPost() != '')
+        {
+            return $this->buildJechoReportFilenameFromPost();
+        }
+
+        return $this->buildStandardResumeFilenameFromPost();
+    }
+
+    private function getParsedResumeTextAttachmentContentFromPost()
+    {
+        $jechoReportMarkdown = $this->getAIJechoReportMarkdownFromPost();
+        if ($jechoReportMarkdown != '')
+        {
+            return $jechoReportMarkdown;
+        }
+
+        return isset($_POST['documentText']) ? $_POST['documentText'] : '';
+    }
+
+    private function getAIJechoReportMarkdownFromPost()
+    {
+        if (!$this->isAIJechoReportRequestedFromPost())
+        {
+            return '';
+        }
+
+        return $this->getTrimmedInput('aiJechoReportMarkdown', $_POST);
+    }
+
+    private function isAIJechoReportRequestedFromPost()
+    {
+        $requested = $this->getTrimmedInput('aiJechoReportRequested', $_POST);
+        if ($requested !== '')
+        {
+            return $requested == '1';
+        }
+
+        return $this->isChecked('aiSavePasteAsJechoReport', $_POST);
+    }
+
+    private function buildJechoReportFilenameFromPost()
+    {
+        $firstName = $this->getTrimmedInput('firstName', $_POST);
+        $lastName = $this->getTrimmedInput('lastName', $_POST);
+        $candidateName = trim($firstName . ' ' . $lastName);
+        if ($candidateName == '')
+        {
+            $candidateName = 'Candidate';
+        }
+
+        $languageCode = $this->getTrimmedInput('aiDocumentLanguage', $_POST);
+        if ($languageCode == '')
+        {
+            $languageCode = 'zh';
+        }
+
+        $parser = new AIResumeParser();
+        return $parser->makeJechoReportFilename('', $candidateName, $languageCode);
     }
 
     private function removeDocumentTempFile()
@@ -2504,11 +2693,12 @@ class CandidatesUI extends UserInterface
             $attachmentCreated = true;
         }
 
-        if (!$attachmentCreated && isset($_POST['documentText']) && !empty($_POST['documentText']))
+        $attachmentText = $this->getParsedResumeTextAttachmentContentFromPost();
+        if (!$attachmentCreated && $attachmentText != '')
         {
             if (!eval(Hooks::get('CANDIDATE_ON_CREATE_ATTACHMENT_PRE'))) return;
 
-            $standardResumeFilename = $this->buildStandardResumeFilenameFromPost();
+            $standardResumeFilename = $this->buildParsedResumeTextFilenameFromPost();
             if ($standardResumeFilename === false)
             {
                 $standardResumeFilename = 'MyResume.txt';
@@ -2516,7 +2706,7 @@ class CandidatesUI extends UserInterface
 
             $attachmentCreator = new AttachmentCreator($this->_siteID);
             $attachmentCreator->createFromText(
-                DATA_ITEM_CANDIDATE, $candidateID, $_POST['documentText'], $standardResumeFilename, true
+                DATA_ITEM_CANDIDATE, $candidateID, $attachmentText, $standardResumeFilename, true
             );
 
             if ($attachmentCreator->isError())
@@ -4648,13 +4838,14 @@ class CandidatesUI extends UserInterface
                 $attachmentCreated = true;
             }
 
-            if (!$attachmentCreated && isset($_POST['documentText']) && !empty($_POST['documentText']))
+            $attachmentText = $this->getParsedResumeTextAttachmentContentFromPost();
+            if (!$attachmentCreated && $attachmentText != '')
             {
                 // Resume was pasted into the form and not uploaded from a file
 
                 if (!eval(Hooks::get('CANDIDATE_ON_CREATE_ATTACHMENT_PRE'))) return;
 
-                $standardResumeFilename = $this->buildStandardResumeFilenameFromPost();
+                $standardResumeFilename = $this->buildParsedResumeTextFilenameFromPost();
                 if ($standardResumeFilename === false)
                 {
                     $standardResumeFilename = 'MyResume.txt';
@@ -4662,7 +4853,7 @@ class CandidatesUI extends UserInterface
 
                 $attachmentCreator = new AttachmentCreator($this->_siteID);
                 $attachmentCreator->createFromText(
-                    DATA_ITEM_CANDIDATE, $candidateID, $_POST['documentText'], $standardResumeFilename, true
+                    DATA_ITEM_CANDIDATE, $candidateID, $attachmentText, $standardResumeFilename, true
                 );
 
                 if ($attachmentCreator->isError())

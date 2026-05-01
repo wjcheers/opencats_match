@@ -64,6 +64,7 @@ function setTransferButtonEnabled(enabled)
 
     if (transferButtonLocked)
     {
+        setAIJechoReportCheckboxEnabled(false);
         return;
     }
 
@@ -76,6 +77,7 @@ function setTransferButtonEnabled(enabled)
     button.style.color = enabled ? '#ffffff' : '#6b7785';
     button.innerHTML = 'AI 解析履歷';
     button.title = enabled ? '' : getAIParseDisabledReason();
+    setAIJechoReportCheckboxEnabled(enabled);
 }
 
 function getAIParseDisabledReason()
@@ -177,6 +179,7 @@ function parseDocumentFileContents(silent)
 
     obj.value = 'true';
     obj2.value = 'true';
+    syncAIJechoReportRequestFromCheckbox();
     transferButtonLocked = true;
 
     if (button)
@@ -189,6 +192,7 @@ function parseDocumentFileContents(silent)
         button.innerHTML = 'AI 解析中...';
         button.onclick = null;
     }
+    setAIJechoReportCheckboxEnabled(false);
     var loading = document.getElementById('aiParsingLoading');
     if (loading)
     {
@@ -198,6 +202,31 @@ function parseDocumentFileContents(silent)
     window.setTimeout(function() {
         submitCandidateParserForm();
     }, 50);
+}
+
+function syncAIJechoReportRequestFromCheckbox()
+{
+    var checkbox = document.getElementById('aiSavePasteAsJechoReport');
+    var requested = document.getElementById('aiJechoReportRequested');
+
+    if (!checkbox || !requested)
+    {
+        return;
+    }
+
+    requested.value = checkbox.checked ? '1' : '0';
+}
+
+function setAIJechoReportCheckboxEnabled(enabled)
+{
+    var checkbox = document.getElementById('aiSavePasteAsJechoReport');
+
+    if (!checkbox)
+    {
+        return;
+    }
+
+    checkbox.disabled = !enabled;
 }
 
 function documentFileChange()
@@ -281,6 +310,16 @@ function removeDocumentFile()
     if (obj8)
     {
         obj8.value = '';
+    }
+    var obj9 = document.getElementById('aiJechoReportMarkdown');
+    if (obj9)
+    {
+        obj9.value = '';
+    }
+    var obj10 = document.getElementById('aiJechoReportRequested');
+    if (obj10)
+    {
+        obj10.value = '0';
     }
     if (obj5)
     {

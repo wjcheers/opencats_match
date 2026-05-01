@@ -541,6 +541,8 @@ class AIResumeParser
         $fileName = isset($options['fileName']) ? trim($options['fileName']) : '';
         $sourceType = isset($options['sourceType']) ? trim($options['sourceType']) : self::DEFAULT_SOURCE_TYPE;
         $languageHint = isset($options['languageHint']) ? trim($options['languageHint']) : '';
+        $includeJechoReport = $this->_shouldIncludeJechoReport($options);
+        $targetLanguage = $this->_getJechoReportTargetLanguage($options, $languageHint);
 
         $instructions = array();
         $instructions[] = 'You extract structured candidate data from resumes for an ATS.';
@@ -556,6 +558,15 @@ class AIResumeParser
         $instructions[] = 'function_en should describe the job function, not simply repeat the raw title.';
         $instructions[] = 'career_summary: Write 3 to 5 bullet points (using "- " prefix) in Traditional Chinese summarizing the candidate\'s professional background, key experience, and strengths. Each bullet should be one concise sentence.';
         $instructions[] = 'skill_summary: Write a bullet list (using "- " prefix) in Traditional Chinese listing the candidate\'s skills grouped or ordered by importance. Include technical skills, tools, and soft skills where applicable.';
+        if ($includeJechoReport)
+        {
+            $instructions[] = 'Also populate jecho_report_markdown with the final JECHO Markdown report in the requested language.';
+            $instructions[] = 'Do not wrap jecho_report_markdown in code fences.';
+        }
+        else
+        {
+            $instructions[] = 'Set jecho_report_markdown to an empty string.';
+        }
 
         $input = "Resume source type: " . $sourceType . "\n";
         if ($fileName != '')
@@ -566,13 +577,20 @@ class AIResumeParser
         {
             $input .= "Language hint: " . $languageHint . "\n";
         }
+        if ($includeJechoReport)
+        {
+            $input .= "Target JECHO report language: " . $targetLanguage . "\n";
+            $input .= "\nFollow these exact JECHO report rules and template when populating jecho_report_markdown:\n\n";
+            $input .= $this->_getJechoReportPrompt($targetLanguage);
+            $input .= "\n";
+        }
         $input .= "\nResume text:\n" . $resumeText;
 
         return array(
             'model' => OPENAI_MODEL,
             'instructions' => implode("\n", $instructions),
             'input' => $input,
-            'max_output_tokens' => 2500,
+            'max_output_tokens' => $includeJechoReport ? 9000 : 2500,
             'text' => array(
                 'format' => array(
                     'type' => 'json_schema',
@@ -587,11 +605,7 @@ class AIResumeParser
 
     private function _buildJechoReportPayload($resumeText, $options)
     {
-        $targetLanguage = isset($options['targetLanguage']) ? strtolower(trim($options['targetLanguage'])) : 'zh';
-        if ($targetLanguage != 'zh' && $targetLanguage != 'en')
-        {
-            $targetLanguage = 'zh';
-        }
+        $targetLanguage = $this->_getJechoReportTargetLanguage($options);
 
         $fileName = isset($options['fileName']) ? trim($options['fileName']) : '';
         $candidateName = isset($options['candidateName']) ? trim($options['candidateName']) : '';
@@ -625,6 +639,30 @@ class AIResumeParser
             'input' => $input,
             'max_output_tokens' => 7000
         );
+    }
+
+
+    private function _shouldIncludeJechoReport($options)
+    {
+        return !empty($options['includeJechoReport']);
+    }
+
+
+    private function _getJechoReportTargetLanguage($options, $languageHint = '')
+    {
+        $targetLanguage = isset($options['targetLanguage']) ? strtolower(trim($options['targetLanguage'])) : '';
+        if ($targetLanguage == 'zh' || $targetLanguage == 'en')
+        {
+            return $targetLanguage;
+        }
+
+        $languageHint = strtolower(trim($languageHint));
+        if ($languageHint == 'en')
+        {
+            return 'en';
+        }
+
+        return 'zh';
     }
 
 
@@ -957,9 +995,10 @@ EOT;
                         'job_title_confidence', 'function_confidence',
                         'job_level_confidence', 'skills_confidence'
                     )
-                )
+                ),
+                'jecho_report_markdown' => array('type' => 'string')
             ),
-            'required' => array('candidate', 'normalization')
+            'required' => array('candidate', 'normalization', 'jecho_report_markdown')
         );
     }
 
@@ -1059,9 +1098,19 @@ EOT;
             'output_tokens' => $this->_getUsageValue($this->_lastResponse, 'output_tokens')
         );
 
+        if (!isset($result['jecho_report_markdown']) || !is_string($result['jecho_report_markdown']))
+        {
+            $result['jecho_report_markdown'] = '';
+        }
+        else
+        {
+            $result['jecho_report_markdown'] = $this->_cleanMarkdownOutput($result['jecho_report_markdown']);
+        }
+
         $result['meta'] = array(
             'source_type' => isset($options['sourceType']) ? $options['sourceType'] : self::DEFAULT_SOURCE_TYPE,
-            'file_name' => isset($options['fileName']) ? $options['fileName'] : ''
+            'file_name' => isset($options['fileName']) ? $options['fileName'] : '',
+            'jecho_report_included' => $this->_shouldIncludeJechoReport($options) ? 1 : 0
         );
 
         return $result;

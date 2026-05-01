@@ -29,8 +29,397 @@
 var candidateIsAlreadyInSystem = false;
 var candidateIsAlreadyInSystemID = -1;
 var candidateIsAlreadyInSystemName = '';
+var candidateAlreadyInSystemMatches = {};
 
-function checkEmailAlreadyInSystem(email, currentID, sessionCookie)
+function normalizeDuplicateCandidateLookupValue(value)
+{
+    return (value || '').replace(/^\s+|\s+$/g, '').toLowerCase();
+}
+
+function makeDuplicateCandidateSourceKey(type, value, sourceKey)
+{
+    sourceKey = sourceKey || normalizeDuplicateCandidateLookupValue(value);
+    return type + ':' + sourceKey;
+}
+
+function updateCandidateAlreadyInSystemDisplay()
+{
+    var selectedMatch = null;
+    for (var key in candidateAlreadyInSystemMatches)
+    {
+        if (candidateAlreadyInSystemMatches.hasOwnProperty(key))
+        {
+            selectedMatch = candidateAlreadyInSystemMatches[key];
+            break;
+        }
+    }
+
+    candidateIsAlreadyInSystem = !!selectedMatch;
+    candidateIsAlreadyInSystemID = selectedMatch ? selectedMatch.id : -1;
+    candidateIsAlreadyInSystemName = selectedMatch ? selectedMatch.name : '';
+
+    var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
+    for (var i = 0; i < linkOuter.length; i++)
+    {
+        linkOuter[i].style.display = selectedMatch ? '' : 'none';
+    }
+
+    if (!selectedMatch)
+    {
+        return;
+    }
+
+    linkOuter = document.getElementsByClassName("candidateAlreadyInSystemName");
+    for (i = 0; i < linkOuter.length; i++)
+    {
+        linkOuter[i].innerHTML = candidateIsAlreadyInSystemName;
+    }
+}
+
+function setCandidateAlreadyInSystemMatch(sourceKey, id, name, currentID)
+{
+    if (!sourceKey)
+    {
+        return;
+    }
+
+    if (id != -1 && !((currentID != '') && (currentID == id)))
+    {
+        candidateAlreadyInSystemMatches[sourceKey] = {
+            id: id,
+            name: name || ''
+        };
+    }
+    else
+    {
+        delete candidateAlreadyInSystemMatches[sourceKey];
+    }
+
+    updateCandidateAlreadyInSystemDisplay();
+}
+
+function getDuplicateCandidateFieldValue(fieldName)
+{
+    var element = null;
+    if (fieldName == 'source')
+    {
+        element = document.getElementById('sourceSelect');
+    }
+    if (!element)
+    {
+        element = document.getElementById(fieldName);
+    }
+    if (!element)
+    {
+        var named = document.getElementsByName(fieldName);
+        if (named && named.length > 0)
+        {
+            element = named[0];
+        }
+    }
+    if (!element)
+    {
+        return '';
+    }
+    if (element.type == 'checkbox')
+    {
+        return element.checked ? '1' : '';
+    }
+    return element.value || '';
+}
+
+function addDuplicateCandidateField(fields, fieldName, value)
+{
+    value = value || '';
+    value = value.replace(/^\s+|\s+$/g, '');
+    if (value != '')
+    {
+        fields[fieldName] = value;
+    }
+}
+
+function hasDuplicateCandidateAIParseResult()
+{
+    var logID = document.getElementById('aiParseLogID');
+    if (logID && logID.value != '')
+    {
+        return true;
+    }
+    return !!document.getElementById('aiSuggestionTable');
+}
+
+function collectDuplicateCandidateAISuggestionFields()
+{
+    var fields = {};
+    var table = document.getElementById('aiSuggestionTable');
+    if (!table)
+    {
+        return fields;
+    }
+
+    var rows = table.querySelectorAll ? table.querySelectorAll('tr.aiSuggestionRow') : [];
+    for (var i = 0; i < rows.length; i++)
+    {
+        var field = rows[i].querySelector('.aiSuggestionFieldName');
+        var target = rows[i].querySelector('.aiSuggestionTarget');
+        var value = rows[i].querySelector('.aiSuggestionValue');
+        var fieldName = field ? field.value : (target ? target.value : '');
+        if (fieldName && value)
+        {
+            addDuplicateCandidateField(fields, fieldName, value.value);
+        }
+    }
+
+    return fields;
+}
+
+function collectDuplicateCandidateSummaryFields(fields)
+{
+    var labels = document.querySelectorAll ? document.querySelectorAll('[id^="extraFieldLbl"]') : [];
+    for (var i = 0; i < labels.length; i++)
+    {
+        var label = (labels[i].innerText || labels[i].textContent || '').replace(/:\s*$/, '').replace(/^\s+|\s+$/g, '');
+        var fieldName = '';
+        if (label == 'Career Summary')
+        {
+            fieldName = 'aiCareerSummary';
+        }
+        else if (label == 'Skill Summary')
+        {
+            fieldName = 'aiSkillSummary';
+        }
+        if (fieldName == '')
+        {
+            continue;
+        }
+
+        var index = labels[i].id.replace('extraFieldLbl', '');
+        var element = document.getElementById('extraField' + index);
+        if (!element)
+        {
+            var cell = document.getElementById('extraFieldData' + index);
+            element = cell && cell.querySelector ? cell.querySelector('textarea,input,select') : null;
+        }
+        if (element)
+        {
+            addDuplicateCandidateField(fields, fieldName, element.value || '');
+        }
+    }
+}
+
+function collectDuplicateCandidateParsedFields()
+{
+    var fields = collectDuplicateCandidateAISuggestionFields();
+    var hasFields = false;
+    for (var existingField in fields)
+    {
+        if (fields.hasOwnProperty(existingField))
+        {
+            hasFields = true;
+            break;
+        }
+    }
+    if (hasFields)
+    {
+        return fields;
+    }
+    if (!hasDuplicateCandidateAIParseResult())
+    {
+        return {};
+    }
+
+    var fieldNames = [
+        'firstName', 'middleName', 'lastName', 'chineseName', 'nationality',
+        'email1', 'email2', 'phoneHome', 'phoneCell', 'phoneWork',
+        'webSite', 'facebook', 'linkedin', 'github', 'googleplus',
+        'twitter', 'cakeresume', 'link1', 'link2', 'link3',
+        'address', 'city', 'state', 'zip', 'source', 'currentEmployer',
+        'jobTitle', 'currentPay', 'desiredPay', 'keySkills', 'extraGender',
+        'maritalStatus', 'birthYear', 'highestDegree', 'major', 'line',
+        'qq', 'skype', 'wechat', 'functions', 'jobLevel', 'notes'
+    ];
+    for (var i = 0; i < fieldNames.length; i++)
+    {
+        addDuplicateCandidateField(fields, fieldNames[i], getDuplicateCandidateFieldValue(fieldNames[i]));
+    }
+    collectDuplicateCandidateSummaryFields(fields);
+
+    return fields;
+}
+
+function addDuplicateCandidatePostParam(params, name, value)
+{
+    if (value === undefined || value === null || value === '')
+    {
+        return;
+    }
+    params.push(encodeURIComponent(name) + '=' + encodeURIComponent(value));
+}
+
+function getDuplicateCandidateOriginalSourceDetails()
+{
+    var sourceURL = getDuplicateCandidateFieldValue('extensionSourceURL');
+    var pageTitle = getDuplicateCandidateFieldValue('extensionSourcePageTitle');
+
+    if (sourceURL == '' || pageTitle == '')
+    {
+        var parsedNotesSource = parseDuplicateCandidateSourceFromNotes(
+            getDuplicateCandidateFieldValue('notes')
+        );
+        sourceURL = sourceURL || parsedNotesSource.sourceURL;
+        pageTitle = pageTitle || parsedNotesSource.pageTitle;
+    }
+
+    if (sourceURL != '' && isDuplicateCandidateInternalCATSPage(sourceURL))
+    {
+        sourceURL = '';
+        pageTitle = '';
+    }
+
+    if (sourceURL == '' && !isDuplicateCandidateInternalCATSPage(window.location.href))
+    {
+        sourceURL = window.location.href;
+        pageTitle = document.title || '';
+    }
+
+    return {
+        sourceURL: sourceURL || '',
+        pageTitle: pageTitle || ''
+    };
+}
+
+function parseDuplicateCandidateSourceFromNotes(notes)
+{
+    var sourceDetails = {
+        sourceURL: '',
+        pageTitle: ''
+    };
+    notes = notes || '';
+
+    var sourceMatch = notes.match(/(?:^|\n)Imported from:\s*(.+?)(?:\r?\n|$)/i);
+    if (sourceMatch && sourceMatch[1])
+    {
+        sourceDetails.sourceURL = sourceMatch[1].replace(/^\s+|\s+$/g, '');
+    }
+
+    var titleMatch = notes.match(/(?:^|\n)Source page title:\s*(.+?)(?:\r?\n|$)/i);
+    if (titleMatch && titleMatch[1])
+    {
+        sourceDetails.pageTitle = titleMatch[1].replace(/^\s+|\s+$/g, '');
+    }
+
+    return sourceDetails;
+}
+
+function isDuplicateCandidateInternalCATSPage(url)
+{
+    url = (url || '').replace(/&amp;/gi, '&');
+    return /[?&]m=candidates(?:[&#]|$)/i.test(url) &&
+        /[?&]a=(add|edit|importFromExtension)(?:[&#]|$)/i.test(url);
+}
+
+function openCandidateAlreadyInSystemWithPaste(indexName)
+{
+    if (candidateIsAlreadyInSystemID == -1)
+    {
+        return false;
+    }
+
+    var candidateURL = indexName + '?m=candidates&a=show&candidateID=' + encodeURIComponent(candidateIsAlreadyInSystemID);
+    var documentTextField = document.getElementById('documentText');
+    var documentText = documentTextField ? documentTextField.value : '';
+    if (documentText.replace(/\s+/g, '') == '')
+    {
+        window.open(candidateURL);
+        return false;
+    }
+
+    var targetWindow = window.open('', '_blank');
+    if (targetWindow)
+    {
+        targetWindow.document.write('<html><body style="font-family:Arial,sans-serif;font-size:13px;">Opening duplicate candidate with pasted resume...</body></html>');
+    }
+
+    var http = AJAX_getXMLHttpObject();
+    http.onreadystatechange = function ()
+    {
+        if (http.readyState != 4)
+        {
+            return;
+        }
+
+        var redirectURL = candidateURL;
+        if (http.status >= 200 && http.status < 300)
+        {
+            try
+            {
+                var response = JSON.parse(http.responseText);
+                if (response && response.success && response.redirectURL)
+                {
+                    redirectURL = response.redirectURL;
+                }
+            }
+            catch (e)
+            {
+            }
+        }
+
+        if (targetWindow)
+        {
+            targetWindow.location = redirectURL;
+        }
+        else
+        {
+            window.open(redirectURL);
+        }
+    };
+
+    var params = [];
+    addDuplicateCandidatePostParam(params, 'postback', 'postback');
+    addDuplicateCandidatePostParam(params, 'candidateID', candidateIsAlreadyInSystemID);
+    addDuplicateCandidatePostParam(params, 'documentText', documentText);
+    addDuplicateCandidatePostParam(params, 'sourceType', 'cats');
+    var originalSource = getDuplicateCandidateOriginalSourceDetails();
+    addDuplicateCandidatePostParam(params, 'sourceURL', originalSource.sourceURL);
+    addDuplicateCandidatePostParam(params, 'pageTitle', originalSource.pageTitle);
+
+    var parsedFields = collectDuplicateCandidateParsedFields();
+    if (window.JSON && JSON.stringify)
+    {
+        var parsedFieldCount = 0;
+        for (var parsedField in parsedFields)
+        {
+            if (parsedFields.hasOwnProperty(parsedField))
+            {
+                parsedFieldCount++;
+            }
+        }
+        if (parsedFieldCount > 0)
+        {
+            addDuplicateCandidatePostParam(params, 'aiSuggestedFields', JSON.stringify(parsedFields));
+        }
+    }
+
+    var metaFields = [
+        'aiParseLogID',
+        'aiDocumentLanguage',
+        'aiResumeExtension',
+        'aiJechoReportRequested',
+        'aiJechoReportMarkdown'
+    ];
+    for (var i = 0; i < metaFields.length; i++)
+    {
+        addDuplicateCandidatePostParam(params, metaFields[i], getDuplicateCandidateFieldValue(metaFields[i]));
+    }
+
+    http.open('POST', indexName + '?m=candidates&a=importFromExtension', true);
+    http.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    http.send(params.join('&'));
+
+    return false;
+}
+
+function checkEmailAlreadyInSystem(email, currentID, sessionCookie, sourceKey)
 {
     if (email == '')
     {
@@ -60,37 +449,15 @@ function checkEmailAlreadyInSystem(email, currentID, sessionCookie)
 
         var idNode = http.responseXML.getElementsByTagName('id').item(0);
 
-        if (idNode.firstChild.nodeValue != -1)
-        {
-            candidateIsAlreadyInSystem = true;
-            candidateIsAlreadyInSystemID = idNode.firstChild.nodeValue;
-            candidateIsAlreadyInSystemName = http.responseXML.getElementsByTagName('name').item(0).firstChild.nodeValue;
-
-            if ((currentID != '') && (currentID == candidateIsAlreadyInSystemID))
-            {
-                return;
-            }
-
-            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].style.display = '';
-            }
-            linkOuter = document.getElementsByClassName("candidateAlreadyInSystemName");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].innerHTML = candidateIsAlreadyInSystemName;
-            }
-        }
-        else
-        {
-            candidateIsAlreadyInSystem = false;
-            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].style.display = 'none';
-            }
-        }
+        var candidateID = idNode.firstChild.nodeValue;
+        var nameNode = http.responseXML.getElementsByTagName('name').item(0);
+        var candidateName = (nameNode && nameNode.firstChild) ? nameNode.firstChild.nodeValue : '';
+        setCandidateAlreadyInSystemMatch(
+            makeDuplicateCandidateSourceKey('email', email, sourceKey),
+            candidateID,
+            candidateName,
+            currentID
+        );
     }
 
     AJAX_callCATSFunction(
@@ -122,7 +489,7 @@ function onSubmitEmailInSystem()
 }
 
 
-function checkPhoneAlreadyInSystem(phone, currentID, sessionCookie)
+function checkPhoneAlreadyInSystem(phone, currentID, sessionCookie, sourceKey)
 {
     if (phone == '')
     {
@@ -152,37 +519,15 @@ function checkPhoneAlreadyInSystem(phone, currentID, sessionCookie)
 
         var idNode = http.responseXML.getElementsByTagName('id').item(0);
 
-        if (idNode.firstChild.nodeValue != -1)
-        {
-            candidateIsAlreadyInSystem = true;
-            candidateIsAlreadyInSystemID = idNode.firstChild.nodeValue;
-            candidateIsAlreadyInSystemName = http.responseXML.getElementsByTagName('name').item(0).firstChild.nodeValue;
-
-            if ((currentID != '') && (currentID == candidateIsAlreadyInSystemID))
-            {
-                return;
-            }
-
-            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].style.display = '';
-            }
-            linkOuter = document.getElementsByClassName("candidateAlreadyInSystemName");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].innerHTML = candidateIsAlreadyInSystemName;
-            }
-        }
-        else
-        {
-            candidateIsAlreadyInSystem = false;
-            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].style.display = 'none';
-            }
-        }
+        var candidateID = idNode.firstChild.nodeValue;
+        var nameNode = http.responseXML.getElementsByTagName('name').item(0);
+        var candidateName = (nameNode && nameNode.firstChild) ? nameNode.firstChild.nodeValue : '';
+        setCandidateAlreadyInSystemMatch(
+            makeDuplicateCandidateSourceKey('phone', phone, sourceKey),
+            candidateID,
+            candidateName,
+            currentID
+        );
     }
 
     AJAX_callCATSFunction(
@@ -214,7 +559,7 @@ function onSubmitPhoneInSystem()
 }
 
 
-function checkLinkAlreadyInSystem(link, currentID, sessionCookie)
+function checkLinkAlreadyInSystem(link, currentID, sessionCookie, sourceKey)
 {
     if (link == '')
     {
@@ -244,37 +589,15 @@ function checkLinkAlreadyInSystem(link, currentID, sessionCookie)
 
         var idNode = http.responseXML.getElementsByTagName('id').item(0);
 
-        if (idNode.firstChild.nodeValue != -1)
-        {
-            candidateIsAlreadyInSystem = true;
-            candidateIsAlreadyInSystemID = idNode.firstChild.nodeValue;
-            candidateIsAlreadyInSystemName = http.responseXML.getElementsByTagName('name').item(0).firstChild.nodeValue;
-
-            if ((currentID != '') && (currentID == candidateIsAlreadyInSystemID))
-            {
-                return;
-            }
-
-            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].style.display = '';
-            }
-            linkOuter = document.getElementsByClassName("candidateAlreadyInSystemName");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].innerHTML = candidateIsAlreadyInSystemName;
-            }
-        }
-        else
-        {
-            candidateIsAlreadyInSystem = false;
-            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].style.display = 'none';
-            }
-        }
+        var candidateID = idNode.firstChild.nodeValue;
+        var nameNode = http.responseXML.getElementsByTagName('name').item(0);
+        var candidateName = (nameNode && nameNode.firstChild) ? nameNode.firstChild.nodeValue : '';
+        setCandidateAlreadyInSystemMatch(
+            makeDuplicateCandidateSourceKey('link', link, sourceKey),
+            candidateID,
+            candidateName,
+            currentID
+        );
     }
 
     AJAX_callCATSFunction(
@@ -306,7 +629,7 @@ function onSubmitLinkInSystem()
 }
 
 
-function checkSocialMediaAlreadyInSystem(type, social, sessionCookie)
+function checkSocialMediaAlreadyInSystem(type, social, sessionCookie, sourceKey)
 {
     if (social == '')
     {
@@ -337,32 +660,15 @@ function checkSocialMediaAlreadyInSystem(type, social, sessionCookie)
 
         var idNode = http.responseXML.getElementsByTagName('id').item(0);
 
-        if (idNode.firstChild.nodeValue != -1)
-        {
-            candidateIsAlreadyInSystem = true;
-            candidateIsAlreadyInSystemID = idNode.firstChild.nodeValue;
-            candidateIsAlreadyInSystemName = http.responseXML.getElementsByTagName('name').item(0).firstChild.nodeValue;
-
-            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].style.display = '';
-            }
-            linkOuter = document.getElementsByClassName("candidateAlreadyInSystemName");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].innerHTML = candidateIsAlreadyInSystemName;
-            }
-        }
-        else
-        {
-            candidateIsAlreadyInSystem = false;
-            var linkOuter = document.getElementsByClassName("candidateAlreadyInSystemTable");
-            for (i = 0; i < linkOuter.length; i++)
-            {
-                linkOuter[i].style.display = 'none';
-            }
-        }
+        var candidateID = idNode.firstChild.nodeValue;
+        var nameNode = http.responseXML.getElementsByTagName('name').item(0);
+        var candidateName = (nameNode && nameNode.firstChild) ? nameNode.firstChild.nodeValue : '';
+        setCandidateAlreadyInSystemMatch(
+            makeDuplicateCandidateSourceKey('social-' + type, social, sourceKey),
+            candidateID,
+            candidateName,
+            ''
+        );
     }
 
     AJAX_callCATSFunction(
@@ -392,4 +698,3 @@ function onSubmitSocialMediaInSystem()
     }
     return true ;
 }
-

@@ -94,6 +94,10 @@ class AttachmentsUI extends UserInterface
         
         $directoryName = $rs['directoryName'];
         $fileName      = $rs['storedFilename'];
+        $downloadName  = $this->makeAttachmentDownloadFilename(
+            isset($rs['originalFilename']) ? $rs['originalFilename'] : '',
+            $fileName
+        );
         $filePath      = sprintf('attachments/%s/%s', $directoryName, $fileName);
 
         /* Check for the existence of the backup.  If it is gone, send the user to a page informing them to press back and generate the backup again. */
@@ -124,7 +128,7 @@ class AttachmentsUI extends UserInterface
         }
 
         /* Set headers for sending the file. */
-        header('Content-Disposition: inline; filename="' . $fileName . '"');  //Disposition attachment was default, but forces download.
+        header('Content-Disposition: inline; filename="' . $this->makeAttachmentDownloadFilenameFallback($downloadName) . '"; filename*=UTF-8\'\'' . rawurlencode($downloadName));  //Disposition attachment was default, but forces download.
         header('Content-Type: ' . $contentType);
         header('Content-Length: ' . filesize($filePath));
         header('Pragma: no-cache');
@@ -142,6 +146,54 @@ class AttachmentsUI extends UserInterface
         
         /* Exit to prevent output after the attachment. */
         exit();
+    }
+
+    private function makeAttachmentDownloadFilename($originalFilename, $storedFilename)
+    {
+        $fileName = trim((string) $originalFilename);
+        if ($fileName == '')
+        {
+            $fileName = trim((string) $storedFilename);
+        }
+
+        $fileName = str_replace(array("\r", "\n", "\0"), '', $fileName);
+
+        $parts = explode('/', $fileName);
+        $fileName = end($parts);
+        $parts = explode('\\', $fileName);
+        $fileName = end($parts);
+
+        if (trim($fileName) == '')
+        {
+            return 'attachment';
+        }
+
+        return $fileName;
+    }
+
+    private function makeAttachmentDownloadFilenameFallback($fileName)
+    {
+        $fallback = '';
+        for ($i = 0; $i < strlen($fileName); $i++)
+        {
+            $ord = ord($fileName[$i]);
+            if ($ord < 32 || $ord >= 127 || $fileName[$i] == '"')
+            {
+                $fallback .= '_';
+            }
+            else
+            {
+                $fallback .= $fileName[$i];
+            }
+        }
+
+        $fallback = trim($fallback, '._ ');
+        if ($fallback == '')
+        {
+            $fallback = 'attachment';
+        }
+
+        return $fallback;
     }
 
 }

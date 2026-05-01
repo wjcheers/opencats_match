@@ -23,7 +23,7 @@
                 <tr>
                     <td class="tdVertical">
                         This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
-                        <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
+                        <a href="javascript:void(0);" onclick="return openCandidateAlreadyInSystemWithPaste('<?php echo(CATSUtility::getIndexName()); ?>');">
                             <img src="images/new_window.gif" border="0" />
                             <img src="images/candidate_small.gif" border="0" />
                             <span class="candidateAlreadyInSystemName"></span>
@@ -38,6 +38,10 @@
                 <input type="hidden" name="aiParseLogID" id="aiParseLogID" value="<?php echo (isset($this->data['aiParseLogID']) ? $this->data['aiParseLogID'] : ''); ?>" />
                 <input type="hidden" name="aiDocumentLanguage" id="aiDocumentLanguage" value="<?php echo (isset($this->data['aiDocumentLanguage']) ? $this->data['aiDocumentLanguage'] : ''); ?>" />
                 <input type="hidden" name="aiResumeExtension" id="aiResumeExtension" value="<?php echo (isset($this->data['aiResumeExtension']) ? $this->data['aiResumeExtension'] : ''); ?>" />
+                <input type="hidden" name="aiJechoReportRequested" id="aiJechoReportRequested" value="<?php echo (!empty($this->data['aiJechoReportRequested']) || (!isset($this->data['aiJechoReportRequested']) && !empty($this->data['aiSavePasteAsJechoReport']))) ? '1' : '0'; ?>" />
+                <input type="hidden" name="extensionSourceURL" id="extensionSourceURL" value="<?php echo (isset($this->data['extensionSourceURL']) ? htmlspecialchars($this->data['extensionSourceURL'], ENT_QUOTES) : ''); ?>" />
+                <input type="hidden" name="extensionSourcePageTitle" id="extensionSourcePageTitle" value="<?php echo (isset($this->data['extensionSourcePageTitle']) ? htmlspecialchars($this->data['extensionSourcePageTitle'], ENT_QUOTES) : ''); ?>" />
+                <textarea name="aiJechoReportMarkdown" id="aiJechoReportMarkdown" style="display:none;"><?php echo (isset($this->data['aiJechoReportMarkdown']) ? htmlspecialchars($this->data['aiJechoReportMarkdown'], ENT_QUOTES) : ''); ?></textarea>
 
                 <?php if (isset($this->data['aiParseError']) && $this->data['aiParseError'] != ''): ?>
                     <div style="margin-bottom: 10px; padding: 8px; border: 1px solid #cc9999; background-color: #fff3f3; color: #800000; width: 980px;">
@@ -156,6 +160,7 @@
                             </td>
                             <td class="tdVertical" style="vertical-align: top; padding-top: 4px; padding-bottom: 4px;">
                                 <?php $this->_($aiFieldLabels[$fieldName]); ?>
+                                <input type="hidden" class="aiSuggestionFieldName" value="<?php $this->_($fieldName); ?>" />
                                 <input type="hidden" class="aiSuggestionTarget" value="<?php $this->_($targetID); ?>" />
                                 <textarea class="aiSuggestionValue" style="display:none;"><?php echo htmlspecialchars($suggestedValue); ?></textarea>
                             </td>
@@ -234,6 +239,10 @@
                                             <?php endif; ?>
                                             <textarea class="inputbox" tabindex="90" name="documentText" id="documentText" rows="5" cols="40" onmousemove="documentCheck();" onchange="documentCheck();" onmousedown="documentCheck();" onkeypress="documentCheck();" style="width: 500px; height: 210px; padding: 3px;"><?php echo $this->contents; ?></textarea>
                                             <br/>
+                                            <label style="display:block; width:500px; margin:6px auto 0 auto; text-align:left; color:#4f5b66; font-size:11px; line-height:15px;">
+                                                <input type="checkbox" id="aiSavePasteAsJechoReport" name="aiSavePasteAsJechoReport" value="1"<?php if (!empty($this->data['aiSavePasteAsJechoReport'])): ?> checked<?php endif; ?> />
+                                                AI 解析後將貼上/Extension 匯入內容另存為 Jecho_AI_Report_*.md 附件
+                                            </label>
                                             <div style="color: #666666; text-align: center;">
                                             (<b>hint:</b> you may also paste the resume contents)
                                             <br /><br />
@@ -309,7 +318,7 @@
                             <label id="email1Label" for="email1">E-Mail:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="email1" name="email1" value="<?php $this->_($this->data['email1']); ?>" style="width: 150px;" onchange="checkEmailAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
+                            <input type="text" class="inputbox" id="email1" name="email1" value="<?php $this->_($this->data['email1']); ?>" style="width: 150px;" onchange="checkEmailAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>, '', 'email1');" />
                         </td>
                     </tr>
                     <tr>
@@ -317,7 +326,7 @@
                             <label id="email2Label" for="email2">2nd E-Mail:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="email2" name="email2" value="<?php $this->_($this->data['email2']); ?>" style="width: 150px;" onchange="checkEmailAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
+                            <input type="text" class="inputbox" id="email2" name="email2" value="<?php $this->_($this->data['email2']); ?>" style="width: 150px;" onchange="checkEmailAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>, '', 'email2');" />
                         </td>
                     </tr>
 
@@ -326,7 +335,7 @@
                             <label id="phoneHomeLabel" for="phoneHome">Home Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="phoneHome" name="phoneHome" value="<?php $this->_($this->data['phoneHome']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
+                            <input type="text" class="inputbox" id="phoneHome" name="phoneHome" value="<?php $this->_($this->data['phoneHome']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>, '', 'phoneHome');" />
                         </td>
                     </tr>
 
@@ -335,7 +344,7 @@
                             <label id="phoneCellLabel" for="phoneCell">Cell Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="phoneCell" name="phoneCell" value="<?php $this->_($this->data['phoneCell']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
+                            <input type="text" class="inputbox" id="phoneCell" name="phoneCell" value="<?php $this->_($this->data['phoneCell']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>, '', 'phoneCell');" />
                         </td>
                     </tr>
 
@@ -344,7 +353,7 @@
                             <label id="phoneWorkLabel" for="phoneWork">Work Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" class="inputbox" id="phoneWork" name="phoneWork" value="<?php $this->_($this->data['phoneWork']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>);" />
+                            <input type="text" class="inputbox" id="phoneWork" name="phoneWork" value="<?php $this->_($this->data['phoneWork']); ?>" style="width: 150px;" onchange="checkPhoneAlreadyInSystem(this.value, <?php echo($this->candidateID); ?>, '', 'phoneWork');" />
                         </td>
                     </tr>
 
@@ -630,7 +639,7 @@
                     <tr>
                         <td class="tdVertical">
                             This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
-                            <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
+                            <a href="javascript:void(0);" onclick="return openCandidateAlreadyInSystemWithPaste('<?php echo(CATSUtility::getIndexName()); ?>');">
                                 <img src="images/new_window.gif" border="0" />
                                 <img src="images/candidate_small.gif" border="0" />
                                 <span class="candidateAlreadyInSystemName"></span>
@@ -838,7 +847,7 @@
                     <tr>
                         <td class="tdVertical">
                             This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
-                            <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
+                            <a href="javascript:void(0);" onclick="return openCandidateAlreadyInSystemWithPaste('<?php echo(CATSUtility::getIndexName()); ?>');">
                                 <img src="images/new_window.gif" border="0" />
                                 <img src="images/candidate_small.gif" border="0" />
                                 <span class="candidateAlreadyInSystemName"></span>

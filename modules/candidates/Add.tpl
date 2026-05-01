@@ -30,7 +30,7 @@
                 <tr>
                     <td class="tdVertical">
                         This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
-                        <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
+                        <a href="javascript:void(0);" onclick="return openCandidateAlreadyInSystemWithPaste('<?php echo(CATSUtility::getIndexName()); ?>');">
                             <img src="images/new_window.gif" border="0" />
                             <img src="images/candidate_small.gif" border="0" />
                             <span class="candidateAlreadyInSystemName"></span>
@@ -53,6 +53,10 @@
                 <input type="hidden" name="aiParseLogID" id="aiParseLogID" value="<?php echo (isset($this->preassignedFields['aiParseLogID']) ? $this->preassignedFields['aiParseLogID'] : ''); ?>" />
                 <input type="hidden" name="aiDocumentLanguage" id="aiDocumentLanguage" value="<?php echo (isset($this->preassignedFields['aiDocumentLanguage']) ? $this->preassignedFields['aiDocumentLanguage'] : ''); ?>" />
                 <input type="hidden" name="aiResumeExtension" id="aiResumeExtension" value="<?php echo (isset($this->preassignedFields['aiResumeExtension']) ? $this->preassignedFields['aiResumeExtension'] : ''); ?>" />
+                <input type="hidden" name="aiJechoReportRequested" id="aiJechoReportRequested" value="<?php echo (!empty($this->preassignedFields['aiJechoReportRequested']) || (!isset($this->preassignedFields['aiJechoReportRequested']) && !empty($this->preassignedFields['aiSavePasteAsJechoReport']))) ? '1' : '0'; ?>" />
+                <input type="hidden" name="extensionSourceURL" id="extensionSourceURL" value="<?php echo (isset($this->preassignedFields['extensionSourceURL']) ? htmlspecialchars($this->preassignedFields['extensionSourceURL'], ENT_QUOTES) : ''); ?>" />
+                <input type="hidden" name="extensionSourcePageTitle" id="extensionSourcePageTitle" value="<?php echo (isset($this->preassignedFields['extensionSourcePageTitle']) ? htmlspecialchars($this->preassignedFields['extensionSourcePageTitle'], ENT_QUOTES) : ''); ?>" />
+                <textarea name="aiJechoReportMarkdown" id="aiJechoReportMarkdown" style="display:none;"><?php echo (isset($this->preassignedFields['aiJechoReportMarkdown']) ? htmlspecialchars($this->preassignedFields['aiJechoReportMarkdown'], ENT_QUOTES) : ''); ?></textarea>
 
                 <?php if (isset($this->preassignedFields['aiParseError']) && $this->preassignedFields['aiParseError'] != ''): ?>
                     <div style="margin-bottom: 10px; padding: 8px; border: 1px solid #cc9999; background-color: #fff3f3; color: #800000; width: <?php if ($this->isModal): ?>100%<?php else: ?>1200px<?php endif; ?>;">
@@ -120,6 +124,10 @@
                                             <?php endif; ?>
                                             <textarea class="inputbox" tabindex="90" name="documentText" id="documentText" rows="5" cols="40" onmousemove="documentCheck();" onchange="documentCheck();" onmousedown="documentCheck();" onkeypress="documentCheck();" style="width: <?php if ($this->isModal): ?>320<?php else: ?>500<?php endif; ?>px; height: 210px; padding: 3px;"><?php echo $this->contents; ?></textarea>
                                             <br/>
+                                            <label style="display:block; width: <?php if ($this->isModal): ?>320<?php else: ?>500<?php endif; ?>px; margin:6px auto 0 auto; text-align:left; color:#4f5b66; font-size:11px; line-height:15px;">
+                                                <input type="checkbox" id="aiSavePasteAsJechoReport" name="aiSavePasteAsJechoReport" value="1"<?php if (!empty($this->preassignedFields['aiSavePasteAsJechoReport'])): ?> checked<?php endif; ?> />
+                                                AI 解析後將貼上/Extension 匯入內容另存為 Jecho_AI_Report_*.md 附件
+                                            </label>
                                             <div style="color: #666666; text-align: center;">
                                             (<b>hint:</b> you may also paste the resume contents)
                                             <br /><br />
@@ -216,7 +224,7 @@
                             <label id="emailLabel" for="email1">E-Mail:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="3" name="email1" id="email1" class="inputbox" style="width: 150px" value="<?php if(isset($this->preassignedFields['email'])) $this->_($this->preassignedFields['email']); elseif (isset($this->preassignedFields['email1'])) $this->_($this->preassignedFields['email1']); ?>" onchange="checkEmailAlreadyInSystem(this.value);" />
+                            <input type="text" tabindex="3" name="email1" id="email1" class="inputbox" style="width: 150px" value="<?php if(isset($this->preassignedFields['email'])) $this->_($this->preassignedFields['email']); elseif (isset($this->preassignedFields['email1'])) $this->_($this->preassignedFields['email1']); ?>" onchange="checkEmailAlreadyInSystem(this.value, '', '', 'email1');" />
                         </td>
                     </tr>
 
@@ -225,7 +233,7 @@
                             <label id="email2Label" for="email2">2nd E-Mail:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="4" name="email2" id="email2" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['email2'])) $this->_($this->preassignedFields['email2']); ?>" onchange="checkEmailAlreadyInSystem(this.value);" />
+                            <input type="text" tabindex="4" name="email2" id="email2" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['email2'])) $this->_($this->preassignedFields['email2']); ?>" onchange="checkEmailAlreadyInSystem(this.value, '', '', 'email2');" />
                         </td>
                     </tr>
 
@@ -349,7 +357,7 @@
                             <label id="phoneHomeLabel" for="phoneHome">Home Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="6" name="phoneHome" id="phoneHome" class="inputbox" style="width: 150px;" value="<?php if (isset($this->preassignedFields['phoneHome'])) $this->_($this->preassignedFields['phoneHome']); ?>" onchange="checkPhoneAlreadyInSystem(this.value);"  />
+                            <input type="text" tabindex="6" name="phoneHome" id="phoneHome" class="inputbox" style="width: 150px;" value="<?php if (isset($this->preassignedFields['phoneHome'])) $this->_($this->preassignedFields['phoneHome']); ?>" onchange="checkPhoneAlreadyInSystem(this.value, '', '', 'phoneHome');"  />
                             <?php if ($this->isParsingEnabled): ?>
                                 <?php if ($this->parsingStatus['parseLimit'] >= 0 && $this->parsingStatus['parseUsed'] >= $this->parsingStatus['parseLimit']): ?>
                                     &nbsp;
@@ -365,7 +373,7 @@
                             <label id="phoneCellLabel" for="phoneCell">Cell Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="7" name="phoneCell" id="phoneCell" class="inputbox" style="width: 150px;" value="<?php if (isset($this->preassignedFields['phoneCell'])) $this->_($this->preassignedFields['phoneCell']); ?>" onchange="checkPhoneAlreadyInSystem(this.value);" />
+                            <input type="text" tabindex="7" name="phoneCell" id="phoneCell" class="inputbox" style="width: 150px;" value="<?php if (isset($this->preassignedFields['phoneCell'])) $this->_($this->preassignedFields['phoneCell']); ?>" onchange="checkPhoneAlreadyInSystem(this.value, '', '', 'phoneCell');" />
                         </td>
                     </tr>
 
@@ -374,7 +382,7 @@
                             <label id="phoneWorkLabel" for="phoneWork">Work Phone:</label>
                         </td>
                         <td class="tdData">
-                            <input type="text" tabindex="8" name="phoneWork" id="phoneWork" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['phoneWork'])) $this->_($this->preassignedFields['phoneWork']); ?>" onchange="checkPhoneAlreadyInSystem(this.value);" />
+                            <input type="text" tabindex="8" name="phoneWork" id="phoneWork" class="inputbox" style="width: 150px" value="<?php if (isset($this->preassignedFields['phoneWork'])) $this->_($this->preassignedFields['phoneWork']); ?>" onchange="checkPhoneAlreadyInSystem(this.value, '', '', 'phoneWork');" />
                         </td>
                     </tr>
 
@@ -553,7 +561,7 @@
                     <tr>
                         <td class="tdVertical">
                             This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
-                            <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
+                            <a href="javascript:void(0);" onclick="return openCandidateAlreadyInSystemWithPaste('<?php echo(CATSUtility::getIndexName()); ?>');">
                                 <img src="images/new_window.gif" border="0" />
                                 <img src="images/candidate_small.gif" border="0" />
                                 <span class="candidateAlreadyInSystemName"></span>
@@ -760,7 +768,7 @@
                     <tr>
                         <td class="tdVertical">
                             This profile may already be in the system.&nbsp;&nbsp;Possible duplicate candidate profile:&nbsp;&nbsp;
-                            <a href="javascript:void(0);" onclick="window.open('<?php echo(CATSUtility::getIndexName()); ?>?m=candidates&amp;a=show&amp;candidateID='+candidateIsAlreadyInSystemID);">
+                            <a href="javascript:void(0);" onclick="return openCandidateAlreadyInSystemWithPaste('<?php echo(CATSUtility::getIndexName()); ?>');">
                                 <img src="images/new_window.gif" border="0" />
                                 <img src="images/candidate_small.gif" border="0" />
                                 <span class="candidateAlreadyInSystemName"></span>
@@ -850,20 +858,25 @@
         highlightMissingAddCandidateRequiredFields();
     <?php endif; ?>
     <?php if(isset($this->preassignedFields['email']) || isset($this->preassignedFields['email1'])): ?>
-        checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['email'])) echo(urlencode($this->preassignedFields['email'])); else if(isset($this->preassignedFields['email1'])) echo(urlencode($this->preassignedFields['email1'])); ?>"));
+        checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['email'])) echo(urlencode($this->preassignedFields['email'])); else if(isset($this->preassignedFields['email1'])) echo(urlencode($this->preassignedFields['email1'])); ?>"), '', '', 'email1');
     <?php endif; ?>
     <?php if(isset($this->preassignedFields['email2']) || isset($this->preassignedFields['email2'])): ?>
-            checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['email2'])) echo(urlencode($this->preassignedFields['email2'])); else if(isset($this->preassignedFields['email2'])) echo(urlencode($this->preassignedFields['email2'])); ?>"));
+            checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['email2'])) echo(urlencode($this->preassignedFields['email2'])); else if(isset($this->preassignedFields['email2'])) echo(urlencode($this->preassignedFields['email2'])); ?>"), '', '', 'email2');
     <?php endif; ?>
     <?php if(isset($this->preassignedFields['phoneCell']) || isset($this->preassignedFields['phoneCell'])): ?>
-            checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneCell'])) echo(urlencode($this->preassignedFields['phoneCell'])); else if(isset($this->preassignedFields['phoneCell'])) echo(urlencode($this->preassignedFields['phoneCell'])); ?>"));
+            checkPhoneAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneCell'])) echo(urlencode($this->preassignedFields['phoneCell'])); else if(isset($this->preassignedFields['phoneCell'])) echo(urlencode($this->preassignedFields['phoneCell'])); ?>"), '', '', 'phoneCell');
     <?php endif; ?>
     <?php if(isset($this->preassignedFields['phoneWork']) || isset($this->preassignedFields['phoneWork'])): ?>
-            checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneWork'])) echo(urlencode($this->preassignedFields['phoneWork'])); else if(isset($this->preassignedFields['phoneWork'])) echo(urlencode($this->preassignedFields['phoneWork'])); ?>"));
+            checkPhoneAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneWork'])) echo(urlencode($this->preassignedFields['phoneWork'])); else if(isset($this->preassignedFields['phoneWork'])) echo(urlencode($this->preassignedFields['phoneWork'])); ?>"), '', '', 'phoneWork');
     <?php endif; ?>
     <?php if(isset($this->preassignedFields['phoneHome']) || isset($this->preassignedFields['phoneHome'])): ?>
-            checkEmailAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneHome'])) echo(urlencode($this->preassignedFields['phoneHome'])); else if(isset($this->preassignedFields['phoneHome'])) echo(urlencode($this->preassignedFields['phoneHome'])); ?>"));
+            checkPhoneAlreadyInSystem(urlDecode("<?php if(isset($this->preassignedFields['phoneHome'])) echo(urlencode($this->preassignedFields['phoneHome'])); else if(isset($this->preassignedFields['phoneHome'])) echo(urlencode($this->preassignedFields['phoneHome'])); ?>"), '', '', 'phoneHome');
     <?php endif; ?>
+    <?php foreach (array('webSite', 'facebook', 'linkedin', 'github', 'googleplus', 'twitter', 'cakeresume', 'link1', 'link2', 'link3') as $linkFieldName): ?>
+        <?php if (isset($this->preassignedFields[$linkFieldName]) && trim((string) $this->preassignedFields[$linkFieldName]) != ''): ?>
+            checkLinkAlreadyInSystem(urlDecode("<?php echo(urlencode($this->preassignedFields[$linkFieldName])); ?>"), '', '', '<?php echo($linkFieldName); ?>');
+        <?php endif; ?>
+    <?php endforeach; ?>
     <?php if (!empty($this->preassignedFields['aiAutoParseFromImport']) && $this->isParsingEnabled): ?>
         if (typeof parseDocumentFileContents === 'function') {
             parseDocumentFileContents(true);
