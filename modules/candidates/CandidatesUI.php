@@ -1012,7 +1012,7 @@ class CandidatesUI extends UserInterface
             foreach (array('aiParseLogID', 'aiDocumentLanguage', 'aiResumeExtension', 'aiJechoReportRequested', 'aiJechoReportMarkdown') as $aiMetaField)
             {
                 $aiMetaValue = $this->getTrimmedInput($aiMetaField, $_POST);
-                if ($aiMetaValue != '')
+                if ($aiMetaValue !== '')
                 {
                     $payload[$aiMetaField] = $aiMetaValue;
                 }
@@ -1023,7 +1023,12 @@ class CandidatesUI extends UserInterface
         if ($payload['sourceType'] == 'cats' &&
             $forcedCandidateID !== '' && is_numeric($forcedCandidateID) && (int) $forcedCandidateID > 0)
         {
-            $payload['forcedCandidateID'] = (int) $forcedCandidateID;
+            $candidates = new Candidates($this->_siteID);
+            $forcedCandidateRS = $candidates->get((int) $forcedCandidateID);
+            if (is_array($forcedCandidateRS) && count($forcedCandidateRS) > 0)
+            {
+                $payload['forcedCandidateID'] = (int) $forcedCandidateID;
+            }
         }
 
         $importID = $_SESSION['CATS']->storeData($payload);
@@ -1062,6 +1067,11 @@ class CandidatesUI extends UserInterface
         }
         $sourceType = isset($payload['sourceType']) ? $payload['sourceType'] : '';
         $sourceLabel = $this->buildExtensionImportSourceLabel($sourceType, $sourceURL);
+        $savePasteAsJechoReport = 1;
+        if (isset($payload['aiJechoReportRequested']))
+        {
+            $savePasteAsJechoReport = ((string) $payload['aiJechoReportRequested'] === '1') ? 1 : 0;
+        }
         $notes = array();
 
         if ($sourceURL != '')
@@ -1079,7 +1089,7 @@ class CandidatesUI extends UserInterface
             'extensionSourcePageTitle' => $pageTitle,
             'documentTempFile' => '',
             'aiResumeExtension' => 'txt',
-            'aiSavePasteAsJechoReport' => 1,
+            'aiSavePasteAsJechoReport' => $savePasteAsJechoReport,
             'isFromParser' => true
         );
 
@@ -1145,7 +1155,7 @@ class CandidatesUI extends UserInterface
         $action = isset($query['a']) ? strtolower($query['a']) : '';
 
         return $module == 'candidates' &&
-            in_array($action, array('add', 'edit', 'importFromExtension'));
+            in_array($action, array('add', 'edit', 'importfromextension'));
     }
 
     private function prepareExtensionImportEditFields($fields)
