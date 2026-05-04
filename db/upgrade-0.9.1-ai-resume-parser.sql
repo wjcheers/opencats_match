@@ -95,11 +95,13 @@ CREATE TABLE `ai_resume_parse_log` (
   `input_tokens` int(11) NOT NULL DEFAULT '0',
   `output_tokens` int(11) NOT NULL DEFAULT '0',
   `status` varchar(20) NOT NULL DEFAULT 'success',
+  `parse_mode` varchar(10) NOT NULL DEFAULT '',
   `saved_candidate_id` int(11) NOT NULL DEFAULT '0',
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_site_user_created` (`site_id`,`user_id`,`created_at`),
   KEY `idx_status` (`status`),
+  KEY `idx_parse_mode` (`parse_mode`),
   KEY `idx_saved_candidate_id` (`saved_candidate_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

@@ -53,6 +53,7 @@
                 <input type="hidden" name="aiParseLogID" id="aiParseLogID" value="<?php echo (isset($this->preassignedFields['aiParseLogID']) ? $this->preassignedFields['aiParseLogID'] : ''); ?>" />
                 <input type="hidden" name="aiDocumentLanguage" id="aiDocumentLanguage" value="<?php echo (isset($this->preassignedFields['aiDocumentLanguage']) ? $this->preassignedFields['aiDocumentLanguage'] : ''); ?>" />
                 <input type="hidden" name="aiResumeExtension" id="aiResumeExtension" value="<?php echo (isset($this->preassignedFields['aiResumeExtension']) ? $this->preassignedFields['aiResumeExtension'] : ''); ?>" />
+                <input type="hidden" name="aiParseMode" id="aiParseMode" value="<?php echo (isset($this->preassignedFields['aiParseMode']) ? htmlspecialchars($this->preassignedFields['aiParseMode'], ENT_QUOTES) : 'full'); ?>" />
                 <input type="hidden" name="aiJechoReportRequested" id="aiJechoReportRequested" value="<?php echo (!empty($this->preassignedFields['aiJechoReportRequested']) || (!isset($this->preassignedFields['aiJechoReportRequested']) && !empty($this->preassignedFields['aiSavePasteAsJechoReport']))) ? '1' : '0'; ?>" />
                 <input type="hidden" name="extensionSourceURL" id="extensionSourceURL" value="<?php echo (isset($this->preassignedFields['extensionSourceURL']) ? htmlspecialchars($this->preassignedFields['extensionSourceURL'], ENT_QUOTES) : ''); ?>" />
                 <input type="hidden" name="extensionSourcePageTitle" id="extensionSourcePageTitle" value="<?php echo (isset($this->preassignedFields['extensionSourcePageTitle']) ? htmlspecialchars($this->preassignedFields['extensionSourcePageTitle'], ENT_QUOTES) : ''); ?>" />
@@ -91,6 +92,98 @@
                         </td>
 
                         <td rowspan="12" align="center" valign="top">
+                            <?php
+                            /* =========================================================================
+                             * Resume widget (Add candidate) — Upload / Paste / Fast / Full
+                             * =========================================================================
+                             *
+                             * IMPORTANT FOR FUTURE EDITS (human or AI): this widget mixes two
+                             * orthogonal concerns. Don't conflate them.
+                             *
+                             *   (1) Upload  -> attaches a file to the candidate at save time.
+                             *   (2) Parse   -> calls the AI to pre-fill candidate form fields,
+                             *                  with two intensities (Fast / Full).
+                             *
+                             * --- Upload path -------------------------------------------------------
+                             *
+                             *   <input type="file" id="documentFile">  +  [Upload] button
+                             *
+                             *   Upload click submits with loadDocument='true' (no parseDocument).
+                             *   Server: moves the file to the per-site temp upload dir, pins the
+                             *   stored name into hidden `documentTempFile`. The file just sits
+                             *   there until the candidate is saved.
+                             *
+                             *   The (remove) link clears `documentTempFile` and unlinks the temp
+                             *   file -> nothing is attached at save.
+                             *
+                             *   At save (`_addCandidate`):
+                             *     - documentTempFile present -> file is attached.
+                             *     - Filename rule:
+                             *         * Parse ran (aiParseLogID present)
+                             *               -> Resume_<Name>_<YYYYMMDD>_<lang>.<ext>
+                             *                  (collisions get _V2 / _V3 / ... via
+                             *                   AIResumeParser::makeNextStandardFilename)
+                             *         * Parse did NOT run
+                             *               -> original filename kept as-is. We can't assume
+                             *                  the file is a resume, so we apply the "Other"
+                             *                  rule from CreateAttachmentModal (no rename).
+                             *
+                             *   Upload is independent of Fast/Full — it never calls AI.
+                             *
+                             * --- Parse path (Fast / Full) -----------------------------------------
+                             *
+                             *   Both buttons submit with loadDocument='true' AND parseDocument='true'.
+                             *   Server reads either:
+                             *     (a) the just-uploaded file, if user clicked Fast/Full without
+                             *         first clicking Upload, OR
+                             *     (b) the textarea contents, if the user pasted text.
+                             *   Then runs the AI and pre-fills the candidate fields.
+                             *
+                             *   Fast vs Full (see AIResumeParser::_buildRequestPayload):
+                             *     - Model:   Fast = OPENAI_FAST_MODEL (nano)
+                             *                Full = OPENAI_MODEL      (mini)
+                             *     - Output:  Fast skips career_summary, skill_summary, AND
+                             *                jecho_report_markdown.
+                             *                Full produces summaries; Jecho Report depends on
+                             *                aiJechoReportRequested.
+                             *     - Tokens:  Fast max=1500;  Full max=2500 (no Jecho) or 9000.
+                             *
+                             *   Canonical mode keys are 'fast' / 'full' (DB column, API options,
+                             *   extension importMode). UI button labels may differ — don't rename
+                             *   the keys.
+                             *
+                             * --- Paste-only flow (no Upload) --------------------------------------
+                             *
+                             *   When user pastes text and clicks Fast/Full, no documentTempFile
+                             *   exists. At save:
+                             *     - Fast + paste:  fields are filled, NO attachment is persisted.
+                             *                      The pasted text is throwaway raw input.
+                             *     - Full + paste:  Jecho_Report_<Name>_<Date>_<Lang>.md is created
+                             *                      from the AI Jecho markdown. The pasted text
+                             *                      itself is still NOT persisted.
+                             *
+                             *   The skip-attachment rule lives in
+                             *   CandidatesUI::getParsedResumeTextAttachmentContentFromPost().
+                             *
+                             * --- Extension import (Chrome / "NBI-ATS") ----------------------------
+                             *
+                             *   The extension's "fast" / "full" importMode maps directly to
+                             *   aiParseMode='fast' / 'full' (CandidatesUI::buildExtensionImportFields).
+                             *   Downstream behavior is identical to the in-app Fast / Full buttons.
+                             *
+                             * --- Race-condition note ---------------------------------------------
+                             *
+                             *   The beforeunload handler at the bottom of this template fires
+                             *   sendBeacon(removeDocumentTempFile) on navigation, gated by
+                             *   window._catsFormSubmitting. js/candidateParser.js sets that flag
+                             *   in submitCandidateParserForm() because form.submit() does not
+                             *   trigger the 'submit' event. If you add a new code path that
+                             *   navigates away programmatically while a temp file is pinned,
+                             *   set the flag yourself or you'll race-delete the upload.
+                             *
+                             * =========================================================================
+                             */
+                            ?>
                             <?php if ($this->isParsingEnabled): ?>
                                 <input type="hidden" name="loadDocument" id="loadDocument" value="" />
                                 <input type="hidden" name="parseDocument" id="parseDocument" value="" />
@@ -124,10 +217,7 @@
                                             <?php endif; ?>
                                             <textarea class="inputbox" tabindex="90" name="documentText" id="documentText" rows="5" cols="40" onmousemove="documentCheck();" onchange="documentCheck();" onmousedown="documentCheck();" onkeypress="documentCheck();" style="width: <?php if ($this->isModal): ?>320<?php else: ?>500<?php endif; ?>px; height: 210px; padding: 3px;"><?php echo $this->contents; ?></textarea>
                                             <br/>
-                                            <label style="display:block; width: <?php if ($this->isModal): ?>320<?php else: ?>500<?php endif; ?>px; margin:6px auto 0 auto; text-align:left; color:#4f5b66; font-size:11px; line-height:15px;">
-                                                <input type="checkbox" id="aiSavePasteAsJechoReport" name="aiSavePasteAsJechoReport" value="1"<?php if (!empty($this->preassignedFields['aiSavePasteAsJechoReport'])): ?> checked<?php endif; ?> />
-                                                AI 解析後將貼上/Extension 匯入內容另存為 Jecho_AI_Report_*.md 附件
-                                            </label>
+                                            <input type="checkbox" id="aiSavePasteAsJechoReport" name="aiSavePasteAsJechoReport" value="1" style="display:none;"<?php if (!empty($this->preassignedFields['aiSavePasteAsJechoReport'])): ?> checked<?php endif; ?> />
                                             <div style="color: #666666; text-align: center;">
                                             (<b>hint:</b> you may also paste the resume contents)
                                             <br /><br />
@@ -136,14 +226,52 @@
                                                 <button
                                                     type="button"
                                                     id="transfer"
-                                                    onclick="parseDocumentFileContents();"
+                                                    data-label="完整解析"
+                                                    onclick="parseDocumentFileContents('full');"
                                                     <?php if ($this->contents == ''): ?>disabled="disabled"<?php endif; ?>
                                                     style="padding:6px 12px; border:1px solid #2f6fad; border-radius:4px; background:<?php echo ($this->contents != '' ? '#3f84c5' : '#d7dfe8'); ?>; color:<?php echo ($this->contents != '' ? '#ffffff' : '#6b7785'); ?>; font-size:12px; font-weight:bold; cursor:<?php echo ($this->contents != '' ? 'pointer' : 'not-allowed'); ?>;"
-                                                >AI 解析履歷</button>
-                                                <span style="display:block; margin-top:5px; font-size:11px; color:#666666;">使用上方上傳或貼上的履歷內容，自動帶入候選人欄位。</span>
+                                                >完整解析</button>
+                                                <button
+                                                    type="button"
+                                                    id="transferFast"
+                                                    data-label="快速解析"
+                                                    onclick="parseDocumentFileContents('fast');"
+                                                    <?php if ($this->contents == ''): ?>disabled="disabled"<?php endif; ?>
+                                                    style="padding:6px 12px; margin-left:6px; border:1px solid #2f6fad; border-radius:4px; background:<?php echo ($this->contents != '' ? '#3f84c5' : '#d7dfe8'); ?>; color:<?php echo ($this->contents != '' ? '#ffffff' : '#6b7785'); ?>; font-size:12px; font-weight:bold; cursor:<?php echo ($this->contents != '' ? 'pointer' : 'not-allowed'); ?>;"
+                                                >快速解析</button>
+                                                <span style="display:block; margin-top:5px; font-size:11px; color:#666666;">快速解析只填候選人欄位；完整解析會另存 Jecho_AI_Report_*.md。</span>
                                             </span>
                                             <span id="aiParsingLoading" style="display:none; margin-left:8px; font-size:11px; color:#7a6000; background:#fffbe6; border:1px solid #e6c700; padding:3px 8px; vertical-align:middle;">&#x23F3; AI 解析中，請稍候...</span>
                                             <br /><br />
+                                            <details style="display:inline-block; position:relative; text-align:left; font-size:11px; line-height:1.65; color:#4f5b66; vertical-align:top;">
+                                                <summary style="cursor:pointer; font-weight:bold; color:#2f6fad; list-style:none; padding:3px 10px; border:1px solid #d8dde2; border-radius:4px; background:#f7f9fb; user-select:none; display:inline-block;">📋 操作說明（Upload / 解析 / 貼上）</summary>
+                                                <div style="position:absolute; top:100%; left:50%; transform:translateX(-50%); margin-top:4px; width:<?php if ($this->isModal): ?>320<?php else: ?>500<?php endif; ?>px; padding:10px 14px; background:#ffffff; border:1px solid #d8dde2; border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,0.12); z-index:10;">
+                                                    <div style="margin-bottom:6px;"><b>📎 Upload 上傳檔案</b></div>
+                                                    <ul style="margin:0 0 8px 18px; padding:0;">
+                                                        <li>選檔 → 按 <b>Upload</b>，檔案暫存；按 <b>Save</b> / <b>Add Candidate</b> 才會正式存成附件。</li>
+                                                        <li>點 <b>(remove)</b> 可取消這次上傳。</li>
+                                                        <li>Upload 跟下方的「快速 / 完整解析」是獨立動作，互不影響。</li>
+                                                    </ul>
+                                                    <div style="margin-bottom:6px;"><b>🏷️ 附件檔名規則</b></div>
+                                                    <ul style="margin:0 0 8px 18px; padding:0;">
+                                                        <li>有跑過解析 → <code>Resume_&lt;姓名&gt;_&lt;日期&gt;_&lt;語言&gt;.&lt;副檔名&gt;</code>。</li>
+                                                        <li>同名衝突 → 自動加 <code>_V2</code>、<code>_V3</code>…</li>
+                                                        <li>沒跑解析 → 保留原檔名（無法判定是不是履歷）。</li>
+                                                    </ul>
+                                                    <div style="margin-bottom:6px;"><b>🤖 AI 解析（快速 vs 完整）</b></div>
+                                                    <ul style="margin:0 0 8px 18px; padding:0;">
+                                                        <li><b>快速</b>：只填候選人欄位；不產 Career / Skill Summary、不產 Jecho Report。</li>
+                                                        <li><b>完整</b>：填欄位 + Career / Skill Summary + Jecho Report。</li>
+                                                        <li>NBI-ATS 擴充功能傳入的快速 / 完整 ＝ 這兩顆按鈕，行為一致。</li>
+                                                    </ul>
+                                                    <div style="margin-bottom:6px;"><b>📋 直接貼上文字</b></div>
+                                                    <ul style="margin:0 0 0 18px; padding:0;">
+                                                        <li>沒上傳檔案、直接貼上履歷文字也可以解析，欄位照樣會填好。</li>
+                                                        <li>貼上的原文 <b>不會</b>另存為附件（來源不明確，視為流水帳）。</li>
+                                                        <li>完整解析時：另存 <code>Jecho_Report_&lt;姓名&gt;_&lt;日期&gt;_&lt;語言&gt;.md</code>。</li>
+                                                    </ul>
+                                                </div>
+                                            </details>
                                             <?php endif; ?>
                                             <?php if (LicenseUtility::isProfessional() || file_exists('modules/asp')): ?>
                                             &nbsp;
@@ -822,12 +950,14 @@
     }
 
     // Clean up temp file if user leaves the page without saving
-    var _catsFormSubmitting = false;
     document.getElementById('addCandidateForm').addEventListener('submit', function() {
-        _catsFormSubmitting = true;
+        window._catsFormSubmitting = true;
     });
     window.addEventListener('beforeunload', function() {
-        if (_catsFormSubmitting) return;
+        // window._catsFormSubmitting is also set by submitCandidateParserForm()
+        // (used by the AI Fast/Full parse buttons) since form.submit() does not
+        // fire the 'submit' event.
+        if (window._catsFormSubmitting) return;
         var tempFile = document.getElementById('documentTempFile');
         var logID    = document.getElementById('aiParseLogID');
         if ((tempFile && tempFile.value !== '') || (logID && logID.value !== '')) {

@@ -29,7 +29,18 @@ class AIResumeParser
 
     public function isEnabled()
     {
-        return (ENABLE_AI_RESUME_PARSER && OPENAI_API_KEY != '');
+        if (!ENABLE_AI_RESUME_PARSER)
+        {
+            return false;
+        }
+
+        // Test bypass returns canned data, so the API key is irrelevant.
+        if (defined('AI_RESUME_PARSER_TEST_BYPASS') && AI_RESUME_PARSER_TEST_BYPASS)
+        {
+            return true;
+        }
+
+        return (OPENAI_API_KEY != '');
     }
 
 
@@ -51,6 +62,25 @@ class AIResumeParser
     }
 
 
+    /**
+     * Calls OpenAI to extract structured candidate fields from a resume.
+     *
+     * `$options['parseMode']` selects the intensity:
+     *   - 'fast': uses OPENAI_FAST_MODEL (nano), instructs the model to skip
+     *             career_summary, skill_summary, and jecho_report_markdown,
+     *             and caps output tokens at 1500. Used to "fill candidate
+     *             fields" cheaply.
+     *   - 'full': uses OPENAI_MODEL (mini), produces summaries, and (when
+     *             $options['includeJechoReport'] is true) produces the full
+     *             Jecho Report markdown. Output tokens up to 9000.
+     *
+     * 'fast' and 'full' are the canonical mode keys persisted in the
+     * ai_resume_parse_log.parse_mode column and used by the chrome extension's
+     * importMode. UI button labels may differ (the Add/Edit candidate widget
+     * documents the contract — see modules/candidates/Add.tpl).
+     *
+     * Returns the normalized result array, or false on failure.
+     */
     public function parseResumeText($resumeText, $options = array())
     {
         $resumeText = trim($resumeText);
@@ -67,6 +97,12 @@ class AIResumeParser
         }
 
         $resumeText = $this->_truncateResumeText($resumeText);
+
+        if ($this->_isTestBypassEnabled())
+        {
+            return $this->_buildBypassParseResult($options);
+        }
+
         $payload = $this->_buildRequestPayload($resumeText, $options);
         $this->_lastRequest = $payload;
 
@@ -120,6 +156,13 @@ class AIResumeParser
         }
 
         $resumeText = $this->_truncateResumeText($resumeText);
+
+        if ($this->_isTestBypassEnabled())
+        {
+            $this->_lastResponse = $this->_buildBypassFakeResponse();
+            return $this->_buildBypassJechoReportMarkdown($options);
+        }
+
         $payload = $this->_buildJechoReportPayload($resumeText, $options);
         $this->_lastRequest = $payload;
 
@@ -150,7 +193,7 @@ class AIResumeParser
     }
 
 
-    public function makeStandardFilename($candidateName, $languageCode, $extension, $version = 1, $date = false)
+    public function makeStandardFilename($candidateName, $languageCode, $extension, $version = 1, $date = false, $prefix = 'Resume')
     {
         $candidateName = $this->_sanitizeFilenameToken($candidateName);
         $languageCode = strtolower(trim($languageCode));
@@ -170,9 +213,16 @@ class AIResumeParser
             $date = date('Ymd');
         }
 
+        $prefix = preg_replace('/[^A-Za-z0-9_]+/', '_', trim((string) $prefix));
+        $prefix = trim($prefix, '_');
+        if ($prefix == '')
+        {
+            $prefix = 'Resume';
+        }
+
         $version = (int) $version;
         $fileName = sprintf(
-            'Resume_%s_%s_%s',
+            $prefix . '_%s_%s_%s',
             $candidateName,
             $date,
             $languageCode
@@ -199,7 +249,7 @@ class AIResumeParser
         if ($baseName != '')
         {
             $baseName = pathinfo($baseName, PATHINFO_FILENAME);
-            $baseName = preg_replace('/^Resume(?:[\s_]+)/i', '', $baseName);
+            $baseName = preg_replace('/^Resume(?:[\s_]+AI)?[\s_]+/i', '', $baseName);
             $baseName = preg_replace('/^Jecho(?:[\s_]+)AI(?:[\s_]+)Report(?:[\s_]+)/i', '', $baseName);
             $baseName = preg_replace('/(?:[_\s]+(?:zh|en|cn|mixed))+(?:[_\s]+V\d+)?$/i', '', $baseName);
             $baseName = trim($baseName);
@@ -217,6 +267,44 @@ class AIResumeParser
         $fileName = 'Jecho_AI_Report_' . $baseName . '_' . $languageCode;
 
         return $fileName . '.md';
+    }
+
+
+    public function makeNextStandardFilename($candidateName, $languageCode, $extension, $existingFilenames = array(), $prefix = 'Resume')
+    {
+        $baseFileName = $this->makeStandardFilename($candidateName, $languageCode, $extension, 1, false, $prefix);
+
+        $normalizedExisting = $this->_normalizeFilenameArray($existingFilenames);
+        if (!in_array(strtolower($baseFileName), $normalizedExisting))
+        {
+            return $baseFileName;
+        }
+
+        $pathInfo = pathinfo($baseFileName);
+        $baseName = isset($pathInfo['filename']) ? $pathInfo['filename'] : $baseFileName;
+        $fileExtension = isset($pathInfo['extension']) ? $pathInfo['extension'] : $extension;
+        $versionPrefix = $baseName;
+        $nextVersion = 2;
+
+        if (preg_match('/^(.*)_V(\d+)$/', $baseName, $matches))
+        {
+            $versionPrefix = $matches[1];
+            $nextVersion = ((int) $matches[2]) + 1;
+        }
+
+        foreach ($normalizedExisting as $existingFileName)
+        {
+            if (preg_match('/^' . preg_quote(strtolower($versionPrefix), '/') . '_v(\d+)\.' . preg_quote(strtolower($fileExtension), '/') . '$/i', $existingFileName, $matches))
+            {
+                $version = (int) $matches[1];
+                if ($version >= $nextVersion)
+                {
+                    $nextVersion = $version + 1;
+                }
+            }
+        }
+
+        return $versionPrefix . '_V' . $nextVersion . '.' . $fileExtension;
     }
 
 
@@ -295,6 +383,16 @@ class AIResumeParser
 
         $db = DatabaseConnection::getInstance();
 
+        $parseMode = '';
+        if (isset($result['meta']['parse_mode']))
+        {
+            $parseMode = (string) $result['meta']['parse_mode'];
+        }
+        if ($parseMode == '' && $sourceType == 'jecho_report')
+        {
+            $parseMode = 'full';
+        }
+
         $sql = sprintf(
             "INSERT INTO ai_resume_parse_log (
                 site_id,
@@ -308,10 +406,11 @@ class AIResumeParser
                 input_tokens,
                 output_tokens,
                 status,
+                parse_mode,
                 saved_candidate_id,
                 created_at
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0, NOW()
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0, NOW()
             )",
             $db->makeQueryInteger($siteID),
             $db->makeQueryInteger($userID),
@@ -323,7 +422,8 @@ class AIResumeParser
             $db->makeQueryString(isset($result['usage']['model']) ? $result['usage']['model'] : OPENAI_MODEL),
             $db->makeQueryInteger(isset($result['usage']['input_tokens']) ? $result['usage']['input_tokens'] : 0),
             $db->makeQueryInteger(isset($result['usage']['output_tokens']) ? $result['usage']['output_tokens'] : 0),
-            $db->makeQueryString($status)
+            $db->makeQueryString($status),
+            $db->makeQueryString($parseMode)
         );
         $db->query($sql);
         $parseLogID = $db->getLastInsertID();
@@ -536,12 +636,110 @@ class AIResumeParser
     }
 
 
+    private function _isTestBypassEnabled()
+    {
+        return defined('AI_RESUME_PARSER_TEST_BYPASS') && AI_RESUME_PARSER_TEST_BYPASS;
+    }
+
+
+    private function _buildBypassParseResult($options)
+    {
+        $this->_lastRequest = array('test_bypass' => true);
+        $this->_lastResponse = $this->_buildBypassFakeResponse();
+
+        $parseMode = $this->_getParseMode($options);
+        $includeJechoReport = ($parseMode != 'fast') && $this->_shouldIncludeJechoReport($options);
+        $languageHint = isset($options['languageHint']) ? strtolower(trim($options['languageHint'])) : '';
+        $targetLanguage = $this->_getJechoReportTargetLanguage($options, $languageHint);
+
+        $candidate = array(
+            'first_name' => 'Test',
+            'last_name' => 'Bypass',
+            'chinese_name' => '測試 旁路',
+            'email' => 'test.bypass@example.com',
+            'phone' => '0900-000-000',
+            'address' => '101 Demo Road',
+            'city' => 'Taipei',
+            'state' => 'Taipei',
+            'zip_code' => '100',
+            'current_employer' => 'Demo Co.',
+            'job_title_raw' => 'Senior Software Engineer',
+            'job_title_zh' => '資深軟體工程師',
+            'job_title_en' => 'Senior Software Engineer',
+            'job_title_canonical_key' => 'senior_software_engineer',
+            'function_raw' => 'Engineering',
+            'function_zh' => '工程',
+            'function_en' => 'Engineering',
+            'function_canonical_key' => 'engineering',
+            'job_level' => 'Senior',
+            'website' => 'https://example.com',
+            'linkedin' => 'https://www.linkedin.com/in/test-bypass',
+            'github' => 'https://github.com/test-bypass',
+            'facebook' => '',
+            'googleplus' => '',
+            'twitter' => '',
+            'cakeresume' => '',
+            'link1' => '',
+            'link2' => '',
+            'link3' => '',
+            'highest_degree' => 'Master',
+            'major' => 'Computer Science',
+            'skills_raw' => array('PHP', 'JavaScript', 'MySQL', 'Docker'),
+            'skills_zh' => array('PHP', 'JavaScript', 'MySQL', 'Docker'),
+            'skills_en' => array('PHP', 'JavaScript', 'MySQL', 'Docker'),
+            'key_skills_zh' => array('PHP', 'JavaScript', 'MySQL'),
+            'key_skills_en' => array('PHP', 'JavaScript', 'MySQL'),
+            'career_summary' => '[TEST BYPASS] 10+ years building web platforms; this summary is dummy data and was not produced by the AI.',
+            'skill_summary' => '[TEST BYPASS] Strong full-stack web skills; this summary is dummy data and was not produced by the AI.'
+        );
+
+        $result = array(
+            'candidate' => $candidate,
+            'normalization' => array(
+                'job_title_confidence' => 0.99,
+                'function_confidence' => 0.99,
+                'job_level_confidence' => 0.99,
+                'skills_confidence' => 0.99
+            ),
+            'jecho_report_markdown' => $includeJechoReport ? $this->_buildBypassJechoReportMarkdown($options) : ''
+        );
+
+        return $this->_normalizeResult($result, $options);
+    }
+
+
+    private function _buildBypassJechoReportMarkdown($options)
+    {
+        $targetLanguage = $this->_getJechoReportTargetLanguage($options, isset($options['languageHint']) ? $options['languageHint'] : '');
+        if ($targetLanguage == 'en')
+        {
+            return "# [TEST BYPASS] Jecho Report\n\n_This is dummy markdown returned because AI_RESUME_PARSER_TEST_BYPASS is enabled. No OpenAI call was made._\n\n- Name: Test Bypass\n- Title: Senior Software Engineer\n- Skills: PHP, JavaScript, MySQL\n";
+        }
+
+        return "# [TEST BYPASS] Jecho 報告\n\n_此為 dummy 內容，因為 AI_RESUME_PARSER_TEST_BYPASS 為開啟狀態，未呼叫 OpenAI。_\n\n- 姓名：測試 旁路\n- 職稱：資深軟體工程師\n- 技能：PHP、JavaScript、MySQL\n";
+    }
+
+
+    private function _buildBypassFakeResponse()
+    {
+        return array(
+            'model' => defined('OPENAI_MODEL') ? OPENAI_MODEL : 'test-bypass',
+            'usage' => array(
+                'input_tokens' => 0,
+                'output_tokens' => 0
+            )
+        );
+    }
+
+
     private function _buildRequestPayload($resumeText, $options)
     {
         $fileName = isset($options['fileName']) ? trim($options['fileName']) : '';
         $sourceType = isset($options['sourceType']) ? trim($options['sourceType']) : self::DEFAULT_SOURCE_TYPE;
         $languageHint = isset($options['languageHint']) ? trim($options['languageHint']) : '';
-        $includeJechoReport = $this->_shouldIncludeJechoReport($options);
+        $parseMode = $this->_getParseMode($options);
+        $isFastParse = ($parseMode == 'fast');
+        $includeJechoReport = !$isFastParse && $this->_shouldIncludeJechoReport($options);
         $targetLanguage = $this->_getJechoReportTargetLanguage($options, $languageHint);
 
         $instructions = array();
@@ -556,8 +754,15 @@ class AIResumeParser
         $instructions[] = 'website, linkedin, github, facebook, googleplus, twitter, cakeresume, link1, link2, link3: Always output as a full URL starting with https:// or http://. If only a bare domain or path is found (e.g. linkedin.com/in/foo), prepend https://. Use link1/link2/link3 for any additional profile or portfolio URLs that do not fit the named fields.';
         $instructions[] = 'job_level must be one of: intern, junior, mid, senior, staff, principal, lead, manager, director, vp, c_level, or empty.';
         $instructions[] = 'function_en should describe the job function, not simply repeat the raw title.';
-        $instructions[] = 'career_summary: Write 3 to 5 bullet points (using "- " prefix) in Traditional Chinese summarizing the candidate\'s professional background, key experience, and strengths. Each bullet should be one concise sentence.';
-        $instructions[] = 'skill_summary: Write a bullet list (using "- " prefix) in Traditional Chinese listing the candidate\'s skills grouped or ordered by importance. Include technical skills, tools, and soft skills where applicable.';
+        if ($isFastParse)
+        {
+            $instructions[] = 'Fast import mode: Extract only structured candidate fields. Set career_summary, skill_summary, and jecho_report_markdown to empty strings. Do not write summaries or JECHO report content.';
+        }
+        else
+        {
+            $instructions[] = 'career_summary: Write 3 to 5 bullet points (using "- " prefix) in Traditional Chinese summarizing the candidate\'s professional background, key experience, and strengths. Each bullet should be one concise sentence.';
+            $instructions[] = 'skill_summary: Write a bullet list (using "- " prefix) in Traditional Chinese listing the candidate\'s skills grouped or ordered by importance. Include technical skills, tools, and soft skills where applicable.';
+        }
         if ($includeJechoReport)
         {
             $instructions[] = 'Also populate jecho_report_markdown with the final JECHO Markdown report in the requested language.';
@@ -587,10 +792,10 @@ class AIResumeParser
         $input .= "\nResume text:\n" . $resumeText;
 
         return array(
-            'model' => OPENAI_MODEL,
+            'model' => $this->_getModelForOptions($options),
             'instructions' => implode("\n", $instructions),
             'input' => $input,
-            'max_output_tokens' => $includeJechoReport ? 9000 : 2500,
+            'max_output_tokens' => $isFastParse ? 1500 : ($includeJechoReport ? 9000 : 2500),
             'text' => array(
                 'format' => array(
                     'type' => 'json_schema',
@@ -645,6 +850,30 @@ class AIResumeParser
     private function _shouldIncludeJechoReport($options)
     {
         return !empty($options['includeJechoReport']);
+    }
+
+
+    private function _getParseMode($options)
+    {
+        $parseMode = isset($options['parseMode']) ? strtolower(trim($options['parseMode'])) : '';
+        if ($parseMode == 'fast' || $parseMode == 'quick')
+        {
+            return 'fast';
+        }
+
+        return 'full';
+    }
+
+
+    private function _getModelForOptions($options)
+    {
+        if ($this->_getParseMode($options) == 'fast' &&
+            defined('OPENAI_FAST_MODEL') && trim((string) OPENAI_FAST_MODEL) != '')
+        {
+            return OPENAI_FAST_MODEL;
+        }
+
+        return OPENAI_MODEL;
     }
 
 
@@ -1093,7 +1322,7 @@ EOT;
 
         $result['usage'] = array(
             'provider' => 'openai',
-            'model' => isset($this->_lastResponse['model']) ? $this->_lastResponse['model'] : OPENAI_MODEL,
+            'model' => isset($this->_lastResponse['model']) ? $this->_lastResponse['model'] : $this->_getModelForOptions($options),
             'input_tokens' => $this->_getUsageValue($this->_lastResponse, 'input_tokens'),
             'output_tokens' => $this->_getUsageValue($this->_lastResponse, 'output_tokens')
         );
@@ -1110,7 +1339,8 @@ EOT;
         $result['meta'] = array(
             'source_type' => isset($options['sourceType']) ? $options['sourceType'] : self::DEFAULT_SOURCE_TYPE,
             'file_name' => isset($options['fileName']) ? $options['fileName'] : '',
-            'jecho_report_included' => $this->_shouldIncludeJechoReport($options) ? 1 : 0
+            'parse_mode' => $this->_getParseMode($options),
+            'jecho_report_included' => ($this->_getParseMode($options) != 'fast' && $this->_shouldIncludeJechoReport($options)) ? 1 : 0
         );
 
         return $result;

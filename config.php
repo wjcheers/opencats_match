@@ -52,8 +52,14 @@ define('DATABASE_NAME', isset($localConfig['DATABASE_NAME']) ? $localConfig['DAT
 define('ENABLE_AI_RESUME_PARSER', isset($localConfig['ENABLE_AI_RESUME_PARSER']) ? (bool) $localConfig['ENABLE_AI_RESUME_PARSER'] : false);
 define('OPENAI_API_KEY', isset($localConfig['OPENAI_API_KEY']) ? $localConfig['OPENAI_API_KEY'] : '');
 define('OPENAI_MODEL', isset($localConfig['OPENAI_MODEL']) ? $localConfig['OPENAI_MODEL'] : 'gpt-5.4-mini');
+define('OPENAI_FAST_MODEL', isset($localConfig['OPENAI_FAST_MODEL']) ? $localConfig['OPENAI_FAST_MODEL'] : 'gpt-5.4-nano');
 define('OPENAI_BASE_URL', isset($localConfig['OPENAI_BASE_URL']) ? $localConfig['OPENAI_BASE_URL'] : 'https://api.openai.com/v1');
 define('OPENAI_TIMEOUT', isset($localConfig['OPENAI_TIMEOUT']) ? (int) $localConfig['OPENAI_TIMEOUT'] : 60);
+
+/* Test bypass: when true, AIResumeParser returns canned dummy data instead of
+ * calling the OpenAI API. Useful during local UI testing so flows don't burn
+ * tokens. Should be set in config.local.php and never enabled in production. */
+define('AI_RESUME_PARSER_TEST_BYPASS', isset($localConfig['AI_RESUME_PARSER_TEST_BYPASS']) ? (bool) $localConfig['AI_RESUME_PARSER_TEST_BYPASS'] : false);
 
 /* Resfly.com Resume Import Services Enabled */
 define('PARSING_ENABLED', false);

@@ -37,6 +37,14 @@
                                 <td align="right"><?php $this->_($this->aiParseSummary['parseCount']); ?>&nbsp;&nbsp;</td>
                             </tr>
                             <tr class="evenTableRow">
+                                <td align="left">&nbsp;&nbsp;Fast (快速)</td>
+                                <td align="right"><?php $this->_($this->aiParseSummary['fastParseCount']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="oddTableRow">
+                                <td align="left">&nbsp;&nbsp;Full (完整)</td>
+                                <td align="right"><?php $this->_($this->aiParseSummary['fullParseCount']); ?>&nbsp;&nbsp;</td>
+                            </tr>
+                            <tr class="evenTableRow">
                                 <td align="left">Jecho Reports Generated</td>
                                 <td align="right"><?php $this->_($this->aiParseSummary['reportCount']); ?>&nbsp;&nbsp;</td>
                             </tr>
@@ -130,6 +138,7 @@
                                 <th align="left">Date</th>
                                 <th align="left">User</th>
                                 <th align="left">Source</th>
+                                <th align="left">Mode</th>
                                 <th align="left">File</th>
                                 <th align="left">Language</th>
                                 <th align="left">Model</th>
@@ -144,6 +153,7 @@
                                         <td><?php $this->_($row['createdAt']); ?></td>
                                         <td><?php $this->_($row['userFullName']); ?></td>
                                         <td><?php $this->_($row['sourceLabel']); ?></td>
+                                        <td><?php $this->_($row['parseModeLabel']); ?></td>
                                         <td><?php $this->_($row['originalFilename']); ?></td>
                                         <td><?php $this->_($row['documentLanguage']); ?></td>
                                         <td><?php $this->_($row['provider'] . ' / ' . $row['model']); ?></td>
@@ -163,7 +173,7 @@
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr class="evenTableRow">
-                                    <td colspan="10">No records found.</td>
+                                    <td colspan="11">No records found.</td>
                                 </tr>
                             <?php endif; ?>
                         </table>

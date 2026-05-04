@@ -38,6 +38,7 @@
                 <input type="hidden" name="aiParseLogID" id="aiParseLogID" value="<?php echo (isset($this->data['aiParseLogID']) ? $this->data['aiParseLogID'] : ''); ?>" />
                 <input type="hidden" name="aiDocumentLanguage" id="aiDocumentLanguage" value="<?php echo (isset($this->data['aiDocumentLanguage']) ? $this->data['aiDocumentLanguage'] : ''); ?>" />
                 <input type="hidden" name="aiResumeExtension" id="aiResumeExtension" value="<?php echo (isset($this->data['aiResumeExtension']) ? $this->data['aiResumeExtension'] : ''); ?>" />
+                <input type="hidden" name="aiParseMode" id="aiParseMode" value="<?php echo (isset($this->data['aiParseMode']) ? htmlspecialchars($this->data['aiParseMode'], ENT_QUOTES) : 'full'); ?>" />
                 <input type="hidden" name="aiJechoReportRequested" id="aiJechoReportRequested" value="<?php echo (!empty($this->data['aiJechoReportRequested']) || (!isset($this->data['aiJechoReportRequested']) && !empty($this->data['aiSavePasteAsJechoReport']))) ? '1' : '0'; ?>" />
                 <input type="hidden" name="extensionSourceURL" id="extensionSourceURL" value="<?php echo (isset($this->data['extensionSourceURL']) ? htmlspecialchars($this->data['extensionSourceURL'], ENT_QUOTES) : ''); ?>" />
                 <input type="hidden" name="extensionSourcePageTitle" id="extensionSourcePageTitle" value="<?php echo (isset($this->data['extensionSourcePageTitle']) ? htmlspecialchars($this->data['extensionSourcePageTitle'], ENT_QUOTES) : ''); ?>" />
@@ -206,6 +207,51 @@
                             <img title="Unchecking this box indicates the candidate is inactive, and will no longer display on the resume search results." src="images/information.gif" alt="" width="16" height="16" />
                         </td>
                         <td rowspan="12" align="center" valign="top">
+                            <?php
+                            /* =========================================================================
+                             * Resume widget (Edit candidate) — Upload / Paste / Fast / Full
+                             * =========================================================================
+                             *
+                             * Mirror of the comment block in modules/candidates/Add.tpl. Keep the
+                             * two in sync when the design changes — the underlying flow is the
+                             * same, just running on an existing candidate.
+                             *
+                             * Two orthogonal concerns:
+                             *
+                             *   (1) Upload  -> attaches a file to the candidate at save time.
+                             *   (2) Parse   -> calls the AI to suggest field updates (shown as
+                             *                  the AI-suggestion table); two intensities
+                             *                  Fast / Full.
+                             *
+                             * Behavior summary (see Add.tpl for the long version):
+                             *
+                             *   - Upload click  -> file pinned in `documentTempFile`; (remove)
+                             *                      cancels by clearing the field and unlinking
+                             *                      the temp file.
+                             *   - Save:
+                             *       * documentTempFile present + parse ran
+                             *           -> Resume_<Name>_<YYYYMMDD>_<lang>.<ext> attachment
+                             *              (collisions get _V2 / _V3 / ...)
+                             *       * documentTempFile present + parse did NOT run
+                             *           -> original filename kept as-is ("Other" rule)
+                             *   - Fast vs Full:
+                             *       * Model:   Fast = OPENAI_FAST_MODEL (nano);  Full = OPENAI_MODEL (mini)
+                             *       * Output:  Fast skips career_summary, skill_summary, and
+                             *                  jecho_report_markdown.
+                             *                  Full produces summaries; Jecho depends on
+                             *                  aiJechoReportRequested.
+                             *   - Paste only (no Upload):
+                             *       * Fast + paste -> NO attachment (paste is throwaway raw input)
+                             *       * Full + paste -> Jecho_Report_*.md only (paste is NOT persisted)
+                             *   - Extension import: importMode 'fast' / 'full' maps 1:1 to
+                             *     aiParseMode 'fast' / 'full'. Same downstream behavior.
+                             *
+                             * Canonical mode keys: 'fast' / 'full' (DB column, API options,
+                             * extension importMode). UI labels may differ — don't rename keys.
+                             *
+                             * =========================================================================
+                             */
+                            ?>
                             <?php if ($this->isParsingEnabled): ?>
                                 <input type="hidden" name="loadDocument" id="loadDocument" value="" />
                                 <input type="hidden" name="parseDocument" id="parseDocument" value="" />
@@ -239,10 +285,7 @@
                                             <?php endif; ?>
                                             <textarea class="inputbox" tabindex="90" name="documentText" id="documentText" rows="5" cols="40" onmousemove="documentCheck();" onchange="documentCheck();" onmousedown="documentCheck();" onkeypress="documentCheck();" style="width: 500px; height: 210px; padding: 3px;"><?php echo $this->contents; ?></textarea>
                                             <br/>
-                                            <label style="display:block; width:500px; margin:6px auto 0 auto; text-align:left; color:#4f5b66; font-size:11px; line-height:15px;">
-                                                <input type="checkbox" id="aiSavePasteAsJechoReport" name="aiSavePasteAsJechoReport" value="1"<?php if (!empty($this->data['aiSavePasteAsJechoReport'])): ?> checked<?php endif; ?> />
-                                                AI 解析後將貼上/Extension 匯入內容另存為 Jecho_AI_Report_*.md 附件
-                                            </label>
+                                            <input type="checkbox" id="aiSavePasteAsJechoReport" name="aiSavePasteAsJechoReport" value="1" style="display:none;"<?php if (!empty($this->data['aiSavePasteAsJechoReport'])): ?> checked<?php endif; ?> />
                                             <div style="color: #666666; text-align: center;">
                                             (<b>hint:</b> you may also paste the resume contents)
                                             <br /><br />
@@ -251,14 +294,52 @@
                                                 <button
                                                     type="button"
                                                     id="transfer"
-                                                    onclick="parseDocumentFileContents();"
+                                                    data-label="完整解析"
+                                                    onclick="parseDocumentFileContents('full');"
                                                     <?php if ($this->contents == ''): ?>disabled="disabled"<?php endif; ?>
                                                     style="padding:6px 12px; border:1px solid #2f6fad; border-radius:4px; background:<?php echo ($this->contents != '' ? '#3f84c5' : '#d7dfe8'); ?>; color:<?php echo ($this->contents != '' ? '#ffffff' : '#6b7785'); ?>; font-size:12px; font-weight:bold; cursor:<?php echo ($this->contents != '' ? 'pointer' : 'not-allowed'); ?>;"
-                                                >AI 解析履歷</button>
-                                                <span style="display:block; margin-top:5px; font-size:11px; color:#666666;">使用上方上傳或貼上的履歷內容，產生可選擇套用的候選人欄位。</span>
+                                                >完整解析</button>
+                                                <button
+                                                    type="button"
+                                                    id="transferFast"
+                                                    data-label="快速解析"
+                                                    onclick="parseDocumentFileContents('fast');"
+                                                    <?php if ($this->contents == ''): ?>disabled="disabled"<?php endif; ?>
+                                                    style="padding:6px 12px; margin-left:6px; border:1px solid #2f6fad; border-radius:4px; background:<?php echo ($this->contents != '' ? '#3f84c5' : '#d7dfe8'); ?>; color:<?php echo ($this->contents != '' ? '#ffffff' : '#6b7785'); ?>; font-size:12px; font-weight:bold; cursor:<?php echo ($this->contents != '' ? 'pointer' : 'not-allowed'); ?>;"
+                                                >快速解析</button>
+                                                <span style="display:block; margin-top:5px; font-size:11px; color:#666666;">快速解析只填候選人欄位；完整解析會另存 Jecho_AI_Report_*.md。</span>
                                             </span>
                                             <span id="aiParsingLoading" style="display:none; margin-left:8px; font-size:11px; color:#7a6000; background:#fffbe6; border:1px solid #e6c700; padding:3px 8px; vertical-align:middle;">&#x23F3; AI 解析中，請稍候...</span>
                                             <br /><br />
+                                            <details style="display:inline-block; position:relative; text-align:left; font-size:11px; line-height:1.65; color:#4f5b66; vertical-align:top;">
+                                                <summary style="cursor:pointer; font-weight:bold; color:#2f6fad; list-style:none; padding:3px 10px; border:1px solid #d8dde2; border-radius:4px; background:#f7f9fb; user-select:none; display:inline-block;">📋 操作說明（Upload / 解析 / 貼上）</summary>
+                                                <div style="position:absolute; top:100%; left:50%; transform:translateX(-50%); margin-top:4px; width:<?php if ($this->isModal): ?>320<?php else: ?>500<?php endif; ?>px; padding:10px 14px; background:#ffffff; border:1px solid #d8dde2; border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,0.12); z-index:10;">
+                                                    <div style="margin-bottom:6px;"><b>📎 Upload 上傳檔案</b></div>
+                                                    <ul style="margin:0 0 8px 18px; padding:0;">
+                                                        <li>選檔 → 按 <b>Upload</b>，檔案暫存；按 <b>Save</b> 才會正式存成附件。</li>
+                                                        <li>點 <b>(remove)</b> 可取消這次上傳。</li>
+                                                        <li>Upload 跟下方的「快速 / 完整解析」是獨立動作，互不影響。</li>
+                                                    </ul>
+                                                    <div style="margin-bottom:6px;"><b>🏷️ 附件檔名規則</b></div>
+                                                    <ul style="margin:0 0 8px 18px; padding:0;">
+                                                        <li>有跑過解析 → <code>Resume_&lt;姓名&gt;_&lt;日期&gt;_&lt;語言&gt;.&lt;副檔名&gt;</code>。</li>
+                                                        <li>同名衝突 → 自動加 <code>_V2</code>、<code>_V3</code>…</li>
+                                                        <li>沒跑解析 → 保留原檔名（無法判定是不是履歷）。</li>
+                                                    </ul>
+                                                    <div style="margin-bottom:6px;"><b>🤖 AI 解析（快速 vs 完整）</b></div>
+                                                    <ul style="margin:0 0 8px 18px; padding:0;">
+                                                        <li><b>快速</b>：只填候選人欄位；不產 Career / Skill Summary、不產 Jecho Report。</li>
+                                                        <li><b>完整</b>：填欄位 + Career / Skill Summary + Jecho Report。</li>
+                                                        <li>NBI-ATS 擴充功能傳入的快速 / 完整 ＝ 這兩顆按鈕，行為一致。</li>
+                                                    </ul>
+                                                    <div style="margin-bottom:6px;"><b>📋 直接貼上文字</b></div>
+                                                    <ul style="margin:0 0 0 18px; padding:0;">
+                                                        <li>沒上傳檔案、直接貼上履歷文字也可以解析，欄位照樣會填好。</li>
+                                                        <li>貼上的原文 <b>不會</b>另存為附件（來源不明確，視為流水帳）。</li>
+                                                        <li>完整解析時：另存 <code>Jecho_Report_&lt;姓名&gt;_&lt;日期&gt;_&lt;語言&gt;.md</code>。</li>
+                                                    </ul>
+                                                </div>
+                                            </details>
                                             <?php endif; ?>
                                             </div>
                                         </td>

@@ -939,6 +939,8 @@ class ReportsUI extends UserInterface
             return array(
                 'totalCount' => 0,
                 'parseCount' => 0,
+                'fastParseCount' => 0,
+                'fullParseCount' => 0,
                 'reportCount' => 0,
                 'savedCount' => 0,
                 'successCount' => 0,
@@ -953,6 +955,8 @@ class ReportsUI extends UserInterface
             "SELECT
                 COUNT(*) AS totalCount,
                 SUM(source_type IN ('upload', 'paste')) AS parseCount,
+                SUM(source_type <> 'jecho_report' AND parse_mode = 'fast') AS fastParseCount,
+                SUM(source_type <> 'jecho_report' AND parse_mode = 'full') AS fullParseCount,
                 SUM(source_type = 'jecho_report') AS reportCount,
                 SUM(status = 'saved') AS savedCount,
                 SUM(status IN ('success', 'saved')) AS successCount,
@@ -969,6 +973,8 @@ class ReportsUI extends UserInterface
         return array(
             'totalCount' => isset($rs['totalCount']) ? (int) $rs['totalCount'] : 0,
             'parseCount' => isset($rs['parseCount']) ? (int) $rs['parseCount'] : 0,
+            'fastParseCount' => isset($rs['fastParseCount']) ? (int) $rs['fastParseCount'] : 0,
+            'fullParseCount' => isset($rs['fullParseCount']) ? (int) $rs['fullParseCount'] : 0,
             'reportCount' => isset($rs['reportCount']) ? (int) $rs['reportCount'] : 0,
             'savedCount' => isset($rs['savedCount']) ? (int) $rs['savedCount'] : 0,
             'successCount' => isset($rs['successCount']) ? (int) $rs['successCount'] : 0,
@@ -997,6 +1003,7 @@ class ReportsUI extends UserInterface
                 ai_resume_parse_log.input_tokens AS inputTokens,
                 ai_resume_parse_log.output_tokens AS outputTokens,
                 ai_resume_parse_log.status AS status,
+                ai_resume_parse_log.parse_mode AS parseMode,
                 ai_resume_parse_log.saved_candidate_id AS savedCandidateID,
                 DATE_FORMAT(ai_resume_parse_log.created_at, '%%m-%%d-%%y %%h:%%i %%p') AS createdAt,
                 CONCAT(user.first_name, ' ', user.last_name) AS userFullName
@@ -1017,6 +1024,10 @@ class ReportsUI extends UserInterface
         {
             $records[$index]['sourceLabel'] = $this->formatAIUsageSourceType($row['sourceType']);
             $records[$index]['statusLabel'] = $this->formatAIUsageStatus($row['status']);
+            $records[$index]['parseModeLabel'] = $this->formatAIUsageParseMode(
+                isset($row['parseMode']) ? $row['parseMode'] : '',
+                $row['sourceType']
+            );
         }
 
         return $records;
@@ -1095,6 +1106,26 @@ class ReportsUI extends UserInterface
 
             default:
                 return ucwords(str_replace('_', ' ', $status));
+        }
+    }
+
+    private function formatAIUsageParseMode($parseMode, $sourceType)
+    {
+        if ($sourceType == 'jecho_report')
+        {
+            return 'Full';
+        }
+
+        switch (strtolower((string) $parseMode))
+        {
+            case 'fast':
+                return 'Fast';
+
+            case 'full':
+                return 'Full';
+
+            default:
+                return '';
         }
     }
 

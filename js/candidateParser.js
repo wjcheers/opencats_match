@@ -55,29 +55,98 @@ function isAIParseAllowedByDocumentState()
 
 function setTransferButtonEnabled(enabled)
 {
-    var button = document.getElementById('transfer');
-
-    if (!button)
-    {
-        return;
-    }
-
     if (transferButtonLocked)
     {
+        setAIParseButtonsEnabled(false);
         setAIJechoReportCheckboxEnabled(false);
         return;
     }
 
     enabled = enabled && isAIParseAllowedByDocumentState();
-
-    button.disabled = !enabled;
-    button.style.cursor = enabled ? 'pointer' : 'not-allowed';
-    button.style.background = enabled ? '#3f84c5' : '#d7dfe8';
-    button.style.borderColor = enabled ? '#2f6fad' : '#b8c3cf';
-    button.style.color = enabled ? '#ffffff' : '#6b7785';
-    button.innerHTML = 'AI 解析履歷';
-    button.title = enabled ? '' : getAIParseDisabledReason();
+    setAIParseButtonsEnabled(enabled);
     setAIJechoReportCheckboxEnabled(enabled);
+}
+
+function setAIParseButtonsEnabled(enabled)
+{
+    var buttons = getAIParseButtons();
+    for (var i = 0; i < buttons.length; i++)
+    {
+        var button = buttons[i];
+        var label = button.getAttribute('data-label') || button.innerHTML || 'AI 解析履歷';
+        button.disabled = !enabled;
+        button.style.cursor = enabled ? 'pointer' : 'not-allowed';
+        button.style.background = enabled ? '#3f84c5' : '#d7dfe8';
+        button.style.borderColor = enabled ? '#2f6fad' : '#b8c3cf';
+        button.style.color = enabled ? '#ffffff' : '#6b7785';
+        button.innerHTML = label;
+        button.title = enabled ? '' : getAIParseDisabledReason();
+    }
+}
+
+function getAIParseButtons()
+{
+    var buttons = [];
+    var ids = ['transfer', 'transferFast'];
+    for (var i = 0; i < ids.length; i++)
+    {
+        var button = document.getElementById(ids[i]);
+        if (button)
+        {
+            buttons.push(button);
+        }
+    }
+
+    return buttons;
+}
+
+function setAIParseButtonsParsing(parseMode)
+{
+    var buttons = getAIParseButtons();
+    for (var i = 0; i < buttons.length; i++)
+    {
+        var button = buttons[i];
+        button.disabled = true;
+        button.style.cursor = 'wait';
+        button.style.background = '#d7dfe8';
+        button.style.borderColor = '#b8c3cf';
+        button.style.color = '#6b7785';
+        button.innerHTML = button.id == 'transferFast' && parseMode == 'fast'
+            ? '快速解析中...'
+            : (button.id == 'transfer' && parseMode == 'full' ? '完整解析中...' : (button.getAttribute('data-label') || button.innerHTML));
+        button.onclick = null;
+    }
+}
+
+function setAIParseMode(parseMode)
+{
+    parseMode = parseMode == 'fast' ? 'fast' : 'full';
+    var mode = document.getElementById('aiParseMode');
+    var checkbox = document.getElementById('aiSavePasteAsJechoReport');
+    var requested = document.getElementById('aiJechoReportRequested');
+    if (mode)
+    {
+        mode.value = parseMode;
+    }
+    if (checkbox)
+    {
+        checkbox.checked = parseMode != 'fast';
+    }
+    if (requested)
+    {
+        requested.value = parseMode == 'fast' ? '0' : '1';
+    }
+}
+
+function syncAIJechoReportRequestForParseMode(parseMode)
+{
+    if (parseMode == 'fast')
+    {
+        setAIParseMode('fast');
+        return;
+    }
+
+    setAIParseMode('full');
 }
 
 function getAIParseDisabledReason()
@@ -113,6 +182,12 @@ function submitCandidateParserForm()
         return;
     }
 
+    // form.submit() does NOT fire the 'submit' event, so the Add page's
+    // beforeunload handler (which keys off _catsFormSubmitting) would
+    // otherwise race a sendBeacon(removeDocumentTempFile) against the
+    // parse POST and delete the just-uploaded temp file mid-flight.
+    window._catsFormSubmitting = true;
+
     if (window.HTMLFormElement && HTMLFormElement.prototype.submit)
     {
         HTMLFormElement.prototype.submit.call(form);
@@ -143,13 +218,19 @@ function loadDocumentFileContents()
     }, 10);
 }
 
-function parseDocumentFileContents(silent)
+function parseDocumentFileContents(parseMode, silent)
 {
+    if (parseMode === true || parseMode === false)
+    {
+        silent = parseMode;
+        parseMode = 'full';
+    }
+    parseMode = parseMode == 'fast' ? 'fast' : 'full';
+
     var text = document.getElementById('documentText');
     var file = document.getElementById('documentFile');
     var obj = document.getElementById('loadDocument');
     var obj2 = document.getElementById('parseDocument');
-    var button = document.getElementById('transfer');
 
     obj.value = '';
     obj2.value = '';
@@ -167,9 +248,9 @@ function parseDocumentFileContents(silent)
 
     if (!silent)
     {
-        var confirmMessage = document.getElementById('editCandidateForm')
-            ? 'AI 解析履歷後會顯示可套用欄位，您可以選擇要補充哪些資料。是否繼續？'
-            : 'AI 解析履歷會覆蓋目前表單中的候選人欄位資料，是否繼續？';
+        var confirmMessage = parseMode == 'fast'
+            ? '快速解析只會萃取候選人欄位，不會產生 Summary/Jecho Report。是否繼續？'
+            : '完整解析會萃取候選人欄位並產生 Jecho Report。是否繼續？';
 
         if (!window.confirm(confirmMessage))
         {
@@ -179,19 +260,9 @@ function parseDocumentFileContents(silent)
 
     obj.value = 'true';
     obj2.value = 'true';
-    syncAIJechoReportRequestFromCheckbox();
+    syncAIJechoReportRequestForParseMode(parseMode);
     transferButtonLocked = true;
-
-    if (button)
-    {
-        button.disabled = true;
-        button.style.cursor = 'wait';
-        button.style.background = '#d7dfe8';
-        button.style.borderColor = '#b8c3cf';
-        button.style.color = '#6b7785';
-        button.innerHTML = 'AI 解析中...';
-        button.onclick = null;
-    }
+    setAIParseButtonsParsing(parseMode);
     setAIJechoReportCheckboxEnabled(false);
     var loading = document.getElementById('aiParsingLoading');
     if (loading)
@@ -270,6 +341,7 @@ function removeDocumentFile()
     var obj6 = document.getElementById('aiParseLogID');
     var obj7 = document.getElementById('aiDocumentLanguage');
     var obj8 = document.getElementById('aiResumeExtension');
+    var obj11 = document.getElementById('aiParseMode');
 
     if ((obj2.value != '') || (obj6 && obj6.value != ''))
     {
@@ -320,6 +392,10 @@ function removeDocumentFile()
     if (obj10)
     {
         obj10.value = '0';
+    }
+    if (obj11)
+    {
+        obj11.value = 'full';
     }
     if (obj5)
     {

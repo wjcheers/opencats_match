@@ -1,5 +1,7 @@
 .DS_Store
 config.local.php
+cleanup.time
+queue.time
 attachments/site_*/
 !attachments/site_*/index.php
 upload/addcandidate/*

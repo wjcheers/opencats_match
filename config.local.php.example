@@ -11,5 +11,10 @@ return array(
     'OPENAI_API_KEY' => '',
     'OPENAI_MODEL' => 'gpt-5.4-mini',
     'OPENAI_BASE_URL' => 'https://api.openai.com/v1',
-    'OPENAI_TIMEOUT' => 60
+    'OPENAI_TIMEOUT' => 60,
+
+    /* Local-only test flag: when true, AIResumeParser skips the OpenAI HTTP
+     * call and returns canned dummy data so you can iterate on the parse UI
+     * without burning tokens. Leave false (or unset) in production. */
+    'AI_RESUME_PARSER_TEST_BYPASS' => false
 );
